@@ -2,8 +2,8 @@
   "name": "docx-kit",
   "type": "module",
   "version": "0.0.0",
-  "packageManager": "pnpm@10.27.0",
-  "description": "TypeScript library for generating Word (.docx) documents easily with rich content, styles, and intuitive, customizable API.",
+  "packageManager": "pnpm@11.5.2",
+  "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
   "keywords": [
     "document",
     "docx",
@@ -29,6 +29,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
     }
   },
   "main": "./dist/index.js",
@@ -52,25 +60,37 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "echarts": ">=5.0.0",
+    "qrcode": ">=1.5.0"
+  },
+  "peerDependenciesMeta": {
+    "echarts": {
+      "optional": true
+    },
+    "qrcode": {
+      "optional": true
+    }
+  },
   "dependencies": {
-    "@ntnyq/utils": "^0.10.0",
-    "docx": "^9.5.1",
-    "echarts": "^6.0.0",
-    "qrcode": "^1.5.4"
+    "docx": "^9.7.1"
   },
   "devDependencies": {
-    "@ntnyq/eslint-config": "^5.9.0",
+    "@ntnyq/eslint-config": "^6.1.5",
     "@ntnyq/prettier-config": "^3.0.1",
-    "@types/node": "^25.0.3",
-    "bumpp": "^10.3.2",
-    "eslint": "^9.39.2",
+    "@types/node": "^25.9.2",
+    "@types/qrcode": "^1.5.5",
+    "bumpp": "^11.1.0",
+    "echarts": "^6.1.0",
+    "eslint": "^10.4.1",
     "husky": "^9.1.7",
-    "nano-staged": "^0.9.0",
-    "npm-run-all2": "^8.0.4",
-    "prettier": "^3.7.4",
-    "tsdown": "^0.19.0-beta.3",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.16"
+    "nano-staged": "^1.0.2",
+    "npm-run-all2": "^9.0.1",
+    "prettier": "^3.8.4",
+    "qrcode": "^1.5.4",
+    "tsdown": "^0.22.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
   },
   "nano-staged": {
     "*.{js,ts,mjs,cjs,md,vue,yml,yaml,toml,json}": "eslint --fix",
