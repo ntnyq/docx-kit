@@ -7,6 +7,7 @@
  * @module style/normalizeStyle
  */
 
+import { DocxKitError } from '../errors'
 import type { DocxStyleRule, StyleSheet } from '../types/style'
 
 /**
@@ -40,11 +41,20 @@ export function resolveStyle(options: {
   const classNames = Array.isArray(options.className)
     ? options.className
     : options.className
-      ? options.className.split(/\s+/)
+      ? options.className.split(/\s+/).filter(Boolean)
       : []
 
   const classStyles = classNames
-    .map(name => options.styles?.[name])
+    .map(name => {
+      const rule = options.styles?.[name]
+      if (options.styles != null && rule == null) {
+        throw new DocxKitError(
+          'STYLE_UNKNOWN_CLASS',
+          `Style class not found: "${name}"`,
+        )
+      }
+      return rule
+    })
     .filter((s): s is DocxStyleRule => s != null)
 
   return Object.assign({}, options.base, ...classStyles, options.inline)

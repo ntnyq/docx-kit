@@ -26,9 +26,11 @@
  * ```
  */
 
-import { ImageRun, Paragraph } from 'docx'
+import { Paragraph } from 'docx'
+import { DocxKitError, ERROR_CODES } from '../../errors'
 import { definePlugin } from '../../types/plugin'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
+import { createImageRun } from '../../utils/image'
 
 // Use type-only import so the dep stays optional at runtime
 import type { EChartsOption } from 'echarts'
@@ -109,12 +111,12 @@ export function echartsPlugin() {
         width,
       })
 
-      const imageRun = new ImageRun({
+      const imageRun = createImageRun({
         data: image.data,
-        transformation: { height, width },
-
-        type: image.type as any,
-      } as any)
+        height,
+        type: image.type,
+        width,
+      })
 
       const paragraphs: Paragraph[] = [new Paragraph({ children: [imageRun] })]
 
@@ -196,7 +198,8 @@ async function renderInNode(
   _option: EChartsOption,
   _config: RenderConfig,
 ): Promise<RenderImageResult> {
-  throw new Error(
+  throw new DocxKitError(
+    ERROR_CODES.PLUGIN_RENDER_FAILED,
     'ECharts Node renderer is not built-in. '
       + 'Use a server-side canvas implementation (e.g. node-canvas + echarts) '
       + 'and provide a custom render function. '

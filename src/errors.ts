@@ -14,14 +14,10 @@ export const ERROR_CODES = {
   EXPORT_FAILED: 'EXPORT_FAILED',
   /** Image data is empty, corrupt, or unsupported. */
   IMAGE_INVALID_DATA: 'IMAGE_INVALID_DATA',
-  /** Could not determine image format. */
-  IMAGE_UNKNOWN_TYPE: 'IMAGE_UNKNOWN_TYPE',
   /** A plugin node referenced an unregistered plugin. */
   PLUGIN_NOT_REGISTERED: 'PLUGIN_NOT_REGISTERED',
   /** A plugin's `render()` method threw an error. */
   PLUGIN_RENDER_FAILED: 'PLUGIN_RENDER_FAILED',
-  /** Invalid unit string was provided. */
-  STYLE_INVALID_UNIT: 'STYLE_INVALID_UNIT',
   /** A `className` referenced a stylesheet key that doesn't exist. */
   STYLE_UNKNOWN_CLASS: 'STYLE_UNKNOWN_CLASS',
   /** Table was created with no columns. */

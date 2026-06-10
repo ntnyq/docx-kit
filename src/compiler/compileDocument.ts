@@ -81,7 +81,9 @@ export async function compileDocument<TStyles extends StyleSheet>(
   return new Document({
     creator: options.config.metadata?.creator,
     description: options.config.metadata?.description,
-
+    keywords: options.config.metadata?.keywords?.join(', '),
+    lastModifiedBy: options.config.metadata?.lastModifiedBy,
+    subject: options.config.metadata?.subject,
     title: options.config.metadata?.title,
     sections: [
       {

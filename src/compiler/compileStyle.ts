@@ -45,7 +45,7 @@ export function compileBorder(style: DocxStyleRule) {
   }
 
   return {
-    bottom: bl ? compileSingleBorder(bb!) : undefined,
+    bottom: bb ? compileSingleBorder(bb!) : undefined,
     left: bl ? compileSingleBorder(bl!) : undefined,
     right: br ? compileSingleBorder(br!) : undefined,
     top: bt ? compileSingleBorder(bt!) : undefined,

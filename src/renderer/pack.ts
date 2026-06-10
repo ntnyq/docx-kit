@@ -9,6 +9,7 @@
  */
 
 import { Packer } from 'docx'
+import { DocxKitError } from '../errors'
 import type { Document } from 'docx'
 
 /**
@@ -24,7 +25,15 @@ import type { Document } from 'docx'
  * ```
  */
 export async function packToBase64String(doc: Document): Promise<string> {
-  return Packer.toBase64String(doc)
+  try {
+    return await Packer.toBase64String(doc)
+  } catch (err) {
+    throw new DocxKitError(
+      'EXPORT_FAILED',
+      'Failed to pack document to base64',
+      err,
+    )
+  }
 }
 
 /**
@@ -41,7 +50,15 @@ export async function packToBase64String(doc: Document): Promise<string> {
  * ```
  */
 export async function packToBlob(doc: Document): Promise<Blob> {
-  return Packer.toBlob(doc)
+  try {
+    return await Packer.toBlob(doc)
+  } catch (err) {
+    throw new DocxKitError(
+      'EXPORT_FAILED',
+      'Failed to pack document to blob',
+      err,
+    )
+  }
 }
 
 /**
@@ -62,8 +79,16 @@ export async function packToBlob(doc: Document): Promise<Blob> {
  * ```
  */
 export async function packToBuffer(doc: Document): Promise<Uint8Array> {
-  const buffer = await Packer.toBuffer(doc)
-  return new Uint8Array(buffer)
+  try {
+    const buffer = await Packer.toBuffer(doc)
+    return new Uint8Array(buffer)
+  } catch (err) {
+    throw new DocxKitError(
+      'EXPORT_FAILED',
+      'Failed to pack document to buffer',
+      err,
+    )
+  }
 }
 
 /**

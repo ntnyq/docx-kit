@@ -16,9 +16,10 @@
  * ```
  */
 
-import { ImageRun, Paragraph } from 'docx'
+import { Paragraph } from 'docx'
 import { definePlugin } from '../../types/plugin'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
+import { createImageRun } from '../../utils/image'
 
 /**
  * Options for the QRCode plugin.
@@ -84,12 +85,12 @@ export function qrcodePlugin() {
 
       const imageData = await dataUrlToUint8Array(dataUrl)
 
-      const imageRun = new ImageRun({
+      const imageRun = createImageRun({
         data: imageData,
-        transformation: { height: size, width: size },
-
-        type: 'png' as any,
-      } as any)
+        height: size,
+        type: 'png',
+        width: size,
+      })
 
       const paragraphs: Paragraph[] = [new Paragraph({ children: [imageRun] })]
 

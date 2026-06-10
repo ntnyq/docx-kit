@@ -47,6 +47,7 @@ export class DocxBuilder<
 > {
   private readonly config: DocxKitConfig<TStyles>
   private readonly nodes: BlockNode<TStyles>[] = []
+  private readonly pendingSetups: Promise<void>[] = []
   private readonly pluginMap = new Map<string, DocxPlugin>()
 
   constructor(config: DocxKitConfig<TStyles> = {}) {
@@ -258,6 +259,9 @@ export class DocxBuilder<
   /**
    * Save the document to a file (Node.js only).
    *
+   * **⚠️ Not available in browser environments.**
+   * Use {@link toBlob} and trigger a download instead.
+   *
    * @param filename - — Output file path (e.g. `"report.docx"`)
    *
    * @example
@@ -332,7 +336,10 @@ export class DocxBuilder<
   }
 
   /**
-   * Export the document as a `Uint8Array` (browser & Node.js).
+   * Export the document as a `Uint8Array` (alias for {@link toUint8Array}).
+   *
+   * **Note:** Despite the name, this returns a standard `Uint8Array`,
+   * not a Node.js `Buffer`. Prefer using {@link toUint8Array} for clarity.
    *
    * @returns Raw .docx bytes
    *
@@ -343,8 +350,7 @@ export class DocxBuilder<
    * ```
    */
   async toBuffer(): Promise<Uint8Array> {
-    const { packToBuffer } = await import('../renderer/pack')
-    return packToBuffer(await this.toDocument())
+    return this.toUint8Array()
   }
 
   /**
@@ -356,6 +362,9 @@ export class DocxBuilder<
    * @returns A `docx` `Document` object
    */
   async toDocument() {
+    // Await all plugin setups before compiling
+    await Promise.all(this.pendingSetups)
+    this.pendingSetups.length = 0
     const { compileDocument } = await import('../compiler/compileDocument')
     return compileDocument({
       config: this.config,
@@ -379,6 +388,25 @@ export class DocxBuilder<
   }
 
   /**
+   * Export the document as a `Uint8Array` (browser & Node.js).
+   *
+   * This is the preferred cross-platform export method.
+   *
+   * @returns Raw .docx bytes
+   *
+   * @example
+   * ```ts
+   * const bytes = await doc.toUint8Array()
+   * // In Node.js: import { writeFileSync } from 'node:fs'
+   * // In browser: trigger a download
+   * ```
+   */
+  async toUint8Array(): Promise<Uint8Array> {
+    const { packToBuffer } = await import('../renderer/pack')
+    return packToBuffer(await this.toDocument())
+  }
+
+  /**
    * Register a plugin.
    *
    * The plugin's name and options type are accumulated into the builder's
@@ -398,6 +426,9 @@ export class DocxBuilder<
     plugin: DocxPlugin<TName, TOptions>,
   ): DocxBuilder<TStyles, Record<TName, TOptions> & TPlugins> {
     this.pluginMap.set(plugin.name, plugin as DocxPlugin)
+    if (plugin.setup) {
+      this.pendingSetups.push(Promise.resolve(plugin.setup()))
+    }
     return this as unknown as DocxBuilder<
       TStyles,
       Record<TName, TOptions> & TPlugins

@@ -9,7 +9,6 @@
 
 import {
   HeadingLevel,
-  ImageRun,
   PageBreak,
   Paragraph,
   Table,
@@ -21,6 +20,7 @@ import {
 import { DocxKitError } from '../errors'
 import { resolveStyle } from '../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../utils/dataUrl'
+import { createImageRun } from '../utils/image'
 import {
   compileCellStyle,
   compileColumnWidth,
@@ -189,22 +189,24 @@ async function compileImage<TStyles extends StyleSheet>(
   node: ImageNode<TStyles>,
   _config: DocxKitConfig<TStyles>,
 ) {
+  if (
+    node.data == null
+    || (typeof node.data === 'string' && node.data.length === 0)
+  ) {
+    throw new DocxKitError('IMAGE_INVALID_DATA', 'Image data is empty or null')
+  }
+
   const data = await normalizeImageData(node.data)
-  const imageType = node.imageType ?? guessImageType(node.data)
+  const imageType = node.imageType ?? 'png'
 
   return new Paragraph({
     children: [
-      new ImageRun({
-        data: data as any,
-
-        type: imageType as any,
-        floating: compileFloating(node.floating) as
-          | import('docx').IFloating
-          | undefined,
-        transformation: {
-          height: toPx(node.height) ?? 180,
-          width: toPx(node.width) ?? 300,
-        },
+      createImageRun({
+        data,
+        floating: compileFloating(node.floating),
+        height: toPx(node.height),
+        type: imageType,
+        width: toPx(node.width),
       }),
     ],
   })
@@ -230,21 +232,25 @@ function compileParagraph<TStyles extends StyleSheet>(
 
   const children =
     node.children && node.children.length > 0
-      ? node.children.map(
-          child =>
-            child.type === 'text'
-              ? new TextRun({
-                  text: child.text,
-                  ...compileTextStyle(
-                    resolveStyle({
-                      base: style,
-                      className: child.className,
-                      inline: child.style,
-                      styles: config.styles,
-                    }),
-                  ),
-                })
-              : new TextRun({ text: '' }), // inline image not supported yet
+      ? node.children.map(child =>
+          child.type === 'text'
+            ? new TextRun({
+                text: child.text,
+                ...compileTextStyle(
+                  resolveStyle({
+                    base: style,
+                    className: child.className,
+                    inline: child.style,
+                    styles: config.styles,
+                  }),
+                ),
+              })
+            : (() => {
+                throw new DocxKitError(
+                  'UNKNOWN_NODE_TYPE',
+                  `Inline image is not supported yet. Use top-level \`.image()\` instead.`,
+                )
+              })(),
         )
       : [
           new TextRun({
@@ -271,6 +277,13 @@ function compileTable<
   TData extends Record<string, unknown>,
   TStyles extends StyleSheet,
 >(node: TableNode<TData, TStyles>, _config: DocxKitConfig<TStyles>) {
+  if (node.columns.length === 0) {
+    throw new DocxKitError(
+      'TABLE_INVALID_COLUMNS',
+      'Table must have at least one column',
+    )
+  }
+
   const rows: TableRow[] = []
 
   // Header row
@@ -347,11 +360,6 @@ function createPluginContext<TStyles extends StyleSheet>(
 }
 
 // ---------- Internal helpers ----------
-
-/** Best-effort guess of image format (defaults to `"png"`). */
-function guessImageType(_data: unknown): string {
-  return 'png'
-}
 
 /**
  * Normalize image data to a form `ImageRun` accepts.

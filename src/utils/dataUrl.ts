@@ -39,7 +39,8 @@ export async function dataUrlToUint8Array(
     const binary = atob(base64)
     const bytes = new Uint8Array(binary.length)
     for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.codePointAt(i) ?? 0
+      // eslint-disable-next-line unicorn/prefer-code-point -- base64 is always ASCII, charCodeAt is sufficient here
+      bytes[i] = binary.charCodeAt(i)
     }
     return bytes
   }

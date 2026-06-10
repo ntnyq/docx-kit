@@ -13,3 +13,5 @@ lib-cov
 
 **/.vitepress/cache
 **/.vitepress/dist
+
+.workbuddy/**

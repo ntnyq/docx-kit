@@ -9,6 +9,79 @@
  * @module compiler/units
  */
 
+// ---------- Unit conversion constants ----------
+
+/**
+ * Points per inch — standard typographic convention.
+ *
+ * All other conversions derive from this and the DPI assumption.
+ */
+const POINTS_PER_INCH = 72
+
+/**
+ * Pixels per inch at 96 DPI (standard screen resolution).
+ */
+const PIXELS_PER_INCH = 96
+
+/**
+ * Pixels per point at 96 DPI.
+ *
+ * 96 px/in ÷ 72 pt/in = 4/3 ≈ 1.333 px/pt.
+ */
+const PX_PER_POINT = PIXELS_PER_INCH / POINTS_PER_INCH // ≈ 1.333
+
+/**
+ * Points per pixel at 96 DPI.
+ *
+ * 72 pt/in ÷ 96 px/in = 0.75 pt/px.
+ */
+const POINTS_PER_PX = POINTS_PER_INCH / PIXELS_PER_INCH // = 0.75
+
+/**
+ * Points per millimeter.
+ *
+ * 72 pt/in ÷ 25.4 mm/in ≈ 2.835 pt/mm.
+ */
+const POINTS_PER_MM = POINTS_PER_INCH / 25.4 // ≈ 2.835
+
+/**
+ * Points per centimeter.
+ *
+ * POINTS_PER_MM × 10.
+ */
+const POINTS_PER_CM = POINTS_PER_MM * 10 // ≈ 28.346
+
+/**
+ * Twips per point — the fundamental Word OpenXML spacing unit.
+ *
+ * 1 twip = 1/20 of a point. All margins, indents, and spacing
+ * values in Word are expressed in twips.
+ */
+const TWIPS_PER_POINT = 20
+
+/**
+ * Twips per pixel at 96 DPI.
+ *
+ * POINTS_PER_PX × TWIPS_PER_POINT = 0.75 × 20 = 15.
+ */
+const TWIPS_PER_PX = POINTS_PER_PX * TWIPS_PER_POINT // = 15
+
+/**
+ * Half-points per point (used for font sizes in Word OpenXML).
+ *
+ * Word stores font sizes in half-points: 12pt → 24 half-points.
+ */
+const HALF_POINTS_PER_POINT = 2
+
+/**
+ * Half-points per pixel at 96 DPI.
+ *
+ * POINTS_PER_PX × HALF_POINTS_PER_POINT = 0.75 × 2 = 1.5.
+ */
+const HALF_POINTS_PER_PX = POINTS_PER_PX * HALF_POINTS_PER_POINT // = 1.5
+
+// ---------- Public API ----------
+
 /**
  * Parse a CSS margin/padding shorthand string into top/right/bottom/left
  * values expressed in **twips** (1/20 pt).
@@ -72,27 +145,27 @@ export function toPtHalf(
     return undefined
   }
   if (typeof value === 'number') {
-    return Math.round(value * 2)
+    return Math.round(value * HALF_POINTS_PER_POINT)
   }
 
   const n = Number.parseFloat(value)
   if (value.endsWith('pt')) {
-    return Math.round(n * 2)
+    return Math.round(n * HALF_POINTS_PER_POINT)
   }
   if (value.endsWith('px')) {
-    return Math.round(n * 1.5)
+    return Math.round(n * HALF_POINTS_PER_PX)
   }
   if (value.endsWith('mm')) {
-    return Math.round(n * 5.66929)
+    return Math.round(n * POINTS_PER_MM * HALF_POINTS_PER_POINT)
   }
   if (value.endsWith('cm')) {
-    return Math.round(n * 56.6929)
+    return Math.round(n * POINTS_PER_CM * HALF_POINTS_PER_POINT)
   }
   if (value.endsWith('in')) {
-    return Math.round(n * 144)
+    return Math.round(n * POINTS_PER_INCH * HALF_POINTS_PER_POINT)
   }
 
-  return Math.round(n * 2)
+  return Math.round(n * HALF_POINTS_PER_POINT)
 }
 
 /**
@@ -123,16 +196,16 @@ export function toPx(value: number | string | undefined): number | undefined {
     return n
   }
   if (value.endsWith('pt')) {
-    return Math.round(n * 1.333333)
+    return Math.round(n * PX_PER_POINT)
   }
   if (value.endsWith('mm')) {
-    return Math.round(n * 3.779527)
+    return Math.round(n * POINTS_PER_MM * PX_PER_POINT)
   }
   if (value.endsWith('cm')) {
-    return Math.round(n * 37.79527)
+    return Math.round(n * POINTS_PER_CM * PX_PER_POINT)
   }
   if (value.endsWith('in')) {
-    return Math.round(n * 96)
+    return Math.round(n * PIXELS_PER_INCH)
   }
 
   return n
@@ -159,25 +232,25 @@ export function toTwip(value: number | string | undefined): number | undefined {
     return undefined
   }
   if (typeof value === 'number') {
-    return Math.round(value * 20)
+    return Math.round(value * TWIPS_PER_POINT)
   }
 
   const n = Number.parseFloat(value)
   if (value.endsWith('pt')) {
-    return Math.round(n * 20)
+    return Math.round(n * TWIPS_PER_POINT)
   }
   if (value.endsWith('px')) {
-    return Math.round(n * 15)
-  } // 96 dpi: 1px ≈ 0.75pt
+    return Math.round(n * TWIPS_PER_PX)
+  }
   if (value.endsWith('mm')) {
-    return Math.round(n * 56.6929)
+    return Math.round(n * POINTS_PER_MM * TWIPS_PER_POINT)
   }
   if (value.endsWith('cm')) {
-    return Math.round(n * 566.929)
+    return Math.round(n * POINTS_PER_CM * TWIPS_PER_POINT)
   }
   if (value.endsWith('in')) {
-    return Math.round(n * 1440)
+    return Math.round(n * POINTS_PER_INCH * TWIPS_PER_POINT)
   }
 
-  return Math.round(n * 20)
+  return Math.round(n * TWIPS_PER_POINT)
 }
