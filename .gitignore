@@ -12,3 +12,4 @@ lib-cov
 *.tsbuildinfo
 
 **/.vitepress/cache
+**/.vitepress/dist

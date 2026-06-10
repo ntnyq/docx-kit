@@ -51,6 +51,8 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
+    "docs:build": "pnpm -C docs run build",
+    "docs:dev": "pnpm -C docs run dev",
     "lint": "eslint",
     "prepare": "husky",
     "prepublishOnly": "pnpm run build",
