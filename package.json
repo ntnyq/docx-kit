@@ -27,20 +27,20 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
     },
     "./browser": {
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
     },
     "./node": {
-      "types": "./dist/node.d.ts",
-      "default": "./dist/node.js"
+      "types": "./dist/node.d.mts",
+      "default": "./dist/node.mjs"
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/browser.js",
+  "types": "./dist/browser.d.ts",
   "files": [
     "dist"
   ],

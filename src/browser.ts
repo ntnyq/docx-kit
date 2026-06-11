@@ -1,45 +1,37 @@
 /**
- * docx-kit Browser platform entry.
+ * docx-kit Browser platform entry — the default import target (`'docx-kit'`).
  *
- * Re-exports all APIs available in browser environments, and documents
- * which APIs are **not** available and why.
- *
- * ## Available API overview
- *
- * | API | Status | Notes |
- * |-----|--------|-------|
- * | `dataUrlToUint8Array()` | ✅ Built-in | Decodes base64 via `atob()` |
- * | `normalizeImageData()` | ✅ Built-in | Converts `Blob` → `Uint8Array` |
- * | `saveDocument()` | ❌ Not available | No filesystem access in browsers |
- * | `echartsPlugin()` | ✅ Built-in | Renders charts in the DOM (import from `'docx-kit'`) |
- *
- * For the full cross-platform builder API (`createDocx`, `defineStyles`, etc.),
- * import from `'docx-kit'` as usual.
+ * Re-exports all shared APIs plus browser-specific utilities.
+ * For Node.js–only APIs (filesystem write), import from `'docx-kit/node'`.
  *
  * ## Usage
  *
  * ```ts
  * import { createDocx, defineStyles, echartsPlugin } from 'docx-kit'
- * import { dataUrlToUint8Array, normalizeImageData } from 'docx-kit/browser'
+ * import { normalizeImageData } from 'docx-kit'
  *
  * const doc = createDocx({ styles: defineStyles({ p: { fontSize: 12 } }) })
  *   .use(echartsPlugin())
  *   .p('Hello from the browser')
  *
- * // Use .toBlob() + URL.createObjectURL() for download
+ * // Download via Blob
  * const blob = await doc.toBlob()
  * const url = URL.createObjectURL(blob)
  * const a = document.createElement('a')
  * a.href = url
  * a.download = 'output.docx'
  * a.click()
+ * URL.revokeObjectURL(url)
  * ```
  *
- * @module docx-kit/browser
+ * @module docx-kit
  * @packageDocumentation
  */
 
-// ---------- Available APIs ----------
+// ---------- Shared API ----------
+export * from './shared'
+
+// ---------- Browser-specific APIs ----------
 
 export { dataUrlToUint8Array, normalizeImageData } from './browser/index'
 

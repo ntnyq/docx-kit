@@ -1,26 +1,14 @@
 /**
- * docx-kit Node.js platform entry.
+ * docx-kit Node.js platform entry — import from `'docx-kit/node'`.
  *
- * Re-exports all APIs available in Node.js environments, and documents
- * which APIs are **not** available and why.
- *
- * ## Available API overview
- *
- * | API | Status | Notes |
- * |-----|--------|-------|
- * | `saveDocument()` | ✅ Built-in | Writes .docx to disk via `node:fs/promises` |
- * | `dataUrlToUint8Array()` | ✅ Built-in | Decodes base64 via `node:buffer` |
- * | `echartsPlugin()` | ❌ Not available | Requires `window`/DOM for chart rendering |
- * | `normalizeImageData()` | ❌ Not built-in | `Blob` exists in Node 18+ but rarely used |
- *
- * For the full cross-platform builder API (`createDocx`, `defineStyles`, etc.),
- * import from `'docx-kit'` as usual.
+ * Re-exports all shared APIs plus Node.js–specific utilities
+ * (filesystem save, Buffer-based base64 decoding).
  *
  * ## Usage
  *
  * ```ts
- * import { createDocx, defineStyles } from 'docx-kit'
- * import { saveDocument, dataUrlToUint8Array } from 'docx-kit/node'
+ * import { createDocx, defineStyles } from 'docx-kit/node'
+ * import { saveDocument } from 'docx-kit/node'
  *
  * const doc = createDocx({ styles: defineStyles({ p: { fontSize: 12 } }) })
  *   .p('Hello from Node.js')
@@ -35,7 +23,10 @@
  * @packageDocumentation
  */
 
-// ---------- Available APIs ----------
+// ---------- Shared API ----------
+export * from './shared'
+
+// ---------- Node.js–specific APIs ----------
 
 export { dataUrlToUint8Array, saveDocument } from './node/index'
 

@@ -1,8 +1,15 @@
 import { defineConfig } from 'tsdown'
 
-export default defineConfig({
-  clean: true,
-  dts: true,
-  entry: ['src/index.ts', 'src/node.ts', 'src/browser.ts'],
-  platform: 'neutral',
-})
+export default defineConfig([
+  {
+    clean: true,
+    dts: true,
+    entry: ['src/browser.ts'],
+    platform: 'browser',
+  },
+  {
+    dts: true,
+    entry: ['src/node.ts'],
+    platform: 'node',
+  },
+])

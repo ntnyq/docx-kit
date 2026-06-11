@@ -18,7 +18,7 @@ Agent operating notes for this repository.
 
 ## Project Map
 
-- Public exports: [src/index.ts](src/index.ts)
+- Public exports: [src/shared.ts](src/shared.ts), platform entries: [src/browser.ts](src/browser.ts), [src/node.ts](src/node.ts)
 - Fluent builder API: [src/builder/DocxBuilder.ts](src/builder/DocxBuilder.ts)
 - JSON schema entry/factory: [src/builder/createDocx.ts](src/builder/createDocx.ts)
 - Document orchestration: [src/compiler/compileDocument.ts](src/compiler/compileDocument.ts)
@@ -55,7 +55,7 @@ Agent operating notes for this repository.
   - `pnpm run lint`
   - `pnpm run typecheck`
   - `pnpm run test`
-- If changing exports, verify [src/index.ts](src/index.ts) and build output assumptions still hold.
+- If changing exports, verify [src/shared.ts](src/shared.ts) and build output assumptions still hold.
 - If changing compiler behavior, update or add tests in [tests/index.test.ts](tests/index.test.ts) (current suite is minimal).
 
 ## CI Reference

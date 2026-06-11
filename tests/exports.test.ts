@@ -1,41 +1,41 @@
 import { describe, expect, it } from 'vitest'
 
-describe('index.ts — main exports', () => {
+describe('shared.ts — shared exports', () => {
   it('exports createDocx and renderDocx', async () => {
-    const mod = await import('../src/index')
+    const mod = await import('../src/shared')
     expect(mod.createDocx).toBeDefined()
     expect(mod.renderDocx).toBeDefined()
     expect(mod.DocxBuilder).toBeDefined()
   })
 
   it('exports defineStyles and definePlugin', async () => {
-    const mod = await import('../src/index')
+    const mod = await import('../src/shared')
     expect(mod.defineStyles).toBeDefined()
     expect(mod.definePlugin).toBeDefined()
   })
 
   it('exports ERROR_CODES and DocxKitError', async () => {
-    const mod = await import('../src/index')
+    const mod = await import('../src/shared')
     expect(mod.ERROR_CODES).toBeDefined()
     expect(mod.DocxKitError).toBeDefined()
   })
 
   it('exports plugins', async () => {
-    const mod = await import('../src/index')
+    const mod = await import('../src/shared')
     expect(mod.qrcodePlugin).toBeDefined()
     expect(mod.echartsPlugin).toBeDefined()
   })
 
   it('exports dataUrlToUint8Array', async () => {
-    const mod = await import('../src/index')
+    const mod = await import('../src/shared')
     expect(mod.dataUrlToUint8Array).toBeDefined()
   })
 
   it('exports all type definitions', async () => {
-    const mod = await import('../src/index')
+    const mod = await import('../src/shared')
     // Types are compile-time only, but the module should load clean
     expect(mod).toBeDefined()
-    // These are documented exports from index.ts
+    // These are documented exports from shared.ts
     expect(typeof mod.createDocx).toBe('function')
   })
 })
