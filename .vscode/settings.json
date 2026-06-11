@@ -39,7 +39,8 @@
     "unrs",
     "vite",
     "vitepress",
-    "vitest"
+    "vitest",
+    "wordprocessingml"
   ],
   "cSpell.allowCompoundWords": true
 }

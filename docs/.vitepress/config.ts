@@ -1,8 +1,9 @@
 import { defineConfig } from 'vitepress'
+import { APP_TITLE } from './meta'
 
 export default defineConfig({
   lang: 'en-US',
-  title: 'docx-kit',
+  title: APP_TITLE,
   description:
     'CSS-like DOCX API Kit — Type-safe, plugin-extensible Word document generation',
 
@@ -14,7 +15,7 @@ export default defineConfig({
   },
 
   themeConfig: {
-    logo: '',
+    // logo: '',
     footer: {
       copyright: 'Copyright © ntnyq',
       message: 'Released under the MIT License.',
@@ -23,6 +24,7 @@ export default defineConfig({
     nav: [
       { link: '/guide/getting-started', text: 'Guide' },
       { link: '/examples/basic-report', text: 'Examples' },
+      { link: '/playground', text: 'Playground' },
       { link: '/api/types', text: 'API' },
     ],
 
@@ -62,11 +64,24 @@ export default defineConfig({
             { link: '/guide/errors', text: 'Error Handling' },
           ],
         },
+        {
+          items: [{ link: '/playground', text: 'Online Playground' }],
+          text: 'Playground',
+        },
       ],
     },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ntnyq/docx-kit' },
     ],
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: ['monaco-editor'],
+    },
+    worker: {
+      format: 'es',
+    },
   },
 })
