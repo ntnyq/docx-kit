@@ -1,7 +1,7 @@
 {
   "name": "docx-kit",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "packageManager": "pnpm@11.5.2",
   "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
   "keywords": [
