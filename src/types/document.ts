@@ -26,6 +26,8 @@ export interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
   defaults?: {
     /** Default table cell style. */
     cell?: DocxStyleRule
+    /** Default image style (applied to the paragraph wrapping the image). */
+    image?: DocxStyleRule
     /** Default paragraph style. */
     paragraph?: DocxStyleRule
     /** Default table style. */

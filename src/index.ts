@@ -35,7 +35,6 @@ export { defineStyles } from './types/style'
 
 // ---------- Plugin ----------
 export { definePlugin } from './types/plugin'
-
 // ---------- Builder ----------
 export { DocxBuilder } from './builder/DocxBuilder'
 
@@ -43,8 +42,10 @@ export { DocxBuilder } from './builder/DocxBuilder'
 export { DocxKitError, ERROR_CODES } from './errors'
 
 export { qrcodePlugin } from './plugins/qrcode/index'
+
 // ---------- Cross-platform utilities ----------
 export { dataUrlToUint8Array } from './utils/dataUrl'
+
 // ---------- Built-in plugins ----------
 export { calloutPlugin } from './plugins/callout/index'
 export { echartsPlugin } from './plugins/echarts/index'
@@ -58,11 +59,20 @@ export { createDocx, renderDocx } from './builder/createDocx'
 export { pageNumberPlugin } from './plugins/page-number/index'
 export { propertyTablePlugin } from './plugins/property-table/index'
 export { meetingMinutesPlugin } from './plugins/meeting-minutes/index'
-
 export { signatureBlockPlugin } from './plugins/signature-block/index'
+// ---------- Presets ----------
+export {
+  academicPreset,
+  classicPreset,
+  modernPreset,
+  PRESET_LIST,
+  usePreset,
+} from './presets'
 
 // ---------- Types ----------
 export type { ErrorCode } from './errors'
+
+export type { DocxPreset } from './presets'
 export type { DocxSchema } from './builder/createDocx'
 
 // Plugin option types

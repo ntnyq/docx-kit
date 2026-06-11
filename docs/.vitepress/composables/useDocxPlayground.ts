@@ -1,9 +1,10 @@
 import * as docx from 'docx'
 import {
-  createDocx,
+  createDocx as _createDocx,
   definePlugin,
   defineStyles,
   DocxBuilder,
+  PRESET_LIST,
   renderDocx,
 } from 'docx-kit'
 import { saveAs } from 'tinysaver'
@@ -18,6 +19,7 @@ import {
 } from 'vue'
 import { DEFAULT_CODE, PRESETS } from '../constants/templates'
 import { DOCX_KIT_TYPES, prepareCode } from '../utils'
+import type { DocxKitConfig, DocxPreset } from 'docx-kit'
 import type { Preset } from '../constants/templates'
 
 /**
@@ -25,7 +27,7 @@ import type { Preset } from '../constants/templates'
  *
  * Manages:
  * - Code editor state (Monaco integration)
- * - Preset switching
+ * - Preset switching (template + style preset)
  * - Code execution pipeline (TS → JS transpile → sandboxed eval)
  * - Result blob download
  */
@@ -46,9 +48,24 @@ export function useDocxPlayground() {
   const editorContainer = ref<HTMLElement | null>(null)
   const editorError = ref('')
 
+  // Style preset state: null = no preset (raw defaults)
+  const activeStylePreset = ref<DocxPreset | null>(null)
+
   let editorInstance: any = null
   let monacoRef: any = null
   let isInternalChange = false
+
+  // -------------------------------------------------------------------------
+  // Wrapped createDocx — merges selected style preset automatically
+  // -------------------------------------------------------------------------
+  function createDocxWrapped(config: DocxKitConfig = {}) {
+    if (activeStylePreset.value) {
+      return _createDocx(
+        mergeWithPreset(activeStylePreset.value.config, config),
+      )
+    }
+    return _createDocx(config)
+  }
 
   // -------------------------------------------------------------------------
   // Monaco editor initialisation
@@ -184,7 +201,7 @@ export function useDocxPlayground() {
         DocxBuilder,
         defineStyles,
         definePlugin,
-        createDocx,
+        createDocxWrapped,
         renderDocx,
         docx,
       )
@@ -231,6 +248,7 @@ export function useDocxPlayground() {
 
   return {
     activePreset,
+    activeStylePreset,
     code,
     download,
     editorContainer,
@@ -242,5 +260,36 @@ export function useDocxPlayground() {
     resetCode,
     resultBlob,
     run,
+    stylePresets: PRESET_LIST,
+  }
+}
+
+/**
+ * Deep-merge a style preset config with user config.
+ *
+ * User values win on conflict; preset values fill in the gaps.
+ * `styles` and `defaults` are merged per-key so that user styles
+ * only override same-named classes — the rest of the preset survives.
+ */
+function mergeWithPreset(
+  presetConfig: DocxKitConfig,
+  userConfig: DocxKitConfig = {},
+): DocxKitConfig {
+  return {
+    ...presetConfig,
+    ...userConfig,
+    styles: { ...presetConfig.styles, ...userConfig.styles },
+    defaults: {
+      ...presetConfig.defaults,
+      ...userConfig.defaults,
+      cell: { ...presetConfig.defaults?.cell, ...userConfig.defaults?.cell },
+      image: { ...presetConfig.defaults?.image, ...userConfig.defaults?.image },
+      table: { ...presetConfig.defaults?.table, ...userConfig.defaults?.table },
+      text: { ...presetConfig.defaults?.text, ...userConfig.defaults?.text },
+      paragraph: {
+        ...presetConfig.defaults?.paragraph,
+        ...userConfig.defaults?.paragraph,
+      },
+    },
   }
 }

@@ -3,6 +3,7 @@ import { useDocxPlayground } from '../composables/useDocxPlayground'
 
 const {
   activePreset,
+  activeStylePreset,
   download,
   editorContainer,
   editorError,
@@ -13,6 +14,7 @@ const {
   resetCode,
   resultBlob,
   run,
+  stylePresets,
 } = useDocxPlayground()
 </script>
 
@@ -53,6 +55,32 @@ const {
         >
           {{ preset.label }}
         </button>
+      </div>
+
+      <!-- Style preset selector -->
+      <div class="style-preset-bar">
+        <label class="style-preset-label">Style:</label>
+        <div class="style-preset-options">
+          <button
+            @click="activeStylePreset = null"
+            :class="{ active: activeStylePreset === null }"
+            class="style-preset-btn"
+            type="button"
+          >
+            None
+          </button>
+          <button
+            @click="activeStylePreset = sp"
+            v-for="sp in stylePresets"
+            :key="sp.id"
+            :class="{ active: activeStylePreset?.id === sp.id }"
+            :title="sp.description"
+            class="style-preset-btn"
+            type="button"
+          >
+            {{ sp.name }}
+          </button>
+        </div>
       </div>
 
       <div
@@ -198,6 +226,55 @@ const {
 .preset-tab.active {
   color: var(--vp-c-brand-1);
   border-bottom-color: var(--vp-c-brand-1);
+}
+
+/* ─── Style preset selector ─── */
+.style-preset-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--vp-c-bg-soft);
+  border-bottom: 1px solid var(--vp-c-divider);
+  flex-shrink: 0;
+}
+
+.style-preset-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--vp-c-text-2);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.style-preset-options {
+  display: flex;
+  gap: 4px;
+}
+
+.style-preset-btn {
+  padding: 3px 10px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 4px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.style-preset-btn:hover {
+  color: var(--vp-c-text-1);
+  border-color: var(--vp-c-brand-1);
+}
+
+.style-preset-btn.active {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  border-color: var(--vp-c-brand-1);
 }
 
 .editor-wrapper {

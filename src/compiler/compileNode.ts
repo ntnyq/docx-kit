@@ -249,7 +249,7 @@ function compileHyperlink<TStyles extends StyleSheet>(
  */
 async function compileImage<TStyles extends StyleSheet>(
   node: ImageNode<TStyles>,
-  _config: DocxKitConfig<TStyles>,
+  config: DocxKitConfig<TStyles>,
 ) {
   if (
     node.data == null
@@ -261,7 +261,16 @@ async function compileImage<TStyles extends StyleSheet>(
   const data = await normalizeImageData(node.data)
   const imageType = node.imageType ?? 'png'
 
+  // Resolve paragraph-level style for the image wrapper (alignment, spacing).
+  const style = resolveStyle({
+    base: config.defaults?.image,
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+  })
+
   return new Paragraph({
+    ...compileParagraphStyle(style),
     children: [
       createImageRun({
         data,
