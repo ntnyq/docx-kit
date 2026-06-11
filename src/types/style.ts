@@ -49,6 +49,9 @@ export interface DocxStyleRule {
   borderRight?: BorderRule
   /** Top border override. */
   borderTop?: BorderRule
+  // ---- character formatting ----
+  /** Character spacing (letter-spacing). */
+  characterSpacing?: number
   /** Text / foreground color. */
   color?: string | HexColor
   // ---- Word-specific escape hatch ----
@@ -70,6 +73,13 @@ export interface DocxStyleRule {
   // ---- layout ----
   /** Element height. */
   height?: UnitValue
+  /** Text highlight color (background marker). */
+  highlight?: HighlightColor
+  // ---- paragraph / page flow ----
+  /** Keep lines together on same page. */
+  keepLines?: boolean
+  /** Keep this paragraph with the next one. */
+  keepNext?: boolean
   // ---- paragraph ----
   /** Character spacing. */
   letterSpacing?: UnitValue
@@ -84,8 +94,16 @@ export interface DocxStyleRule {
 
   /** Top margin. */
   marginTop?: UnitValue
+  /** Force page break before this paragraph. */
+  pageBreakBefore?: boolean
+  /** Small caps text variant. */
+  smallCaps?: boolean
   /** Strikethrough toggle. */
   strike?: boolean
+  /** Sub-script text. */
+  subScript?: boolean
+  /** Super-script text. */
+  superScript?: boolean
   /** Horizontal text alignment. */
   textAlign?: TextAlign
 
@@ -134,6 +152,26 @@ export type FontWeight =
   | 700
   | 800
   | 900
+
+/** Text highlight / marker colors (matches Word highlight palette). */
+export type HighlightColor =
+  | 'black'
+  | 'blue'
+  | 'cyan'
+  | 'darkBlue'
+  | 'darkCyan'
+  | 'darkGray'
+  | 'darkGreen'
+  | 'darkMagenta'
+  | 'darkRed'
+  | 'darkYellow'
+  | 'green'
+  | 'lightGray'
+  | 'magenta'
+  | 'none'
+  | 'red'
+  | 'white'
+  | 'yellow'
 
 /**
  * A map of class name → style rule.

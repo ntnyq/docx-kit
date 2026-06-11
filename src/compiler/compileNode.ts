@@ -8,7 +8,10 @@
  */
 
 import {
+  AlignmentType,
+  ExternalHyperlink,
   HeadingLevel,
+  LevelFormat,
   PageBreak,
   Paragraph,
   Table,
@@ -30,8 +33,11 @@ import {
 import { toPx } from './units'
 import type {
   BlockNode,
+  BulletListNode,
   HeadingNode,
+  HyperlinkNode,
   ImageNode,
+  NumberedListNode,
   ParagraphNode,
   TableNode,
 } from '../dsl/nodes'
@@ -90,12 +96,26 @@ export async function compileNode<TStyles extends StyleSheet>(
   ctx: CompileNodeContext<TStyles>,
 ): Promise<unknown> {
   switch (ctx.node.type) {
+    case 'bulletList':
+      return compileBulletList(ctx.node as BulletListNode<TStyles>, ctx.config)
     case 'heading':
       return compileHeading(ctx.node, ctx.config)
+    case 'hyperlink':
+      return compileHyperlink(ctx.node as HyperlinkNode<TStyles>, ctx.config)
     case 'image':
       return compileImage(ctx.node, ctx.config)
+    case 'numberedList':
+      return compileNumberedList(
+        ctx.node as NumberedListNode<TStyles>,
+        ctx.config,
+      )
     case 'pageBreak':
       return new Paragraph({ children: [new PageBreak()] })
+    case 'sectionBreak':
+      throw new DocxKitError(
+        'UNKNOWN_NODE_TYPE',
+        'Section break nodes must be handled at the document compilation level',
+      )
     case 'paragraph':
       return compileParagraph(ctx.node, ctx.config)
     case 'table':
@@ -180,6 +200,48 @@ function compileHeading<TStyles extends StyleSheet>(
 }
 
 /**
+ * Compile a hyperlink node into an `ExternalHyperlink` containing `TextRun`s.
+ */
+function compileHyperlink<TStyles extends StyleSheet>(
+  node: HyperlinkNode<TStyles>,
+  config: DocxKitConfig<TStyles>,
+) {
+  const style = resolveStyle({
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+  })
+
+  const children = node.children.map(child => {
+    if (typeof child === 'string') {
+      return new TextRun({ text: child, ...compileTextStyle(style) })
+    }
+    return new TextRun({
+      text: child.text,
+      ...compileTextStyle(
+        resolveStyle({
+          base: style,
+          className: child.className,
+          inline: child.style,
+          styles: config.styles,
+        }),
+      ),
+    })
+  })
+
+  return new Paragraph({
+    children: [
+      new ExternalHyperlink({
+        children,
+        link: node.url,
+      }),
+    ],
+  })
+}
+
+// ---------- Paragraph ----------
+
+/**
  * Compile an image node into a `docx` Paragraph containing an `ImageRun`.
  *
  * Handles image data normalization (Blob → Uint8Array), auto format detection,
@@ -212,7 +274,7 @@ async function compileImage<TStyles extends StyleSheet>(
   })
 }
 
-// ---------- Paragraph ----------
+// ---------- Hyperlink ----------
 
 /**
  * Compile a paragraph node into a `docx` Paragraph.
@@ -265,6 +327,140 @@ function compileParagraph<TStyles extends StyleSheet>(
   })
 }
 
+// ---------- Bullet List ----------
+
+/**
+ * Collect numbering configs during compilation.
+ *
+ * Keys are reference strings, values are config entries passed to
+ * `Document({ numbering: { config: [...] } })`.
+ */
+export const numberingConfigMap = new Map<string, unknown>()
+
+let numberingCounter = 0
+
+/** Reset numbering state between compilations. */
+export function resetNumberingState() {
+  numberingConfigMap.clear()
+  numberingCounter = 0
+}
+
+/**
+ * Generate a numbering config entry for a bullet list
+ * and return Paragraphs with numbering references.
+ */
+function compileBulletList<TStyles extends StyleSheet>(
+  node: BulletListNode<TStyles>,
+  config: DocxKitConfig<TStyles>,
+): Paragraph[] {
+  const ref = `bullet-${++numberingCounter}`
+  const bullet = node.bullet ?? '\u2022'
+
+  numberingConfigMap.set(ref, {
+    reference: ref,
+    levels: [
+      {
+        alignment: AlignmentType.LEFT,
+        format: LevelFormat.BULLET,
+        level: node.level ?? 0,
+        text: bullet,
+      },
+    ],
+  })
+
+  const style = resolveStyle({
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+  })
+
+  return node.items.map(item => {
+    const text = typeof item === 'string' ? item : item.text
+    const itemStyle =
+      typeof item === 'object'
+        ? resolveStyle({
+            base: style,
+            className: item.className,
+            inline: item.style,
+            styles: config.styles,
+          })
+        : style
+
+    return new Paragraph({
+      ...compileParagraphStyle(itemStyle),
+      numbering: { level: node.level ?? 0, reference: ref },
+      children: [
+        new TextRun({
+          text,
+          ...compileTextStyle(itemStyle),
+        }),
+      ],
+    })
+  })
+}
+
+/**
+ * Generate a numbering config entry for an ordered list
+ * and return Paragraphs with numbering references.
+ */
+function compileNumberedList<TStyles extends StyleSheet>(
+  node: NumberedListNode<TStyles>,
+  config: DocxKitConfig<TStyles>,
+): Paragraph[] {
+  const ref = `numbered-${++numberingCounter}`
+  const formatMap: Record<string, string> = {
+    decimal: LevelFormat.DECIMAL,
+    lowerLetter: LevelFormat.LOWER_LETTER,
+    lowerRoman: LevelFormat.LOWER_ROMAN,
+    upperLetter: LevelFormat.UPPER_LETTER,
+    upperRoman: LevelFormat.UPPER_ROMAN,
+  }
+
+  numberingConfigMap.set(ref, {
+    reference: ref,
+    levels: [
+      {
+        alignment: AlignmentType.LEFT,
+        level: node.level ?? 0,
+        start: node.start ?? 1,
+        text: '%1.',
+        format:
+          formatMap[node.numberingFormat ?? 'decimal'] ?? LevelFormat.DECIMAL,
+      },
+    ],
+  })
+
+  const style = resolveStyle({
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+  })
+
+  return node.items.map(item => {
+    const text = typeof item === 'string' ? item : item.text
+    const itemStyle =
+      typeof item === 'object'
+        ? resolveStyle({
+            base: style,
+            className: item.className,
+            inline: item.style,
+            styles: config.styles,
+          })
+        : style
+
+    return new Paragraph({
+      ...compileParagraphStyle(itemStyle),
+      numbering: { level: node.level ?? 0, reference: ref },
+      children: [
+        new TextRun({
+          text,
+          ...compileTextStyle(itemStyle),
+        }),
+      ],
+    })
+  })
+}
+
 // ---------- Table ----------
 
 /**
@@ -296,6 +492,9 @@ function compileTable<
             new TableCell({
               ...compileCellStyle(node.headerCellStyle ?? {}),
               children: [new Paragraph(String(col.title))],
+              ...(col.colSpan && col.colSpan > 1
+                ? { columnSpan: col.colSpan }
+                : {}),
               width: compileColumnWidth(col.width),
             }),
         ),
@@ -314,9 +513,30 @@ function compileTable<
               ? col.render(raw, row, rowIndex)
               : String(raw ?? '')
 
+            // Per-cell colSpan override from data object (`_colSpan` key)
+            const cellColSpan =
+              (row[`_${col.key}_colSpan` as string] as number) ?? col.colSpan
+
+            // Striped shading
+            const isEvenRow = rowIndex % 2 === 1
+            const baseCellStyle: Record<string, unknown> = node.cellStyle
+              ? { ...compileCellStyle(node.cellStyle) }
+              : {}
+
             return new TableCell({
-              ...compileCellStyle(node.cellStyle ?? {}),
+              ...baseCellStyle,
+              ...(node.striped && isEvenRow && baseCellStyle.shading
+                ? {
+                    shading: {
+                      ...baseCellStyle.shading,
+                      fill: 'F2F2F2',
+                    },
+                  }
+                : {}),
               children: [new Paragraph(String(rendered))],
+              ...(cellColSpan && cellColSpan > 1
+                ? { columnSpan: cellColSpan }
+                : {}),
               width: compileColumnWidth(col.width),
             })
           }),

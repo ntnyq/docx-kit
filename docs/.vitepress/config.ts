@@ -23,9 +23,10 @@ export default defineConfig({
 
     nav: [
       { link: '/guide/getting-started', text: 'Guide' },
+      { link: '/api/types', text: 'API' },
+      { link: '/plugins/', text: 'Plugins' },
       { link: '/examples/basic-report', text: 'Examples' },
       { link: '/playground', text: 'Playground' },
-      { link: '/api/types', text: 'API' },
     ],
 
     search: {
@@ -67,6 +68,26 @@ export default defineConfig({
         {
           items: [{ link: '/playground', text: 'Online Playground' }],
           text: 'Playground',
+        },
+      ],
+      '/plugins/': [
+        {
+          text: 'Plugins',
+          items: [
+            { link: '/plugins/', text: 'Overview' },
+            { link: '/plugins/callout', text: 'Callout' },
+            { link: '/plugins/code-block', text: 'Code Block' },
+            { link: '/plugins/cover-page', text: 'Cover Page' },
+            { link: '/plugins/data-table', text: 'Data Table' },
+            { link: '/plugins/echarts', text: 'ECharts' },
+            { link: '/plugins/meeting-minutes', text: 'Meeting Minutes' },
+            { link: '/plugins/page-number', text: 'Page Number' },
+            { link: '/plugins/property-table', text: 'Property Table' },
+            { link: '/plugins/qrcode', text: 'QR Code' },
+            { link: '/plugins/signature-block', text: 'Signature Block' },
+            { link: '/plugins/timeline', text: 'Timeline' },
+            { link: '/plugins/watermark', text: 'Watermark' },
+          ],
         },
       ],
     },

@@ -1,7 +1,7 @@
 ---
 layout: home
 hero:
-  name: docx-kit
+  name: Docx Kit
   text: CSS-like DOCX API Kit
   tagline: Type-safe, plugin-extensible Word document generation for Node.js & browser
   actions:

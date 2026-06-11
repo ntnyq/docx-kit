@@ -67,6 +67,44 @@ export interface DocxTheme {
   spacing?: Record<string, UnitValue>
 }
 
+/**
+ * Header/footer configuration for a section.
+ *
+ * Supports standard, first-page, and even-page variants.
+ *
+ * @example
+ * ```ts
+ * {
+ *   default: { children: ['Chapter 1'] },
+ *   first: { children: ['Title Page'] },
+ * }
+ * ```
+ */
+export interface HeaderFooterConfig {
+  /** Default header/footer (appears on all pages). */
+  default?: HeaderFooterContent
+  /** Even-page header/footer (overrides default on even pages). */
+  even?: HeaderFooterContent
+  /** First-page-only header/footer (overrides default on page 1). */
+  first?: HeaderFooterContent
+}
+
+/**
+ * Content for a header or footer — a list of text strings.
+ *
+ * Each string maps to a `Paragraph` in the compiled .docx output.
+ * Future versions may support richer content (tables, images, page numbers).
+ *
+ * @example
+ * ```ts
+ * { default: ['Company Name', 'Confidential'] }
+ * ```
+ */
+export interface HeaderFooterContent {
+  /** Paragraph text lines. */
+  children: string[]
+}
+
 /** Page orientation. */
 export type Orientation = 'landscape' | 'portrait'
 
@@ -92,3 +130,27 @@ export interface PageConfig {
 
 /** Available page size presets. */
 export type PageSize = 'A3' | 'A4' | 'Legal' | 'Letter'
+
+/**
+ * Per-section configuration.
+ *
+ * Each call to `.section(config)` starts a new document section, which
+ * can have its own page setup, headers, and footers independent of other
+ * sections.
+ *
+ * @example
+ * ```ts
+ * doc.section({
+ *   page: { size: 'A3', orientation: 'landscape' },
+ *   header: { default: { children: ['Wide Page'] } },
+ * })
+ * ```
+ */
+export interface SectionConfig {
+  /** Section footer(s). */
+  footer?: HeaderFooterConfig
+  /** Section header(s). */
+  header?: HeaderFooterConfig
+  /** Section-specific page dimensions (overrides document-level `page`). */
+  page?: PageConfig
+}

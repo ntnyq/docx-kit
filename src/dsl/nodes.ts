@@ -8,6 +8,7 @@
  * @module dsl/nodes
  */
 
+import type { SectionConfig } from '../types/document'
 import type { DocxStyleRule, StyleSheet } from '../types/style'
 import type { UnitValue } from '../types/utility'
 
@@ -35,14 +36,53 @@ export interface BaseNode<TStyles extends StyleSheet = StyleSheet> {
  * @template TStyles — The user's stylesheet type
  */
 export type BlockNode<TStyles extends StyleSheet = StyleSheet> =
+  | BulletListNode<TStyles>
   | HeadingNode<TStyles>
+  | HyperlinkNode<TStyles>
   | ImageNode<TStyles>
+  | NumberedListNode<TStyles>
   | PageBreakNode
   | ParagraphNode<TStyles>
   | PluginNode<string, unknown, TStyles>
+  | SectionBreakNode
   | TableNode<Record<string, unknown>, TStyles>
 
 // ---- Utility types ----
+
+/**
+ * A structured list item (for rich bullet/numbered items).
+ *
+ * @template TStyles — The user's stylesheet type
+ */
+export interface BulletItem<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** Item text content. */
+  text: string
+  /** Optional inline children override (instead of text). */
+  children?: InlineNode<TStyles>[]
+}
+
+// ---- Block nodes ----
+
+/**
+ * A bullet list node.
+ *
+ * Supports plain string items or structured items with children.
+ *
+ * @template TStyles — The user's stylesheet type
+ */
+export interface BulletListNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** List items — strings or structured items. */
+  items: (string | BulletItem<TStyles>)[]
+  type: 'bulletList'
+  /** Bullet character / style. Default: `'•'`. */
+  bullet?: string
+  /** Nested list level (0 = top-level). */
+  level?: number
+}
 
 /**
  * Extract valid class name keys from a stylesheet type.
@@ -54,7 +94,7 @@ export type ClassName<TStyles extends StyleSheet> = Extract<
   string
 >
 
-// ---- Block nodes ----
+// ---- Inline nodes ----
 
 /**
  * A heading node (h1–h6).
@@ -69,6 +109,21 @@ export interface HeadingNode<
   /** Heading text content. */
   text: string
   type: 'heading'
+}
+
+/**
+ * A hyperlink node (inline content that creates a clickable link).
+ *
+ * @template TStyles — The user's stylesheet type
+ */
+export interface HyperlinkNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** Display text or inline children. */
+  children: (string | TextNode<TStyles>)[]
+  type: 'hyperlink'
+  /** Link target URL. */
+  url: string
 }
 
 /**
@@ -110,16 +165,44 @@ export interface ImageNode<
       }
 }
 
-// ---- Inline nodes ----
-
 /**
  * Union of inline content node types (appear inside paragraphs).
  *
  * @template TStyles — The user's stylesheet type
  */
 export type InlineNode<TStyles extends StyleSheet = StyleSheet> =
+  | HyperlinkNode<TStyles>
   | ImageNode<TStyles>
   | TextNode<TStyles>
+
+/**
+ * A numbered / ordered list node.
+ *
+ * @template TStyles — The user's stylesheet type
+ */
+export interface NumberedListNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** List items. */
+  items: (string | BulletItem<TStyles>)[]
+  type: 'numberedList'
+  /** Nested list level (0 = top-level). */
+  level?: number
+  /** Starting number (default: 1). */
+  start?: number
+  /**
+   * Numbering format.
+   *
+   * {@link `LevelFormat.DECIMAL`} by default.
+   * e.g. `'decimal'`, `'upperRoman'`, `'lowerLetter'`
+   */
+  numberingFormat?:
+    | 'decimal'
+    | 'lowerLetter'
+    | 'lowerRoman'
+    | 'upperLetter'
+    | 'upperRoman'
+}
 
 /**
  * A forced page break.
@@ -165,6 +248,21 @@ export interface PluginNode<
 }
 
 /**
+ * Internal marker node that represents a section boundary.
+ *
+ * Created automatically by {@link DocxBuilder.section} — users should
+ * not create this node directly.
+ *
+ * When the compiler encounters this marker, it starts a new section
+ * with the provided configuration.
+ */
+export interface SectionBreakNode {
+  type: 'sectionBreak'
+  /** Optional per-section page/header/footer overrides. */
+  config?: SectionConfig
+}
+
+/**
  * A column definition for a table.
  *
  * @template TData — The row data type
@@ -178,6 +276,19 @@ export interface TableColumn<
   title: string
   /** Cell text alignment. */
   align?: 'center' | 'left' | 'right'
+  /**
+   * Span multiple columns horizontally.
+   *
+   * Applied to all cells in this column.
+   */
+  colSpan?: number
+  /**
+   * Span multiple rows vertically (per-cell via data hints).
+   *
+   * Set `rowSpan` on individual data objects using `_rowSpan: N` or keep it
+   * as a static column default.
+   */
+  rowSpan?: number
   /** Column width. Supports percentage strings (e.g. `"30%"`). */
   width?: UnitValue
   /**

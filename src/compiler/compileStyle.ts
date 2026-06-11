@@ -10,6 +10,7 @@
 import {
   AlignmentType,
   BorderStyle,
+  HighlightColor,
   ShadingType,
   VerticalAlign,
   WidthType,
@@ -118,6 +119,15 @@ export function compileColumnWidth(width: unknown) {
 
 // ---------- Border ----------
 
+/** Compile paragraph-level borders (separate from cell borders). */
+export function compileParagraphBorder(style: DocxStyleRule) {
+  const borders = compileBorder(style)
+  if (!borders) {
+    return {}
+  }
+  return { border: borders }
+}
+
 /**
  * Compile a `DocxStyleRule` into `docx` paragraph-level options
  * (alignment, indent, spacing).
@@ -137,7 +147,11 @@ export function compileParagraphStyle(style: DocxStyleRule) {
 
   return {
     alignment: compileAlignment(style.textAlign),
+    ...compileParagraphBorder(style),
     indent,
+    keepLines: style.keepLines,
+    keepNext: style.keepNext,
+    pageBreakBefore: style.pageBreakBefore,
     spacing,
   }
 }
@@ -163,11 +177,16 @@ export function compileTextStyle(style: DocxStyleRule) {
   const result: Record<string, unknown> = {
     allCaps: style.allCaps,
     bold: style.fontWeight === 'bold' || Number(style.fontWeight) >= 600,
+    characterSpacing: style.characterSpacing,
     color: normalizeColor(style.color),
     font: style.fontFamily,
+    highlight: compileHighlight(style.highlight),
     italics: style.fontStyle === 'italic',
     size: toPtHalf(style.fontSize),
+    smallCaps: style.smallCaps,
     strike: style.strike,
+    subScript: style.subScript,
+    superScript: style.superScript,
     underline: style.underline ? {} : undefined,
   }
 
@@ -214,6 +233,16 @@ function compileBorderStyle(style?: import('../types/style').BorderStyle) {
     return BorderStyle.NONE
   }
   return BorderStyle.SINGLE
+}
+
+/**
+ * Map a highlight color name to `docx` `HighlightColor`.
+ */
+function compileHighlight(color?: import('../types/style').HighlightColor) {
+  if (!color || color === 'none') {
+    return undefined
+  }
+  return (HighlightColor as Record<string, unknown>)[color.toUpperCase()]
 }
 
 /** Convert line-height multiplier to twips. 1 → 240 (single-spacing). */

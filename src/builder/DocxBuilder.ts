@@ -22,12 +22,16 @@
 
 import type {
   BlockNode,
+  BulletItem,
+  BulletListNode,
   HeadingNode,
+  HyperlinkNode,
   ImageNode,
+  NumberedListNode,
   ParagraphNode,
   TableNode,
 } from '../dsl/nodes'
-import type { DocxKitConfig } from '../types/document'
+import type { DocxKitConfig, SectionConfig } from '../types/document'
 import type { DocxPlugin, PluginRegistry } from '../types/plugin'
 import type { DocxStyleRule, StyleSheet } from '../types/style'
 
@@ -74,6 +78,35 @@ export class DocxBuilder<
   }
 
   /**
+   * Add a bullet (unordered) list.
+   *
+   * @param items - — List items (strings or structured items)
+   * @param options - — Optional bullet character, className, style, level
+   * @returns The builder (for chaining)
+   *
+   * @example
+   * ```ts
+   * doc.bulletList(['Item 1', 'Item 2', 'Item 3'])
+   * doc.bulletList([
+   *   'Simple item',
+   *   { text: 'Rich item', className: 'highlight' },
+   * ], { bullet: '\u25CB' })
+   * ```
+   */
+  bulletList(
+    items: (string | BulletItem<TStyles>)[],
+    options: Omit<Partial<BulletListNode<TStyles>>, 'items' | 'type'> = {},
+  ): this {
+    return this.add({
+      items,
+      type: 'bulletList',
+      ...options,
+    } as BlockNode<TStyles>)
+  }
+
+  // ---------- Content DSL ----------
+
+  /**
    * Add a level-1 heading.
    *
    * @param text - — Heading text
@@ -94,8 +127,6 @@ export class DocxBuilder<
   ): this {
     return this.add({ level: 1, text, type: 'heading', ...options })
   }
-
-  // ---------- Content DSL ----------
 
   /**
    * Add a level-2 heading.
@@ -183,6 +214,35 @@ export class DocxBuilder<
   }
 
   /**
+   * Add a hyperlink.
+   *
+   * @param url - — Target URL
+   * @param text - — Display text
+   * @param options - — Optional style overrides
+   * @returns The builder (for chaining)
+   *
+   * @example
+   * ```ts
+   * doc.hyperlink('https://example.com', 'Click here')
+   * ```
+   */
+  hyperlink(
+    url: string,
+    text: string,
+    options: Omit<
+      Partial<HyperlinkNode<TStyles>>,
+      'children' | 'type' | 'url'
+    > = {},
+  ): this {
+    return this.add({
+      children: [text],
+      type: 'hyperlink',
+      url,
+      ...options,
+    } as BlockNode<TStyles>)
+  }
+
+  /**
    * Add an image node.
    *
    * @param options - — Image node options (data, width, height, etc.)
@@ -195,6 +255,33 @@ export class DocxBuilder<
    */
   image(options: Omit<ImageNode<TStyles>, 'type'>): this {
     return this.add({ type: 'image', ...options })
+  }
+
+  /**
+   * Add a numbered (ordered) list.
+   *
+   * @param items - — List items
+   * @param options - — Optional numbering format, start, className, style, level
+   * @returns The builder (for chaining)
+   *
+   * @example
+   * ```ts
+   * doc.numberedList(['First', 'Second', 'Third'])
+   * doc.numberedList(
+   *   [{ text: 'Intro' }, { text: 'Body' }],
+   *   { numberingFormat: 'upperRoman', start: 1 },
+   * )
+   * ```
+   */
+  numberedList(
+    items: (string | BulletItem<TStyles>)[],
+    options: Omit<Partial<NumberedListNode<TStyles>>, 'items' | 'type'> = {},
+  ): this {
+    return this.add({
+      items,
+      type: 'numberedList',
+      ...options,
+    } as BlockNode<TStyles>)
   }
 
   /**
@@ -272,6 +359,38 @@ export class DocxBuilder<
   async save(filename: string): Promise<void> {
     const { saveDocument } = await import('../node/fs')
     return saveDocument(await this.toDocument(), filename)
+  }
+
+  /**
+   * Start a new document section.
+   *
+   * Each section can have its own page size, orientation, margins,
+   * headers, and footers. Content added after this call belongs to
+   * the new section.
+   *
+   * @param config - — Optional section-level page/header/footer overrides
+   * @returns The builder (for chaining)
+   *
+   * @example
+   * ```ts
+   * // Simple section break
+   * doc.p('Section 1 content').section().p('Section 2 content')
+   *
+   * // Section with custom page setup
+   * doc.section({ page: { size: 'A3', orientation: 'landscape' } })
+   *    .h1('Wide table')
+   *    .table({ columns: [...], data: [...] })
+   *
+   * // Section with header and footer
+   * doc.section({
+   *   header: { default: { children: ['Chapter 2', 'Confidential'] } },
+   *   footer: { default: { children: ['Page 2'] } },
+   * })
+   * ```
+   */
+  section(config?: SectionConfig): this {
+    this.nodes.push({ config, type: 'sectionBreak' } as BlockNode<TStyles>)
+    return this
   }
 
   /**

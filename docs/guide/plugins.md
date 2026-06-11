@@ -2,14 +2,26 @@
 
 Plugins extend docx-kit with custom content types like QR codes, charts, signatures, and more.
 
+> See the [Plugins section](/plugins/) for detailed documentation of each built-in plugin, including full option tables and rich examples.
+
 ## Built-in Plugins
 
-docx-kit ships with two built-in plugins:
+docx-kit ships with **12 built-in plugins**:
 
-| Plugin | Package | Platform | Description |
-|---|---|---|---|
-| `qrcodePlugin()` | `qrcode` (peer dep) | Both | Generate QR code images |
-| `echartsPlugin()` | `echarts` (peer dep) | Browser | Render ECharts charts as images |
+| Plugin | Node Name | Description | Full Docs |
+|--------|-----------|-------------|-----------|
+| `calloutPlugin()` | `callout` | Colored info / warning / success / danger boxes | [→](/plugins/callout) |
+| `codeBlockPlugin()` | `codeBlock` | Syntax-highlighted code blocks | [→](/plugins/code-block) |
+| `coverPagePlugin()` | `coverPage` | Professional title page | [→](/plugins/cover-page) |
+| `dataTablePlugin()` | `dataTable` | Auto-inferred table from object arrays | [→](/plugins/data-table) |
+| `echartsPlugin()` | `echarts` | ECharts charts as images _(browser only)_ | [→](/plugins/echarts) |
+| `meetingMinutesPlugin()` | `meetingMinutes` | Structured meeting notes | [→](/plugins/meeting-minutes) |
+| `pageNumberPlugin()` | `pageNumber` | Page number field | [→](/plugins/page-number) |
+| `propertyTablePlugin()` | `propertyTable` | Key-value pair styled table | [→](/plugins/property-table) |
+| `qrcodePlugin()` | `qrcode` | QR code images from text or URLs | [→](/plugins/qrcode) |
+| `signatureBlockPlugin()` | `signatureBlock` | Signature lines for contracts | [→](/plugins/signature-block) |
+| `timelinePlugin()` | `timeline` | Chronological timeline | [→](/plugins/timeline) |
+| `watermarkPlugin()` | `watermark` | Text watermark | [→](/plugins/watermark) |
 
 ## Using Plugins
 
