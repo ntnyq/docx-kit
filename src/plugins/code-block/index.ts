@@ -63,6 +63,11 @@ const LINE_NO_COLOR = '999999'
 const MONO_FONT = 'Courier New'
 const FONT_SIZE = 16 // half-points → 8pt
 
+/** Minimal interface for the highlight.js default export (optional peer dep). */
+interface HighlightJs {
+  highlight(code: string, options: { language: string }): { value: string }
+}
+
 /**
  * Create a CodeBlock plugin instance.
  *
@@ -78,7 +83,10 @@ export function codeBlockPlugin() {
       if (options.language) {
         try {
           // Dynamic import — highlight.js is an optional peer dependency
-          const hljs = ((await import('highlight.js')) as any).default
+          const hljsModule = (await import('highlight.js')) as {
+            default: HighlightJs
+          }
+          const hljs = hljsModule.default
           const result = hljs.highlight(options.code, {
             language: options.language,
           })

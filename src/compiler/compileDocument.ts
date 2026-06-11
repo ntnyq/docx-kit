@@ -23,6 +23,7 @@ import {
   resetNumberingState,
 } from './compileNode'
 import { parseShorthandTwip, toTwip } from './units'
+import type { FileChild, ISectionOptions } from 'docx'
 import type {
   BlockNode,
   SectionBreakNode as SectionBreakNodeType,
@@ -108,10 +109,10 @@ export async function compileDocument<TStyles extends StyleSheet>(
   }
 
   // Compile each section
-  const sections: unknown[] = []
+  const sections: ISectionOptions[] = []
 
   for (const [i, group] of sectionGroups.entries()) {
-    const children: unknown[] = []
+    const children: FileChild[] = []
 
     for (const node of group.nodes) {
       const compiled = await compileNode({
@@ -134,7 +135,7 @@ export async function compileDocument<TStyles extends StyleSheet>(
 
     sections.push({
       ...compileSectionProperties(pageConfig),
-      children: children as any[],
+      children,
       footers: compileFooters(
         i === 0 ? undefined : sectionConfig?.footer,
         options.config,
@@ -159,10 +160,8 @@ export async function compileDocument<TStyles extends StyleSheet>(
     lastModifiedBy: options.config.metadata?.lastModifiedBy,
     subject: options.config.metadata?.subject,
     title: options.config.metadata?.title,
-    ...(numberingConfig
-      ? { numbering: { config: numberingConfig as any } }
-      : {}),
-    sections: sections as any[],
+    ...(numberingConfig ? { numbering: { config: numberingConfig } } : {}),
+    sections,
   })
 }
 

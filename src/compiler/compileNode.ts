@@ -31,6 +31,8 @@ import {
   compileTextStyle,
 } from './compileStyle'
 import { toPx } from './units'
+import type { Buffer } from 'node:buffer'
+import type { FileChild, ILevelsOptions } from 'docx'
 import type {
   BlockNode,
   BulletListNode,
@@ -75,6 +77,23 @@ export interface CompileNodeContext<TStyles extends StyleSheet = StyleSheet> {
 
 // ---------- Main ----------
 
+/** Floating options returned to `createImageRun`. */
+type FloatingOptions = Record<string, unknown>
+
+// ---------- Heading ----------
+
+/**
+ * Collect numbering configs during compilation.
+ *
+ * Keys are reference strings, values are config entries passed to
+ * `Document({ numbering: { config: [...] } })`.
+ */
+/** Numbering config entry shape — mirrors `INumberingOptions.config[number]`. */
+type NumberingConfigEntry = {
+  levels: readonly ILevelsOptions[]
+  reference: string
+}
+
 /**
  * Compile a single DSL node into its `docx` representation.
  *
@@ -94,7 +113,7 @@ export interface CompileNodeContext<TStyles extends StyleSheet = StyleSheet> {
  */
 export async function compileNode<TStyles extends StyleSheet>(
   ctx: CompileNodeContext<TStyles>,
-): Promise<unknown> {
+): Promise<FileChild | FileChild[]> {
   switch (ctx.node.type) {
     case 'bulletList':
       return compileBulletList(ctx.node as BulletListNode<TStyles>, ctx.config)
@@ -132,7 +151,10 @@ export async function compileNode<TStyles extends StyleSheet>(
         )
       }
       try {
-        return await plugin.render(ctx.node.options, createPluginContext(ctx))
+        return (await plugin.render(
+          ctx.node.options,
+          createPluginContext(ctx),
+        )) as FileChild | FileChild[]
       } catch (err) {
         throw new DocxKitError(
           'PLUGIN_RENDER_FAILED',
@@ -149,12 +171,14 @@ export async function compileNode<TStyles extends StyleSheet>(
   }
 }
 
-// ---------- Heading ----------
+// ---------- Image ----------
 
 /**
  * Build floating layout options for `ImageRun`.
  */
-function compileFloating(floating: ImageNode['floating']): unknown {
+function compileFloating(
+  floating: ImageNode['floating'],
+): FloatingOptions | undefined {
   if (!floating) {
     return undefined
   }
@@ -168,8 +192,6 @@ function compileFloating(floating: ImageNode['floating']): unknown {
       floating.y === undefined ? undefined : { offset: floating.y },
   }
 }
-
-// ---------- Image ----------
 
 /**
  * Compile a heading node into a `docx` Paragraph with heading level.
@@ -198,6 +220,8 @@ function compileHeading<TStyles extends StyleSheet>(
     ],
   })
 }
+
+// ---------- Paragraph ----------
 
 /**
  * Compile a hyperlink node into an `ExternalHyperlink` containing `TextRun`s.
@@ -239,7 +263,7 @@ function compileHyperlink<TStyles extends StyleSheet>(
   })
 }
 
-// ---------- Paragraph ----------
+// ---------- Hyperlink ----------
 
 /**
  * Compile an image node into a `docx` Paragraph containing an `ImageRun`.
@@ -283,7 +307,7 @@ async function compileImage<TStyles extends StyleSheet>(
   })
 }
 
-// ---------- Hyperlink ----------
+// ---------- Bullet List ----------
 
 /**
  * Compile a paragraph node into a `docx` Paragraph.
@@ -336,15 +360,7 @@ function compileParagraph<TStyles extends StyleSheet>(
   })
 }
 
-// ---------- Bullet List ----------
-
-/**
- * Collect numbering configs during compilation.
- *
- * Keys are reference strings, values are config entries passed to
- * `Document({ numbering: { config: [...] } })`.
- */
-export const numberingConfigMap = new Map<string, unknown>()
+export const numberingConfigMap = new Map<string, NumberingConfigEntry>()
 
 let numberingCounter = 0
 
@@ -417,7 +433,10 @@ function compileNumberedList<TStyles extends StyleSheet>(
   config: DocxKitConfig<TStyles>,
 ): Paragraph[] {
   const ref = `numbered-${++numberingCounter}`
-  const formatMap: Record<string, string> = {
+  const formatMap: Record<
+    string,
+    (typeof LevelFormat)[keyof typeof LevelFormat]
+  > = {
     decimal: LevelFormat.DECIMAL,
     lowerLetter: LevelFormat.LOWER_LETTER,
     lowerRoman: LevelFormat.LOWER_ROMAN,
@@ -595,9 +614,11 @@ function createPluginContext<TStyles extends StyleSheet>(
  *
  * Converts `Blob` → `Uint8Array` in browser environments.
  */
-async function normalizeImageData(data: unknown): Promise<unknown> {
+async function normalizeImageData(
+  data: unknown,
+): Promise<string | ArrayBuffer | Buffer | Uint8Array> {
   if (typeof Blob !== 'undefined' && data instanceof Blob) {
     return new Uint8Array(await data.arrayBuffer())
   }
-  return data
+  return data as string | ArrayBuffer | Buffer | Uint8Array
 }

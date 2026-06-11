@@ -20,6 +20,7 @@ import {
 import { DEFAULT_CODE, PRESETS } from '../constants/templates'
 import { DOCX_KIT_TYPES, prepareCode } from '../utils'
 import type { DocxKitConfig, DocxPreset } from 'docx-kit'
+import type * as Monaco from 'monaco-editor'
 import type { Preset } from '../constants/templates'
 
 /**
@@ -51,8 +52,9 @@ export function useDocxPlayground() {
   // Style preset state: null = no preset (raw defaults)
   const activeStylePreset = ref<DocxPreset | null>(null)
 
-  let editorInstance: any = null
-  let monacoRef: any = null
+  let editorInstance: Monaco.editor.IStandaloneCodeEditor | null = null
+  let modelInstance: Monaco.editor.ITextModel | null = null
+  let monacoRef: typeof Monaco | null = null
   let isInternalChange = false
 
   // -------------------------------------------------------------------------
@@ -99,20 +101,28 @@ export function useDocxPlayground() {
         target: monaco.typescript.ScriptTarget.ESNext,
       })
 
-      // Create a model with an explicit file:// URI so the TypeScript worker
-      // can resolve it during diagnostics — avoids "Could not find source file".
-      const model = monaco.editor.createModel(
-        code.value,
-        'typescript',
-        monaco.Uri.parse('file:///main.ts'),
-      )
+      // Reuse existing model if present (e.g. after page re-visit in VitePress
+      // SPA navigation), otherwise create one with a file:// URI so the TS
+      // worker can resolve it during diagnostics.
+      const modelUri = monaco.Uri.parse('file:///main.ts')
+      const existingModel = monaco.editor.getModel(modelUri)
+      if (existingModel) {
+        modelInstance = existingModel
+        existingModel.setValue(code.value)
+      } else {
+        modelInstance = monaco.editor.createModel(
+          code.value,
+          'typescript',
+          modelUri,
+        )
+      }
 
       editorInstance = monaco.editor.create(editorContainer.value, {
         automaticLayout: true,
         fontSize: 13,
         lineNumbers: 'on',
         minimap: { enabled: false },
-        model,
+        model: modelInstance,
         padding: { bottom: 12, top: 12 },
         scrollBeyondLastLine: false,
         tabSize: 2,
@@ -156,6 +166,10 @@ export function useDocxPlayground() {
       editorInstance.dispose()
       editorInstance = null
     }
+    if (modelInstance) {
+      modelInstance.dispose()
+      modelInstance = null
+    }
   })
 
   // -------------------------------------------------------------------------
@@ -167,6 +181,15 @@ export function useDocxPlayground() {
     if (editorInstance) {
       editorInstance.setValue(preset.code)
     }
+    resultBlob.value = null
+    error.value = ''
+  }
+
+  // -------------------------------------------------------------------------
+  // Style preset switching — also clears generated results
+  // -------------------------------------------------------------------------
+  function selectStylePreset(sp: DocxPreset | null) {
+    activeStylePreset.value = sp
     resultBlob.value = null
     error.value = ''
   }
@@ -260,6 +283,7 @@ export function useDocxPlayground() {
     resetCode,
     resultBlob,
     run,
+    selectStylePreset,
     stylePresets: PRESET_LIST,
   }
 }

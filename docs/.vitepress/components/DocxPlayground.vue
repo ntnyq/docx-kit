@@ -14,6 +14,7 @@ const {
   resetCode,
   resultBlob,
   run,
+  selectStylePreset,
   stylePresets,
 } = useDocxPlayground()
 </script>
@@ -24,6 +25,29 @@ const {
       <div class="panel-header">
         <span class="panel-title">Code Editor</span>
         <div class="panel-actions">
+          <!-- Style preset selector -->
+          <div class="style-preset-bar">
+            <span class="style-preset-label">Style:</span>
+            <button
+              @click="selectStylePreset(null)"
+              :class="{ active: activeStylePreset === null }"
+              class="style-preset-btn"
+              type="button"
+            >
+              None
+            </button>
+            <button
+              @click="selectStylePreset(sp)"
+              v-for="sp in stylePresets"
+              :key="sp.id"
+              :class="{ active: activeStylePreset?.id === sp.id }"
+              :title="sp.description"
+              class="style-preset-btn"
+              type="button"
+            >
+              {{ sp.name }}
+            </button>
+          </div>
           <button
             @click="resetCode"
             class="btn btn-ghost"
@@ -55,32 +79,6 @@ const {
         >
           {{ preset.label }}
         </button>
-      </div>
-
-      <!-- Style preset selector -->
-      <div class="style-preset-bar">
-        <label class="style-preset-label">Style:</label>
-        <div class="style-preset-options">
-          <button
-            @click="activeStylePreset = null"
-            :class="{ active: activeStylePreset === null }"
-            class="style-preset-btn"
-            type="button"
-          >
-            None
-          </button>
-          <button
-            @click="activeStylePreset = sp"
-            v-for="sp in stylePresets"
-            :key="sp.id"
-            :class="{ active: activeStylePreset?.id === sp.id }"
-            :title="sp.description"
-            class="style-preset-btn"
-            type="button"
-          >
-            {{ sp.name }}
-          </button>
-        </div>
       </div>
 
       <div
@@ -228,15 +226,11 @@ const {
   border-bottom-color: var(--vp-c-brand-1);
 }
 
-/* ─── Style preset selector ─── */
+/* ─── Style preset selector (inside panel-header) ─── */
 .style-preset-bar {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: var(--vp-c-bg-soft);
-  border-bottom: 1px solid var(--vp-c-divider);
-  flex-shrink: 0;
+  gap: 4px;
 }
 
 .style-preset-label {
@@ -246,11 +240,7 @@ const {
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.style-preset-options {
-  display: flex;
-  gap: 4px;
+  margin-right: 2px;
 }
 
 .style-preset-btn {

@@ -13,7 +13,11 @@ import HTMLWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import JSONWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import TSWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
-const globalSelf = globalThis as any
+const globalSelf = globalThis as {
+  MonacoEnvironment?: {
+    getWorker(_workerId: string, label: string): Worker
+  }
+} & typeof globalThis
 
 // ─── Monaco Environment ─────────────────────────────────────────────────
 globalSelf.MonacoEnvironment = {

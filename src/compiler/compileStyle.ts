@@ -59,6 +59,9 @@ export function compileBorder(style: DocxStyleRule) {
  * Compile a `DocxStyleRule` into `docx` table cell options
  * (vertical alignment, margins, shading).
  *
+ * Applies sensible default cell padding (5 pt left/right, 2 pt top/bottom)
+ * when no margins are explicitly set.
+ *
  * @param style - — The resolved style rule
  * @returns Options object suitable for `new TableCell(...)`
  *
@@ -72,14 +75,31 @@ export function compileCellStyle(style: DocxStyleRule) {
   const shorthand =
     style.margin == null ? undefined : parseShorthandTwip(style.margin)
 
+  // Default cell padding: 100 twips (5 pt) left/right, 0 top/bottom.
+  // These are overridden when any margin value is explicitly provided.
+  const bottom = toTwip(style.marginBottom) ?? shorthand?.bottom
+  const left = toTwip(style.marginLeft) ?? shorthand?.left
+  const right = toTwip(style.marginRight) ?? shorthand?.right
+  const top = toTwip(style.marginTop) ?? shorthand?.top
+
+  const hasAnyMargin =
+    bottom != null || left != null || right != null || top != null
+
   return {
     verticalAlign: compileVerticalAlign(style.verticalAlign),
-    margins: {
-      bottom: toTwip(style.marginBottom) ?? shorthand?.bottom,
-      left: toTwip(style.marginLeft) ?? shorthand?.left,
-      right: toTwip(style.marginRight) ?? shorthand?.right,
-      top: toTwip(style.marginTop) ?? shorthand?.top,
-    },
+    margins: hasAnyMargin
+      ? {
+          bottom: bottom ?? 0,
+          left: left ?? 0,
+          right: right ?? 0,
+          top: top ?? 0,
+        }
+      : {
+          bottom: 0,
+          left: 100,
+          right: 100,
+          top: 0,
+        },
     shading:
       style.backgroundColor == null
         ? undefined
