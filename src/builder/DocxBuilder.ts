@@ -20,6 +20,7 @@
  * ```
  */
 
+import { PluginManager } from './PluginManager'
 import type {
   BlockNode,
   BulletItem,
@@ -30,6 +31,7 @@ import type {
   NumberedListNode,
   ParagraphNode,
   TableNode,
+  TextNode,
 } from '../dsl/nodes'
 import type { DocxKitConfig, SectionConfig } from '../types/document'
 import type { DocxPlugin, PluginRegistry } from '../types/plugin'
@@ -51,11 +53,11 @@ export class DocxBuilder<
 > {
   private readonly config: DocxKitConfig<TStyles>
   private readonly nodes: BlockNode<TStyles>[] = []
-  private readonly pendingSetups: Promise<void>[] = []
-  private readonly pluginMap = new Map<string, DocxPlugin>()
+  private readonly plugins: PluginManager<TPlugins>
 
   constructor(config: DocxKitConfig<TStyles> = {}) {
     this.config = config
+    this.plugins = new PluginManager()
   }
 
   // ---------- Plugin registration ----------
@@ -65,58 +67,31 @@ export class DocxBuilder<
    *
    * @param node - — Any block-level node
    * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.add({ type: 'heading', level: 2, text: 'Section' })
-   * doc.add({ type: 'pageBreak' })
-   * ```
    */
   add(node: BlockNode<TStyles>): this {
     this.nodes.push(node)
     return this
   }
 
+  // ---------- Content DSL ----------
+
   /**
    * Add a bullet (unordered) list.
-   *
-   * @param items - — List items (strings or structured items)
-   * @param options - — Optional bullet character, className, style, level
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.bulletList(['Item 1', 'Item 2', 'Item 3'])
-   * doc.bulletList([
-   *   'Simple item',
-   *   { text: 'Rich item', className: 'highlight' },
-   * ], { bullet: '\u25CB' })
-   * ```
    */
   bulletList(
     items: (string | BulletItem<TStyles>)[],
     options: Omit<Partial<BulletListNode<TStyles>>, 'items' | 'type'> = {},
   ): this {
-    return this.add({
+    const node: BulletListNode<TStyles> = {
       items,
       type: 'bulletList',
       ...options,
-    } as BlockNode<TStyles>)
+    }
+    return this.add(node)
   }
-
-  // ---------- Content DSL ----------
 
   /**
    * Add a level-1 heading.
-   *
-   * @param text - — Heading text
-   * @param options - — Optional style overrides (className, id, style)
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.h1('Introduction', { className: 'title' })
-   * ```
    */
   h1(
     text: string,
@@ -128,13 +103,7 @@ export class DocxBuilder<
     return this.add({ level: 1, text, type: 'heading', ...options })
   }
 
-  /**
-   * Add a level-2 heading.
-   *
-   * @param text - — Heading text
-   * @param options - — Optional style overrides
-   * @returns The builder (for chaining)
-   */
+  /** Add a level-2 heading. */
   h2(
     text: string,
     options: Omit<
@@ -145,13 +114,7 @@ export class DocxBuilder<
     return this.add({ level: 2, text, type: 'heading', ...options })
   }
 
-  /**
-   * Add a level-3 heading.
-   *
-   * @param text - — Heading text
-   * @param options - — Optional style overrides
-   * @returns The builder (for chaining)
-   */
+  /** Add a level-3 heading. */
   h3(
     text: string,
     options: Omit<
@@ -162,13 +125,7 @@ export class DocxBuilder<
     return this.add({ level: 3, text, type: 'heading', ...options })
   }
 
-  /**
-   * Add a level-4 heading.
-   *
-   * @param text - — Heading text
-   * @param options - — Optional style overrides
-   * @returns The builder (for chaining)
-   */
+  /** Add a level-4 heading. */
   h4(
     text: string,
     options: Omit<
@@ -179,13 +136,7 @@ export class DocxBuilder<
     return this.add({ level: 4, text, type: 'heading', ...options })
   }
 
-  /**
-   * Add a level-5 heading.
-   *
-   * @param text - — Heading text
-   * @param options - — Optional style overrides
-   * @returns The builder (for chaining)
-   */
+  /** Add a level-5 heading. */
   h5(
     text: string,
     options: Omit<
@@ -196,13 +147,7 @@ export class DocxBuilder<
     return this.add({ level: 5, text, type: 'heading', ...options })
   }
 
-  /**
-   * Add a level-6 heading.
-   *
-   * @param text - — Heading text
-   * @param options - — Optional style overrides
-   * @returns The builder (for chaining)
-   */
+  /** Add a level-6 heading. */
   h6(
     text: string,
     options: Omit<
@@ -215,16 +160,6 @@ export class DocxBuilder<
 
   /**
    * Add a hyperlink.
-   *
-   * @param url - — Target URL
-   * @param text - — Display text
-   * @param options - — Optional style overrides
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.hyperlink('https://example.com', 'Click here')
-   * ```
    */
   hyperlink(
     url: string,
@@ -234,67 +169,58 @@ export class DocxBuilder<
       'children' | 'type' | 'url'
     > = {},
   ): this {
-    return this.add({
+    const node: HyperlinkNode<TStyles> = {
       children: [text],
       type: 'hyperlink',
       url,
       ...options,
-    } as BlockNode<TStyles>)
+    }
+    return this.add(node)
   }
 
   /**
    * Add an image node.
-   *
-   * @param options - — Image node options (data, width, height, etc.)
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.image({ data: imageBytes, width: 400, height: 300 })
-   * ```
    */
   image(options: Omit<ImageNode<TStyles>, 'type'>): this {
     return this.add({ type: 'image', ...options })
   }
 
   /**
-   * Add a numbered (ordered) list.
+   * Create an inline image node for use in paragraph children.
    *
-   * @param items - — List items
-   * @param options - — Optional numbering format, start, className, style, level
-   * @returns The builder (for chaining)
+   * Returns an `ImageNode` object that can be passed directly to
+   * `p()` via the `children` option.
    *
    * @example
    * ```ts
-   * doc.numberedList(['First', 'Second', 'Third'])
-   * doc.numberedList(
-   *   [{ text: 'Intro' }, { text: 'Body' }],
-   *   { numberingFormat: 'upperRoman', start: 1 },
-   * )
+   * doc.p([
+   *   doc.span('Icon: '),
+   *   doc.inlineImg({ data: iconUrl, width: 16, height: 16 }),
+   * ])
    * ```
+   */
+  inlineImg(options: Omit<ImageNode<TStyles>, 'type'>): ImageNode<TStyles> {
+    const node: ImageNode<TStyles> = { type: 'image', ...options }
+    return node
+  }
+
+  /**
+   * Add a numbered (ordered) list.
    */
   numberedList(
     items: (string | BulletItem<TStyles>)[],
     options: Omit<Partial<NumberedListNode<TStyles>>, 'items' | 'type'> = {},
   ): this {
-    return this.add({
+    const node: NumberedListNode<TStyles> = {
       items,
       type: 'numberedList',
       ...options,
-    } as BlockNode<TStyles>)
+    }
+    return this.add(node)
   }
 
   /**
    * Add a paragraph.
-   *
-   * @param text - — Paragraph text content
-   * @param options - — Optional style overrides (className, id, style)
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.p('Hello world', { className: 'body', style: { textAlign: 'center' } })
-   * ```
    */
   p(
     text: string,
@@ -303,58 +229,24 @@ export class DocxBuilder<
     return this.add({ text, type: 'paragraph', ...options })
   }
 
-  /**
-   * Add a forced page break.
-   *
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.h1('Chapter 1').pageBreak().h1('Chapter 2')
-   * ```
-   */
+  /** Add a forced page break. */
   pageBreak(): this {
     return this.add({ type: 'pageBreak' })
   }
 
   /**
    * Invoke a registered plugin.
-   *
-   * @param name - — Plugin name (must match a previously registered plugin)
-   * @param options - — Plugin-specific options
-   * @param style - — Optional inline style for the plugin's container
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.use(qrcodePlugin()).plugin('qrcode', { text: 'https://example.com' })
-   * ```
    */
   plugin<TName extends string & keyof TPlugins>(
     name: TName,
     options: TPlugins[TName],
     style?: DocxStyleRule,
   ): this {
-    return this.add({
-      name,
-      options,
-      style,
-      type: 'plugin',
-    } as unknown as BlockNode<TStyles>)
+    return this.add(this.plugins.createNode(name, options, style))
   }
 
   /**
    * Save the document to a file (Node.js only).
-   *
-   * **⚠️ Not available in browser environments.**
-   * Use {@link toBlob} and trigger a download instead.
-   *
-   * @param filename - — Output file path (e.g. `"report.docx"`)
-   *
-   * @example
-   * ```ts
-   * await doc.save('output.docx')
-   * ```
    */
   async save(filename: string): Promise<void> {
     const { saveDocument } = await import('../node/fs')
@@ -363,75 +255,50 @@ export class DocxBuilder<
 
   /**
    * Start a new document section.
+   */
+  section(config?: SectionConfig): this {
+    return this.add({ config, type: 'sectionBreak' })
+  }
+
+  /**
+   * Create a styled inline text span for use in paragraph children.
    *
-   * Each section can have its own page size, orientation, margins,
-   * headers, and footers. Content added after this call belongs to
-   * the new section.
-   *
-   * @param config - — Optional section-level page/header/footer overrides
-   * @returns The builder (for chaining)
+   * Returns a `TextNode` object that can be passed directly to
+   * `p()` via the `children` option.
    *
    * @example
    * ```ts
-   * // Simple section break
-   * doc.p('Section 1 content').section().p('Section 2 content')
-   *
-   * // Section with custom page setup
-   * doc.section({ page: { size: 'A3', orientation: 'landscape' } })
-   *    .h1('Wide table')
-   *    .table({ columns: [...], data: [...] })
-   *
-   * // Section with header and footer
-   * doc.section({
-   *   header: { default: { children: ['Chapter 2', 'Confidential'] } },
-   *   footer: { default: { children: ['Page 2'] } },
-   * })
+   * doc.p([
+   *   doc.span('Normal, '),
+   *   doc.span('bold red', { bold: true, color: '#f00' }),
+   * ])
    * ```
    */
-  section(config?: SectionConfig): this {
-    this.nodes.push({ config, type: 'sectionBreak' } as BlockNode<TStyles>)
-    return this
+  span(text: string, style?: DocxStyleRule): TextNode {
+    const node: TextNode = { text, type: 'text' }
+    if (style) {
+      node.style = style
+    }
+    return node
   }
 
   /**
    * Add a table.
-   *
-   * @param options - — Table node options (columns, data, style, etc.)
-   * @returns The builder (for chaining)
-   *
-   * @example
-   * ```ts
-   * doc.table({
-   *   columns: [
-   *     { key: 'name', title: 'Name' },
-   *     { key: 'value', title: 'Value', align: 'right' },
-   *   ],
-   *   data: [{ name: 'Revenue', value: '$1.2M' }],
-   *   headerCellStyle: { fontWeight: 'bold' },
-   * })
-   * ```
    */
   table<TData extends Record<string, unknown>>(
     options: Omit<TableNode<TData, TStyles>, 'type'>,
   ): this {
-    return this.add({
+    const node: TableNode<TData, TStyles> = {
       type: 'table',
       ...options,
-    } as unknown as BlockNode<TStyles>)
+    }
+    return this.add(node as unknown as BlockNode<TStyles>)
   }
 
   // ---------- Output ----------
 
   /**
    * Export the document as a base64-encoded string.
-   *
-   * @returns Base64-encoded .docx data
-   *
-   * @example
-   * ```ts
-   * const b64 = await doc.toBase64()
-   * // Send b64 over HTTP or store in a database
-   * ```
    */
   async toBase64(): Promise<string> {
     const { packToBase64String } = await import('../renderer/pack')
@@ -440,14 +307,6 @@ export class DocxBuilder<
 
   /**
    * Export the document as a `Blob` (browser-friendly).
-   *
-   * @returns A `Blob` containing the .docx binary
-   *
-   * @example
-   * ```ts
-   * const blob = await doc.toBlob()
-   * const url = URL.createObjectURL(blob)
-   * ```
    */
   async toBlob(): Promise<Blob> {
     const { packToBlob } = await import('../renderer/pack')
@@ -456,17 +315,6 @@ export class DocxBuilder<
 
   /**
    * Export the document as a `Uint8Array` (alias for {@link toUint8Array}).
-   *
-   * **Note:** Despite the name, this returns a standard `Uint8Array`,
-   * not a Node.js `Buffer`. Prefer using {@link toUint8Array} for clarity.
-   *
-   * @returns Raw .docx bytes
-   *
-   * @example
-   * ```ts
-   * const bytes = await doc.toBuffer()
-   * fs.writeFileSync('output.docx', bytes)
-   * ```
    */
   async toBuffer(): Promise<Uint8Array> {
     return this.toUint8Array()
@@ -474,30 +322,19 @@ export class DocxBuilder<
 
   /**
    * Compile and return the internal `docx` {@link Document} instance.
-   *
-   * Useful if you need to further manipulate the document with the
-   * raw `docx` library before packaging.
-   *
-   * @returns A `docx` `Document` object
    */
   async toDocument() {
-    // Await all plugin setups before compiling
-    await Promise.all(this.pendingSetups)
-    this.pendingSetups.length = 0
+    await this.plugins.awaitSetups()
     const { compileDocument } = await import('../compiler/compileDocument')
     return compileDocument({
       config: this.config,
       nodes: this.nodes,
-      plugins: this.pluginMap,
+      plugins: this.plugins.toMap(),
     })
   }
 
   /**
    * Serialize the builder state to a JSON-friendly object.
-   *
-   * Useful for debugging, serialization, or AI-driven document generation.
-   *
-   * @returns The config + content node array as a plain object
    */
   toJSON() {
     return {
@@ -507,18 +344,7 @@ export class DocxBuilder<
   }
 
   /**
-   * Export the document as a `Uint8Array` (browser & Node.js).
-   *
-   * This is the preferred cross-platform export method.
-   *
-   * @returns Raw .docx bytes
-   *
-   * @example
-   * ```ts
-   * const bytes = await doc.toUint8Array()
-   * // In Node.js: import { writeFileSync } from 'node:fs'
-   * // In browser: trigger a download
-   * ```
+   * Export the document as a `Uint8Array`.
    */
   async toUint8Array(): Promise<Uint8Array> {
     const { packToBuffer } = await import('../renderer/pack')
@@ -544,10 +370,7 @@ export class DocxBuilder<
   use<TName extends string, TOptions>(
     plugin: DocxPlugin<TName, TOptions>,
   ): DocxBuilder<TStyles, Record<TName, TOptions> & TPlugins> {
-    this.pluginMap.set(plugin.name, plugin as DocxPlugin)
-    if (plugin.setup) {
-      this.pendingSetups.push(Promise.resolve(plugin.setup()))
-    }
+    this.plugins.register(plugin)
     return this as unknown as DocxBuilder<
       TStyles,
       Record<TName, TOptions> & TPlugins

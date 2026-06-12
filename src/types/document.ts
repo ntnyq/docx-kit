@@ -4,6 +4,7 @@
  * @module types/document
  */
 
+import type { BlockNode } from '../dsl/nodes'
 import type { DocxStyleRule, StyleSheet } from './style'
 import type { UnitValue } from './utility'
 
@@ -53,20 +54,35 @@ export interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
 }
 
 /**
- * Theme tokens that can be referenced in styles.
+ * Theme tokens that can be referenced in styles via `$category.key` syntax.
  *
  * Allows defining a single source of truth for colors, fonts,
- * font sizes, and spacing values.
+ * font sizes, and spacing values. Token references are resolved
+ * at compile time by {@link resolveThemeTokens}.
+ *
+ * @example
+ * ```ts
+ * const theme: DocxTheme = {
+ *   colors:  { primary: '#1a56db', accent: '#f59e0b', muted: '#6b7280' },
+ *   fonts:   { heading: 'Georgia', body: 'Inter', mono: 'JetBrains Mono' },
+ *   spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 48 },
+ * }
+ *
+ * const styles = defineStyles({
+ *   title: { color: '$colors.primary', fontFamily: '$fonts.heading' },
+ *   card:  { marginBottom: '$spacing.lg' },
+ * })
+ * ```
  */
 export interface DocxTheme {
-  /** Color palette (name → hex). */
-  colors?: Record<string, string>
-  /** Font family tokens (name → font family). */
-  fontFamily?: Record<string, string>
+  /** Color palette tokens (name → hex). */
+  colors?: ThemeColors
+  /** Font family tokens (name → font family string). */
+  fonts?: ThemeFonts
   /** Font size tokens (name → value). */
   fontSize?: Record<string, UnitValue>
   /** Spacing tokens (name → value). */
-  spacing?: Record<string, UnitValue>
+  spacing?: ThemeSpacing
 }
 
 /**
@@ -92,19 +108,30 @@ export interface HeaderFooterConfig {
 }
 
 /**
- * Content for a header or footer — a list of text strings.
+ * Content for a header or footer.
  *
- * Each string maps to a `Paragraph` in the compiled .docx output.
- * Future versions may support richer content (tables, images, page numbers).
+ * Supports both simple text strings (backward compatible, each maps to a `Paragraph`)
+ * and full {@link BlockNode} elements (paragraphs, images, tables, etc.).
  *
  * @example
  * ```ts
- * { default: ['Company Name', 'Confidential'] }
+ * // Simple text (backward compatible)
+ * { default: { children: ['Company Name', 'Confidential'] } }
+ *
+ * // Rich content
+ * {
+ *   default: {
+ *     children: [
+ *       { type: 'paragraph', children: [{ type: 'text', text: 'Page ', style: { color: '#888' } }, { type: 'plugin', name: 'pageNumber' }] },
+ *       { type: 'image', data: logoBuffer, width: 100, height: 30 },
+ *     ],
+ *   },
+ * }
  * ```
  */
 export interface HeaderFooterContent {
-  /** Paragraph text lines. */
-  children: string[]
+  /** Content items — strings (simple) or BlockNode objects (rich). */
+  children: (string | BlockNode)[]
 }
 
 /** Page orientation. */
@@ -155,4 +182,34 @@ export interface SectionConfig {
   header?: HeaderFooterConfig
   /** Section-specific page dimensions (overrides document-level `page`). */
   page?: PageConfig
+}
+
+/**
+ * Theme color palette — semantic color tokens referenced by name.
+ *
+ * Each key can be any semantic name (e.g. `"primary"`, `"muted"`, `"danger"`),
+ * and each value is a hex color string.
+ */
+export interface ThemeColors {
+  [name: string]: string
+}
+
+/**
+ * Theme font tokens — semantic font family names.
+ *
+ * Keys are semantic names (e.g. `"heading"`, `"body"`, `"mono"`),
+ * values are CSS font-family strings.
+ */
+export interface ThemeFonts {
+  [name: string]: string
+}
+
+/**
+ * Theme spacing tokens — named spacing values.
+ *
+ * Keys are semantic names (e.g. `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`),
+ * values are `UnitValue` dimensions.
+ */
+export interface ThemeSpacing {
+  [name: string]: UnitValue
 }

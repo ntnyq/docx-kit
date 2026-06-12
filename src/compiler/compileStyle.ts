@@ -16,7 +16,12 @@ import {
   WidthType,
 } from 'docx'
 import { parseShorthandTwip, toPtHalf, toTwip } from './units'
-import type { DocxStyleRule } from '../types/style'
+import type {
+  CellStyleRule,
+  DocxStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '../types/style'
 
 // ---------- Text / Run ----------
 
@@ -34,7 +39,7 @@ import type { DocxStyleRule } from '../types/style'
  * // => { top: {...}, right: {...}, bottom: {...}, left: {...} }
  * ```
  */
-export function compileBorder(style: DocxStyleRule) {
+export function compileBorder(style: CellStyleRule | ParagraphStyleRule) {
   const b = style.border
   const bt = style.borderTop ?? b
   const br = style.borderRight ?? b
@@ -71,7 +76,7 @@ export function compileBorder(style: DocxStyleRule) {
  * // => { verticalAlign: VerticalAlign.CENTER, shading: { fill: 'f0f0f0', ... } }
  * ```
  */
-export function compileCellStyle(style: DocxStyleRule) {
+export function compileCellStyle(style: CellStyleRule) {
   const shorthand =
     style.margin == null ? undefined : parseShorthandTwip(style.margin)
 
@@ -140,7 +145,7 @@ export function compileColumnWidth(width: unknown) {
 // ---------- Border ----------
 
 /** Compile paragraph-level borders (separate from cell borders). */
-export function compileParagraphBorder(style: DocxStyleRule) {
+export function compileParagraphBorder(style: ParagraphStyleRule) {
   const borders = compileBorder(style)
   if (!borders) {
     return {}
@@ -161,7 +166,7 @@ export function compileParagraphBorder(style: DocxStyleRule) {
  * // => { alignment: AlignmentType.CENTER, spacing: { before: 200, ... } }
  * ```
  */
-export function compileParagraphStyle(style: DocxStyleRule) {
+export function compileParagraphStyle(style: ParagraphStyleRule) {
   const spacing = resolveSpacing(style)
   const indent = resolveIndent(style)
 
@@ -193,7 +198,7 @@ export function compileParagraphStyle(style: DocxStyleRule) {
  * // => { size: 28, bold: true, color: 'ff0000' }
  * ```
  */
-export function compileTextStyle(style: DocxStyleRule) {
+export function compileTextStyle(style: TextStyleRule) {
   const result: Record<string, unknown> = {
     allCaps: style.allCaps,
     bold: style.fontWeight === 'bold' || Number(style.fontWeight) >= 600,

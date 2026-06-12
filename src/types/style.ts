@@ -7,6 +7,7 @@
  * @module types/style
  */
 
+import { DocxKitError } from '../errors'
 import type { HexColor, LiteralUnion, UnitValue } from './utility'
 
 /**
@@ -27,18 +28,13 @@ export interface BorderRule {
 export type BorderStyle = 'dashed' | 'dotted' | 'double' | 'none' | 'single'
 
 /**
- * CSS-like style descriptor for a run, paragraph, cell, or table.
+ * Table-cell level style properties.
  *
- * Keys mirror familiar CSS property names. Unknown properties that don't
- * map to Word XML are silently ignored.
+ * Used by {@link compileCellStyle} for `TableCell` construction.
  */
-export interface DocxStyleRule {
-  // ---- text ----
-  /** Force text to uppercase (small caps-like). */
-  allCaps?: boolean
+export interface CellStyleRule {
   /** Background / shading color. */
   backgroundColor?: string | HexColor
-  // ---- border ----
   /** Shorthand border for all four sides. */
   border?: BorderRule
   /** Bottom border override. */
@@ -49,92 +45,40 @@ export interface DocxStyleRule {
   borderRight?: BorderRule
   /** Top border override. */
   borderTop?: BorderRule
-  // ---- character formatting ----
-  /** Character spacing (letter-spacing). */
-  characterSpacing?: number
-  /** Text / foreground color. */
-  color?: string | HexColor
-  // ---- Word-specific escape hatch ----
-  /**
-   * Direct passthrough to the underlying `docx` library constructor options.
-   * Use for properties not yet covered by the CSS-like mapping.
-   */
-  docx?: Record<string, unknown>
-
-  /** Font family name. */
-  fontFamily?: LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>
-  /** Font size (bare number = pt). */
-  fontSize?: UnitValue
-  /** Italic toggle. */
-  fontStyle?: 'italic' | 'normal'
-  /** Font weight: keyword `"bold"` / `"normal"` or numeric 100–900. */
-  fontWeight?: FontWeight
-
-  // ---- layout ----
   /** Element height. */
   height?: UnitValue
-  /** Text highlight color (background marker). */
-  highlight?: HighlightColor
-  // ---- paragraph / page flow ----
-  /** Keep lines together on same page. */
-  keepLines?: boolean
-  /** Keep this paragraph with the next one. */
-  keepNext?: boolean
-  // ---- paragraph ----
-  /** Character spacing. */
-  letterSpacing?: UnitValue
-  /** Line height multiplier or explicit unit value. */
-  lineHeight?: number | UnitValue
-  /** Bottom margin. */
+  /** Bottom margin (cell padding). */
   marginBottom?: UnitValue
-  /** Left margin. */
+  /** Left margin (cell padding). */
   marginLeft?: UnitValue
-  /** Right margin. */
+  /** Right margin (cell padding). */
   marginRight?: UnitValue
-
-  /** Top margin. */
+  /** Top margin (cell padding). */
   marginTop?: UnitValue
-  /** Force page break before this paragraph. */
-  pageBreakBefore?: boolean
-  /** Small caps text variant. */
-  smallCaps?: boolean
-  /** Strikethrough toggle. */
-  strike?: boolean
-  /** Sub-script text. */
-  subScript?: boolean
-  /** Super-script text. */
-  superScript?: boolean
-  /** Horizontal text alignment. */
-  textAlign?: TextAlign
-
-  /** First-line indent. */
-  textIndent?: UnitValue
-  /** Underline style. */
-  underline?: 'double' | 'single' | boolean
   /** Vertical alignment (mostly for table cells). */
   verticalAlign?: VerticalAlign
   /** Element width. */
   width?: UnitValue
-  // ---- spacing / box ----
   /**
-   * CSS-like margin shorthand.
-   *
-   * Supports 1-value, 2-value, and 4-value string syntax
-   * (e.g. `"10pt"`, `"10pt 20pt"`, `"10pt 20pt 30pt 40pt"`).
+   * CSS-like margin shorthand (used as cell padding).
    */
   margin?:
     | `${string} ${string}`
     | `${string} ${string} ${string} ${string}`
     | UnitValue
-
-  /**
-   * CSS-like padding shorthand (same syntax as margin).
-   */
-  padding?:
-    | `${string} ${string}`
-    | `${string} ${string} ${string} ${string}`
-    | UnitValue
 }
+
+/**
+ * CSS-like style descriptor for a run, paragraph, cell, or table.
+ *
+ * Combines text, paragraph, and cell-level properties.
+ * This is the user-facing style type — individual compiler functions
+ * narrow to {@link TextStyleRule}, {@link ParagraphStyleRule}, or
+ * {@link CellStyleRule} as appropriate.
+ */
+export type DocxStyleRule = CellStyleRule & ParagraphStyleRule & TextStyleRule
+
+// ---- Sub-types and enums ----
 
 /**
  * Font weight: keyword `"bold"` / `"normal"`, or numeric 100–900
@@ -174,6 +118,57 @@ export type HighlightColor =
   | 'yellow'
 
 /**
+ * Paragraph-level style properties.
+ *
+ * Used by {@link compileParagraphStyle} for `Paragraph` construction.
+ */
+export interface ParagraphStyleRule {
+  // ---- border ----
+  /** Shorthand border for all four sides. */
+  border?: BorderRule
+  /** Bottom border override. */
+  borderBottom?: BorderRule
+  /** Left border override. */
+  borderLeft?: BorderRule
+  /** Right border override. */
+  borderRight?: BorderRule
+  /** Top border override. */
+  borderTop?: BorderRule
+
+  // ---- paragraph flow ----
+  /** Keep lines together on same page. */
+  keepLines?: boolean
+  /** Keep this paragraph with the next one. */
+  keepNext?: boolean
+  /** Line height multiplier or explicit unit value. */
+  lineHeight?: number | UnitValue
+  /** Bottom margin. */
+  marginBottom?: UnitValue
+  /** Left margin. */
+  marginLeft?: UnitValue
+  /** Right margin. */
+  marginRight?: UnitValue
+  /** Top margin. */
+  marginTop?: UnitValue
+  /** Force page break before this paragraph. */
+  pageBreakBefore?: boolean
+  /** Horizontal text alignment. */
+  textAlign?: TextAlign
+  /** First-line indent. */
+  textIndent?: UnitValue
+  /**
+   * CSS-like margin shorthand.
+   *
+   * Supports 1-value, 2-value, and 4-value string syntax
+   * (e.g. `"10pt"`, `"10pt 20pt"`, `"10pt 20pt 30pt 40pt"`).
+   */
+  margin?:
+    | `${string} ${string}`
+    | `${string} ${string} ${string} ${string}`
+    | UnitValue
+}
+
+/**
  * A map of class name → style rule.
  *
  * Used to define reusable named styles referenced via `className` on nodes.
@@ -186,10 +181,73 @@ export type HighlightColor =
  * })
  * ```
  */
-export type StyleSheet = Record<string, DocxStyleRule>
+export type StyleSheet = Record<string, StyleSheetEntry>
+
+/**
+ * A single entry in the stylesheet.
+ *
+ * Extends {@link DocxStyleRule} with an optional `extends` property
+ * that allows style classes to inherit from other classes.
+ *
+ * @example
+ * ```ts
+ * defineStyles({
+ *   baseText: { fontFamily: 'Arial', fontSize: 12, color: '#333' },
+ *   heading:  { extends: 'baseText', fontSize: 20, fontWeight: 'bold' },
+ *   muted:    { extends: 'baseText', color: '#888' },
+ * })
+ * ```
+ */
+export interface StyleSheetEntry extends DocxStyleRule {
+  /** Inherit style properties from one or more other style classes. */
+  extends?: string | string[]
+}
 
 /** Horizontal text alignment. */
 export type TextAlign = 'center' | 'justify' | 'left' | 'right'
+
+/**
+ * Text-level style properties (font, color, size, weight, etc.).
+ *
+ * Used by {@link compileTextStyle} for `TextRun` construction.
+ */
+export interface TextStyleRule {
+  /** Force text to uppercase (small caps-like). */
+  allCaps?: boolean
+  /** Background / shading color. */
+  backgroundColor?: string | HexColor
+  /** Character spacing (letter-spacing). */
+  characterSpacing?: number
+  /** Text / foreground color. */
+  color?: string | HexColor
+  /**
+   * Direct passthrough to the underlying `docx` library constructor options.
+   * Use for properties not yet covered by the CSS-like mapping.
+   */
+  docx?: Record<string, unknown>
+  /** Font family name. */
+  fontFamily?: LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>
+  /** Font size (bare number = pt). */
+  fontSize?: UnitValue
+  /** Italic toggle. */
+  fontStyle?: 'italic' | 'normal'
+  /** Font weight: keyword `"bold"` / `"normal"` or numeric 100–900. */
+  fontWeight?: FontWeight
+  /** Text highlight color (background marker). */
+  highlight?: HighlightColor
+  /** Character spacing. */
+  letterSpacing?: UnitValue
+  /** Small caps text variant. */
+  smallCaps?: boolean
+  /** Strikethrough toggle. */
+  strike?: boolean
+  /** Sub-script text. */
+  subScript?: boolean
+  /** Super-script text. */
+  superScript?: boolean
+  /** Underline style. */
+  underline?: 'double' | 'single' | boolean
+}
 
 /** Vertical alignment (for table cells). */
 export type VerticalAlign = 'bottom' | 'middle' | 'top'
@@ -211,5 +269,23 @@ export type VerticalAlign = 'bottom' | 'middle' | 'top'
  * ```
  */
 export function defineStyles<const T extends StyleSheet>(styles: T): T {
+  // Filter out metadata-only keys like `extends` from the resolved rule.
+  // This validation can be extended to check for circular inheritance.
+  const styleKeys = new Set(Object.keys(styles))
+  for (const [name, entry] of Object.entries(styles)) {
+    if (entry.extends) {
+      const parents = Array.isArray(entry.extends)
+        ? entry.extends
+        : [entry.extends]
+      for (const parent of parents) {
+        if (!styleKeys.has(parent)) {
+          throw new DocxKitError(
+            'STYLE_UNKNOWN_CLASS',
+            `Style class "${name}" extends unknown class "${parent}"`,
+          )
+        }
+      }
+    }
+  }
   return styles
 }

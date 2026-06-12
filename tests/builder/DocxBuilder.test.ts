@@ -151,7 +151,7 @@ describe('DocxBuilder', () => {
   describe('plugin', () => {
     it('adds a plugin node', () => {
       const builder = new DocxBuilder() as any
-      builder.pluginMap.set('custom', { name: 'custom' })
+      builder.plugins.toMap().set('custom', { name: 'custom' })
       builder.plugin('custom', { value: 42 })
       const node = builder.toJSON().content![0]
       expect(node).toMatchObject({ name: 'custom', type: 'plugin' })
@@ -159,7 +159,7 @@ describe('DocxBuilder', () => {
 
     it('plugin accepts optional style param', () => {
       const builder = new DocxBuilder() as any
-      builder.pluginMap.set('custom', { name: 'custom' })
+      builder.plugins.toMap().set('custom', { name: 'custom' })
       builder.plugin('custom', {}, { color: '#f00' })
       const node = builder.toJSON().content![0]
       expect(node).toMatchObject({ name: 'custom', style: { color: '#f00' } })
@@ -171,7 +171,7 @@ describe('DocxBuilder', () => {
       const builder = new DocxBuilder()
       const result = builder.use({ name: 'myPlugin', render: () => 'ok' })
       expect(result).toBe(builder)
-      expect((builder as any).pluginMap.has('myPlugin')).toBe(true)
+      expect((builder as any).plugins.toMap().has('myPlugin')).toBe(true)
     })
   })
 

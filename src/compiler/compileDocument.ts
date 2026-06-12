@@ -17,11 +17,8 @@ import {
   Header as DocxHeader,
   Paragraph,
 } from 'docx'
-import {
-  compileNode,
-  numberingConfigMap,
-  resetNumberingState,
-} from './compileNode'
+import { compileNode } from './compileNode'
+import { CompilationSession } from './numbers'
 import { parseShorthandTwip, toTwip } from './units'
 import type { FileChild, ISectionOptions } from 'docx'
 import type {
@@ -63,11 +60,8 @@ type PageSizeValue = PageConfig['size']
 /**
  * Compile an array of block nodes into a `docx` {@link Document} instance.
  *
- * This is the primary compilation pipeline — nodes flow through
- * `compileNode` → individual sub-compilers → `docx` objects → `Document`.
- *
- * If `SectionBreakNode` markers are present, content is split into
- * multiple sections, each with its own page setup, headers, and footers.
+ * Creates a fresh {@link CompilationSession} per call to scope numbering
+ * state to this compilation. Uses the node registry for dispatch.
  *
  * @param options - — Compilation options with config, nodes, and plugins
  * @returns A `docx` `Document` ready for packaging
@@ -87,11 +81,10 @@ type PageSizeValue = PageConfig['size']
 export async function compileDocument<TStyles extends StyleSheet>(
   options: CompileDocumentOptions<TStyles>,
 ) {
-  // Reset numbering state for each compilation
-  resetNumberingState()
+  // Create a fresh session to scope numbering state to this compilation
+  const session = new CompilationSession()
 
   // Split nodes into section groups by SectionBreakNode markers.
-  // The first group always exists (even if the document has no explicit sections).
   const sectionGroups: Array<{
     nodes: BlockNode<TStyles>[]
     config?: SectionConfig
@@ -119,6 +112,7 @@ export async function compileDocument<TStyles extends StyleSheet>(
         config: options.config,
         node,
         plugins: options.plugins,
+        session,
       })
 
       if (Array.isArray(compiled)) {
@@ -133,25 +127,29 @@ export async function compileDocument<TStyles extends StyleSheet>(
     const pageConfig =
       i === 0 ? options.config : mergePageConfig(options.config, sectionConfig)
 
+    const footers = await compileHeaderFooter(
+      DocxFooter,
+      i === 0 ? undefined : sectionConfig?.footer,
+      options,
+      session,
+    )
+    const headers = await compileHeaderFooter(
+      DocxHeader,
+      i === 0 ? undefined : sectionConfig?.header,
+      options,
+      session,
+    )
+
     sections.push({
       ...compileSectionProperties(pageConfig),
       children,
-      footers: compileFooters(
-        i === 0 ? undefined : sectionConfig?.footer,
-        options.config,
-      ),
-      headers: compileHeaders(
-        i === 0 ? undefined : sectionConfig?.header,
-        options.config,
-      ),
+      footers,
+      headers,
     })
   }
 
   // Collect numbering configs generated during compilation
-  const numberingConfig =
-    numberingConfigMap.size > 0
-      ? Array.from(numberingConfigMap.values())
-      : undefined
+  const numberingConfig = session.toArray()
 
   return new Document({
     creator: options.config.metadata?.creator,
@@ -165,84 +163,87 @@ export async function compileDocument<TStyles extends StyleSheet>(
   })
 }
 
-// ---------- Section helpers ----------
+// ---------- Header / Footer (deduplicated) ----------
 
 /**
- * Compile section footers into `docx` `Footer` objects.
+ * Compile section headers or footers into `docx` `Header`/`Footer` objects.
  *
- * @returns `{ default?, first?, even? }` or `undefined` if no footers defined
+ * Generic over the constructor type — eliminates the copy-paste between
+ * `compileHeaders` and `compileFooters`.
+ *
+ * @returns `{ default?, first?, even? }` or `undefined` if no content defined
  */
-function compileFooters<TStyles extends StyleSheet>(
+async function compileHeaderFooter<TStyles extends StyleSheet>(
+  Ctor: typeof DocxFooter | typeof DocxHeader,
   config: HeaderFooterConfig | undefined,
-  _docConfig: DocxKitConfig<TStyles>,
+  options: CompileDocumentOptions<TStyles>,
+  session: CompilationSession,
 ) {
   if (!config) {
     return undefined
   }
 
-  const result: Record<string, DocxFooter> = {}
-  if (config.default) {
-    result.default = new DocxFooter({
-      children: compileHeaderFooterChildren(config.default),
-    })
-  }
-  if (config.first) {
-    result.first = new DocxFooter({
-      children: compileHeaderFooterChildren(config.first),
-    })
-  }
-  if (config.even) {
-    result.even = new DocxFooter({
-      children: compileHeaderFooterChildren(config.even),
-    })
+  const result: Record<string, DocxFooter | DocxHeader> = {}
+  const keys: (keyof HeaderFooterConfig)[] = ['default', 'first', 'even']
+
+  for (const key of keys) {
+    if (config[key]) {
+      result[key] = new Ctor({
+        children: await compileHeaderFooterChildren(
+          config[key]!,
+          options,
+          session,
+        ),
+      })
+    }
   }
 
   return Object.keys(result).length > 0 ? result : undefined
 }
 
-// ---------- Header / Footer ----------
-
 /**
- * Compile a `HeaderFooterContent` into a list of `docx` `Paragraph`s.
+ * Compile a `HeaderFooterContent` into `docx` `Paragraph` children.
+ *
+ * Supports both simple strings (backward compatible — each becomes a `Paragraph`)
+ * and full {@link BlockNode} objects (compiled via the node registry with style support).
  */
-function compileHeaderFooterChildren(
+async function compileHeaderFooterChildren<TStyles extends StyleSheet>(
   content: HeaderFooterContent,
-): Paragraph[] {
-  return content.children.map(text => new Paragraph(text))
+  options: CompileDocumentOptions<TStyles>,
+  session: CompilationSession,
+): Promise<Paragraph[]> {
+  const result: Paragraph[] = []
+
+  for (const item of content.children) {
+    if (typeof item === 'string') {
+      // Simple text — create a plain paragraph (backward compatible)
+      result.push(new Paragraph(item))
+    } else {
+      // Rich content BlockNode — compile via the node registry
+      const compiled = await compileNode({
+        config: options.config,
+        node: item,
+        plugins: options.plugins,
+        session,
+      })
+
+      // Flatten the result — collect only Paragraph children
+      const items = Array.isArray(compiled) ? compiled : [compiled]
+      for (const child of items) {
+        if (child instanceof Paragraph) {
+          result.push(child)
+        } else {
+          // Wrap non-Paragraph FileChild in a Paragraph
+          result.push(new Paragraph({ children: [child] }))
+        }
+      }
+    }
+  }
+
+  return result
 }
 
-/**
- * Compile section headers into `docx` `Header` objects.
- *
- * @returns `{ default?, first?, even? }` or `undefined` if no headers defined
- */
-function compileHeaders<TStyles extends StyleSheet>(
-  config: HeaderFooterConfig | undefined,
-  _docConfig: DocxKitConfig<TStyles>,
-) {
-  if (!config) {
-    return undefined
-  }
-
-  const result: Record<string, DocxHeader> = {}
-  if (config.default) {
-    result.default = new DocxHeader({
-      children: compileHeaderFooterChildren(config.default),
-    })
-  }
-  if (config.first) {
-    result.first = new DocxHeader({
-      children: compileHeaderFooterChildren(config.first),
-    })
-  }
-  if (config.even) {
-    result.even = new DocxHeader({
-      children: compileHeaderFooterChildren(config.even),
-    })
-  }
-
-  return Object.keys(result).length > 0 ? result : undefined
-}
+// ---------- Page / Section properties ----------
 
 /**
  * Compile a single page margin value (shorthand or explicit) into twips.
@@ -263,8 +264,6 @@ function compilePageMargin(margin: PageMarginValue) {
   }
 }
 
-// ---------- Page / Section properties ----------
-
 /**
  * Build the section properties (page size, margin) for the `Document`.
  */
@@ -281,9 +280,6 @@ function compileSectionProperties(config: DocxKitConfig) {
 
 /**
  * Merge document-level page config with per-section overrides.
- *
- * Section config wins when both are specified; falls back to document
- * defaults for any property not set in the section.
  */
 function mergePageConfig<TStyles extends StyleSheet>(
   docConfig: DocxKitConfig<TStyles>,
@@ -301,27 +297,18 @@ function mergePageConfig<TStyles extends StyleSheet>(
   }
 }
 
-/**
- * Page size presets in twips (width × height).
- *
- * Values sourced from the OOXML specification.
- */
+// ---------- Page size ----------
+
+/** Page size presets in twips (width × height). */
 const PAGE_SIZE_PRESETS = {
-  /** A3: 297 × 420 mm */
   A3: { height: 23811, width: 16838 },
-  /** A4: 210 × 297 mm */
   A4: { height: 16838, width: 11906 },
-  /** US Legal: 8.5 × 14 in */
   Legal: { height: 20160, width: 12240 },
-  /** US Letter: 8.5 × 11 in */
   Letter: { height: 15840, width: 12240 },
 } as const
 
 /**
  * Compile page size into Word twips.
- *
- * Resolves presets (`"A4"`, `"Letter"`, etc.) or custom dimensions.
- * Swaps width/height when orientation is `"landscape"`.
  */
 function compilePageSize(
   size: PageSizeValue,

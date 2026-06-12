@@ -39,7 +39,7 @@ describe('createDocx', () => {
 
   it('accepts config with theme', () => {
     const builder = createDocx({
-      theme: { colors: { primary: '#333' }, fontFamily: { body: 'Arial' } },
+      theme: { colors: { primary: '#333' }, fonts: { body: 'Arial' } },
     })
     expect(builder).toBeInstanceOf(DocxBuilder)
   })
@@ -56,7 +56,7 @@ describe('createDocx', () => {
       metadata: { creator: 'test', description: 'desc', title: 'Doc' },
       page: { margin: '20mm', orientation: 'portrait', size: 'A4' },
       styles: { title: { fontSize: '28pt', fontWeight: 'bold' } },
-      theme: { colors: { primary: '#333' }, fontFamily: { body: 'Calibri' } },
+      theme: { colors: { primary: '#333' }, fonts: { body: 'Calibri' } },
     })
     builder.h1('Title', { className: 'title' })
     expect(builder.toJSON().content).toHaveLength(1)

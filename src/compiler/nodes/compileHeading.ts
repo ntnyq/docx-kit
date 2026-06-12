@@ -1,0 +1,46 @@
+/**
+ * Compile a heading node into a `docx` Paragraph with heading level.
+ *
+ * @module compiler/nodes/compileHeading
+ */
+
+import { HeadingLevel, Paragraph, TextRun } from 'docx'
+import { resolveStyle } from '../../style/normalizeStyle'
+import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
+import type { HeadingNode } from '../../dsl/nodes'
+import type { DocxKitConfig } from '../../types/document'
+import type { StyleSheet } from '../../types/style'
+
+/** Map heading level numbers to `docx` `HeadingLevel` enum values. */
+export const HEADING_MAP = {
+  1: HeadingLevel.HEADING_1,
+  2: HeadingLevel.HEADING_2,
+  3: HeadingLevel.HEADING_3,
+  4: HeadingLevel.HEADING_4,
+  5: HeadingLevel.HEADING_5,
+  6: HeadingLevel.HEADING_6,
+} as const
+
+export function compileHeading<TStyles extends StyleSheet>(
+  node: HeadingNode<TStyles>,
+  config: DocxKitConfig<TStyles>,
+) {
+  const className = node.className ?? `h${node.level}`
+  const style = resolveStyle({
+    className,
+    inline: node.style,
+    styles: config.styles,
+    theme: config.theme,
+  })
+
+  return new Paragraph({
+    ...compileParagraphStyle(style),
+    heading: HEADING_MAP[node.level],
+    children: [
+      new TextRun({
+        text: node.text,
+        ...compileTextStyle(style),
+      }),
+    ],
+  })
+}

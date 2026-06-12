@@ -11,6 +11,9 @@ export { defineStyles } from './types/style'
 // ---------- Plugin ----------
 export { definePlugin } from './types/plugin'
 
+// ---------- DSL helpers ----------
+export { inlineImg, span } from './dsl/helpers'
+
 export { qrcodePlugin } from './plugins/qrcode'
 // ---------- Built-in plugins ----------
 export { calloutPlugin } from './plugins/callout'
@@ -43,6 +46,16 @@ export {
   PRESET_LIST,
   usePreset,
 } from './presets'
+
+// ---------- Themes ----------
+export {
+  BUILTIN_THEMES,
+  minimalTheme,
+  oceanTheme,
+  THEME_LIST,
+  useTheme,
+  warmTheme,
+} from './themes'
 
 // ---------- Types ----------
 export type { ErrorCode } from './errors'
@@ -91,6 +104,7 @@ export type {
   FontWeight,
   HighlightColor,
   StyleSheet,
+  StyleSheetEntry,
   TextAlign,
   VerticalAlign,
 } from './types/style'
@@ -105,6 +119,9 @@ export type {
   PageConfig,
   PageSize,
   SectionConfig,
+  ThemeColors,
+  ThemeFonts,
+  ThemeSpacing,
 } from './types/document'
 
 // DSL node types
