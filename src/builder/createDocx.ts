@@ -8,8 +8,10 @@
  * @module builder/createDocx
  */
 
+import { createPluginLoader } from '../loader/PluginLoader'
 import { DocxBuilder } from './DocxBuilder'
 import type { BlockNode } from '../dsl/nodes'
+import type { PluginSource } from '../loader/PluginLoader'
 import type { DocxKitConfig } from '../types/document'
 import type { StyleSheet } from '../types/style'
 
@@ -27,6 +29,28 @@ export interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
   content: BlockNode<TStyles>[]
   /** Optional page configuration. */
   page?: DocxKitConfig<TStyles>['page']
+  /**
+   * Plugin sources to load before rendering.
+   *
+   * Each source is resolved via the {@link PluginLoader}, and the resulting
+   * `DocxPlugin` is registered via `builder.use()`. This enables declarative
+   * plugin usage in JSON-serializable documents.
+   *
+   * @example
+   * ```ts
+   * await renderDocx({
+   *   styles: { p: { fontSize: 12 } },
+   *   plugins: [
+   *     { type: 'inline', plugin: qrcodePlugin },
+   *   ],
+   *   content: [
+   *     { type: 'heading', level: 1, text: 'Report' },
+   *     { type: 'plugin', name: 'qrcode', options: { text: 'hello' } },
+   *   ],
+   * }).toBlob()
+   * ```
+   */
+  plugins?: PluginSource[]
   /** Named stylesheet entries. */
   styles?: TStyles
 }
@@ -71,6 +95,7 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
  *
  * Unlike `createDocx()`, this accepts a single JSON-serializable object
  * with `content` (node array), optional `styles`, and optional `page` config.
+ * Supports plugin registration via the `plugins` field.
  * Ideal for AI-driven document generation or API integrations.
  *
  * @param schema - — The `DocxSchema` object
@@ -78,6 +103,7 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
  *
  * @example
  * ```ts
+ * // Without plugins
  * const blob = await renderDocx({
  *   page: { size: 'A4', margin: '20mm' },
  *   styles: {
@@ -87,21 +113,38 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
  *   content: [
  *     { type: 'heading',  level: 1, text: 'Report', className: 'h1' },
  *     { type: 'paragraph', text: 'This is a report generated via JSON DSL.', className: 'p' },
- *     { type: 'pageBreak' },
- *     {
- *       type: 'table',
- *       columns: [{ key: 'name', title: 'Name' }, { key: 'value', title: 'Value' }],
- *       data: [{ name: 'Revenue', value: '$1.2M' }],
- *     },
+ *   ],
+ * }).toBlob()
+ *
+ * // With plugins
+ * const blob2 = await renderDocx({
+ *   page: { size: 'A4' },
+ *   styles: { h1: { fontSize: 24 } },
+ *   plugins: [
+ *     { type: 'inline', plugin: qrcodePlugin },
+ *   ],
+ *   content: [
+ *     { type: 'heading', level: 1, text: 'QR Demo', className: 'h1' },
+ *     { type: 'plugin', name: 'qrcode', options: { text: 'https://example.com' } },
  *   ],
  * }).toBlob()
  * ```
  */
-export function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
+export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   schema: DocxSchema<TStyles>,
-): DocxBuilder<TStyles> {
-  const { content, ...config } = schema
+): Promise<DocxBuilder<TStyles>> {
+  const { content, plugins, ...config } = schema
   const builder = new DocxBuilder<TStyles>(config as DocxKitConfig<TStyles>)
+
+  // Load and register plugins before compiling content
+  if (plugins && plugins.length > 0) {
+    const loader = createPluginLoader()
+    const results = await loader.loadAll(plugins)
+    for (const result of results) {
+      builder.use(result.plugin)
+    }
+  }
+
   for (const node of content) {
     builder.add(node)
   }

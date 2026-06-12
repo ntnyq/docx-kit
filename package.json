@@ -30,13 +30,41 @@
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
     },
+    "./ai": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./browser": {
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
     },
+    "./loader": {
+      "types": "./dist/loader.d.ts",
+      "default": "./dist/loader.js"
+    },
+    "./loader/browser": {
+      "types": "./dist/loader-browser.d.ts",
+      "default": "./dist/loader-browser.js"
+    },
+    "./loader/node": {
+      "types": "./dist/loader-node.d.mts",
+      "default": "./dist/loader-node.mjs"
+    },
+    "./mcp": {
+      "types": "./dist/mcp.d.mts",
+      "default": "./dist/mcp.mjs"
+    },
     "./node": {
       "types": "./dist/node.d.mts",
       "default": "./dist/node.mjs"
+    },
+    "./pdk": {
+      "types": "./dist/pdk.d.mts",
+      "default": "./dist/pdk.mjs"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.mts",
+      "default": "./dist/registry.mjs"
     }
   },
   "main": "./dist/browser.js",
@@ -63,11 +91,16 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "@modelcontextprotocol/sdk": ">=1.0.0",
     "echarts": ">=5.0.0",
     "highlight.js": ">=11.0.0",
-    "qrcode": ">=1.5.0"
+    "qrcode": ">=1.5.0",
+    "zod": ">=3.0.0"
   },
   "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
     "echarts": {
       "optional": true
     },
@@ -75,6 +108,9 @@
       "optional": true
     },
     "qrcode": {
+      "optional": true
+    },
+    "zod": {
       "optional": true
     }
   },

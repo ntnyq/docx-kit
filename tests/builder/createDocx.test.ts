@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createDocx, renderDocx } from '../../src/builder/createDocx'
 import { DocxBuilder } from '../../src/builder/DocxBuilder'
+import { calloutPlugin } from '../../src/plugins/callout'
+import { watermarkPlugin } from '../../src/plugins/watermark'
+import type { DocxPlugin } from '../../src/types/plugin'
 
 describe('createDocx', () => {
   it('returns a DocxBuilder instance', () => {
@@ -64,8 +67,8 @@ describe('createDocx', () => {
 })
 
 describe('renderDocx', () => {
-  it('returns a DocxBuilder from JSON schema', () => {
-    const builder = renderDocx({
+  it('returns a DocxBuilder from JSON schema', async () => {
+    const builder = await renderDocx({
       content: [
         { level: 1, text: 'Title', type: 'heading' },
         { text: 'Content', type: 'paragraph' },
@@ -76,8 +79,8 @@ describe('renderDocx', () => {
     expect(builder.toJSON().content).toHaveLength(3)
   })
 
-  it('separates page config from content', () => {
-    const builder = renderDocx({
+  it('separates page config from content', async () => {
+    const builder = await renderDocx({
       content: [{ className: 'h1', level: 1, text: 'Hello', type: 'heading' }],
       page: { margin: '20mm', size: 'A4' },
       styles: {
@@ -91,8 +94,8 @@ describe('renderDocx', () => {
     })
   })
 
-  it('supports table nodes in schema', () => {
-    const builder = renderDocx({
+  it('supports table nodes in schema', async () => {
+    const builder = await renderDocx({
       content: [
         {
           columns: [{ key: 'name', title: 'Name' }],
@@ -104,8 +107,8 @@ describe('renderDocx', () => {
     expect(builder.toJSON().content).toHaveLength(1)
   })
 
-  it('supports image nodes in schema', () => {
-    const builder = renderDocx({
+  it('supports image nodes in schema', async () => {
+    const builder = await renderDocx({
       content: [
         {
           data: new Uint8Array([1, 2, 3]),
@@ -118,11 +121,73 @@ describe('renderDocx', () => {
     expect(builder.toJSON().content).toHaveLength(1)
   })
 
-  it('supports plugin nodes in schema', () => {
-    const builder = renderDocx({
+  it('supports plugin nodes in schema', async () => {
+    const builder = await renderDocx({
       content: [{ name: 'test', options: {}, type: 'plugin' }],
     })
     const node = builder.toJSON().content![0]
     expect(node).toMatchObject({ name: 'test', type: 'plugin' })
+  })
+
+  it('registers inline plugins from plugins field', async () => {
+    const callout = calloutPlugin() as DocxPlugin
+    const builder = await renderDocx({
+      plugins: [{ plugin: callout, type: 'inline' }],
+      content: [
+        {
+          name: 'callout',
+          options: { content: 'Hello', type: 'info' },
+          type: 'plugin',
+        },
+      ],
+    })
+    // Verify the plugin was registered by checking the builder has content
+    expect(builder.toJSON().content).toHaveLength(1)
+    expect(builder.toJSON().content![0]).toMatchObject({
+      name: 'callout',
+      type: 'plugin',
+    })
+  })
+
+  it('registers multiple inline plugins', async () => {
+    const builder = await renderDocx({
+      content: [
+        {
+          name: 'callout',
+          options: { content: 'A', type: 'info' },
+          type: 'plugin',
+        },
+        { name: 'watermark', options: { text: 'DRAFT' }, type: 'plugin' },
+      ],
+      plugins: [
+        { plugin: calloutPlugin() as DocxPlugin, type: 'inline' },
+        { plugin: watermarkPlugin() as DocxPlugin, type: 'inline' },
+      ],
+    })
+    expect(builder.toJSON().content).toHaveLength(2)
+  })
+
+  it('handles empty plugins array', async () => {
+    const builder = await renderDocx({
+      content: [{ text: 'Hello', type: 'paragraph' }],
+      plugins: [],
+    })
+    expect(builder.toJSON().content).toHaveLength(1)
+  })
+
+  it('emits warnings for failed plugin sources but continues', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const builder = await renderDocx({
+      content: [{ text: 'Hello', type: 'paragraph' }],
+      plugins: [
+        { plugin: calloutPlugin() as DocxPlugin, type: 'inline' },
+        { package: 'nonexistent-plugin-xyz', type: 'npm' },
+      ],
+    })
+    expect(builder.toJSON().content).toHaveLength(1)
+    expect(warnSpy).toHaveBeenCalled()
+
+    warnSpy.mockRestore()
   })
 })

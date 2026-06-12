@@ -72,6 +72,9 @@ export default defineConfig({
             { link: '/guide/json-dsl', text: 'JSON DSL (renderDocx)' },
             { link: '/guide/platforms', text: 'Node.js & Browser' },
             { link: '/guide/errors', text: 'Error Handling' },
+            { link: '/guide/plugin-security', text: 'Plugin Security' },
+            { link: '/guide/ai-templates', text: 'AI Templates & Prompts' },
+            { link: '/guide/mcp-server', text: 'MCP Server' },
           ],
         },
         {

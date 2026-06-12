@@ -26,13 +26,18 @@ export { DocxBuilder } from './builder/DocxBuilder'
 export { timelinePlugin } from './plugins/timeline'
 // ---------- Errors ----------
 export { DocxKitError, ERROR_CODES } from './errors'
+// ---------- Manifest ----------
+export { validateManifest } from './loader/manifest'
 export { watermarkPlugin } from './plugins/watermark'
+
 // ---------- Cross-platform utilities ----------
 export { dataUrlToUint8Array } from './utils/dataUrl'
 export { codeBlockPlugin } from './plugins/code-block'
 export { coverPagePlugin } from './plugins/cover-page'
 export { dataTablePlugin } from './plugins/data-table'
 export { pageNumberPlugin } from './plugins/page-number'
+// ---------- Plugin Loading ----------
+export { createPluginLoader } from './loader/PluginLoader'
 export { createDocx, renderDocx } from './builder/createDocx'
 export { propertyTablePlugin } from './plugins/property-table'
 export { meetingMinutesPlugin } from './plugins/meeting-minutes'
@@ -62,11 +67,12 @@ export type { ErrorCode } from './errors'
 export type { DocxPreset } from './presets'
 export type { DocxSchema } from './builder/createDocx'
 
+export type { PluginManifest } from './loader/manifest'
+
 // Plugin option types
 export type { CalloutOptions } from './plugins/callout'
 
 export type { QRCodePluginOptions } from './plugins/qrcode'
-
 export type { WatermarkOptions } from './plugins/watermark'
 export type { CodeBlockOptions } from './plugins/code-block'
 export type { CoverPageOptions } from './plugins/cover-page'
@@ -96,6 +102,13 @@ export type {
   PluginRegistry,
   PluginRenderContext,
 } from './types/plugin'
+
+// Plugin loader types
+export type {
+  PluginLoadResult,
+  PluginSecurityPolicy,
+  PluginSource,
+} from './loader/PluginLoader'
 // Style types
 export type {
   BorderRule,

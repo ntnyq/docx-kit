@@ -14,10 +14,23 @@ export const ERROR_CODES = {
   EXPORT_FAILED: 'EXPORT_FAILED',
   /** Image data is empty, corrupt, or unsupported. */
   IMAGE_INVALID_DATA: 'IMAGE_INVALID_DATA',
+  /** Plugin manifest JSON is missing required fields or has invalid structure. */
+  MANIFEST_INVALID: 'MANIFEST_INVALID',
+  /** Plugin manifest file was not found at the expected path. */
+  MANIFEST_MISSING: 'MANIFEST_MISSING',
+  /** A required plugin dependency was not found or version is incompatible. */
+  PLUGIN_DEPENDENCY_MISSING: 'PLUGIN_DEPENDENCY_MISSING',
+  /** Plugin failed to load (import error, network error, etc.). */
+  PLUGIN_LOAD_FAILED: 'PLUGIN_LOAD_FAILED',
   /** A plugin node referenced an unregistered plugin. */
   PLUGIN_NOT_REGISTERED: 'PLUGIN_NOT_REGISTERED',
+
+  // ---- Plugin ecosystem errors ----
+
   /** A plugin's `render()` method threw an error. */
   PLUGIN_RENDER_FAILED: 'PLUGIN_RENDER_FAILED',
+  /** Plugin's `docxKit` semver range is incompatible with the running version. */
+  PLUGIN_VERSION_MISMATCH: 'PLUGIN_VERSION_MISMATCH',
   /** A `className` referenced a stylesheet key that doesn't exist. */
   STYLE_UNKNOWN_CLASS: 'STYLE_UNKNOWN_CLASS',
   /** Table was created with no columns. */
