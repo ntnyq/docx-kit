@@ -27,7 +27,7 @@ Every plugin follows the same pattern:
 import { createDocx, somePlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(somePlugin())           // 1. Register the plugin
+  .use(somePlugin)           // 1. Register the plugin
   .plugin('someName', {        // 2. Invoke with options
     // ... plugin-specific options
   })

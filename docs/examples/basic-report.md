@@ -199,7 +199,7 @@ doc
   .p('• Competitive pressure in the APAC region', { className: 'body' })
 
   .h2('5. Contact Information', { className: 'h2' })
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .plugin('qrcode', {
     text: 'https://example.com/investor-relations',
     size: 150,

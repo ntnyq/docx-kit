@@ -42,7 +42,8 @@
     "vite",
     "vitepress",
     "vitest",
-    "wordprocessingml"
+    "wordprocessingml",
+    "xlarge"
   ],
   "cSpell.allowCompoundWords": true
 }

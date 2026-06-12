@@ -33,12 +33,13 @@ const style = {
 | `fontFamily` | `LiteralUnion<'Arial' \| 'Calibri' \| 'Times New Roman'>` | Font family |
 | `color` | `string \| HexColor` | Text / foreground color |
 | `backgroundColor` | `string \| HexColor` | Background shading |
+| `highlight` | `HighlightColor` | Text highlighting (`'yellow'`, `'green'`, `'red'`, etc.) |
 | `textAlign` | `'left' \| 'center' \| 'right' \| 'justify'` | Horizontal alignment |
 | `verticalAlign` | `'top' \| 'middle' \| 'bottom'` | Vertical alignment (table cells) |
 | `lineHeight` | `number \| UnitValue` | Line height |
 | `letterSpacing` | `UnitValue` | Character spacing |
 | `textIndent` | `UnitValue` | First-line indent |
-| `underline` | `boolean \| 'single' \| 'double'` | Underline |
+| `underline` | `boolean \| 'single' \| 'double' \| 'dash' \| 'dotDash'` | Underline |
 | `strike` | `boolean` | Strikethrough |
 | `allCaps` | `boolean` | Force uppercase |
 | `margin` | `UnitValue \| shorthand string` | CSS-like margin shorthand |
@@ -238,9 +239,11 @@ const doc = createDocx({
 
 ## Theme Tokens
 
-Define reusable design tokens via the `theme` option:
+Define reusable design tokens via the `theme` option, then reference them in styles using `$category.key` syntax:
 
 ```ts
+import { createDocx, defineStyles } from 'docx-kit'
+
 const doc = createDocx({
   theme: {
     colors: {
@@ -248,7 +251,7 @@ const doc = createDocx({
       secondary: '#64748b',
       danger: '#dc2626',
     },
-    fontFamily: {
+    fonts: {
       heading: 'Arial',
       body: 'Calibri',
     },
@@ -260,10 +263,103 @@ const doc = createDocx({
       xl: 20,
     },
     spacing: {
-      tight: '5pt',
-      normal: '10pt',
-      loose: '20pt',
+      tight: 5,
+      normal: 10,
+      loose: 20,
     },
+  },
+  styles: defineStyles({
+    title: {
+      color: '$colors.primary',        // resolves to '#2563eb'
+      fontFamily: '$fonts.heading',    // resolves to 'Arial'
+      fontSize: '$fontSize.xl',        // resolves to 20
+      marginBottom: '$spacing.loose',  // resolves to 20
+    },
+    body: {
+      fontSize: '$fontSize.md',
+      fontFamily: '$fonts.body',
+    },
+  }),
+})
+```
+
+### Built-in Themes
+
+docx-kit ships with 3 built-in themes:
+
+```ts
+import { useTheme } from 'docx-kit'
+
+const doc = createDocx({
+  theme: useTheme('ocean'),   // 'minimal' | 'ocean' | 'warm'
+})
+```
+
+| Theme | Palette | Best For |
+|---|---|---|
+| `minimal` | Clean grayscale + blue accent | General-purpose docs |
+| `ocean` | Deep blue / teal color scheme | Business reports |
+| `warm` | Warm earth-tone color scheme | Creative docs, presentations |
+
+## Style Inheritance (extends)
+
+Styles can extend other styles for CSS-like inheritance:
+
+```ts
+const styles = defineStyles({
+  // Base style
+  baseText: {
+    fontSize: 11,
+    fontFamily: 'Calibri',
+    color: '#333',
+  },
+
+  // inherit from baseText, override selectively
+  body: {
+    extends: 'baseText',
+    lineHeight: 1.5,
+  },
+
+  // 3-level chain: h2 → body → baseText
+  h2: {
+    extends: 'body',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+  // Multiple inheritance (later array entries win on conflicts)
+  warning: {
+    extends: ['baseText', 'callout'],
+    color: '#92400e',
+    border: { style: 'single', width: 1, color: '#f59e0b' },
+  },
+})
+```
+
+Inheritance is resolved at compile time with circular reference detection.
+
+See the [Style Inheritance Example](/examples/style-inheritance) for a full demonstration.
+
+## Style Presets
+
+Quick-start with a pre-configured style preset:
+
+```ts
+import { createDocx, usePreset } from 'docx-kit'
+
+// 3 built-in presets available:
+const doc = createDocx(usePreset('modern').config)
+// or 'classic' (gov-doc style), 'academic' (thesis style)
+```
+
+Each preset provides a complete stylesheet, page config, and element defaults tuned for its use case. You can also merge a preset with your own config:
+
+```ts
+const doc = createDocx({
+  ...usePreset('modern').config,
+  styles: {
+    ...usePreset('modern').config.styles,
+    customClass: { color: '#f00' },
   },
 })
 ```

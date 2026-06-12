@@ -51,6 +51,30 @@ doc
   })
 ```
 
+### Rich Inline Content
+
+Paragraphs can contain mixed inline content using `span()` and `inlineImg()` helpers:
+
+```ts
+import { span, inlineImg } from 'docx-kit'
+
+// Mixed text runs with per-span styles
+doc.p([
+  span('Hello '),
+  span('world', { bold: true, color: '#e11d48' }),
+  span(' — all in one paragraph.'),
+])
+
+// Inline image among text
+doc.p([
+  span('Click the icon: '),
+  inlineImg({ data: iconDataUrl, width: 16, height: 16 }),
+  span(' to continue.'),
+])
+```
+
+See the [Rich Content Example](/examples/rich-content) for a complete demonstration.
+
 ### Images
 
 Embed PNG, JPEG, GIF, or BMP images:
@@ -139,8 +163,11 @@ doc.add({ type: 'pageBreak' })
 Invoke registered plugins:
 
 ```ts
+import { createDocx, qrcodePlugin, echartsPlugin } from 'docx-kit'
+
 doc
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)     // Register QRCode
+  .use(echartsPlugin)    // Register ECharts
   .plugin('qrcode', { text: 'https://example.com', size: 200 })
 ```
 
@@ -190,8 +217,8 @@ Register plugins before invoking them:
 import { createDocx, qrcodePlugin, echartsPlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(qrcodePlugin())     // Register QRCode
-  .use(echartsPlugin())    // Register ECharts
+  .use(qrcodePlugin)     // Register QRCode
+  .use(echartsPlugin)    // Register ECharts
   .h1('Document with Plugins')
   .plugin('qrcode', { text: 'https://example.com' })
   .plugin('echarts', {

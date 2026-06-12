@@ -78,12 +78,12 @@ try {
 ```ts
 try {
   await doc
-    // Forgot .use(qrcodePlugin())!
+    // Forgot .use(qrcodePlugin)!
     .plugin('qrcode', { text: 'https://example.com' })
     .save('output.docx')
 } catch (err) {
   if (err instanceof DocxKitError && err.code === ERROR_CODES.PLUGIN_NOT_REGISTERED) {
-    console.error('Plugin "qrcode" was not registered. Call .use(qrcodePlugin()) first.')
+    console.error('Plugin "qrcode" was not registered. Call .use(qrcodePlugin) first.')
   }
 }
 ```

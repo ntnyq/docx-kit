@@ -362,8 +362,8 @@ docx-kit ships with **12 built-in plugins**. Each plugin is registered via `.use
 import { createDocx, calloutPlugin, dataTablePlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(calloutPlugin())
-  .use(dataTablePlugin())
+  .use(calloutPlugin)
+  .use(dataTablePlugin)
   .h1('Report')
   .plugin('callout', { type: 'info', content: 'System status: OK' })
   .plugin('dataTable', {

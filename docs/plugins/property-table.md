@@ -5,23 +5,27 @@ Renders key-value pairs as a styled 2-column table. Ideal for configuration summ
 ## Import
 
 ```ts
-import { propertyTablePlugin, type PropertyTableOptions, type PropertyItem } from 'docx-kit'
+import {
+  propertyTablePlugin,
+  type PropertyTableOptions,
+  type PropertyItem,
+} from 'docx-kit'
 ```
 
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `items` | `PropertyItem[]` | _(required)_ | Key-value items to display |
-| `keyBold` | `boolean` | `true` | Whether the key column text is bold |
-| `striped` | `boolean` | `true` | Alternate row background shading |
+| Option    | Type             | Default      | Description                         |
+| --------- | ---------------- | ------------ | ----------------------------------- |
+| `items`   | `PropertyItem[]` | _(required)_ | Key-value items to display          |
+| `keyBold` | `boolean`        | `true`       | Whether the key column text is bold |
+| `striped` | `boolean`        | `true`       | Alternate row background shading    |
 
 ### `PropertyItem`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `key` | `string` | Property name (right-aligned, gray background) |
-| `value` | `string` | Property value (left-aligned) |
+| Field   | Type     | Description                                    |
+| ------- | -------- | ---------------------------------------------- |
+| `key`   | `string` | Property name (right-aligned, gray background) |
+| `value` | `string` | Property value (left-aligned)                  |
 
 ## Examples
 
@@ -31,7 +35,7 @@ import { propertyTablePlugin, type PropertyTableOptions, type PropertyItem } fro
 import { createDocx, propertyTablePlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(propertyTablePlugin())
+  .use(propertyTablePlugin)
   .h1('Project Overview')
   .plugin('propertyTable', {
     items: [
@@ -49,7 +53,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin())
+  .use(propertyTablePlugin)
   .h1('API Endpoint')
   .plugin('propertyTable', {
     items: [
@@ -68,7 +72,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin())
+  .use(propertyTablePlugin)
   .h1('System Info')
   .plugin('propertyTable', {
     items: [
@@ -87,7 +91,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin())
+  .use(propertyTablePlugin)
   .h1('Environment Variables')
 
   .h2('Database')
@@ -117,7 +121,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin())
+  .use(propertyTablePlugin)
   .h1('Deployment Specification')
   .plugin('propertyTable', {
     items: [

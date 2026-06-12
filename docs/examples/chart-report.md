@@ -68,8 +68,8 @@ const doc = createDocx({
 
 doc
   // Register plugins
-  .use(echartsPlugin())
-  .use(qrcodePlugin())
+  .use(echartsPlugin)
+  .use(qrcodePlugin)
 
   // === Cover ===
   .h1('Analytics Dashboard', { className: 'title' })
@@ -303,10 +303,10 @@ doc
 
 | Feature | Used In |
 |---|---|
-| `echartsPlugin()` — bar chart | Revenue comparison (Q1 vs Q2) |
-| `echartsPlugin()` — donut/pie chart | Market share distribution |
-| `echartsPlugin()` — line chart with gradient area | User growth trend |
-| `qrcodePlugin()` | Link to online dashboard |
+| `echartsPlugin` — bar chart | Revenue comparison (Q1 vs Q2) |
+| `echartsPlugin` — donut/pie chart | Market share distribution |
+| `echartsPlugin` — line chart with gradient area | User growth trend |
+| `qrcodePlugin` | Link to online dashboard |
 | Multiple `pageBreak()` | One chart per page |
 | Typed table with color-coded `render()` | KPI status table |
 | Rich ECharts options: tooltips, legends, gradients | All 3 charts |

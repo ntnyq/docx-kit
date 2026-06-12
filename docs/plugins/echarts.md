@@ -37,7 +37,7 @@ pnpm add echarts
 import { createDocx, echartsPlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('Monthly Revenue')
   .plugin('echarts', {
     option: {
@@ -66,7 +66,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('User Growth')
   .plugin('echarts', {
     option: {
@@ -101,7 +101,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('Market Share Analysis')
   .plugin('echarts', {
     option: {
@@ -137,7 +137,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('Correlation Analysis')
   .plugin('echarts', {
     option: {
@@ -163,7 +163,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('Q2 Analytics Report')
 
   // Bar chart — revenue
@@ -230,7 +230,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('Wide Chart')
   .plugin('echarts', {
     option: {

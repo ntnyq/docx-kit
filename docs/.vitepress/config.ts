@@ -36,8 +36,14 @@ export default defineConfig({
     sidebar: {
       '/api/': [
         {
-          items: [{ link: '/api/types', text: 'Types' }],
           text: 'API Reference',
+          items: [
+            { link: '/api/config', text: 'Config' },
+            { link: '/api/style', text: 'Styles' },
+            { link: '/api/nodes', text: 'DSL Nodes' },
+            { link: '/api/builder', text: 'Builder' },
+            { link: '/api/plugins', text: 'Plugins' },
+          ],
         },
       ],
       '/examples/': [
@@ -47,6 +53,9 @@ export default defineConfig({
             { link: '/examples/basic-report', text: 'Basic Report' },
             { link: '/examples/invoice', text: 'Invoice' },
             { link: '/examples/chart-report', text: 'Chart Report' },
+            { link: '/examples/theme-system', text: 'Theme System' },
+            { link: '/examples/rich-content', text: 'Rich Content' },
+            { link: '/examples/style-inheritance', text: 'Style Inheritance' },
           ],
         },
       ],

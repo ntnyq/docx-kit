@@ -163,8 +163,8 @@ interface DocxSchema<TStyles> {
 ```ts
 // renderDocx returns a DocxBuilder — register plugins on it:
 const doc = renderDocx({ content: [...] })
-  .use(qrcodePlugin())
-  .use(echartsPlugin())
+  .use(qrcodePlugin)
+  .use(echartsPlugin)
 
 // now .plugin(...) nodes will be resolved
 await doc.save('output.docx')
@@ -241,8 +241,8 @@ const report = {
 
 // Build + register plugins + export
 await renderDocx(report)
-  .use(echartsPlugin())
-  .use(qrcodePlugin())
+  .use(echartsPlugin)
+  .use(qrcodePlugin)
   .save('monthly-report.docx')
 ```
 

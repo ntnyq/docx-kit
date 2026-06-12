@@ -249,7 +249,7 @@ doc
   .p(' ', { style: { fontSize: 8 } })
 
   // QR Code for payment link
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .p('Scan to pay:', {
     style: { textAlign: 'center', fontSize: 10, marginBottom: 3 },
   })
@@ -280,7 +280,7 @@ doc
 | Typed generics `table<InvoiceLine>()` | Type-safe column keys |
 | Custom `render()` with currency formatting | Rate & Amount columns |
 | `pageBreak()` | Invoice → Payment info |
-| `qrcodePlugin()` with caption | Payment QR code |
+| `qrcodePlugin` with caption | Payment QR code |
 | Centered / right-aligned text | Invoice title, totals, footer |
 | ASCII divider lines | Section separators |
 | Empty paragraphs as spacers | Visual gaps between sections |

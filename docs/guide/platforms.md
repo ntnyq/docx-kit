@@ -11,8 +11,8 @@ docx-kit works in both Node.js and browser environments. Platform-specific APIs 
 | `defineStyles()` | ✅ | — | — |
 | `definePlugin()` | ✅ | — | — |
 | `DocxBuilder` | ✅ | — | — |
-| `qrcodePlugin()` | ✅ | — | — |
-| `echartsPlugin()` | ✅ (browser) | ❌ | ✅ (built-in) |
+| `qrcodePlugin` | ✅ | — | — |
+| `echartsPlugin` | ✅ (browser) | ❌ | ✅ (built-in) |
 | `dataUrlToUint8Array()` | ✅ | ✅ | ✅ |
 | `saveDocument()` | — | ✅ | ❌ |
 | `normalizeImageData()` | — | ❌ | ✅ |
@@ -78,7 +78,7 @@ const bytes = await dataUrlToUint8Array('data:image/png;base64,iVBORw0KGgo...')
 
 | API | Reason | Workaround |
 |---|---|---|
-| `echartsPlugin()` | Requires browser `window`/DOM | Use server-side canvas (e.g. `node-canvas` + `echarts`), or pre-render charts on the client |
+| `echartsPlugin` | Requires browser `window`/DOM | Use server-side canvas (e.g. `node-canvas` + `echarts`), or pre-render charts on the client |
 | `normalizeImageData()` | Node rarely uses `Blob` for images | Use `new Uint8Array(await blob.arrayBuffer())` |
 
 ## Browser Platform

@@ -10,18 +10,18 @@ docx-kit ships with **12 built-in plugins**:
 
 | Plugin | Node Name | Description | Full Docs |
 |--------|-----------|-------------|-----------|
-| `calloutPlugin()` | `callout` | Colored info / warning / success / danger boxes | [→](/plugins/callout) |
-| `codeBlockPlugin()` | `codeBlock` | Syntax-highlighted code blocks | [→](/plugins/code-block) |
-| `coverPagePlugin()` | `coverPage` | Professional title page | [→](/plugins/cover-page) |
-| `dataTablePlugin()` | `dataTable` | Auto-inferred table from object arrays | [→](/plugins/data-table) |
-| `echartsPlugin()` | `echarts` | ECharts charts as images _(browser only)_ | [→](/plugins/echarts) |
-| `meetingMinutesPlugin()` | `meetingMinutes` | Structured meeting notes | [→](/plugins/meeting-minutes) |
-| `pageNumberPlugin()` | `pageNumber` | Page number field | [→](/plugins/page-number) |
-| `propertyTablePlugin()` | `propertyTable` | Key-value pair styled table | [→](/plugins/property-table) |
-| `qrcodePlugin()` | `qrcode` | QR code images from text or URLs | [→](/plugins/qrcode) |
-| `signatureBlockPlugin()` | `signatureBlock` | Signature lines for contracts | [→](/plugins/signature-block) |
-| `timelinePlugin()` | `timeline` | Chronological timeline | [→](/plugins/timeline) |
-| `watermarkPlugin()` | `watermark` | Text watermark | [→](/plugins/watermark) |
+| `calloutPlugin` | `callout` | Colored info / warning / success / danger boxes | [→](/plugins/callout) |
+| `codeBlockPlugin` | `codeBlock` | Syntax-highlighted code blocks | [→](/plugins/code-block) |
+| `coverPagePlugin` | `coverPage` | Professional title page | [→](/plugins/cover-page) |
+| `dataTablePlugin` | `dataTable` | Auto-inferred table from object arrays | [→](/plugins/data-table) |
+| `echartsPlugin` | `echarts` | ECharts charts as images _(browser only)_ | [→](/plugins/echarts) |
+| `meetingMinutesPlugin` | `meetingMinutes` | Structured meeting notes | [→](/plugins/meeting-minutes) |
+| `pageNumberPlugin` | `pageNumber` | Page number field | [→](/plugins/page-number) |
+| `propertyTablePlugin` | `propertyTable` | Key-value pair styled table | [→](/plugins/property-table) |
+| `qrcodePlugin` | `qrcode` | QR code images from text or URLs | [→](/plugins/qrcode) |
+| `signatureBlockPlugin` | `signatureBlock` | Signature lines for contracts | [→](/plugins/signature-block) |
+| `timelinePlugin` | `timeline` | Chronological timeline | [→](/plugins/timeline) |
+| `watermarkPlugin` | `watermark` | Text watermark | [→](/plugins/watermark) |
 
 ## Using Plugins
 
@@ -38,7 +38,7 @@ pnpm add echarts    # for ECharts plugin (browser)
 import { createDocx, qrcodePlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(qrcodePlugin())              // register
+  .use(qrcodePlugin)              // register
   .h1('QR Code Demo')
   .plugin('qrcode', {               // invoke
     text: 'https://example.com',
@@ -55,7 +55,7 @@ Generate QR codes from text or URLs:
 import { createDocx, qrcodePlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .h1('Business Card QR')
   .plugin('qrcode', {
     text: 'https://ntnyq.com',
@@ -85,7 +85,7 @@ Render ECharts charts as embedded images (browser only):
 import { createDocx, echartsPlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('Sales Dashboard')
   .plugin('echarts', {
     option: {
@@ -116,7 +116,7 @@ const doc = createDocx()
 
 ```ts
 doc
-  .use(echartsPlugin())
+  .use(echartsPlugin)
   .h1('Analytics Report')
 
   // Bar chart

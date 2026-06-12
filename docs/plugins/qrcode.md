@@ -43,7 +43,7 @@ pnpm add qrcode
 import { createDocx, qrcodePlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .h1('Website QR')
   .plugin('qrcode', {
     text: 'https://example.com',
@@ -55,7 +55,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .h1('Business Card')
   .plugin('qrcode', {
     text: 'https://ntnyq.com',
@@ -71,7 +71,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .h1('Invoice #2026-001')
   .p('Please scan the QR code below to complete payment:')
   .plugin('qrcode', {
@@ -87,7 +87,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .h1('Office Wi-Fi')
   .p('Scan the QR code to connect to the office network:')
   .plugin('qrcode', {
@@ -103,7 +103,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .h1('Document Reference')
   .plugin('qrcode', {
     text: 'REF-2026-06-11-001',
@@ -117,7 +117,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(qrcodePlugin())
+  .use(qrcodePlugin)
   .h1('Multi-Channel Contact')
 
   .h2('Website')
