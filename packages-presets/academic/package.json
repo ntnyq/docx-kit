@@ -1,0 +1,41 @@
+{
+  "name": "@docxkit/preset-academic",
+  "type": "module",
+  "version": "0.3.0",
+  "description": "Formal thesis/paper style (Times New Roman) — docx-kit style preset",
+  "keywords": [
+    "docx",
+    "docx-kit",
+    "docx-kit-preset",
+    "style"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ntnyq/docx-kit",
+    "directory": "packages-presets/academic"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
+  "peerDependencies": {
+    "@docxkit/core": "workspace:*"
+  }
+}

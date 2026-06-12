@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@ntnyq/utils": "^0.15.0",
+    "docx": "^9.7.1",
     "docx-kit": "workspace:*",
     "monaco-editor": "^0.55.1",
     "sucrase": "^3.35.1",

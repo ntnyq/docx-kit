@@ -7,7 +7,7 @@ This guide covers how to create, test, and publish a docx-kit plugin. Whether yo
 The fastest way to create a plugin project is with the scaffolding tool:
 
 ```bash
-npx create-docx-kit-plugin my-chart-plugin
+npx @docxkit/create-plugin my-chart-plugin
 ```
 
 This generates a complete project with:

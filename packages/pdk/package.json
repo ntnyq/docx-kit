@@ -1,0 +1,41 @@
+{
+  "name": "@docxkit/pdk",
+  "type": "module",
+  "version": "0.3.0",
+  "description": "Plugin Development Kit for docx-kit",
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ntnyq/docx-kit",
+    "directory": "packages/pdk"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
+  "peerDependencies": {
+    "@docxkit/core": "workspace:*",
+    "docx": "^9.7.1"
+  },
+  "devDependencies": {
+    "@docxkit/core": "workspace:*",
+    "@docxkit/plugin-callout": "workspace:*",
+    "@docxkit/plugin-watermark": "workspace:*"
+  }
+}

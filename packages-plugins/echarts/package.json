@@ -1,0 +1,50 @@
+{
+  "name": "@docxkit/plugin-echarts",
+  "type": "module",
+  "version": "0.3.0",
+  "description": "ECharts chart embedding (browser only) — docx-kit plugin",
+  "keywords": [
+    "docx",
+    "docx-kit",
+    "docx-kit-plugin"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ntnyq/docx-kit",
+    "directory": "packages-plugins/echarts"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
+  "peerDependencies": {
+    "@docxkit/core": "workspace:*",
+    "docx": "^9.7.1",
+    "echarts": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "echarts": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@docxkit/pdk": "workspace:*"
+  }
+}

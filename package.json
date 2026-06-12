@@ -1,121 +1,22 @@
 {
   "name": "docx-kit",
   "type": "module",
-  "version": "0.2.0",
+  "private": true,
   "packageManager": "pnpm@11.5.2",
   "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
-  "keywords": [
-    "document",
-    "docx",
-    "generator",
-    "library",
-    "report",
-    "template",
-    "typescript",
-    "word"
-  ],
   "license": "MIT",
-  "author": {
-    "name": "ntnyq",
-    "email": "ntnyq13@gmail.com"
-  },
-  "homepage": "https://github.com/ntnyq/docx-kit#readme",
-  "repository": "ntnyq/docx-kit",
-  "bugs": {
-    "url": "https://github.com/ntnyq/docx-kit/issues"
-  },
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/browser.d.ts",
-      "default": "./dist/browser.js"
-    },
-    "./ai": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./browser": {
-      "types": "./dist/browser.d.ts",
-      "default": "./dist/browser.js"
-    },
-    "./loader": {
-      "types": "./dist/loader.d.ts",
-      "default": "./dist/loader.js"
-    },
-    "./loader/browser": {
-      "types": "./dist/loader-browser.d.ts",
-      "default": "./dist/loader-browser.js"
-    },
-    "./loader/node": {
-      "types": "./dist/loader-node.d.mts",
-      "default": "./dist/loader-node.mjs"
-    },
-    "./mcp": {
-      "types": "./dist/mcp.d.mts",
-      "default": "./dist/mcp.mjs"
-    },
-    "./node": {
-      "types": "./dist/node.d.mts",
-      "default": "./dist/node.mjs"
-    },
-    "./pdk": {
-      "types": "./dist/pdk.d.mts",
-      "default": "./dist/pdk.mjs"
-    },
-    "./registry": {
-      "types": "./dist/registry.d.mts",
-      "default": "./dist/registry.mjs"
-    }
-  },
-  "main": "./dist/browser.js",
-  "types": "./dist/browser.d.ts",
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": false,
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "pnpm -r --filter '!docs' run build",
+    "dev": "pnpm -r --filter '!docs' --parallel run dev",
     "docs:build": "pnpm -C docs run build",
     "docs:dev": "pnpm -C docs run dev",
     "lint": "eslint",
     "prepare": "husky",
-    "prepublishOnly": "pnpm run build",
     "release": "run-s release:check release:version",
     "release:check": "run-s lint typecheck test",
-    "release:version": "bumpp",
+    "release:version": "bumpp -r",
     "test": "vitest",
-    "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "@modelcontextprotocol/sdk": ">=1.0.0",
-    "echarts": ">=5.0.0",
-    "highlight.js": ">=11.0.0",
-    "qrcode": ">=1.5.0",
-    "zod": ">=3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@modelcontextprotocol/sdk": {
-      "optional": true
-    },
-    "echarts": {
-      "optional": true
-    },
-    "highlight.js": {
-      "optional": true
-    },
-    "qrcode": {
-      "optional": true
-    },
-    "zod": {
-      "optional": true
-    }
-  },
-  "dependencies": {
-    "docx": "^9.7.1"
+    "typecheck": "pnpm -r exec tsc --noEmit"
   },
   "devDependencies": {
     "@ntnyq/eslint-config": "^6.1.5",

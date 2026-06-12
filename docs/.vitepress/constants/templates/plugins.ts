@@ -41,18 +41,18 @@ export const PLUGIN_CODE = unindent(`
   })
 
   doc
-    .use(calloutPlugin)
-    .use(codeBlockPlugin)
-    .use(coverPagePlugin)
-    .use(dataTablePlugin)
-    .use(echartsPlugin)
-    .use(meetingMinutesPlugin)
-    .use(pageNumberPlugin)
-    .use(propertyTablePlugin)
-    .use(qrcodePlugin)
-    .use(signatureBlockPlugin)
-    .use(timelinePlugin)
-    .use(watermarkPlugin)
+    .use(calloutPlugin())
+    .use(codeBlockPlugin())
+    .use(coverPagePlugin())
+    .use(dataTablePlugin())
+    .use(echartsPlugin())
+    .use(meetingMinutesPlugin())
+    .use(pageNumberPlugin())
+    .use(propertyTablePlugin())
+    .use(qrcodePlugin())
+    .use(signatureBlockPlugin())
+    .use(timelinePlugin())
+    .use(watermarkPlugin())
 
   // ════════════════════════════════════════════════════════════
   // 1. Cover Page

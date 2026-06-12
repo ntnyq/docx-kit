@@ -1,5 +1,8 @@
 packages:
   - docs
+  - packages-plugins/*
+  - packages-presets/*
+  - packages-themes/*
   - packages/*
 
 allowBuilds:

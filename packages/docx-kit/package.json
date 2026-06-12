@@ -1,0 +1,115 @@
+{
+  "name": "docx-kit",
+  "type": "module",
+  "version": "0.3.0",
+  "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
+  "keywords": [
+    "document",
+    "docx",
+    "generator",
+    "library",
+    "report",
+    "template",
+    "typescript",
+    "word"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "homepage": "https://github.com/ntnyq/docx-kit#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ntnyq/docx-kit",
+    "directory": "packages/docx-kit"
+  },
+  "bugs": {
+    "url": "https://github.com/ntnyq/docx-kit/issues"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
+    "./ai": {
+      "types": "./dist/ai-proxy.d.ts",
+      "default": "./dist/ai-proxy.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
+    "./loader": {
+      "types": "./dist/loader-proxy.d.ts",
+      "default": "./dist/loader-proxy.js"
+    },
+    "./loader/browser": {
+      "types": "./dist/loader-proxy.d.ts",
+      "default": "./dist/loader-proxy.js"
+    },
+    "./loader/node": {
+      "types": "./dist/loader-proxy.d.ts",
+      "default": "./dist/loader-proxy.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp-proxy.d.ts",
+      "default": "./dist/mcp-proxy.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    },
+    "./pdk": {
+      "types": "./dist/pdk-proxy.d.ts",
+      "default": "./dist/pdk-proxy.js"
+    },
+    "./registry": {
+      "types": "./dist/registry-proxy.d.ts",
+      "default": "./dist/registry-proxy.js"
+    }
+  },
+  "main": "./dist/browser.js",
+  "types": "./dist/browser.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
+  "peerDependencies": {
+    "docx": "^9.7.1"
+  },
+  "dependencies": {
+    "@docxkit/ai": "workspace:*",
+    "@docxkit/core": "workspace:*",
+    "@docxkit/loader": "workspace:*",
+    "@docxkit/mcp": "workspace:*",
+    "@docxkit/pdk": "workspace:*",
+    "@docxkit/plugin-callout": "workspace:*",
+    "@docxkit/plugin-code-block": "workspace:*",
+    "@docxkit/plugin-cover-page": "workspace:*",
+    "@docxkit/plugin-data-table": "workspace:*",
+    "@docxkit/plugin-echarts": "workspace:*",
+    "@docxkit/plugin-meeting-minutes": "workspace:*",
+    "@docxkit/plugin-page-number": "workspace:*",
+    "@docxkit/plugin-property-table": "workspace:*",
+    "@docxkit/plugin-qrcode": "workspace:*",
+    "@docxkit/plugin-signature-block": "workspace:*",
+    "@docxkit/plugin-timeline": "workspace:*",
+    "@docxkit/plugin-watermark": "workspace:*",
+    "@docxkit/preset-academic": "workspace:*",
+    "@docxkit/preset-classic": "workspace:*",
+    "@docxkit/preset-modern": "workspace:*",
+    "@docxkit/registry": "workspace:*",
+    "@docxkit/theme-minimal": "workspace:*",
+    "@docxkit/theme-ocean": "workspace:*",
+    "@docxkit/theme-warm": "workspace:*"
+  }
+}
