@@ -39,11 +39,11 @@ await doc
 
 docx-kit is built around three core concepts:
 
-| Concept | Description |
-|---|---|
-| **Styles** | CSS-like style rules (fontSize, color, margin...) organized as a stylesheet |
-| **Nodes** | Content building blocks: headings, paragraphs, tables, images, plugins |
-| **Builder** | Fluent API that chains nodes together and exports to .docx |
+| Concept     | Description                                                                 |
+| ----------- | --------------------------------------------------------------------------- |
+| **Styles**  | CSS-like style rules (fontSize, color, margin...) organized as a stylesheet |
+| **Nodes**   | Content building blocks: headings, paragraphs, tables, images, plugins      |
+| **Builder** | Fluent API that chains nodes together and exports to .docx                  |
 
 ### 1. Define Styles (CSS-like)
 
@@ -140,7 +140,58 @@ const doc = createDocx({
 })
 ```
 
-## Next Steps
+## What's Next?
+
+You now know enough to build any document. Choose your next step based on what you need:
+
+### I want to start from a pre-built style
+
+→ [Style Presets](/guide/presets) — `classic`, `modern`, `academic` ready-to-use configs
+
+```ts
+import { createDocx, modernPreset } from 'docx-kit'
+const doc = createDocx(modernPreset.config)
+```
+
+### I want a consistent look across many documents
+
+→ [Themes](/guide/themes) — `minimal`, `ocean`, `warm` with token-based color/font systems
+
+```ts
+import { createDocx, defineStyles, useTheme } from 'docx-kit'
+const doc = createDocx({
+  theme: useTheme('ocean'),
+  styles: defineStyles({ title: { color: '$colors.primary' } }),
+})
+```
+
+### I want AI/LLM to generate my document
+
+→ [AI Templates](/guide/ai-templates) — 4 built-in templates + prompt builder
+
+```ts
+import { reportTemplate } from 'docx-kit/ai'
+const schema = reportTemplate.generate({ title: 'Q2 Report' /* ... */ })
+```
+
+### I want to integrate with Claude / ChatGPT via MCP
+
+→ [MCP Server](/guide/mcp-server) — 6 tools + 1 resource for AI agents
+
+```ts
+import { createDocxKitServer } from 'docx-kit/mcp'
+// expose to MCP-compatible clients
+```
+
+### I want to learn the full builder API
+
+→ [Builder API](/guide/builder-api) — Every method, every option
+
+### I want to use a built-in plugin (QR, charts, signatures...)
+
+→ [Plugins guide](/guide/plugins) — 12 built-in plugins
+
+## Next Steps (Detailed)
 
 - [Builder API](/guide/builder-api) — Learn all fluent API methods
 - [CSS-like Styling](/guide/styling) — Master the styling system

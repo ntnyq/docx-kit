@@ -46,16 +46,30 @@ export default defineConfig({
           ],
         },
       ],
+      '/ecosystem/': [
+        {
+          text: 'Ecosystem',
+          items: [
+            { link: '/ecosystem/monorepo', text: 'Monorepo Structure' },
+            { link: '/ecosystem/creating-plugins', text: 'Creating Plugins' },
+            { link: '/playground', text: 'Online Playground' },
+          ],
+        },
+      ],
       '/examples/': [
         {
           text: 'Examples',
           items: [
             { link: '/examples/basic-report', text: 'Basic Report' },
+            { link: '/examples/preset-modern', text: 'Modern Preset' },
+            { link: '/examples/preset-academic', text: 'Academic Preset' },
+            { link: '/examples/ai-generated', text: 'AI Generated' },
             { link: '/examples/invoice', text: 'Invoice' },
             { link: '/examples/chart-report', text: 'Chart Report' },
             { link: '/examples/theme-system', text: 'Theme System' },
             { link: '/examples/rich-content', text: 'Rich Content' },
             { link: '/examples/style-inheritance', text: 'Style Inheritance' },
+            { link: '/examples/preview', text: 'DOCX Preview' },
           ],
         },
       ],
@@ -66,8 +80,11 @@ export default defineConfig({
             { link: '/guide/getting-started', text: 'Getting Started' },
             { link: '/guide/builder-api', text: 'Builder API' },
             { link: '/guide/styling', text: 'CSS-like Styling' },
+            { link: '/guide/presets', text: 'Style Presets' },
+            { link: '/guide/themes', text: 'Themes' },
             { link: '/guide/tables', text: 'Tables' },
             { link: '/guide/images', text: 'Images' },
+            { link: '/guide/preview', text: 'Browser Preview' },
             { link: '/guide/plugins', text: 'Plugins' },
             { link: '/guide/json-dsl', text: 'JSON DSL (renderDocx)' },
             { link: '/guide/platforms', text: 'Node.js & Browser' },
@@ -76,10 +93,6 @@ export default defineConfig({
             { link: '/guide/ai-templates', text: 'AI Templates & Prompts' },
             { link: '/guide/mcp-server', text: 'MCP Server' },
           ],
-        },
-        {
-          items: [{ link: '/playground', text: 'Online Playground' }],
-          text: 'Playground',
         },
       ],
       '/plugins/': [

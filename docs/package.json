@@ -3,8 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "vitepress build",
-    "dev": "vitepress dev"
+    "build": "pnpm run generate:monaco-types && vitepress build",
+    "dev": "pnpm run generate:monaco-types && vitepress dev",
+    "generate:monaco-types": "tsx ../scripts/generate-monaco-types.ts"
   },
   "dependencies": {
     "@ntnyq/utils": "^0.15.0",
@@ -16,6 +17,7 @@
     "vue": "^3.5.37"
   },
   "devDependencies": {
+    "tsx": "^4.20.3",
     "vitepress": "^2.0.0-alpha.17"
   }
 }

@@ -10,12 +10,9 @@
  * @packageDocumentation
  */
 
-// ---------- Core ----------
-// ---------- Style Presets ----------
 import { academicPreset } from '@docxkit/preset-academic'
 import { classicPreset } from '@docxkit/preset-classic'
 import { modernPreset } from '@docxkit/preset-modern'
-// ---------- Themes ----------
 import { minimalTheme } from '@docxkit/theme-minimal'
 import { oceanTheme } from '@docxkit/theme-ocean'
 import { warmTheme } from '@docxkit/theme-warm'
@@ -37,8 +34,9 @@ export { dataTablePlugin } from '@docxkit/plugin-data-table'
 export { pageNumberPlugin } from '@docxkit/plugin-page-number'
 export { propertyTablePlugin } from '@docxkit/plugin-property-table'
 export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
-
 export { signatureBlockPlugin } from '@docxkit/plugin-signature-block'
+// ---------- Preview (Browser DOCX viewer) ----------
+export { createDocxPreview, PREVIEW_ERROR_CODES } from '@docxkit/renderer'
 // ---------- Plugin option types ----------
 export type { CalloutOptions } from '@docxkit/plugin-callout'
 export type { QRCodePluginOptions } from '@docxkit/plugin-qrcode'
@@ -56,11 +54,24 @@ export type {
   PropertyItem,
   PropertyTableOptions,
 } from '@docxkit/plugin-property-table'
+
 export type {
   ColAlign,
   ColFormat,
   DataTableOptions,
 } from '@docxkit/plugin-data-table'
+
+export type {
+  SignatureBlockOptions,
+  SignatureParty,
+} from '@docxkit/plugin-signature-block'
+export type {
+  DocxInput,
+  DocxPreview,
+  DocxPreviewOptions,
+  PreviewErrorCode,
+  RendererKind,
+} from '@docxkit/renderer'
 
 export { academicPreset, classicPreset, modernPreset }
 
@@ -103,8 +114,3 @@ export const THEME_LIST: readonly DocxTheme[] = [
 export function useTheme(id: string): DocxTheme | undefined {
   return BUILTIN_THEMES.get(id)
 }
-
-export type {
-  SignatureBlockOptions,
-  SignatureParty,
-} from '@docxkit/plugin-signature-block'

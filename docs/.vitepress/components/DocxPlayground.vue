@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { createDocxPreview } from 'docx-kit'
+import { nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import { useDocxPlayground } from '../composables/useDocxPlayground'
+import type { DocxPreview } from 'docx-kit'
 
 const {
   activePreset,
@@ -17,6 +20,62 @@ const {
   selectStylePreset,
   stylePresets,
 } = useDocxPlayground()
+
+// ---------- Preview renderer ----------
+const previewContainer = useTemplateRef<HTMLElement>('previewContainer')
+let previewInstance: DocxPreview | null = null
+const previewLoading = ref(false)
+const previewError = ref('')
+
+// Re-render preview when resultBlob changes.
+// Use flush: 'post' so the watcher runs AFTER Vue has updated the DOM,
+// ensuring previewContainer.value is set when the v-else-if branch activates.
+watch(
+  resultBlob,
+  async blob => {
+    // Clean up previous instance.
+    if (previewInstance) {
+      previewInstance.destroy()
+      previewInstance = null
+    }
+    previewError.value = ''
+
+    if (!blob) {
+      return
+    }
+
+    // Wait one more tick to guarantee the v-else-if="resultBlob" branch
+    // has been committed to the DOM (flush: 'post' already covers this,
+    // but nextTick() adds an extra safety net).
+    await nextTick()
+    if (!previewContainer.value) {
+      return
+    }
+
+    previewLoading.value = true
+    try {
+      previewInstance = createDocxPreview(previewContainer.value, {
+        // Custom className avoids colliding with global `.docx` styles.
+        // The rendered DOM will use `.docxkit-preview-wrapper` and
+        // `section.docxkit-preview`.
+        className: 'docxkit-preview',
+      })
+      await previewInstance.render(blob)
+    } catch (err) {
+      previewError.value = String(err)
+    } finally {
+      previewLoading.value = false
+    }
+  },
+  { flush: 'post' },
+)
+
+onBeforeUnmount(() => {
+  if (previewInstance) {
+    previewInstance.destroy()
+    previewInstance = null
+  }
+})
 </script>
 
 <template>
@@ -97,19 +156,21 @@ const {
 
     <div class="preview-panel">
       <div class="panel-header">
-        <span class="panel-title">Preview &amp; Download</span>
+        <span class="panel-title">Preview</span>
         <div class="panel-actions">
           <button
             @click="download"
             :disabled="!resultBlob"
             class="btn btn-success"
+            title="Download .docx file"
             type="button"
           >
-            ⤓ Download .docx
+            ⤓ Download
           </button>
         </div>
       </div>
       <div class="preview-content">
+        <!-- Run error: blocks everything -->
         <div
           v-if="error"
           class="error-box"
@@ -117,23 +178,40 @@ const {
           <strong>Run Error:</strong>
           <pre>{{ error }}</pre>
         </div>
+
+        <!-- Stage: rendered preview + overlays -->
         <div
           v-else-if="resultBlob"
-          class="success-state"
+          class="preview-stage"
         >
-          <div class="success-icon">&#9989;</div>
-          <p><strong>Document generated successfully!</strong></p>
-          <p class="file-info">
-            File size: {{ (resultBlob.size / 1024).toFixed(1) }} KB
-          </p>
-          <button
-            @click="download"
-            class="btn btn-success btn-lg"
-            type="button"
+          <div
+            ref="previewContainer"
+            class="preview-renderer"
+          />
+
+          <!-- Loading overlay -->
+          <div
+            v-if="previewLoading"
+            class="preview-overlay loading-overlay"
           >
-            ⤓ Download document.docx
-          </button>
+            <div class="spinner" />
+            <p>Rendering preview…</p>
+          </div>
+
+          <!-- Preview error overlay -->
+          <div
+            v-if="previewError"
+            class="preview-overlay error-overlay"
+          >
+            <strong>Preview Error</strong>
+            <pre>{{ previewError }}</pre>
+            <p class="hint">
+              You can still download the .docx file using the button above.
+            </p>
+          </div>
         </div>
+
+        <!-- Placeholder: no result yet -->
         <div
           v-else
           class="placeholder"
@@ -296,8 +374,68 @@ const {
 
 .preview-content {
   flex: 1;
-  padding: 24px;
+  padding: 0;
   overflow-y: auto;
+}
+
+/* ─── Preview stage (container + overlays) ─── */
+.preview-stage {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Overlay base: covers the stage */
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  z-index: 10;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  background: var(--vp-c-bg);
+  gap: 12px;
+  color: var(--vp-c-text-2);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--vp-c-divider);
+  border-top-color: var(--vp-c-brand-1);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Preview error overlay */
+.error-overlay {
+  background: var(--vp-c-danger-soft);
+  color: var(--vp-c-danger-1);
+  font-size: 13px;
+}
+
+.error-overlay pre {
+  margin-top: 8px;
+  background: var(--vp-c-bg-mute);
+  padding: 8px 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 12px;
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .placeholder {
@@ -308,6 +446,34 @@ const {
   height: 100%;
   color: var(--vp-c-text-3);
   text-align: center;
+}
+
+.preview-renderer {
+  padding: 24px;
+  min-height: 100%;
+}
+
+/* docx-preview output: custom className = 'docxkit-preview' */
+.preview-renderer :deep(.docxkit-preview-wrapper) {
+  background: #f8f8f8;
+  padding: 20px;
+}
+
+.preview-renderer :deep(section.docxkit-preview) {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0 auto 16px;
+  padding: 40px;
+}
+
+@media (max-width: 768px) {
+  .preview-renderer {
+    padding: 12px;
+  }
+
+  .preview-renderer :deep(section.docxkit-preview) {
+    padding: 20px;
+  }
 }
 
 .placeholder-icon {
@@ -336,25 +502,6 @@ const {
   border-radius: 4px;
   overflow-x: auto;
   font-size: 12px;
-}
-
-.success-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  gap: 12px;
-}
-
-.success-icon {
-  font-size: 48px;
-}
-
-.file-info {
-  font-size: 13px;
-  color: var(--vp-c-text-2);
 }
 
 .btn {
@@ -400,11 +547,6 @@ const {
 
 .btn-ghost:hover {
   background: var(--vp-c-bg-soft-up);
-}
-
-.btn-lg {
-  padding: 10px 24px;
-  font-size: 14px;
 }
 
 @media (max-width: 768px) {

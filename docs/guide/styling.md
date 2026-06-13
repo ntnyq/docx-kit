@@ -301,6 +301,51 @@ const doc = createDocx({
 | `ocean` | Deep blue / teal color scheme | Business reports |
 | `warm` | Warm earth-tone color scheme | Creative docs, presentations |
 
+## Style Presets
+
+For a faster start, docx-kit ships with **3 pre-configured style presets**. See [Style Presets](/guide/presets) for details.
+
+Quick example using `modernPreset`:
+
+```ts
+import { createDocx, modernPreset } from 'docx-kit'
+
+const doc = createDocx(modernPreset.config)
+
+doc
+  .h1('Q1 Report')           // Navy 26pt with blue underline (Calibri)
+  .p('Body text here.')      // Calibri 11pt, 1.5× line height
+```
+
+## Themes
+
+Themes are design tokens (colors, fonts, scale) that can be referenced in styles via `$category.key` syntax. docx-kit ships with **3 built-in themes** (`minimal`, `ocean`, `warm`). See [Themes](/guide/themes) for the full token reference.
+
+Quick example using the ocean theme:
+
+```ts
+import { createDocx, defineStyles, useTheme } from 'docx-kit'
+
+const doc = createDocx({
+  theme: useTheme('ocean'),
+  styles: defineStyles({
+    title: {
+      color: '$colors.primary',      // → '#0f172a'
+      fontFamily: '$fonts.heading',  // → 'Georgia, serif'
+      fontSize: '$fontSize.xl',      // → 20
+      marginBottom: '$spacing.lg',   // → 28
+    },
+  }),
+})
+```
+
+## See Also
+
+- [Style Presets](/guide/presets) — Pre-configured style bundles
+- [Themes](/guide/themes) — Design tokens
+- [Builder API](/guide/builder-api) — Full builder reference
+- [Examples: Theme System](/examples/theme-system) — End-to-end themed report
+
 ## Style Inheritance (extends)
 
 Styles can extend other styles for CSS-like inheritance:

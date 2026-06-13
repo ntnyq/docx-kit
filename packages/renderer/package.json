@@ -1,0 +1,42 @@
+{
+  "name": "@docxkit/renderer",
+  "type": "module",
+  "version": "0.3.0",
+  "description": "Browser DOCX preview for docx-kit — renders .docx files in the browser with DOM-based or Microsoft Office Online rendering.",
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ntnyq/docx-kit",
+    "directory": "packages/renderer"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "docx-preview": "0.3.7",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@docxkit/core": "workspace:*",
+    "happy-dom": "^15.11.7"
+  }
+}

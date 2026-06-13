@@ -108,6 +108,7 @@
     "@docxkit/preset-classic": "workspace:*",
     "@docxkit/preset-modern": "workspace:*",
     "@docxkit/registry": "workspace:*",
+    "@docxkit/renderer": "workspace:*",
     "@docxkit/theme-minimal": "workspace:*",
     "@docxkit/theme-ocean": "workspace:*",
     "@docxkit/theme-warm": "workspace:*"
