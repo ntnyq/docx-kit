@@ -16,6 +16,8 @@ import { modernPreset } from '@docxkit/preset-modern'
 import { minimalTheme } from '@docxkit/theme-minimal'
 import { oceanTheme } from '@docxkit/theme-ocean'
 import { warmTheme } from '@docxkit/theme-warm'
+// Plugin type map augmentation (must be imported before any code that uses DocxBuilder)
+import './types/plugin-map'
 import type { DocxPreset, DocxTheme } from '@docxkit/core'
 
 export * from '@docxkit/core'

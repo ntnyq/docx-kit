@@ -1,1 +1,8 @@
 /* docx-kit docs custom styles */
+
+/* Limit home page features grid to 3 columns max to avoid cramped layout */
+@media (min-width: 960px) {
+  .VPHomeFeatures .items {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}

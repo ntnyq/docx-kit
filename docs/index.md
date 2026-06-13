@@ -40,6 +40,10 @@ features:
     title: MCP Server & AI Templates
     details: Expose docx-kit as Model Context Protocol (MCP) tools. Comes with 4 built-in templates (report, invoice, resume, letter) and a prompt builder for LLM-powered doc generation.
 
+  - icon: 🖥️
+    title: Browser Preview
+    details: Render .docx files directly in the browser with @docxkit/renderer. Supports DOM-based rendering (via docx-preview) and Microsoft Office Online iframe — perfect for live preview in web apps.
+
   - icon: 🌐
     title: Cross-Platform
     details: Works in Node.js (save to disk) and browsers (download as Blob). Platform-specific APIs are cleanly separated under docx-kit/node and docx-kit/browser.

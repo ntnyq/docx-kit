@@ -85,6 +85,29 @@ const DOCX_DTS = resolve(
   ROOT,
   'node_modules/.pnpm/docx@9.7.1/node_modules/docx/dist/index.d.ts',
 )
+/**
+ * Mapping of plugin name (as registered via `.use()` / `.plugin()`) to the
+ * name of the option-type interface exported by that plugin's `.d.ts`.
+ *
+ * Used to emit a `BuiltinPluginMap` augmentation so the playground
+ * gets type-safe `.plugin('callout', { ... })` calls without
+ * requiring an explicit `.use()` chain.
+ */
+const PLUGIN_NAME_TO_OPTIONS_TYPE: Record<string, string> = {
+  callout: 'CalloutOptions',
+  codeBlock: 'CodeBlockOptions',
+  coverPage: 'CoverPageOptions',
+  dataTable: 'DataTableOptions',
+  echarts: 'EChartsPluginOptions',
+  meetingMinutes: 'MeetingMinutesOptions',
+  pageNumber: 'PageNumberOptions',
+  propertyTable: 'PropertyTableOptions',
+  qrcode: 'QRCodePluginOptions',
+  signatureBlock: 'SignatureBlockOptions',
+  timeline: 'TimelineOptions',
+  watermark: 'WatermarkOptions',
+}
+
 const OUTPUT = resolve(ROOT, 'docs/.vitepress/utils/monacoTypes.generated.ts')
 
 // ─── Header (emitted verbatim at the top of the generated file) ───
@@ -130,6 +153,29 @@ const DECL_HEADER_PATTERN =
 // Not currently used by the transformer (we strip export lists outright)
 // but kept here for future extension.
 const EXPORT_NAMED_LIST_PATTERN = /^export\s+(?:type\s+)?\{([^}]+)\};?\s*$/
+
+/**
+ * Build the `BuiltinPluginMap` interface that augments
+ * `declare module 'docx-kit' { … }` so that `.plugin('callout', { … })`
+ * (etc.) are type-safe without an explicit `.use()` chain.
+ *
+ * The block is appended to the `'docx-kit'` ambient module as a
+ * nested `interface BuiltinPluginMap` (matching the runtime augmentation
+ * done in `packages/docx-kit/src/types/plugin-map.ts`).
+ */
+function buildBuiltinPluginMapBlock(): string {
+  const entries = Object.entries(PLUGIN_NAME_TO_OPTIONS_TYPE)
+    .map(([pluginName, optionsType]) => `  ${pluginName}: ${optionsType}`)
+    .join('\n')
+
+  return [
+    "declare module 'docx-kit' {",
+    '  interface BuiltinPluginMap {',
+    entries,
+    '  }',
+    '}',
+  ].join('\n')
+}
 
 // ─── Build `declare module 'docx' { … }` ────────────────────────
 function buildDocxBlock(): string {
@@ -227,8 +273,11 @@ function indent(text: string, n: number): string {
 function main() {
   const docxkitBlock = buildDocxKitBlock()
   const docxBlock = buildDocxBlock()
+  const builtinPluginMapBlock = buildBuiltinPluginMapBlock()
 
-  const content = [docxkitBlock, '', docxBlock].join('\n')
+  const content = [docxkitBlock, '', docxBlock, '', builtinPluginMapBlock].join(
+    '\n',
+  )
 
   // Escape for template literal:
   //   1. \\  → \\\\   (literal backslash in the content)

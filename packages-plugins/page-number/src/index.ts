@@ -25,8 +25,8 @@ export interface PageNumberOptions {
    */
   alignment?: (typeof AlignmentType)[keyof typeof AlignmentType]
   /**
-   * Font size in half-points.
-   * @default 20
+   * Font size in **points** (will be converted to docx half-points internally).
+   * @default 10
    */
   fontSize?: number
   /**
@@ -56,45 +56,24 @@ export function pageNumberPlugin() {
     name: 'pageNumber',
     render(options) {
       const alignment = options.alignment ?? AlignmentType.CENTER
-      const fontSize = options.fontSize ?? 20
+      // docx's `TextRun.size` is in half-points; user-facing option is in points.
+      const halfPoints = (options.fontSize ?? 10) * 2
 
-      if (options.showTotal) {
-        return new Paragraph({
-          alignment,
-          spacing: { after: 0, before: 0 },
-          children: [
-            new TextRun({
-              font: 'Arial',
-              size: fontSize,
-              text: 'Page ',
-            }),
-            new TextRun({
-              children: [PageNumber.CURRENT],
-              font: 'Arial',
-              size: fontSize,
-            }),
-            new TextRun({
-              font: 'Arial',
-              size: fontSize,
-              text: ' of ',
-            }),
-            new TextRun({
-              children: [PageNumber.TOTAL_PAGES],
-              font: 'Arial',
-              size: fontSize,
-            }),
-          ],
-        })
-      }
+      // Per the docx library docs, `PageNumber.CURRENT` and `PageNumber.TOTAL_PAGES`
+      // must be placed inside a single `TextRun.children` array — splitting them across
+      // multiple `TextRun`s breaks the field rendering in Word.
+      const children: (string | typeof PageNumber.CURRENT)[] = options.showTotal
+        ? ['Page ', PageNumber.CURRENT, ' of ', PageNumber.TOTAL_PAGES]
+        : [PageNumber.CURRENT]
 
       return new Paragraph({
         alignment,
         spacing: { after: 0, before: 0 },
         children: [
           new TextRun({
-            children: [PageNumber.CURRENT],
+            children,
             font: 'Arial',
-            size: fontSize,
+            size: halfPoints,
           }),
         ],
       })

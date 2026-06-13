@@ -34,13 +34,11 @@ export const PLUGIN_CODE = unindent(`
     watermarkPlugin,
   } from 'docx-kit'
 
-  // 1. Register all 12 built-in plugins
+  // 1. Register all 12 built-in plugins (chain \`.use()\` for type-safe \`.plugin()\` calls)
   const doc = createDocx({
     page: { size: 'A4', margin: '20mm 25mm' },
     metadata: { title: 'Built-in Plugins Showcase', creator: 'docx-kit' },
   })
-
-  doc
     .use(calloutPlugin())
     .use(codeBlockPlugin())
     .use(coverPagePlugin())

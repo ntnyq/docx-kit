@@ -13,6 +13,41 @@ import { unindent } from '@ntnyq/utils'
 
 export const DOCX_KIT_TYPES = unindent(`
 declare module 'docx-kit' {
+    interface BuiltinPluginMap {
+      callout: CalloutOptions$1;
+      codeBlock: CodeBlockOptions$1;
+      coverPage: CoverPageOptions$1;
+      dataTable: DataTableOptions$1;
+      echarts: EChartsPluginOptions$1;
+      meetingMinutes: MeetingMinutesOptions$1;
+      pageNumber: PageNumberOptions$1;
+      propertyTable: PropertyTableOptions$1;
+      qrcode: QRCodePluginOptions$1;
+      signatureBlock: SignatureBlockOptions$1;
+      timeline: TimelineOptions$1;
+      watermark: WatermarkOptions$1;
+    }
+  }
+  //#endregion
+  //#region src/browser/dom.d.ts
+  /**
+   * Normalize image data for \`ImageRun\` — converts \`Blob\` to \`Uint8Array\`.
+   *
+   * In the browser, image data often arrives as a \`Blob\` (e.g. from
+   * \`<input type="file">\` or \`fetch()\`). \`ImageRun\` expects raw bytes,
+   * so we convert via \`Blob.arrayBuffer()\`.
+   *
+   * @param data - — The raw image data (Blob, Uint8Array, ArrayBuffer, string)
+   * @returns Normalized data suitable for \`ImageRun\`
+   *
+   * @example
+   * \`\`\`ts
+   * import { normalizeImageData } from 'docx-kit/browser'
+   *
+   * const file = document.querySelector('input[type=file]').files[0]
+   * const data = await normalizeImageData(file) // Blob → Uint8Array
+   * \`\`\`
+   */
   declare function normalizeImageData(data: unknown): Promise<string | ArrayBuffer | Uint8Array>;
   //#endregion
   //#region src/browser.d.ts
@@ -731,14 +766,20 @@ declare module 'docx-kit' {
   //#endregion
   //#region src/types/plugin.d.ts
   /**
-   * A docx-kit plugin.
+   * Built-in plugin type map.
    *
-   * Plugins have a unique \`name\`, an optional \`setup\` hook,
-   * and a required \`render\` function that receives user options
-   * and a rendering context.
+   * Users can extend this interface via module augmentation to add
+   * custom plugin types that are available without explicit \`.use()\` calls.
    *
-   * @template TName — The plugin name (string literal type)
-   * @template TOptions — The shape of the user-provided options
+   * @example
+   * \`\`\`ts
+   * // In your code (module augmentation):
+   * declare module '@docxkit/core' {
+   *   interface BuiltinPluginMap {
+   *     myCustomPlugin: { text: string }
+   *   }
+   * }
+   * \`\`\`
    */
   interface DocxPlugin<TName extends string = string, TOptions = unknown> {
     /** Unique plugin name, used as the node discriminator. */
@@ -890,7 +931,7 @@ declare module 'docx-kit' {
    * @template TStyles — Inferred stylesheet type from \`config.styles\`
    * @template TPlugins — Accumulated plugin registry (built via \`.use()\`)
    */
-  declare class DocxBuilder<TStyles extends StyleSheet = StyleSheet, TPlugins extends PluginRegistry = Record<never, never>> {
+  declare class DocxBuilder<TStyles extends StyleSheet = StyleSheet, TPlugins extends PluginRegistry = BuiltinPluginMap> {
     /**
      * Save the document to a file (Node.js only).
      *
@@ -1566,7 +1607,7 @@ declare module 'docx-kit' {
    *   .save('report.docx')
    * \`\`\`
    */
-  declare function createDocx<const TStyles extends StyleSheet = StyleSheet>(config?: DocxKitConfig<TStyles>): DocxBuilder<TStyles, Record<never, never>>;
+  declare function createDocx<const TStyles extends StyleSheet = StyleSheet>(config?: DocxKitConfig<TStyles>): DocxBuilder<TStyles, BuiltinPluginMap>;
   /**
    * Render a document from a JSON schema (AI-friendly / serializable DSL).
    *
@@ -1832,8 +1873,8 @@ declare module 'docx-kit' {
      */
     alignment?: (typeof AlignmentType)[keyof typeof AlignmentType];
     /**
-     * Font size in half-points.
-     * @default 20
+     * Font size in **points** (will be converted to docx half-points internally).
+     * @default 10
      */
     fontSize?: number;
     /**
@@ -5434,5 +5475,22 @@ declare module 'docx' {
   }
   
 
+}
+
+declare module 'docx-kit' {
+  interface BuiltinPluginMap {
+  callout: CalloutOptions
+  codeBlock: CodeBlockOptions
+  coverPage: CoverPageOptions
+  dataTable: DataTableOptions
+  echarts: EChartsPluginOptions
+  meetingMinutes: MeetingMinutesOptions
+  pageNumber: PageNumberOptions
+  propertyTable: PropertyTableOptions
+  qrcode: QRCodePluginOptions
+  signatureBlock: SignatureBlockOptions
+  timeline: TimelineOptions
+  watermark: WatermarkOptions
+  }
 }
 `)

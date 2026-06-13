@@ -35,7 +35,11 @@ import type {
   TextNode,
 } from '../dsl/nodes'
 import type { DocxKitConfig, SectionConfig } from '../types/document'
-import type { DocxPlugin, PluginRegistry } from '../types/plugin'
+import type {
+  BuiltinPluginMap,
+  DocxPlugin,
+  PluginRegistry,
+} from '../types/plugin'
 import type { DocxStyleRule, StyleSheet } from '../types/style'
 
 /**
@@ -50,7 +54,7 @@ import type { DocxStyleRule, StyleSheet } from '../types/style'
  */
 export class DocxBuilder<
   TStyles extends StyleSheet = StyleSheet,
-  TPlugins extends PluginRegistry = Record<never, never>,
+  TPlugins extends PluginRegistry = BuiltinPluginMap,
 > {
   /**
    * Save the document to a file (Node.js only).

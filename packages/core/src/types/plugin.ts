@@ -12,6 +12,24 @@ import type { DocxKitConfig } from './document'
 import type { MaybePromise } from './utility'
 
 /**
+ * Built-in plugin type map.
+ *
+ * Users can extend this interface via module augmentation to add
+ * custom plugin types that are available without explicit `.use()` calls.
+ *
+ * @example
+ * ```ts
+ * // In your code (module augmentation):
+ * declare module '@docxkit/core' {
+ *   interface BuiltinPluginMap {
+ *     myCustomPlugin: { text: string }
+ *   }
+ * }
+ * ```
+ */
+export interface BuiltinPluginMap extends PluginRegistry {}
+
+/**
  * A docx-kit plugin.
  *
  * Plugins have a unique `name`, an optional `setup` hook,
