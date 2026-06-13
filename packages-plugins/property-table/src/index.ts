@@ -117,6 +117,12 @@ export function propertyTablePlugin() {
       return new Table({
         rows,
         width: { size: 100, type: WidthType.PERCENTAGE },
+        margins: {
+          bottom: 40,
+          left: 100,
+          right: 100,
+          top: 40,
+        },
       })
     },
   })

@@ -155,12 +155,24 @@ function linesToParagraphs(
  */
 function parseHighlightHtml(html: string): TextRun[] {
   const results: TextRun[] = []
-  const regex = /<span\s+class="hljs-(\w+)">(.*?)<\/span>/g
+  const regex = /<span\s+class="([^"]*)">(.*?)<\/span>/g
 
   let lastIndex = 0
   let match = regex.exec(html)
 
   while (match !== null) {
+    const classAttr = match[1]
+    const tokenMatch = /hljs-(\w+)/.exec(classAttr)
+
+    // Skip spans that are not highlight.js spans
+    if (!tokenMatch) {
+      lastIndex = match.index + match[0].length
+      match = regex.exec(html)
+      continue
+    }
+
+    const type = tokenMatch[1]
+
     // Text before this span
     if (match.index > lastIndex) {
       const before = html.slice(lastIndex, match.index)
@@ -175,7 +187,6 @@ function parseHighlightHtml(html: string): TextRun[] {
       }
     }
 
-    const type = match[1]
     const text = match[2]
     const color = TOKEN_COLORS[type] ?? 'D4D4D4'
 

@@ -246,6 +246,12 @@ export function timelinePlugin() {
             style: BorderStyle.NONE,
           },
         },
+        margins: {
+          bottom: 40,
+          left: 100,
+          right: 100,
+          top: 40,
+        },
       })
     },
   })

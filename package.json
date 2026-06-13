@@ -6,8 +6,8 @@
   "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
   "license": "MIT",
   "scripts": {
-    "build": "pnpm -r --filter '!docs' run build",
-    "dev": "pnpm -r --filter '!docs' --parallel run dev",
+    "build": "pnpm -r --filter \"!docs\" run build",
+    "dev": "pnpm -r --filter \"!docs\" --parallel run dev",
     "docs:build": "pnpm -C docs run build",
     "docs:dev": "pnpm -C docs run dev",
     "lint": "eslint",

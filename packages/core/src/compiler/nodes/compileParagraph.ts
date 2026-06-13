@@ -62,9 +62,12 @@ export async function compileParagraph<TStyles extends StyleSheet>(
           }),
         ]
 
+  const paragraphStyle = compileParagraphStyle(style)
+
   return new Paragraph({
-    ...compileParagraphStyle(style),
+    ...paragraphStyle,
     children,
+    spacing: paragraphStyle.spacing ?? { after: 160 },
   })
 }
 

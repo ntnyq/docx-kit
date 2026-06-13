@@ -179,7 +179,7 @@ async function renderInBrowser(
     renderer: config.renderer,
     width: config.width,
   })
-  chart.setOption(option)
+  chart.setOption({ ...option, animation: false })
 
   const dataUrl = chart.getDataURL({
     backgroundColor: '#ffffff',

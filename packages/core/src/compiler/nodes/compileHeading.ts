@@ -33,9 +33,12 @@ export function compileHeading<TStyles extends StyleSheet>(
     theme: config.theme,
   })
 
+  const paragraphStyle = compileParagraphStyle(style)
+
   return new Paragraph({
-    ...compileParagraphStyle(style),
+    ...paragraphStyle,
     heading: HEADING_MAP[node.level],
+    spacing: paragraphStyle.spacing ?? { after: 120, before: 240 },
     children: [
       new TextRun({
         text: node.text,
