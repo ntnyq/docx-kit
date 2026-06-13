@@ -6,25 +6,27 @@
  * containing `declare module` blocks that Monaco's TypeScript worker
  * can consume.
  *
- * Strategy (avoiding diamond-dependency duplication):
- *   1. Read the umbrella's `dist/browser.d.ts` first. It contains the
- *      `useTheme`, `usePreset`, `BUILTIN_THEMES`, `PRESET_LIST`,
- *      `normalizeImageData`, `createDocxPreview` and all the
- *      re-exported *types* (`export * from "@docxkit/core"`) that
- *      `docx-kit` exposes as a public API.
- *   2. For every leaf workspace package (plugins, presets, themes,
- *      loader, renderer, …), read its `dist/index.d.ts` and append
- *      any declaration whose name has *not* been seen before. This
- *      deduplicates the `export *` re-exports vs. the actual leaf
- *      declarations, and avoids repeating the same `DocxTheme` /
- *      `DocxPreset` interfaces three times across theme/preset
- *      packages.
- *   3. Concatenate everything into `declare module 'docx-kit' { … }`.
- *   4. Separately, read `node_modules/docx/dist/index.d.ts` and apply
- *      the same transformation for `declare module 'docx' { … }`.
+ * Strategy:
+ *   1. **docx-kit module** — read the umbrella `dist/browser.d.ts`
+ *      and all leaf packages, strip `import` lines, and emit a
+ *      single `declare module 'docx-kit' { … }` block.
+ *      - The umbrella's `declare module '@docxkit/core' { … }`
+ *        augmentation is REWRITTEN to target `'docx-kit'` so the
+ *        augmentation actually applies to the module playground
+ *        users `import` from.
+ *      - The `declare` keyword is stripped from declarations
+ *        (redundant inside `declare module { … }`).
+ *      - A manual `BuiltinPluginMap` augmentation is emitted
+ *        with simple type names (no `$1` suffix) so it doesn't
+ *        conflict with the umbrella's imports.
+ *   2. **docx module** — read `node_modules/docx/dist/index.d.ts`,
+ *      strip `import` lines, wrap in `declare module 'docx' { … }`.
+ *      - `declare` keyword is also stripped.
  *
- * The resulting blocks are wrapped in a template literal assigned to
- * `DOCX_KIT_TYPES`, using `unindent` from `@ntnyq/utils` for readability.
+ * The resulting blocks are emitted as a regular JS string literal
+ * (via `JSON.stringify`) — this avoids all manual escaping pitfalls
+ * (backticks, `${…}` interpolation, backslashes in TypeScript
+ * template-literal types like `` `#${string}` ``).
  *
  * @example
  *   pnpm tsx scripts/generate-monaco-types.ts
@@ -36,26 +38,10 @@ const ROOT = resolve(import.meta.dirname, '..')
 
 // ─── Configuration ────────────────────────────────────────────────
 
-/**
- * The umbrella package — its `browser.d.ts` contains the *unique*
- * value exports (`useTheme`, `usePreset`, `BUILTIN_THEMES`, …) plus
- * `export * from "@docxkit/core"`. Processing this first guarantees
- * those names are recorded as "seen" before the leaf packages can
- * re-introduce them.
- */
 const UMBRELLA_DTS = 'packages/docx-kit/dist/browser.d.ts'
 
-/**
- * Leaf workspace packages whose types are not fully re-exported by
- * the umbrella, or whose unique types we'd like to make available
- * in the playground (in case a user wants to import them via the
- * deep package path rather than `docx-kit`).
- */
 const DOCXKIT_LEAF_PACKAGES = [
-  // Core (types are mostly re-exported by umbrella, but include
-  // here for completeness — dedup will drop the duplicates).
   'packages/core/dist/index.d.ts',
-  // Plugins.
   'packages-plugins/callout/dist/index.d.ts',
   'packages-plugins/code-block/dist/index.d.ts',
   'packages-plugins/cover-page/dist/index.d.ts',
@@ -68,15 +54,12 @@ const DOCXKIT_LEAF_PACKAGES = [
   'packages-plugins/signature-block/dist/index.d.ts',
   'packages-plugins/timeline/dist/index.d.ts',
   'packages-plugins/watermark/dist/index.d.ts',
-  // Presets.
   'packages-presets/academic/dist/index.d.ts',
   'packages-presets/classic/dist/index.d.ts',
   'packages-presets/modern/dist/index.d.ts',
-  // Themes.
   'packages-themes/minimal/dist/index.d.ts',
   'packages-themes/ocean/dist/index.d.ts',
   'packages-themes/warm/dist/index.d.ts',
-  // Infrastructure.
   'packages/loader/dist/index.d.ts',
   'packages/renderer/dist/index.d.ts',
 ]
@@ -85,32 +68,10 @@ const DOCX_DTS = resolve(
   ROOT,
   'node_modules/.pnpm/docx@9.7.1/node_modules/docx/dist/index.d.ts',
 )
-/**
- * Mapping of plugin name (as registered via `.use()` / `.plugin()`) to the
- * name of the option-type interface exported by that plugin's `.d.ts`.
- *
- * Used to emit a `BuiltinPluginMap` augmentation so the playground
- * gets type-safe `.plugin('callout', { ... })` calls without
- * requiring an explicit `.use()` chain.
- */
-const PLUGIN_NAME_TO_OPTIONS_TYPE: Record<string, string> = {
-  callout: 'CalloutOptions',
-  codeBlock: 'CodeBlockOptions',
-  coverPage: 'CoverPageOptions',
-  dataTable: 'DataTableOptions',
-  echarts: 'EChartsPluginOptions',
-  meetingMinutes: 'MeetingMinutesOptions',
-  pageNumber: 'PageNumberOptions',
-  propertyTable: 'PropertyTableOptions',
-  qrcode: 'QRCodePluginOptions',
-  signatureBlock: 'SignatureBlockOptions',
-  timeline: 'TimelineOptions',
-  watermark: 'WatermarkOptions',
-}
 
 const OUTPUT = resolve(ROOT, 'docs/.vitepress/utils/monacoTypes.generated.ts')
 
-// ─── Header (emitted verbatim at the top of the generated file) ───
+// ─── Header ───────────────────────────────────────────────────────
 const HEADER = [
   '/**',
   ' * AUTO-GENERATED by `scripts/generate-monaco-types.ts` — DO NOT EDIT.',
@@ -124,143 +85,26 @@ const HEADER = [
   '',
 ]
 
-// ─── Regex patterns (hoisted to avoid the "used before defined" lint rule) ─
-const IMPORT_LINE_PATTERN = /^import\s/
-
-// Matches `export { … };` (or `export {}`) at end of line, allowing optional
-// whitespace and trailing semicolon. Bounded by the absence of further `{`.
-const EXPORT_LIST_PATTERN = /^export\s*\{[^}]*\};?\s*$/
-
-// Captures leading whitespace before `export` and consumes the `export` keyword
-// (and one trailing space) when followed by a declaration-style identifier.
-const EXPORT_PREFIX_PATTERN =
-  /^(\s*)export\s+(?=declare\b|type\b|interface\b|class\b|function\b|const\b|enum\b|namespace\b|abstract\b|async\b)/
-
-// Matches a top-level declaration. We use this to extract the declared
-// name(s) so the dedup step can skip leaves that have already contributed
-// a name to the ambient module.
-//
-// Captures:
-//   1. leading indentation
-//   2. kind keyword (declare / type / interface / …)
-//   3. the declared name (function/const/type/interface/enum/namespace/class)
-//   4. for `export type { Foo, Bar }` (re-export forms) — comma-separated
-//      list of names; not currently used because we strip the export list
-const DECL_HEADER_PATTERN =
-  /^(\s*)(?:export\s+)?(declare\s+)?(type|interface|class|function|const|enum|namespace|abstract\s+class|async\s+function)\s+([A-Za-z_$][\w$]*)/
-
-// Captures the identifier names from a `export type { A, B as C }` form.
-// Not currently used by the transformer (we strip export lists outright)
-// but kept here for future extension.
-const EXPORT_NAMED_LIST_PATTERN = /^export\s+(?:type\s+)?\{([^}]+)\};?\s*$/
+// ─── Helpers ────────────────────────────────────────────────────
 
 /**
- * Build the `BuiltinPluginMap` interface that augments
- * `declare module 'docx-kit' { … }` so that `.plugin('callout', { … })`
- * (etc.) are type-safe without an explicit `.use()` chain.
+ * Rewrite any `declare module '@docxkit/core' { … }` block in `source`
+ * so that it targets `'docx-kit'` instead, AND drop it entirely.
  *
- * The block is appended to the `'docx-kit'` ambient module as a
- * nested `interface BuiltinPluginMap` (matching the runtime augmentation
- * done in `packages/docx-kit/src/types/plugin-map.ts`).
+ * We drop it because the umbrella's augmentation references the
+ * import-alias names like `CalloutOptions$1` which become unresolved
+ * once we strip the umbrella's `import` lines.  A cleaner manual
+ * augmentation is emitted by `BUILTIN_PLUGIN_MAP_AUGMENTATION`
+ * using the plain type names that resolve via the leaf packages.
  */
-function buildBuiltinPluginMapBlock(): string {
-  const entries = Object.entries(PLUGIN_NAME_TO_OPTIONS_TYPE)
-    .map(([pluginName, optionsType]) => `  ${pluginName}: ${optionsType}`)
-    .join('\n')
-
-  return [
-    "declare module 'docx-kit' {",
-    '  interface BuiltinPluginMap {',
-    entries,
-    '  }',
-    '}',
-  ].join('\n')
+function dropAugmentationBlock(source: string): string {
+  // Match `declare module 'X' { … }` blocks (greedy) and remove them.
+  return source.replace(
+    /declare\s+module\s+['"][^'"]+['"]\s*\{[\s\S]*?\n\}/g,
+    '',
+  )
 }
 
-// ─── Build `declare module 'docx' { … }` ────────────────────────
-function buildDocxBlock(): string {
-  if (!existsSync(DOCX_DTS)) {
-    throw new Error(
-      `[generate-monaco-types] missing ${DOCX_DTS}\n`
-        + `Run \`pnpm install\` first.`,
-    )
-  }
-
-  const seenNames = new Set<string>()
-  const body = transformLeafDts(readFileSync(DOCX_DTS, 'utf8'), seenNames)
-
-  return [`declare module 'docx' {`, indent(body, 2), '}'].join('\n')
-}
-
-// ─── Build `declare module 'docx-kit' { … }` ─────────────────────
-function buildDocxKitBlock(): string {
-  const seenNames = new Set<string>()
-  const parts: string[] = []
-
-  // 1. Process the umbrella first so its unique value exports
-  //    (useTheme, usePreset, BUILTIN_THEMES, …) win the dedup race.
-  const umbrellaBody = readAndTransform(UMBRELLA_DTS, seenNames)
-  if (umbrellaBody) {
-    parts.push(umbrellaBody)
-  }
-
-  // 2. Walk the leaf packages, appending only declarations that
-  //    haven't been seen yet.
-  for (const relPath of DOCXKIT_LEAF_PACKAGES) {
-    const body = readAndTransform(relPath, seenNames)
-    if (body) {
-      parts.push(body)
-    }
-  }
-
-  return [
-    `declare module 'docx-kit' {`,
-    indent(parts.join('\n\n'), 2),
-    '}',
-  ].join('\n')
-}
-
-/**
- * Extract the top-level declaration name from a `declare …` / `type …` /
- * `interface …` line, e.g.
- *
- *   - `declare function useTheme(id: string): DocxTheme | undefined;`
- *     → `"useTheme"`
- *   - `type DocxTheme = { … }`
- *     → `"DocxTheme"`
- *   - `export type { Foo, Bar }`
- *     → `["Foo", "Bar"]`
- *   - `   interface HeadingNode { … }`
- *     → `"HeadingNode"`
- *
- * Returns `null` when the line is not a recognisable declaration header.
- */
-function extractDeclaredNames(line: string): string[] | null {
-  const trimmed = line.trim()
-
-  // `export type { Foo, Bar }` (re-export list of types)
-  const named = trimmed.match(EXPORT_NAMED_LIST_PATTERN)
-  if (named) {
-    return named[1]
-      .split(',')
-      .map(part =>
-        part
-          .trim()
-          .split(/\s+as\s+/)
-          .pop()!
-          .trim(),
-      )
-      .filter(Boolean)
-  }
-
-  const m = trimmed.match(DECL_HEADER_PATTERN)
-  if (!m) {
-    return null
-  }
-  return [m[4]]
-}
-
-// ─── Helpers ────────────────────────────────────────────────────────
 /** Indent every non-empty line of `text` by `n` spaces. */
 function indent(text: string, n: number): string {
   const pad = ' '.repeat(n)
@@ -270,34 +114,213 @@ function indent(text: string, n: number): string {
     .join('\n')
 }
 
+/**
+ * Strip the `declare` keyword from declarations.
+ *
+ * When we move declarations from their original `.d.ts` files
+ * (where `declare` is necessary) into a `declare module 'X' { … }`
+ * block, the `declare` becomes redundant and TS reports
+ * "TS1038: A 'declare' modifier cannot be used in an already
+ * ambient context."
+ *
+ * Important: do NOT strip `declare` from `declare module 'X' { … }`
+ * opening lines — that would break the augmentation block syntax.
+ */
+function stripDeclareKeyword(source: string): string {
+  // Match `declare` only when NOT followed by `module`.
+  return source.replace(/^(\s*)(export\s+)?declare\s+(?!module\b)/gm, '$1$2')
+}
+
+/**
+ * Strip `import … from "…";` lines, `export { … };` / `export {};` lines,
+ * and `export * from "…";` re-exports from a `.d.ts` source.
+ *
+ * These reference other npm packages and can't be resolved by
+ * Monaco's TS worker at runtime.
+ */
+function stripImportsAndExports(source: string): string {
+  return source
+    .split('\n')
+    .filter(line => {
+      const t = line.trim()
+      if (t.startsWith('import ')) {
+        return false
+      }
+      if (/^export\s*\{[^}]*\};?\s*$/.test(t)) {
+        return false
+      }
+      if (/^export\s+\*\s+from\s+/.test(t)) {
+        return false
+      }
+      return true
+    })
+    .join('\n')
+}
+
+// ─── BuiltinPluginMap augmentation (manual emission) ────────────
+
+/**
+ * Manually emit a `BuiltinPluginMap` augmentation that augments
+ * `declare module 'docx-kit' { … }` so the playground gets
+ * type-safe `.plugin('callout', { ... })` calls without an
+ * explicit `.use()` chain.
+ *
+ * We use plain plugin option type names (e.g. `CalloutOptions`)
+ * which are resolved by the leaf packages' declarations in the
+ * same module scope.
+ */
+const BUILTIN_PLUGIN_MAP_AUGMENTATION = `
+interface BuiltinPluginMap {
+  callout: CalloutOptions;
+  codeBlock: CodeBlockOptions;
+  coverPage: CoverPageOptions;
+  dataTable: DataTableOptions;
+  echarts: EChartsPluginOptions;
+  meetingMinutes: MeetingMinutesOptions;
+  pageNumber: PageNumberOptions;
+  propertyTable: PropertyTableOptions;
+  qrcode: QRCodePluginOptions;
+  signatureBlock: SignatureBlockOptions;
+  timeline: TimelineOptions;
+  watermark: WatermarkOptions;
+}
+`.trim()
+
+// ─── Main builder functions ────────────────────────────────────
+
+/**
+ * Build the `declare module 'docx' { … }` block.
+ */
+function buildDocxBlock(): string {
+  if (!existsSync(DOCX_DTS)) {
+    throw new Error(
+      `[generate-monaco-types] missing ${DOCX_DTS}\n`
+        + 'Run `pnpm install` first.',
+    )
+  }
+  let src = readFileSync(DOCX_DTS, 'utf8')
+  src = stripImportsAndExports(src)
+  src = stripDeclareKeyword(src)
+  return [`declare module 'docx' {`, indent(src, 2), '}'].join('\n')
+}
+
+/**
+ * Build the body of the `docx-kit` module block by concatenating
+ * the umbrella and leaf package declarations, deduped by name.
+ *
+ * Dedup: a simple regex finds top-level `type` / `interface` /
+ * `class` / `function` / `const` / `enum` / `namespace` /
+ * `abstract class` / `async function` declaration headers and
+ * records their names. A leaf package is skipped entirely if
+ * every one of its names is already seen (the umbrella and
+ * earlier leaves won the dedup race).
+ */
+function buildDocxKitBody(): string {
+  const seen = new Set<string>()
+  const parts: string[] = []
+
+  // Extract declared names from a `.d.ts` source.
+  const declNamePattern =
+    /^\s*(?:export\s+)?(?:declare\s+)?(?:type|interface|class|function|const|enum|namespace|abstract\s+class|async\s+function)\s+([A-Za-z_$][\w$]*)/gm
+  function extractNames(src: string): string[] {
+    const names: string[] = []
+    let m: RegExpExecArray | null
+    while ((m = declNamePattern.exec(src)) !== null) {
+      names.push(m[1]!)
+    }
+    declNamePattern.lastIndex = 0
+    return names
+  }
+
+  // 1. Umbrella first (so its unique value exports and types win).
+  const umbrellaSrc = readLeafDts(UMBRELLA_DTS, { isUmbrella: true })
+  if (umbrellaSrc) {
+    for (const n of extractNames(umbrellaSrc)) {
+      seen.add(n)
+    }
+    parts.push(umbrellaSrc)
+  }
+
+  // 2. Leaf packages.
+  for (const relPath of DOCXKIT_LEAF_PACKAGES) {
+    const src = readLeafDts(relPath)
+    if (!src) {
+      continue
+    }
+    const names = extractNames(src)
+    const allSeen = names.length > 0 && names.every(n => seen.has(n))
+    if (allSeen) {
+      continue
+    }
+    for (const n of names) {
+      seen.add(n)
+    }
+    parts.push(src)
+  }
+
+  // 3. Manual `BuiltinPluginMap` augmentation (uses plain type
+  //    names that resolve via the leaf packages in this scope).
+  parts.push(BUILTIN_PLUGIN_MAP_AUGMENTATION)
+
+  return parts.join('\n\n')
+}
+
 function main() {
-  const docxkitBlock = buildDocxKitBlock()
+  const docxkitBody = buildDocxKitBody()
   const docxBlock = buildDocxBlock()
-  const builtinPluginMapBlock = buildBuiltinPluginMapBlock()
 
-  const content = [docxkitBlock, '', docxBlock, '', builtinPluginMapBlock].join(
-    '\n',
-  )
+  const docxkitBlock = [
+    `declare module 'docx-kit' {`,
+    indent(docxkitBody, 2),
+    '}',
+  ].join('\n')
 
-  // Escape for template literal:
-  //   1. \\  → \\\\   (literal backslash in the content)
-  //   2. `   → \`    (backtick in the content)
-  //   3. ${  → \${   (template literal type → interpolation in JS)
-  const escaped = content
-    .replace(/\\/g, '\\\\')
-    .replace(/`/g, '\\`')
-    .replace(/\$\{/g, '\\${')
+  const content = [docxkitBlock, '', docxBlock].join('\n')
+
+  // `JSON.stringify` produces a regular JS string literal with
+  // every special character properly escaped (backticks, backslashes,
+  // `${…}`, control chars, non-ASCII). This avoids the pitfalls of
+  // embedding TS source inside a JS template literal, where:
+  //   • `` ` ``  must become `` \` ``
+  //   • `\`     must become `\\`
+  //   • `${`    must become `\${`
+  // When emitted as a plain string, the resulting constant holds the
+  // original source verbatim — including valid TS template-literal
+  // types like `` `#${string}` ``.
+  //
+  // We keep the full `JSON.stringify` output (with surrounding `"…"`)
+  // and wrap with `unindent(…)` for runtime whitespace normalisation
+  // (not for escaping).
+  const jsonEncoded = JSON.stringify(content)
 
   const output = [
     ...HEADER,
     '',
     "import { unindent } from '@ntnyq/utils'",
     '',
-    'export const DOCX_KIT_TYPES = unindent(`',
-    escaped,
-    '`)',
+    'export const DOCX_KIT_TYPES = unindent(',
+    `  ${jsonEncoded}`,
+    ')',
     '',
   ].join('\n')
+
+  // ─── Self-check: brace balance must be zero ─────────────────────
+  // If unbalanced, Monaco's TS worker will report syntax errors in
+  // the `addExtraLib` content.
+  let depth = 0
+  for (const ch of content) {
+    if (ch === '{') {
+      depth++
+    } else if (ch === '}') {
+      depth--
+    }
+  }
+  if (depth !== 0) {
+    throw new Error(
+      `[generate-monaco-types] brace imbalance detected (depth=${depth}). `
+        + 'The generated `declare module` blocks are not properly closed.',
+    )
+  }
 
   mkdirSync(dirname(OUTPUT), { recursive: true })
   writeFileSync(OUTPUT, output, 'utf8')
@@ -308,89 +331,31 @@ function main() {
   )
 }
 
+// ─── Main ────────────────────────────────────────────────────────
+
 /**
- * Read a `.d.ts` file, transform it, and return its body fragment.
- * Missing files produce a warning and an empty string (build resilience).
+ * Read a `.d.ts` file and return its content with imports/exports
+ * stripped, the `declare` keyword removed, and the augmentation
+ * target rewritten to `'docx-kit'`.
+ *
+ * Returns `null` if the file doesn't exist.
  */
-function readAndTransform(relPath: string, seenNames: Set<string>): string {
+function readLeafDts(
+  relPath: string,
+  opts: { isUmbrella?: boolean } = {},
+): string | null {
   const absPath = resolve(ROOT, relPath)
   if (!existsSync(absPath)) {
     console.warn(`[generate-monaco-types] skipping missing ${relPath}`)
-    return ''
+    return null
   }
-  const source = readFileSync(absPath, 'utf8')
-  return transformLeafDts(source, seenNames)
+  let src = readFileSync(absPath, 'utf8')
+  src = stripImportsAndExports(src)
+  if (opts.isUmbrella) {
+    src = dropAugmentationBlock(src)
+  }
+  src = stripDeclareKeyword(src)
+  return src
 }
 
-/**
- * Transform a single leaf package's `.d.ts` into an ambient-module
- * body fragment:
- *
- *   1. Strip every top-level `import … from "…"` line.
- *   2. Strip the trailing `export { … }` (and `export { }`) line.
- *   3. Strip the `export` keyword from `export declare …` / `export type …` / …
- *   4. Skip any declaration whose name is already in `seenNames`.
- *   5. Keep all `declare class/function/const/…` and `interface` / `type` lines.
- */
-function transformLeafDts(source: string, seenNames: Set<string>): string {
-  const lines = source.split('\n')
-  const out: string[] = []
-  let currentBlock: { lines: string[]; names: string[] } | null = null
-
-  const flushBlock = (): void => {
-    if (!currentBlock) {
-      return
-    }
-    const allSeen = currentBlock.names.every(name => seenNames.has(name))
-    if (!allSeen) {
-      for (const name of currentBlock.names) {
-        seenNames.add(name)
-      }
-      out.push(...currentBlock.lines)
-    }
-    currentBlock = null
-  }
-
-  for (const line of lines) {
-    const trimmed = line.trim()
-
-    // Skip `import … from "…"`.
-    if (IMPORT_LINE_PATTERN.test(trimmed)) {
-      continue
-    }
-
-    // Skip the trailing `export { … }` list.
-    if (EXPORT_LIST_PATTERN.test(trimmed)) {
-      continue
-    }
-
-    // Strip leading `export ` from `export declare …`.
-    const cleaned = line.replace(EXPORT_PREFIX_PATTERN, '$1')
-
-    // Top-level declaration header? Start (or extend) a new block.
-    const isHeader =
-      /^\s*(?:declare\s+|type\s+|interface\s+|class\s+|function\s+|const\s+|enum\s+|namespace\s+|abstract\s+class\s+|async\s+function\s+|export\s+(?:declare|type|interface|class|function|const|enum|namespace|abstract\s+class|async\s+function))/.test(
-        cleaned,
-      )
-    const names = isHeader ? extractDeclaredNames(cleaned) : null
-
-    if (names) {
-      // Close the previous block (if any) before starting a new one.
-      flushBlock()
-      currentBlock = { lines: [cleaned], names }
-    } else if (currentBlock) {
-      currentBlock.lines.push(cleaned)
-    } else {
-      // Stray line (e.g. an orphan `}` or comment outside a declaration).
-      // Drop it to keep the ambient module body clean.
-    }
-  }
-
-  // Flush the last block.
-  flushBlock()
-
-  return out.join('\n')
-}
-
-// ─── CLI entry ─────────────────────────────────────────────────────
 main()

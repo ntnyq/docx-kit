@@ -27,10 +27,46 @@ export type LiteralUnion<T extends U, U = string> = T | (U & {})
 export type MaybePromise<T> = Promise<T> | T
 
 /**
+ * Augments a base value type with theme token references.
+ *
+ * Lets users write `$colors.primary` in any style field that accepts the
+ * base type — the token is resolved at compile time against the document
+ * theme.
+ *
+ * @example
+ * ```ts
+ * const rule: DocxStyleRule = {
+ *   // Plain UnitValue:
+ *   fontSize: 12,
+ *   // Theme token resolved against `theme.fontSize.lg`:
+ *   marginBottom: '$spacing.lg',
+ *   // `StyleToken<UnitValue>` would also accept both:
+ *   marginTop: '$spacing.md' as StyleToken<UnitValue>,
+ * }
+ * ```
+ */
+export type StyleToken<T extends number | string> = T | ThemeToken
+
+/**
+ * Supported theme token categories (must match {@link resolveSingleToken}).
+ */
+export type StyleTokenCategory = '$colors' | '$fonts' | '$fontSize' | '$spacing'
+
+/**
+ * A `$category.key` reference to a theme token, e.g. `"$colors.primary"`,
+ * `"$fontSize.lg"`, `"$spacing.xl"`. Resolved at compile time by
+ * {@link resolveThemeTokens}.
+ *
+ * Use {@link StyleToken} to combine this with a concrete value type.
+ */
+export type ThemeToken = `${StyleTokenCategory}.${string}`
+
+/**
  * CSS-like length value.
  *
- * Supports bare numbers, and explicit unit strings:
- * `%`, `cm`, `in`, `mm`, `pt`, `px`.
+ * Supports bare numbers, explicit unit strings
+ * (`%`, `cm`, `in`, `mm`, `pt`, `px`), and theme token references
+ * (e.g. `"$spacing.lg"`, `"$fontSize.base"`).
  *
  * Bare-number conventions vary by context:
  * - `fontSize` → interpreted as `pt`
@@ -45,3 +81,4 @@ export type UnitValue =
   | `${number}pt`
   | `${number}px`
   | number
+  | ThemeToken

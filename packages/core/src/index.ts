@@ -49,19 +49,22 @@ export type {
   PluginRenderContext,
 } from './types/plugin'
 
+export type {
+  PluginLoadResult,
+  PluginSecurityPolicy,
+  PluginSource,
+} from './loader/PluginLoader'
 // Utility types
 export type {
   Dict,
   HexColor,
   LiteralUnion,
   MaybePromise,
+  StyleToken,
+  StyleTokenCategory,
+  ThemeToken,
   UnitValue,
 } from './types/utility'
-export type {
-  PluginLoadResult,
-  PluginSecurityPolicy,
-  PluginSource,
-} from './loader/PluginLoader'
 // Style types
 export type {
   BorderRule,

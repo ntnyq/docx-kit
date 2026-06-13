@@ -8,7 +8,7 @@
  */
 
 import { DocxKitError } from '../errors'
-import type { HexColor, LiteralUnion, UnitValue } from './utility'
+import type { HexColor, LiteralUnion, StyleToken, UnitValue } from './utility'
 
 /**
  * A single border side descriptor.
@@ -16,8 +16,8 @@ import type { HexColor, LiteralUnion, UnitValue } from './utility'
  * Follows the CSS `border` shorthand convention (style, width, color).
  */
 export interface BorderRule {
-  /** Border color (e.g. `"#333"` or named color). */
-  color?: string | HexColor
+  /** Border color (e.g. `"#333"`, named color, or theme token like `"$colors.primary"`). */
+  color?: HexColor | StyleToken<string>
   /** Line style. */
   style?: BorderStyle
   /** Line width (bare number treated as pt). */
@@ -33,8 +33,8 @@ export type BorderStyle = 'dashed' | 'dotted' | 'double' | 'none' | 'single'
  * Used by {@link compileCellStyle} for `TableCell` construction.
  */
 export interface CellStyleRule {
-  /** Background / shading color. */
-  backgroundColor?: string | HexColor
+  /** Background / shading color (hex, named, or theme token like `"$colors.info"`). */
+  backgroundColor?: HexColor | StyleToken<string>
   /** Shorthand border for all four sides. */
   border?: BorderRule
   /** Bottom border override. */
@@ -214,19 +214,21 @@ export type TextAlign = 'center' | 'justify' | 'left' | 'right'
 export interface TextStyleRule {
   /** Force text to uppercase (small caps-like). */
   allCaps?: boolean
-  /** Background / shading color. */
-  backgroundColor?: string | HexColor
+  /** Background / shading color (hex, named, or theme token like `"$colors.info"`). */
+  backgroundColor?: HexColor | StyleToken<string>
   /** Character spacing (letter-spacing). */
   characterSpacing?: number
-  /** Text / foreground color. */
-  color?: string | HexColor
+  /** Text / foreground color (hex, named, or theme token like `"$colors.primary"`). */
+  color?: HexColor | StyleToken<string>
   /**
    * Direct passthrough to the underlying `docx` library constructor options.
    * Use for properties not yet covered by the CSS-like mapping.
    */
   docx?: Record<string, unknown>
-  /** Font family name. */
-  fontFamily?: LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>
+  /**
+   * Font family name (e.g. `"Arial"`, or theme token like `"$fonts.heading"`).
+   */
+  fontFamily?: StyleToken<LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>>
   /** Font size (bare number = pt). */
   fontSize?: UnitValue
   /** Italic toggle. */
