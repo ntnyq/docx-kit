@@ -1,45 +1,59 @@
 # Plugins
 
-docx-kit ships with **12 built-in plugins** that cover common document-generation needs. Each plugin can be registered via `.use()` and invoked with `.plugin(name, options)`.
+docx-kit currently ships with **18 built-in plugins**. Each plugin lives in its own workspace package under `packages-plugins/`, can be registered with `.use(...)`, and is invoked through `.plugin(name, options)`.
 
-## Plugin Overview
+## Catalog
 
-| Plugin | Node Name | Description |
-|--------|-----------|-------------|
-| [Callout](./callout) | `callout` | Colored info / warning / success / danger boxes |
-| [Code Block](./code-block) | `codeBlock` | Syntax-highlighted code blocks with line numbers |
-| [Cover Page](./cover-page) | `coverPage` | Professional title page with title, author, date |
-| [Data Table](./data-table) | `dataTable` | Auto-inferred table from an array of objects |
-| [ECharts](./echarts) | `echarts` | ECharts charts rendered as embedded images |
-| [Meeting Minutes](./meeting-minutes) | `meetingMinutes` | Structured meeting notes with agenda table |
-| [Page Number](./page-number) | `pageNumber` | Page number field for headers/footers |
-| [Property Table](./property-table) | `propertyTable` | Key-value pair table with styled cells |
-| [QR Code](./qrcode) | `qrcode` | QR code images from text or URLs |
-| [Signature Block](./signature-block) | `signatureBlock` | Signature lines for contracts and approvals |
-| [Timeline](./timeline) | `timeline` | Chronological timeline as a styled table |
-| [Watermark](./watermark) | `watermark` | Text watermark for document branding |
+| Plugin | Package | Node Name | Description |
+| --- | --- | --- | --- |
+| [Badge](./badge) | `@docxkit/plugin-badge` | `badge` | Status chips and short labels |
+| [Callout](./callout) | `@docxkit/plugin-callout` | `callout` | Info, warning, success, and danger boxes |
+| [Changelog](./changelog) | `@docxkit/plugin-changelog` | `changelog` | Release-note tables with typed entries |
+| [Code Block](./code-block) | `@docxkit/plugin-code-block` | `codeBlock` | Monospaced source blocks with optional highlighting |
+| [Cover Page](./cover-page) | `@docxkit/plugin-cover-page` | `coverPage` | Professional title and report covers |
+| [Data Table](./data-table) | `@docxkit/plugin-data-table` | `dataTable` | Object-array tables with formatting helpers |
+| [Divider](./divider) | `@docxkit/plugin-divider` | `divider` | Horizontal rules and section separators |
+| [ECharts](./echarts) | `@docxkit/plugin-echarts` | `echarts` | Embedded ECharts charts |
+| [Invoice](./invoice) | `@docxkit/plugin-invoice` | `invoice` | Invoice layouts with totals and tax calculation |
+| [Letterhead](./letterhead) | `@docxkit/plugin-letterhead` | `letterhead` | Branded company headers for formal letters |
+| [Meeting Minutes](./meeting-minutes) | `@docxkit/plugin-meeting-minutes` | `meetingMinutes` | Structured meeting summaries |
+| [Page Number](./page-number) | `@docxkit/plugin-page-number` | `pageNumber` | Current page or page X of Y fields |
+| [Property Table](./property-table) | `@docxkit/plugin-property-table` | `propertyTable` | Key-value metadata tables |
+| [QR Code](./qrcode) | `@docxkit/plugin-qrcode` | `qrcode` | QR code images from text or URLs |
+| [Signature Block](./signature-block) | `@docxkit/plugin-signature-block` | `signatureBlock` | Signature grids for approvals and contracts |
+| [Timeline](./timeline) | `@docxkit/plugin-timeline` | `timeline` | Chronological milestone rendering |
+| [Table of Contents](./toc) | `@docxkit/plugin-toc` | `toc` | Word TOC fields based on headings |
+| [Watermark](./watermark) | `@docxkit/plugin-watermark` | `watermark` | Simple textual watermarks |
 
-## Usage Pattern
-
-Every plugin follows the same pattern:
+## Shared Usage Pattern
 
 ```ts
-import { createDocx, somePlugin } from 'docx-kit'
+import { createDocx, calloutPlugin } from 'docx-kit'
 
 const doc = createDocx()
-  .use(somePlugin)           // 1. Register the plugin
-  .plugin('someName', {        // 2. Invoke with options
-    // ... plugin-specific options
+  .use(calloutPlugin())
+  .plugin('callout', {
+    type: 'info',
+    title: 'Heads up',
+    content: 'This report is generated automatically.',
   })
 ```
 
-## Custom Plugins
+## Compatibility Notes
 
-You can also create your own plugins with `definePlugin()`. See the [Plugins Guide](/guide/plugins#custom-plugins) for details.
+| Plugin | Extra dependency or runtime note |
+| --- | --- |
+| `codeBlock` | Optional `highlight.js` peer dependency for syntax coloring |
+| `echarts` | Requires `echarts`; browser DOM is the primary target |
+| `qrcode` | Requires the `qrcode` package |
+| `toc` | Word usually asks to update fields after opening the generated `.docx` |
+| `pageNumber` | Most useful when inserted into headers or footers |
 
-## Platform Notes
+## How To Choose
 
-- **ECharts** requires a browser DOM environment. In Node.js, provide a server-side canvas implementation.
-- **QR Code** requires the `qrcode` peer dependency (`pnpm add qrcode`).
-- **Code Block** syntax highlighting requires the optional `highlight.js` peer dependency.
-- All other plugins work in both Node.js and browser with no extra dependencies.
+- Use content plugins like `callout`, `codeBlock`, `badge`, and `divider` when you need presentational blocks inside a normal document flow.
+- Use document-structure plugins like `coverPage`, `toc`, `pageNumber`, and `letterhead` when you want reusable report scaffolding.
+- Use data plugins like `dataTable`, `propertyTable`, `timeline`, `invoice`, and `meetingMinutes` when your source data already has a clear schema.
+- Use media plugins like `echarts` and `qrcode` when the document needs scannable or visual output.
+
+Custom plugins are still supported through `definePlugin()`. See the [Plugins guide](/guide/plugins) and the [package catalog](/ecosystem/packages) for the package-level view.

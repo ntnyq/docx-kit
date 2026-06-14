@@ -1,11 +1,54 @@
 import { defineConfig } from 'vitepress'
 import { APP_TITLE } from './meta'
+import {
+  buildEnglishSidebar,
+  buildSimplifiedSidebar,
+  buildTraditionalSidebar,
+  englishNav,
+  navWithPrefix,
+  simplifiedNav,
+  traditionalNav,
+} from './site'
 
 export default defineConfig({
   lang: 'en-US',
   title: APP_TITLE,
   description:
     'CSS-like DOCX API Kit — Type-safe, plugin-extensible Word document generation',
+  locales: {
+    root: {
+      label: 'English',
+      lang: 'en-US',
+      themeConfig: {
+        nav: navWithPrefix('', englishNav),
+        sidebar: buildEnglishSidebar(),
+      },
+    },
+    'zh-CN': {
+      label: '简体中文',
+      lang: 'zh-CN',
+      link: '/zh-CN/',
+      title: APP_TITLE,
+      description:
+        'CSS 风格的 DOCX API 工具包，支持类型安全、插件扩展的 Word 文档生成',
+      themeConfig: {
+        nav: navWithPrefix('/zh-CN', simplifiedNav),
+        sidebar: buildSimplifiedSidebar('/zh-CN'),
+      },
+    },
+    'zh-TW': {
+      label: '繁體中文',
+      lang: 'zh-TW',
+      link: '/zh-TW/',
+      title: APP_TITLE,
+      description:
+        'CSS 風格的 DOCX API 工具包，支援型別安全、可擴充外掛的 Word 文件生成',
+      themeConfig: {
+        nav: navWithPrefix('/zh-TW', traditionalNav),
+        sidebar: buildTraditionalSidebar('/zh-TW'),
+      },
+    },
+  },
 
   markdown: {
     theme: {
@@ -15,106 +58,58 @@ export default defineConfig({
   },
 
   themeConfig: {
+    nav: navWithPrefix('', englishNav),
+    sidebar: buildEnglishSidebar(),
+
     // logo: '',
     footer: {
       copyright: 'Copyright © ntnyq',
       message: 'Released under the MIT License.',
     },
-
-    nav: [
-      { link: '/guide/getting-started', text: 'Guide' },
-      { link: '/api/types', text: 'API' },
-      { link: '/plugins/', text: 'Plugins' },
-      { link: '/examples/basic-report', text: 'Examples' },
-      { link: '/playground', text: 'Playground' },
-    ],
-
     search: {
       provider: 'local',
-    },
-
-    sidebar: {
-      '/api/': [
-        {
-          text: 'API Reference',
-          items: [
-            { link: '/api/config', text: 'Config' },
-            { link: '/api/style', text: 'Styles' },
-            { link: '/api/nodes', text: 'DSL Nodes' },
-            { link: '/api/builder', text: 'Builder' },
-            { link: '/api/plugins', text: 'Plugins' },
-          ],
+      options: {
+        locales: {
+          'zh-CN': {
+            translations: {
+              button: {
+                buttonAriaLabel: '搜索文档',
+                buttonText: '搜索',
+              },
+              modal: {
+                displayDetails: '显示详情',
+                noResultsText: '没有找到结果',
+                resetButtonTitle: '清空搜索条件',
+                footer: {
+                  closeKeyAriaLabel: '关闭',
+                  closeText: '关闭',
+                  navigateText: '切换',
+                  selectText: '选择',
+                },
+              },
+            },
+          },
+          'zh-TW': {
+            translations: {
+              button: {
+                buttonAriaLabel: '搜尋文件',
+                buttonText: '搜尋',
+              },
+              modal: {
+                displayDetails: '顯示詳細資訊',
+                noResultsText: '找不到結果',
+                resetButtonTitle: '清除搜尋條件',
+                footer: {
+                  closeKeyAriaLabel: '關閉',
+                  closeText: '關閉',
+                  navigateText: '切換',
+                  selectText: '選擇',
+                },
+              },
+            },
+          },
         },
-      ],
-      '/ecosystem/': [
-        {
-          text: 'Ecosystem',
-          items: [
-            { link: '/ecosystem/monorepo', text: 'Monorepo Structure' },
-            { link: '/ecosystem/creating-plugins', text: 'Creating Plugins' },
-            { link: '/playground', text: 'Online Playground' },
-          ],
-        },
-      ],
-      '/examples/': [
-        {
-          text: 'Examples',
-          items: [
-            { link: '/examples/basic-report', text: 'Basic Report' },
-            { link: '/examples/preset-modern', text: 'Modern Preset' },
-            { link: '/examples/preset-academic', text: 'Academic Preset' },
-            { link: '/examples/ai-generated', text: 'AI Generated' },
-            { link: '/examples/invoice', text: 'Invoice' },
-            { link: '/examples/chart-report', text: 'Chart Report' },
-            { link: '/examples/theme-system', text: 'Theme System' },
-            { link: '/examples/rich-content', text: 'Rich Content' },
-            { link: '/examples/style-inheritance', text: 'Style Inheritance' },
-            { link: '/examples/preview', text: 'DOCX Preview' },
-          ],
-        },
-      ],
-      '/guide/': [
-        {
-          text: 'Guide',
-          items: [
-            { link: '/guide/getting-started', text: 'Getting Started' },
-            { link: '/guide/builder-api', text: 'Builder API' },
-            { link: '/guide/styling', text: 'CSS-like Styling' },
-            { link: '/guide/presets', text: 'Style Presets' },
-            { link: '/guide/themes', text: 'Themes' },
-            { link: '/guide/tables', text: 'Tables' },
-            { link: '/guide/images', text: 'Images' },
-            { link: '/guide/preview', text: 'Browser Preview' },
-            { link: '/guide/plugins', text: 'Plugins' },
-            { link: '/guide/json-dsl', text: 'JSON DSL (renderDocx)' },
-            { link: '/guide/platforms', text: 'Node.js & Browser' },
-            { link: '/guide/errors', text: 'Error Handling' },
-            { link: '/guide/plugin-security', text: 'Plugin Security' },
-            { link: '/guide/ai-templates', text: 'AI Templates & Prompts' },
-            { link: '/guide/mcp-server', text: 'MCP Server' },
-          ],
-        },
-      ],
-      '/plugins/': [
-        {
-          text: 'Plugins',
-          items: [
-            { link: '/plugins/', text: 'Overview' },
-            { link: '/plugins/callout', text: 'Callout' },
-            { link: '/plugins/code-block', text: 'Code Block' },
-            { link: '/plugins/cover-page', text: 'Cover Page' },
-            { link: '/plugins/data-table', text: 'Data Table' },
-            { link: '/plugins/echarts', text: 'ECharts' },
-            { link: '/plugins/meeting-minutes', text: 'Meeting Minutes' },
-            { link: '/plugins/page-number', text: 'Page Number' },
-            { link: '/plugins/property-table', text: 'Property Table' },
-            { link: '/plugins/qrcode', text: 'QR Code' },
-            { link: '/plugins/signature-block', text: 'Signature Block' },
-            { link: '/plugins/timeline', text: 'Timeline' },
-            { link: '/plugins/watermark', text: 'Watermark' },
-          ],
-        },
-      ],
+      },
     },
 
     socialLinks: [
