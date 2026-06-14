@@ -7,9 +7,12 @@
 import { AlignmentType, LevelFormat, Paragraph, TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
-import type { BulletListNode, NumberedListNode } from '../../dsl/nodes'
-import type { DocxKitConfig } from '../../types/document'
-import type { StyleSheet } from '../../types/style'
+import type {
+  BulletListNode,
+  DocxKitConfig,
+  NumberedListNode,
+  StyleSheet,
+} from '@docxkit/types'
 import type { CompilationSession } from '../numbers'
 
 /** Map bullet list node to Paragraphs. */

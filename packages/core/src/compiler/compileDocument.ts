@@ -20,20 +20,18 @@ import {
 import { compileNode } from './compileNode'
 import { CompilationSession } from './numbers'
 import { parseShorthandTwip, toTwip } from './units'
-import type { FileChild, ISectionOptions } from 'docx'
 import type {
   BlockNode,
-  SectionBreakNode as SectionBreakNodeType,
-} from '../dsl/nodes'
-import type {
   DocxKitConfig,
+  DocxPlugin,
   HeaderFooterConfig,
   HeaderFooterContent,
   PageConfig,
+  SectionBreakNode as SectionBreakNodeType,
   SectionConfig,
-} from '../types/document'
-import type { DocxPlugin } from '../types/plugin'
-import type { StyleSheet } from '../types/style'
+  StyleSheet,
+} from '@docxkit/types'
+import type { FileChild, ISectionOptions } from 'docx'
 
 /**
  * Options for compiling a full document.
@@ -329,8 +327,8 @@ function compilePageSize(
     }
   } else if (typeof size === 'object' && size !== null) {
     const s = size as {
-      height: import('../types/utility').UnitValue
-      width: import('../types/utility').UnitValue
+      height: import('@docxkit/types').UnitValue
+      width: import('@docxkit/types').UnitValue
     }
     width = toTwip(s.width as number | string)
     height = toTwip(s.height as number | string)

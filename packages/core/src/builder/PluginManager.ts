@@ -7,9 +7,12 @@
  * @module builder/PluginManager
  */
 
-import type { PluginNode } from '../dsl/nodes'
-import type { DocxPlugin, PluginRegistry } from '../types/plugin'
-import type { DocxStyleRule } from '../types/style'
+import type {
+  DocxPlugin,
+  DocxStyleRule,
+  PluginNode,
+  PluginRegistry,
+} from '@docxkit/types'
 
 /**
  * Manages plugin registration, setup lifecycle, and plugin node creation.

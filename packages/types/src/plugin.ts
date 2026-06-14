@@ -4,11 +4,11 @@
  * Plugins extend the document DSL with custom content types
  * (e.g. QR codes, charts, signatures).
  *
- * @module types/plugin
+ * @module plugin
  */
 
-import type { BlockNode } from '../dsl/nodes'
 import type { DocxKitConfig } from './document'
+import type { BlockNode } from './dsl/nodes'
 import type { MaybePromise } from './utility'
 
 /**
@@ -20,7 +20,7 @@ import type { MaybePromise } from './utility'
  * @example
  * ```ts
  * // In your code (module augmentation):
- * declare module '@docxkit/core' {
+ * declare module '@docxkit/types' {
  *   interface BuiltinPluginMap {
  *     myCustomPlugin: { text: string }
  *   }

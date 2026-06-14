@@ -8,8 +8,8 @@
  * @module compiler/compileNode
  */
 
+import { DocxKitError } from '@docxkit/types'
 import { PageBreak, Paragraph } from 'docx'
-import { DocxKitError } from '../errors'
 import { compileHeading } from './nodes/compileHeading'
 import { compileHyperlink } from './nodes/compileHyperlink'
 import { compileImage } from './nodes/compileImage'
@@ -23,21 +23,21 @@ import {
   resetNumberingState,
 } from './numbers'
 import { NodeCompilerRegistry } from './registry'
-import type { FileChild } from 'docx'
 import type {
   BlockNode,
   BulletListNode,
+  DocxKitConfig,
+  DocxPlugin,
   HeadingNode,
   HyperlinkNode,
   ImageNode,
   NumberedListNode,
   ParagraphNode,
   PluginNode,
+  StyleSheet,
   TableNode,
-} from '../dsl/nodes'
-import type { DocxKitConfig } from '../types/document'
-import type { DocxPlugin } from '../types/plugin'
-import type { StyleSheet } from '../types/style'
+} from '@docxkit/types'
+import type { FileChild } from 'docx'
 
 /** Re-export for backward compatibility. */
 export { CompilationSession, numberingConfigMap, resetNumberingState }

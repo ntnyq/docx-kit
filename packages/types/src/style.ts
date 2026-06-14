@@ -4,10 +4,10 @@
  * These mirror familiar CSS property names and are compiled
  * into Word OpenXML (docx) constructor options internally.
  *
- * @module types/style
+ * @module style
  */
 
-import { DocxKitError } from '../errors'
+import { DocxKitError } from './errors'
 import type { HexColor, LiteralUnion, StyleToken, UnitValue } from './utility'
 
 /**
@@ -76,7 +76,8 @@ export interface CellStyleRule {
  * narrow to {@link TextStyleRule}, {@link ParagraphStyleRule}, or
  * {@link CellStyleRule} as appropriate.
  */
-export type DocxStyleRule = CellStyleRule & ParagraphStyleRule & TextStyleRule
+export interface DocxStyleRule
+  extends CellStyleRule, ParagraphStyleRule, TextStyleRule {}
 
 // ---- Sub-types and enums ----
 
@@ -210,12 +211,23 @@ export type TextAlign = 'center' | 'justify' | 'left' | 'right'
  * Text-level style properties (font, color, size, weight, etc.).
  *
  * Used by {@link compileTextStyle} for `TextRun` construction.
+ *
+ * @remarks
+ * Convenience boolean shortcuts `bold` and `italic` are provided
+ * alongside the canonical `fontWeight` / `fontStyle` properties.
+ * When `bold: true` is set, it is equivalent to `fontWeight: 'bold'`.
+ * When `italic: true` is set, it is equivalent to `fontStyle: 'italic'`.
  */
 export interface TextStyleRule {
   /** Force text to uppercase (small caps-like). */
   allCaps?: boolean
   /** Background / shading color (hex, named, or theme token like `"$colors.info"`). */
   backgroundColor?: HexColor | StyleToken<string>
+  /**
+   * Convenience boolean: `true` maps to `fontWeight: 'bold'`.
+   * Takes precedence over `fontWeight` when both are set.
+   */
+  bold?: boolean
   /** Character spacing (letter-spacing). */
   characterSpacing?: number
   /** Text / foreground color (hex, named, or theme token like `"$colors.primary"`). */
@@ -231,12 +243,17 @@ export interface TextStyleRule {
   fontFamily?: StyleToken<LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>>
   /** Font size (bare number = pt). */
   fontSize?: UnitValue
-  /** Italic toggle. */
+  /** Italic toggle (canonical form). Use `italic?: boolean` for convenience. */
   fontStyle?: 'italic' | 'normal'
   /** Font weight: keyword `"bold"` / `"normal"` or numeric 100–900. */
   fontWeight?: FontWeight
   /** Text highlight color (background marker). */
   highlight?: HighlightColor
+  /**
+   * Convenience boolean: `true` maps to `fontStyle: 'italic'`.
+   * Takes precedence over `fontStyle` when both are set.
+   */
+  italic?: boolean
   /** Character spacing. */
   letterSpacing?: UnitValue
   /** Small caps text variant. */

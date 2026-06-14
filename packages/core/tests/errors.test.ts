@@ -1,5 +1,5 @@
+import { DocxKitError, ERROR_CODES } from '@docxkit/types'
 import { describe, expect, it } from 'vitest'
-import { DocxKitError, ERROR_CODES } from '../src/errors'
 
 describe('ERROR_CODES', () => {
   it('contains all expected error codes', () => {

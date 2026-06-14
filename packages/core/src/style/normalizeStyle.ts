@@ -7,10 +7,14 @@
  * @module style/normalizeStyle
  */
 
-import { DocxKitError } from '../errors'
+import { DocxKitError } from '@docxkit/types'
 import { resolveThemeTokens } from './theme'
-import type { DocxTheme } from '../types/document'
-import type { DocxStyleRule, StyleSheet, StyleSheetEntry } from '../types/style'
+import type {
+  DocxStyleRule,
+  DocxTheme,
+  StyleSheet,
+  StyleSheetEntry,
+} from '@docxkit/types'
 
 /**
  * Options for resolving a style cascade.

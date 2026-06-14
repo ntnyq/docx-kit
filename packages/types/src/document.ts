@@ -1,10 +1,10 @@
 /**
  * Document-level configuration types for docx-kit.
  *
- * @module types/document
+ * @module document
  */
 
-import type { BlockNode } from '../dsl/nodes'
+import type { BlockNode } from './dsl/nodes'
 import type { DocxStyleRule, StyleSheet } from './style'
 import type { UnitValue } from './utility'
 
@@ -77,20 +77,6 @@ export interface DocxPreset {
  * Allows defining a single source of truth for colors, fonts,
  * font sizes, and spacing values. Token references are resolved
  * at compile time by {@link resolveThemeTokens}.
- *
- * @example
- * ```ts
- * const theme: DocxTheme = {
- *   colors:  { primary: '#1a56db', accent: '#f59e0b', muted: '#6b7280' },
- *   fonts:   { heading: 'Georgia', body: 'Inter', mono: 'JetBrains Mono' },
- *   spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 48 },
- * }
- *
- * const styles = defineStyles({
- *   title: { color: '$colors.primary', fontFamily: '$fonts.heading' },
- *   card:  { marginBottom: '$spacing.lg' },
- * })
- * ```
  */
 export interface DocxTheme {
   /** Color palette tokens (name → hex). */
@@ -107,14 +93,6 @@ export interface DocxTheme {
  * Header/footer configuration for a section.
  *
  * Supports standard, first-page, and even-page variants.
- *
- * @example
- * ```ts
- * {
- *   default: { children: ['Chapter 1'] },
- *   first: { children: ['Title Page'] },
- * }
- * ```
  */
 export interface HeaderFooterConfig {
   /** Default header/footer (appears on all pages). */
@@ -130,22 +108,6 @@ export interface HeaderFooterConfig {
  *
  * Supports both simple text strings (backward compatible, each maps to a `Paragraph`)
  * and full {@link BlockNode} elements (paragraphs, images, tables, etc.).
- *
- * @example
- * ```ts
- * // Simple text (backward compatible)
- * { default: { children: ['Company Name', 'Confidential'] } }
- *
- * // Rich content
- * {
- *   default: {
- *     children: [
- *       { type: 'paragraph', children: [{ type: 'text', text: 'Page ', style: { color: '#888' } }, { type: 'plugin', name: 'pageNumber' }] },
- *       { type: 'image', data: logoBuffer, width: 100, height: 30 },
- *     ],
- *   },
- * }
- * ```
  */
 export interface HeaderFooterContent {
   /** Content items — strings (simple) or BlockNode objects (rich). */
@@ -184,14 +146,6 @@ export type PageSize = 'A3' | 'A4' | 'Legal' | 'Letter'
  * Each call to `.section(config)` starts a new document section, which
  * can have its own page setup, headers, and footers independent of other
  * sections.
- *
- * @example
- * ```ts
- * doc.section({
- *   page: { size: 'A3', orientation: 'landscape' },
- *   header: { default: { children: ['Wide Page'] } },
- * })
- * ```
  */
 export interface SectionConfig {
   /** Section footer(s). */
@@ -204,9 +158,6 @@ export interface SectionConfig {
 
 /**
  * Theme color palette — semantic color tokens referenced by name.
- *
- * Each key can be any semantic name (e.g. `"primary"`, `"muted"`, `"danger"`),
- * and each value is a hex color string.
  */
 export interface ThemeColors {
   [name: string]: string
@@ -214,9 +165,6 @@ export interface ThemeColors {
 
 /**
  * Theme font tokens — semantic font family names.
- *
- * Keys are semantic names (e.g. `"heading"`, `"body"`, `"mono"`),
- * values are CSS font-family strings.
  */
 export interface ThemeFonts {
   [name: string]: string
@@ -224,9 +172,6 @@ export interface ThemeFonts {
 
 /**
  * Theme spacing tokens — named spacing values.
- *
- * Keys are semantic names (e.g. `"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`),
- * values are `UnitValue` dimensions.
  */
 export interface ThemeSpacing {
   [name: string]: UnitValue

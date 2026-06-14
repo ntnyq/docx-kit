@@ -23,24 +23,24 @@
 import { PluginManager } from './PluginManager'
 import type {
   BlockNode,
+  BuiltinPluginMap,
   BulletItem,
   BulletListNode,
+  DocxKitConfig,
+  DocxPlugin,
+  DocxStyleRule,
   HeadingNode,
   HyperlinkNode,
   ImageNode,
   InlineNode,
   NumberedListNode,
   ParagraphNode,
+  PluginRegistry,
+  SectionConfig,
+  StyleSheet,
   TableNode,
   TextNode,
-} from '../dsl/nodes'
-import type { DocxKitConfig, SectionConfig } from '../types/document'
-import type {
-  BuiltinPluginMap,
-  DocxPlugin,
-  PluginRegistry,
-} from '../types/plugin'
-import type { DocxStyleRule, StyleSheet } from '../types/style'
+} from '@docxkit/types'
 
 /**
  * Fluent document builder.

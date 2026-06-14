@@ -7,22 +7,18 @@
  * @module dsl/helpers
  */
 
-import type { DocxStyleRule } from '../types/style'
+import type { DocxStyleRule } from '../style'
 import type { ImageNode, TextNode } from './nodes'
 
 /**
  * Create an inline image node for use in paragraph children.
  *
- * @param options - — Image configuration
- * @param options.data - — Image data (URL, base64 data URL, Buffer, or Uint8Array)
- * @param options.width - — Display width in pixels
- * @param options.height - — Display height in pixels
- * @param options.imageType - — Image format override (default: `"png"`)
+ * @param options - — Image configuration (omit `type`)
  * @returns An `ImageNode` object
  *
  * @example
  * ```ts
- * import { createDocx, inlineImg } from 'docx-kit'
+ * import { createDocx, span, inlineImg } from 'docx-kit'
  *
  * const doc = createDocx()
  * doc.p([
@@ -38,6 +34,9 @@ export function inlineImg(options: Omit<ImageNode, 'type'>): ImageNode {
 /**
  * Create an inline text span node for use in paragraph children.
  *
+ * Accepts all {@link DocxStyleRule} properties, including convenience
+ * booleans `bold` and `italic`.
+ *
  * @param text - — The text content
  * @param style - — Optional inline style overrides
  * @returns A `TextNode` object
@@ -49,7 +48,9 @@ export function inlineImg(options: Omit<ImageNode, 'type'>): ImageNode {
  * const doc = createDocx()
  * doc.p([
  *   span('Normal text, '),
- *   span('bold red text', { bold: true, color: '#f00' }),
+ *   span('bold text', { bold: true }),
+ *   span('italic text', { italic: true }),
+ *   span('bold italic', { bold: true, italic: true }),
  * ])
  * ```
  */

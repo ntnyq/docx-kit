@@ -30,6 +30,7 @@
     "dev": "tsdown --watch"
   },
   "dependencies": {
+    "@docxkit/types": "workspace:*",
     "docx": "^9.7.1"
   }
 }

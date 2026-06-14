@@ -1,5 +1,5 @@
+import { defineStyles } from '@docxkit/types'
 import { describe, expect, it } from 'vitest'
-import { defineStyles } from '../src/types/style'
 
 describe('defineStyles', () => {
   it('returns the same object', () => {

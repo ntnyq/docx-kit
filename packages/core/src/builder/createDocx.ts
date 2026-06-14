@@ -10,10 +10,8 @@
 
 import { createPluginLoader } from '../loader/PluginLoader'
 import { DocxBuilder } from './DocxBuilder'
-import type { BlockNode } from '../dsl/nodes'
+import type { BlockNode, DocxKitConfig, StyleSheet } from '@docxkit/types'
 import type { PluginSource } from '../loader/PluginLoader'
-import type { DocxKitConfig } from '../types/document'
-import type { StyleSheet } from '../types/style'
 
 /**
  * JSON schema for `renderDocx()`.

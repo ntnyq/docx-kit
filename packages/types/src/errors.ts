@@ -47,17 +47,6 @@ export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]
  *
  * Carries a machine-readable `code`, a human-readable `message`,
  * and optionally the underlying `cause`.
- *
- * @example
- * ```ts
- * try {
- *   await doc.save('output.docx')
- * } catch (err) {
- *   if (err instanceof DocxKitError && err.code === ERROR_CODES.EXPORT_FAILED) {
- *     console.error('Export failed:', err.message)
- *   }
- * }
- * ```
  */
 export class DocxKitError extends Error {
   /** The underlying error that caused this failure (if any). */

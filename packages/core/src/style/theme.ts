@@ -4,8 +4,7 @@
  * @module style/theme
  */
 
-import type { DocxTheme } from '../types/document'
-import type { DocxStyleRule } from '../types/style'
+import type { DocxStyleRule, DocxTheme } from '@docxkit/types'
 
 /**
  * Resolve all theme token references in a style rule.

@@ -4,17 +4,15 @@
  * @module compiler/nodes/compileImage
  */
 
+import { DocxKitError } from '@docxkit/types'
 import { Paragraph } from 'docx'
-import { DocxKitError } from '../../errors'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
 import { createImageRun } from '../../utils/image'
 import { compileParagraphStyle } from '../compileStyle'
 import { toPx } from '../units'
 import type { Buffer } from 'node:buffer'
-import type { ImageNode } from '../../dsl/nodes'
-import type { DocxKitConfig } from '../../types/document'
-import type { StyleSheet } from '../../types/style'
+import type { DocxKitConfig, ImageNode, StyleSheet } from '@docxkit/types'
 
 type FloatingOptions = Record<string, unknown>
 

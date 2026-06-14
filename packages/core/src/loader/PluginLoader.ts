@@ -8,10 +8,9 @@
  * @module loader/PluginLoader
  */
 
-import { DocxKitError } from '../errors'
+import { DocxKitError } from '@docxkit/types'
 import { validateManifest } from './manifest'
-import type { DocxPlugin } from '../types/plugin'
-import type { MaybePromise } from '../types/utility'
+import type { DocxPlugin, MaybePromise } from '@docxkit/types'
 import type { PluginManifest } from './manifest'
 
 // Re-export manifest types for convenience

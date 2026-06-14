@@ -12,9 +12,12 @@ import { createImageRun } from '../../utils/image'
 import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
 import { toPx } from '../units'
 import { normalizeImageData } from './compileImage'
-import type { ImageNode, ParagraphNode } from '../../dsl/nodes'
-import type { DocxKitConfig } from '../../types/document'
-import type { StyleSheet } from '../../types/style'
+import type {
+  DocxKitConfig,
+  ImageNode,
+  ParagraphNode,
+  StyleSheet,
+} from '@docxkit/types'
 
 export async function compileParagraph<TStyles extends StyleSheet>(
   node: ParagraphNode<TStyles>,

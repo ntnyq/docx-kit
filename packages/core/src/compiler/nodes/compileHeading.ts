@@ -7,9 +7,7 @@
 import { HeadingLevel, Paragraph, TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
-import type { HeadingNode } from '../../dsl/nodes'
-import type { DocxKitConfig } from '../../types/document'
-import type { StyleSheet } from '../../types/style'
+import type { DocxKitConfig, HeadingNode, StyleSheet } from '@docxkit/types'
 
 /** Map heading level numbers to `docx` `HeadingLevel` enum values. */
 export const HEADING_MAP = {

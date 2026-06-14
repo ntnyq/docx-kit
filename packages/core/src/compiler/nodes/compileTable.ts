@@ -4,13 +4,11 @@
  * @module compiler/nodes/compileTable
  */
 
+import { DocxKitError } from '@docxkit/types'
 import { Paragraph, Table, TableCell, TableRow, WidthType } from 'docx'
-import { DocxKitError } from '../../errors'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileCellStyle, compileColumnWidth } from '../compileStyle'
-import type { TableNode } from '../../dsl/nodes'
-import type { DocxKitConfig } from '../../types/document'
-import type { StyleSheet } from '../../types/style'
+import type { DocxKitConfig, StyleSheet, TableNode } from '@docxkit/types'
 
 export function compileTable<
   TData extends Record<string, unknown>,

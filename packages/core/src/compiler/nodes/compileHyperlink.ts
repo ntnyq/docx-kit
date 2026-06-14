@@ -7,9 +7,7 @@
 import { ExternalHyperlink, Paragraph, TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileTextStyle } from '../compileStyle'
-import type { HyperlinkNode } from '../../dsl/nodes'
-import type { DocxKitConfig } from '../../types/document'
-import type { StyleSheet } from '../../types/style'
+import type { DocxKitConfig, HyperlinkNode, StyleSheet } from '@docxkit/types'
 
 export function compileHyperlink<TStyles extends StyleSheet>(
   node: HyperlinkNode<TStyles>,

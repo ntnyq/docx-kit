@@ -9,11 +9,9 @@
  * @module compiler/registry
  */
 
-import { DocxKitError } from '../errors'
+import { DocxKitError } from '@docxkit/types'
+import type { BlockNode, DocxKitConfig, DocxPlugin } from '@docxkit/types'
 import type { FileChild } from 'docx'
-import type { BlockNode } from '../dsl/nodes'
-import type { DocxKitConfig } from '../types/document'
-import type { DocxPlugin } from '../types/plugin'
 import type { CompilationSession } from './numbers'
 
 /**

@@ -6,9 +6,9 @@
  * - Multi-style spans in same paragraph
  */
 
+import { inlineImg, span } from '@docxkit/types'
 import { describe, expect, it } from 'vitest'
 import { DocxBuilder } from '../../src/builder/DocxBuilder'
-import { inlineImg, span } from '../../src/dsl/helpers'
 import { resolveStyle } from '../../src/style/normalizeStyle'
 
 // -------------------------------------------------------------------

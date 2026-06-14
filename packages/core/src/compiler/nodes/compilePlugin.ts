@@ -4,14 +4,18 @@
  * @module compiler/nodes/compilePlugin
  */
 
-import { DocxKitError } from '../../errors'
+import { DocxKitError } from '@docxkit/types'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
 import { compileNode } from '../compileNode'
+import type {
+  BlockNode,
+  DocxKitConfig,
+  DocxPlugin,
+  PluginNode,
+  PluginRenderContext,
+  StyleSheet,
+} from '@docxkit/types'
 import type { FileChild } from 'docx'
-import type { BlockNode, PluginNode } from '../../dsl/nodes'
-import type { DocxKitConfig } from '../../types/document'
-import type { DocxPlugin, PluginRenderContext } from '../../types/plugin'
-import type { StyleSheet } from '../../types/style'
 
 export async function compilePlugin<TStyles extends StyleSheet>(
   node: PluginNode<string, unknown, TStyles>,

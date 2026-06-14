@@ -7,108 +7,91 @@
  * @packageDocumentation
  */
 
-// ---------- Style ----------
-export { defineStyles } from './types/style'
-
-// ---------- Plugin ----------
-export { definePlugin } from './types/plugin'
-
+// ---------- Cross-platform utilities ----------
 export { createImageRun } from './utils/image'
-
-// ---------- DSL helpers ----------
-export { inlineImg, span } from './dsl/helpers'
 // ---------- Builder ----------
 export { DocxBuilder } from './builder/DocxBuilder'
 
-// ---------- Errors ----------
-export { DocxKitError, ERROR_CODES } from './errors'
-
 export { validateManifest } from './loader/manifest'
-// ---------- Cross-platform utilities ----------
-export { dataUrlToUint8Array } from './utils/dataUrl'
 
+export { dataUrlToUint8Array } from './utils/dataUrl'
 export { createDocx, renderDocx } from './builder/createDocx'
 
 // ---------- Loader ----------
 export { createPluginLoader, PluginLoader } from './loader/PluginLoader'
+// ---------- Re-exports from @docxkit/types ----------
+// Value exports
+export {
+  definePlugin,
+  defineStyles,
+  DocxKitError,
+  ERROR_CODES,
+  inlineImg,
+  span,
+  type ErrorCode,
+} from '@docxkit/types'
 
-// ---------- Types (value exports) ----------
-export type { ErrorCode } from './errors'
-
-// Builder types
+// ---------- Local types ----------
 export type { DocxSchema } from './builder/createDocx'
+
 export type { PluginManifest } from './loader/manifest'
 
 // ---------- Compiler internals (for plugin authors) ----------
 export type { CompilationSession } from './compiler/numbers'
-
-// Plugin types
-export type {
-  DocxPlugin,
-  PluginRegistry,
-  PluginRenderContext,
-} from './types/plugin'
-
 export type {
   PluginLoadResult,
   PluginSecurityPolicy,
   PluginSource,
 } from './loader/PluginLoader'
-// Utility types
-export type {
-  Dict,
-  HexColor,
-  LiteralUnion,
-  MaybePromise,
-  StyleToken,
-  StyleTokenCategory,
-  ThemeToken,
-  UnitValue,
-} from './types/utility'
-// Style types
-export type {
-  BorderRule,
-  BorderStyle,
-  DocxStyleRule,
-  FontWeight,
-  HighlightColor,
-  StyleSheet,
-  StyleSheetEntry,
-  TextAlign,
-  VerticalAlign,
-} from './types/style'
-export type {
-  DocxKitConfig,
-  DocxPreset,
-  DocxTheme,
-  HeaderFooterConfig,
-  HeaderFooterContent,
-  Orientation,
-  PageConfig,
-  PageSize,
-  SectionConfig,
-  ThemeColors,
-  ThemeFonts,
-  ThemeSpacing,
-} from './types/document'
-
-// DSL node types
+// Type exports
 export type {
   BaseNode,
   BlockNode,
+  BorderRule,
+  BorderStyle,
   BulletItem,
   BulletListNode,
   ClassName,
+  Dict,
+  DocxKitConfig,
+  DocxPlugin,
+  DocxPreset,
+  DocxStyleRule,
+  DocxTheme,
+  FontWeight,
+  HeaderFooterConfig,
+  HeaderFooterContent,
   HeadingNode,
+  HexColor,
+  HighlightColor,
   HyperlinkNode,
   ImageNode,
   InlineNode,
+  LiteralUnion,
+  MaybePromise,
   NumberedListNode,
+  Orientation,
   PageBreakNode,
+  PageConfig,
+  PageSize,
   ParagraphNode,
   PluginNode,
+  PluginRegistry,
+  PluginRenderContext,
   SectionBreakNode,
+  SectionConfig,
+  StyleSheet,
+  StyleSheetEntry,
+  StyleToken,
+  StyleTokenCategory,
   TableColumn,
   TableNode,
+  TextAlign,
   TextNode,
-} from './dsl/nodes'
+  ThemeColors,
+  ThemeFonts,
+  ThemeSpacing,
+  ThemeToken,
+  UnitValue,
+  VerticalAlign,
+} from '@docxkit/types'

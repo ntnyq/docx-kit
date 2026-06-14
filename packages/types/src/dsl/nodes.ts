@@ -8,9 +8,9 @@
  * @module dsl/nodes
  */
 
-import type { SectionConfig } from '../types/document'
-import type { DocxStyleRule, StyleSheet } from '../types/style'
-import type { UnitValue } from '../types/utility'
+import type { SectionConfig } from '../document'
+import type { DocxStyleRule, StyleSheet } from '../style'
+import type { UnitValue } from '../utility'
 
 /**
  * Common properties shared by all nodes.

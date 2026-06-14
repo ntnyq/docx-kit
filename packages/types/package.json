@@ -1,0 +1,42 @@
+{
+  "name": "@docxkit/types",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Shared type definitions and utility types for docx-kit monorepo packages.",
+  "keywords": [
+    "docx",
+    "docx-kit",
+    "types"
+  ],
+  "license": "MIT",
+  "author": "ntnyq",
+  "homepage": "https://docx-kit.ntnyq.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ntnyq/docx-kit",
+    "directory": "packages/types"
+  },
+  "bugs": {
+    "url": "https://github.com/ntnyq/docx-kit/issues"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsdown && tsc -p tsconfig.json",
+    "test": "echo 'No tests for @docxkit/types'"
+  },
+  "devDependencies": {
+    "tsdown": "^0.22.2",
+    "typescript": "^5.9.3"
+  }
+}

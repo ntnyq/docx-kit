@@ -21,7 +21,7 @@ import type {
   DocxStyleRule,
   ParagraphStyleRule,
   TextStyleRule,
-} from '../types/style'
+} from '@docxkit/types'
 
 // ---------- Text / Run ----------
 
@@ -244,7 +244,7 @@ function compileAlignment(value: DocxStyleRule['textAlign']) {
 /**
  * Map a CSS-like border-style string to a `docx` `BorderStyle` enum value.
  */
-function compileBorderStyle(style?: import('../types/style').BorderStyle) {
+function compileBorderStyle(style?: import('@docxkit/types').BorderStyle) {
   if (style === 'dashed') {
     return BorderStyle.DASHED
   }
@@ -263,7 +263,7 @@ function compileBorderStyle(style?: import('../types/style').BorderStyle) {
 /**
  * Map a highlight color name to `docx` `HighlightColor`.
  */
-function compileHighlight(color?: import('../types/style').HighlightColor) {
+function compileHighlight(color?: import('@docxkit/types').HighlightColor) {
   if (!color || color === 'none') {
     return undefined
   }

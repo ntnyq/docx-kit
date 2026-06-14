@@ -8,7 +8,7 @@
  * @module loader/manifest
  */
 
-import { DocxKitError } from '../errors'
+import { DocxKitError } from '@docxkit/types'
 
 /**
  * Plugin manifest as defined in `docx-kit.plugin.json`.
