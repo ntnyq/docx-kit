@@ -24,6 +24,9 @@ describe('shared.ts — shared exports', () => {
     const mod = await import('../src/browser')
     expect(mod.qrcodePlugin).toBeDefined()
     expect(mod.echartsPlugin).toBeDefined()
+    expect(mod.badgePlugin).toBeDefined()
+    expect(mod.invoicePlugin).toBeDefined()
+    expect(mod.tocPlugin).toBeDefined()
   })
 
   it('exports dataUrlToUint8Array', async () => {

@@ -88,7 +88,33 @@ importers:
         specifier: ^2.0.0-alpha.17
         version: 2.0.0-alpha.17(@types/node@25.9.3)(change-case@5.4.4)(jiti@2.7.0)(lightningcss@1.32.0)(postcss@8.5.15)(qrcode@1.5.4)(tsx@4.22.4)(typescript@6.0.3)(yaml@2.9.0)
 
+  packages-plugins/badge:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.7.1
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
   packages-plugins/callout:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.7.1
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
+  packages-plugins/changelog:
     dependencies:
       '@docxkit/core':
         specifier: workspace:*
@@ -143,6 +169,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/pdk
 
+  packages-plugins/divider:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.7.1
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
   packages-plugins/echarts:
     dependencies:
       '@docxkit/core':
@@ -154,6 +193,32 @@ importers:
       echarts:
         specifier: '>=5.0.0'
         version: 6.1.0
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
+  packages-plugins/invoice:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.7.1
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
+  packages-plugins/letterhead:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.7.1
     devDependencies:
       '@docxkit/pdk':
         specifier: workspace:*
@@ -228,6 +293,19 @@ importers:
         version: link:../../packages/pdk
 
   packages-plugins/timeline:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.7.1
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
+  packages-plugins/toc:
     dependencies:
       '@docxkit/core':
         specifier: workspace:*
@@ -343,9 +421,15 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../pdk
+      '@docxkit/plugin-badge':
+        specifier: workspace:*
+        version: link:../../packages-plugins/badge
       '@docxkit/plugin-callout':
         specifier: workspace:*
         version: link:../../packages-plugins/callout
+      '@docxkit/plugin-changelog':
+        specifier: workspace:*
+        version: link:../../packages-plugins/changelog
       '@docxkit/plugin-code-block':
         specifier: workspace:*
         version: link:../../packages-plugins/code-block
@@ -355,9 +439,18 @@ importers:
       '@docxkit/plugin-data-table':
         specifier: workspace:*
         version: link:../../packages-plugins/data-table
+      '@docxkit/plugin-divider':
+        specifier: workspace:*
+        version: link:../../packages-plugins/divider
       '@docxkit/plugin-echarts':
         specifier: workspace:*
         version: link:../../packages-plugins/echarts
+      '@docxkit/plugin-invoice':
+        specifier: workspace:*
+        version: link:../../packages-plugins/invoice
+      '@docxkit/plugin-letterhead':
+        specifier: workspace:*
+        version: link:../../packages-plugins/letterhead
       '@docxkit/plugin-meeting-minutes':
         specifier: workspace:*
         version: link:../../packages-plugins/meeting-minutes
@@ -376,6 +469,9 @@ importers:
       '@docxkit/plugin-timeline':
         specifier: workspace:*
         version: link:../../packages-plugins/timeline
+      '@docxkit/plugin-toc':
+        specifier: workspace:*
+        version: link:../../packages-plugins/toc
       '@docxkit/plugin-watermark':
         specifier: workspace:*
         version: link:../../packages-plugins/watermark

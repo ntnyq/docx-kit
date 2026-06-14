@@ -25,7 +25,6 @@ export * from '@docxkit/core'
 // ---------- Browser-specific APIs ----------
 export { normalizeImageData } from './browser/index'
 export { qrcodePlugin } from '@docxkit/plugin-qrcode'
-// ---------- Built-in plugins ----------
 export { calloutPlugin } from '@docxkit/plugin-callout'
 export { echartsPlugin } from '@docxkit/plugin-echarts'
 export { timelinePlugin } from '@docxkit/plugin-timeline'
@@ -33,21 +32,32 @@ export { watermarkPlugin } from '@docxkit/plugin-watermark'
 export { codeBlockPlugin } from '@docxkit/plugin-code-block'
 export { coverPagePlugin } from '@docxkit/plugin-cover-page'
 export { dataTablePlugin } from '@docxkit/plugin-data-table'
+export { tocPlugin } from '../../../packages-plugins/toc/src'
 export { pageNumberPlugin } from '@docxkit/plugin-page-number'
+// ---------- Built-in plugins ----------
+export { badgePlugin } from '../../../packages-plugins/badge/src'
 export { propertyTablePlugin } from '@docxkit/plugin-property-table'
+export { dividerPlugin } from '../../../packages-plugins/divider/src'
+export { invoicePlugin } from '../../../packages-plugins/invoice/src'
 export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
 export { signatureBlockPlugin } from '@docxkit/plugin-signature-block'
+export { changelogPlugin } from '../../../packages-plugins/changelog/src'
 // ---------- Preview (Browser DOCX viewer) ----------
 export { createDocxPreview, PREVIEW_ERROR_CODES } from '@docxkit/renderer'
-// ---------- Plugin option types ----------
+export { letterheadPlugin } from '../../../packages-plugins/letterhead/src'
 export type { CalloutOptions } from '@docxkit/plugin-callout'
 export type { QRCodePluginOptions } from '@docxkit/plugin-qrcode'
 export type { WatermarkOptions } from '@docxkit/plugin-watermark'
 export type { CodeBlockOptions } from '@docxkit/plugin-code-block'
 export type { CoverPageOptions } from '@docxkit/plugin-cover-page'
+export type { TocOptions } from '../../../packages-plugins/toc/src'
 export type { EChartsPluginOptions } from '@docxkit/plugin-echarts'
 export type { PageNumberOptions } from '@docxkit/plugin-page-number'
+// ---------- Plugin option types ----------
+export type { BadgeOptions } from '../../../packages-plugins/badge/src'
+export type { DividerOptions } from '../../../packages-plugins/divider/src'
 export type { TimelineEvent, TimelineOptions } from '@docxkit/plugin-timeline'
+export type { LetterheadOptions } from '../../../packages-plugins/letterhead/src'
 export type {
   AgendaItem,
   MeetingMinutesOptions,
@@ -56,17 +66,26 @@ export type {
   PropertyItem,
   PropertyTableOptions,
 } from '@docxkit/plugin-property-table'
-
 export type {
   ColAlign,
   ColFormat,
   DataTableOptions,
 } from '@docxkit/plugin-data-table'
-
 export type {
   SignatureBlockOptions,
   SignatureParty,
 } from '@docxkit/plugin-signature-block'
+
+export type {
+  ChangelogEntry,
+  ChangelogOptions,
+} from '../../../packages-plugins/changelog/src'
+
+export type {
+  InvoiceLineItem,
+  InvoiceOptions,
+  InvoiceParty,
+} from '../../../packages-plugins/invoice/src'
 export type {
   DocxInput,
   DocxPreview,

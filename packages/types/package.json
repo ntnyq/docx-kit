@@ -31,6 +31,9 @@
   "files": [
     "dist/"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rm -rf dist && tsdown && tsc -p tsconfig.json",
     "test": "echo 'No tests for @docxkit/types'"

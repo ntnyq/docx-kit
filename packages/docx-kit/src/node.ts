@@ -23,28 +23,38 @@ import type { DocxPreset, DocxTheme } from '@docxkit/core'
 export * from '@docxkit/core'
 
 export { qrcodePlugin } from '@docxkit/plugin-qrcode'
-// ---------- Built-in plugins (except echarts — browser only) ----------
 export { calloutPlugin } from '@docxkit/plugin-callout'
 export { timelinePlugin } from '@docxkit/plugin-timeline'
 export { watermarkPlugin } from '@docxkit/plugin-watermark'
 export { codeBlockPlugin } from '@docxkit/plugin-code-block'
 export { coverPagePlugin } from '@docxkit/plugin-cover-page'
 export { dataTablePlugin } from '@docxkit/plugin-data-table'
+export { tocPlugin } from '../../../packages-plugins/toc/src'
 export { pageNumberPlugin } from '@docxkit/plugin-page-number'
 // ---------- Node.js–specific APIs ----------
 export { dataUrlToUint8Array, saveDocument } from './node/index'
+// ---------- Built-in plugins (except echarts — browser only) ----------
+export { badgePlugin } from '../../../packages-plugins/badge/src'
 export { propertyTablePlugin } from '@docxkit/plugin-property-table'
+export { dividerPlugin } from '../../../packages-plugins/divider/src'
+export { invoicePlugin } from '../../../packages-plugins/invoice/src'
 export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
-
 export { signatureBlockPlugin } from '@docxkit/plugin-signature-block'
-// ---------- Plugin option types ----------
+export { changelogPlugin } from '../../../packages-plugins/changelog/src'
+
+export { letterheadPlugin } from '../../../packages-plugins/letterhead/src'
 export type { CalloutOptions } from '@docxkit/plugin-callout'
 export type { QRCodePluginOptions } from '@docxkit/plugin-qrcode'
 export type { WatermarkOptions } from '@docxkit/plugin-watermark'
 export type { CodeBlockOptions } from '@docxkit/plugin-code-block'
 export type { CoverPageOptions } from '@docxkit/plugin-cover-page'
+export type { TocOptions } from '../../../packages-plugins/toc/src'
 export type { PageNumberOptions } from '@docxkit/plugin-page-number'
+// ---------- Plugin option types ----------
+export type { BadgeOptions } from '../../../packages-plugins/badge/src'
+export type { DividerOptions } from '../../../packages-plugins/divider/src'
 export type { TimelineEvent, TimelineOptions } from '@docxkit/plugin-timeline'
+export type { LetterheadOptions } from '../../../packages-plugins/letterhead/src'
 export type {
   AgendaItem,
   MeetingMinutesOptions,
@@ -58,6 +68,14 @@ export type {
   ColFormat,
   DataTableOptions,
 } from '@docxkit/plugin-data-table'
+export type {
+  SignatureBlockOptions,
+  SignatureParty,
+} from '@docxkit/plugin-signature-block'
+export type {
+  ChangelogEntry,
+  ChangelogOptions,
+} from '../../../packages-plugins/changelog/src'
 
 export { academicPreset, classicPreset, modernPreset }
 
@@ -96,6 +114,7 @@ export function useTheme(id: string): DocxTheme | undefined {
 }
 
 export type {
-  SignatureBlockOptions,
-  SignatureParty,
-} from '@docxkit/plugin-signature-block'
+  InvoiceLineItem,
+  InvoiceOptions,
+  InvoiceParty,
+} from '../../../packages-plugins/invoice/src'
