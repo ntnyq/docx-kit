@@ -206,18 +206,19 @@ export function createPluginTestContext(
 export async function renderPlugin<
   TName extends string = string,
   TOptions = unknown,
+  TRender = unknown,
 >(
-  plugin: DocxPlugin<TName, TOptions>,
+  plugin: DocxPlugin<TName, TOptions, TRender>,
   options: TOptions,
   context?: PluginRenderContext,
-): Promise<unknown> {
+): Promise<Awaited<TRender>> {
   // Run setup if defined
   if (plugin.setup) {
     await plugin.setup()
   }
 
   const ctx = context ?? createPluginTestContext()
-  return plugin.render(options as Parameters<typeof plugin.render>[0], ctx)
+  return await plugin.render(options, ctx)
 }
 
 // ---------- Internal Helpers ----------

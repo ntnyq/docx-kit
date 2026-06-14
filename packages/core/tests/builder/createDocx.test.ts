@@ -3,7 +3,7 @@ import { calloutPlugin } from '../../../../packages-plugins/callout/src/index'
 import { watermarkPlugin } from '../../../../packages-plugins/watermark/src/index'
 import { createDocx, renderDocx } from '../../src/builder/createDocx'
 import { DocxBuilder } from '../../src/builder/DocxBuilder'
-import type { DocxPlugin } from '../../src/types/plugin'
+import type { DocxPlugin } from '@docxkit/core'
 
 describe('createDocx', () => {
   it('returns a DocxBuilder instance', () => {

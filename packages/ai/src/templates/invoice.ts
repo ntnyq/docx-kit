@@ -7,8 +7,14 @@
  * @module ai/templates/invoice
  */
 
-import type { DocxSchema } from '@docxkit/core'
-import type { AiTemplate } from '../types'
+import type {
+  BlockNode,
+  DocxSchema,
+  ParagraphNode,
+  PluginNode,
+  TableNode,
+} from '@docxkit/core'
+import type { AiTemplate, AiTemplateSchema } from '../types'
 
 /** Invoice template parameters. */
 export interface InvoiceParams {
@@ -39,6 +45,13 @@ export interface InvoiceParams {
   }[]
 }
 
+interface InvoiceTableRow extends Record<string, string> {
+  amount: string
+  description: string
+  quantity: string
+  unitPrice: string
+}
+
 const systemPrompt = `You are a professional document generator. Generate a docx-kit JSON schema for an invoice document.
 
 The invoice should include:
@@ -57,7 +70,7 @@ Use the following docx-kit node types:
 Make sure all monetary values are formatted consistently.
 `
 
-const schema = {
+const schema: AiTemplateSchema = {
   description: 'Professional invoice with itemized charges, tax, and totals',
   title: 'InvoiceParams',
   type: 'object',
@@ -136,12 +149,12 @@ const schema = {
  */
 function generate(params: InvoiceParams): DocxSchema {
   // Company info
-  const issuerLines = params.issuerAddress
+  const issuerLines: ParagraphNode[] = params.issuerAddress
     ? [{ text: params.issuerAddress, type: 'paragraph' }]
     : []
 
   // Invoice metadata
-  const propItems: any[] = [
+  const propItems: { key: string; value: string }[] = [
     { key: 'Invoice #', value: params.invoiceNumber },
     ...(params.issueDate
       ? [{ key: 'Issue Date', value: params.issueDate }]
@@ -163,54 +176,67 @@ function generate(params: InvoiceParams): DocxSchema {
   const tax = subtotal * taxRate
   const total = subtotal + tax
 
-  const tableData = params.items.map(
-    (item: { description: string; quantity: number; unitPrice: number }) => ({
-      amount: `$${(item.quantity * item.unitPrice).toFixed(2)}`,
-      description: item.description,
-      quantity: String(item.quantity),
-      unitPrice: `$${item.unitPrice.toFixed(2)}`,
-    }),
-  )
+  const tableData: InvoiceTableRow[] = params.items.map(item => ({
+    amount: `$${(item.quantity * item.unitPrice).toFixed(2)}`,
+    description: item.description,
+    quantity: String(item.quantity),
+    unitPrice: `$${item.unitPrice.toFixed(2)}`,
+  }))
 
-  const content: any[] = [
+  const propertyTableNode: PluginNode<'propertyTable'> = {
+    name: 'propertyTable',
+    options: { items: propItems },
+    type: 'plugin',
+  }
+
+  const columns: TableNode<Record<string, unknown>>['columns'] = [
+    { key: 'description', title: 'Description' },
+    { key: 'quantity', title: 'Qty' },
+    { key: 'unitPrice', title: 'Unit Price' },
+    { key: 'amount', title: 'Amount' },
+  ]
+
+  const itemsTableNode: TableNode<Record<string, unknown>> = {
+    columns,
+    data: tableData,
+    header: true,
+    type: 'table',
+  }
+
+  const subtotalNode: ParagraphNode = {
+    text: `Subtotal: $${subtotal.toFixed(2)}`,
+    type: 'paragraph',
+  }
+  const taxNode: ParagraphNode | undefined =
+    taxRate > 0
+      ? {
+          text: `Tax (${(taxRate * 100).toFixed(0)}%): $${tax.toFixed(2)}`,
+          type: 'paragraph',
+        }
+      : undefined
+  const totalNode: ParagraphNode = {
+    text: `Total: $${total.toFixed(2)}`,
+    type: 'paragraph',
+  }
+
+  const content: BlockNode[] = [
     { level: 1, text: 'INVOICE', type: 'heading' },
     { text: params.issuerName, type: 'paragraph' },
     ...issuerLines,
-    {
-      name: 'propertyTable',
-      options: { items: propItems },
-      type: 'plugin',
-    },
-    {
-      data: tableData,
-      header: true,
-      type: 'table',
-      columns: [
-        { key: 'description', title: 'Description' },
-        { key: 'quantity', title: 'Qty' },
-        { key: 'unitPrice', title: 'Unit Price' },
-        { key: 'amount', title: 'Amount' },
-      ],
-    },
-    { text: `Subtotal: $${subtotal.toFixed(2)}`, type: 'paragraph' },
-    ...(taxRate > 0
-      ? [
-          {
-            text: `Tax (${(taxRate * 100).toFixed(0)}%): $${tax.toFixed(2)}`,
-            type: 'paragraph',
-          },
-        ]
-      : []),
-    { text: `Total: $${total.toFixed(2)}`, type: 'paragraph' },
+    propertyTableNode,
+    itemsTableNode,
+    subtotalNode,
+    ...(taxNode ? [taxNode] : []),
+    totalNode,
   ]
 
-  return { content } as any as DocxSchema
+  return { content }
 }
 
 export const invoiceTemplate: AiTemplate<InvoiceParams> = {
   description: 'Professional invoice with itemized charges, tax, and totals',
   generate,
   name: 'invoice',
-  schema: schema as any,
+  schema,
   systemPrompt,
 }

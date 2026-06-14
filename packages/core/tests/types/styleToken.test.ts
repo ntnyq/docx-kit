@@ -16,8 +16,12 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import type { DocxStyleRule } from '../../src/types/style'
-import type { StyleToken, ThemeToken, UnitValue } from '../../src/types/utility'
+import type {
+  DocxStyleRule,
+  StyleToken,
+  ThemeToken,
+  UnitValue,
+} from '@docxkit/types'
 
 describe('theme token types', () => {
   it('UnitValue accepts theme tokens', () => {

@@ -11,9 +11,55 @@ import {
   reportTemplate,
   resumeTemplate,
 } from '../src/templates'
-import type { AiTemplate } from '../src/types'
+import type {
+  BlockNode,
+  HeadingNode,
+  ParagraphNode,
+  PluginNode,
+  TableNode,
+} from '@docxkit/core'
+import type {
+  AiTemplate,
+  AiTemplateObjectSchema,
+  AiTemplateSchema,
+} from '../src/types'
 
-function validateTemplate(template: AiTemplate<any>): void {
+function isHeadingNode(node: BlockNode): node is HeadingNode {
+  return node.type === 'heading'
+}
+
+function isObjectSchema(
+  schema: AiTemplateSchema,
+): schema is AiTemplateObjectSchema {
+  return schema.type === 'object'
+}
+
+function isParagraphNode(node: BlockNode): node is ParagraphNode {
+  return node.type === 'paragraph'
+}
+
+function isPluginNode<TName extends string>(
+  node: BlockNode,
+  name: TName,
+): node is PluginNode<TName> {
+  return node.type === 'plugin' && node.name === name
+}
+
+function isTableNode(
+  node: BlockNode,
+): node is TableNode<Record<string, unknown>> {
+  return node.type === 'table'
+}
+
+function isTextParagraphNode(
+  node: BlockNode,
+): node is ParagraphNode & { text: string } {
+  return node.type === 'paragraph' && typeof node.text === 'string'
+}
+
+function validateTemplate<TParams extends object>(
+  template: AiTemplate<TParams>,
+): void {
   expect(template.name).toBeTypeOf('string')
   expect(template.name.length).toBeGreaterThan(0)
   expect(template.description).toBeTypeOf('string')
@@ -21,14 +67,17 @@ function validateTemplate(template: AiTemplate<any>): void {
   expect(template.systemPrompt.length).toBeGreaterThan(0)
   expect(template.schema).toBeTypeOf('object')
   expect(template.schema.type).toBe('object')
-  expect(template.schema.properties).toBeTypeOf('object')
+  expect(isObjectSchema(template.schema)).toBe(true)
+  expect(
+    isObjectSchema(template.schema) && template.schema.properties,
+  ).toBeTypeOf('object')
   expect(template.generate).toBeTypeOf('function')
 }
 
 describe('report template', () => {
   // eslint-disable-next-line vitest/expect-expect
   it('has valid structure', () => {
-    validateTemplate(reportTemplate as any)
+    validateTemplate(reportTemplate)
   })
 
   it('generates schema with title', () => {
@@ -39,8 +88,8 @@ describe('report template', () => {
 
   it('generates cover page plugin node', () => {
     const result = reportTemplate.generate({ author: 'Alice', title: 'Report' })
-    const coverNode = result.content.find(
-      (n: any) => n.type === 'plugin' && n.name === 'coverPage',
+    const coverNode = result.content.find(node =>
+      isPluginNode(node, 'coverPage'),
     )
     expect(coverNode).toBeDefined()
   })
@@ -51,7 +100,7 @@ describe('report template', () => {
       title: 'Report',
     })
     const headingNode = result.content.find(
-      (n: any) => n.type === 'heading' && n.text === 'Executive Summary',
+      node => isHeadingNode(node) && node.text === 'Executive Summary',
     )
     expect(headingNode).toBeDefined()
   })
@@ -65,7 +114,7 @@ describe('report template', () => {
       ],
     })
     const sectionHeadings = result.content.filter(
-      (n: any) => n.type === 'heading' && n.level === 2,
+      node => isHeadingNode(node) && node.level === 2,
     )
     expect(sectionHeadings.length).toBeGreaterThanOrEqual(2)
   })
@@ -76,20 +125,24 @@ describe('report template', () => {
       title: 'Report',
     })
     const conclusionNode = result.content.find(
-      (n: any) => n.type === 'heading' && n.text === 'Conclusion',
+      node => isHeadingNode(node) && node.text === 'Conclusion',
     )
     expect(conclusionNode).toBeDefined()
   })
 
   it('schema has title as required property', () => {
-    expect(reportTemplate.schema.properties.title.required).toBe(true)
+    expect(isObjectSchema(reportTemplate.schema)).toBe(true)
+    if (!isObjectSchema(reportTemplate.schema)) {
+      throw new Error('report template schema must be an object schema')
+    }
+    expect(reportTemplate.schema.properties.title?.required).toBe(true)
   })
 })
 
 describe('invoice template', () => {
   // eslint-disable-next-line vitest/expect-expect
   it('has valid structure', () => {
-    validateTemplate(invoiceTemplate as any)
+    validateTemplate(invoiceTemplate)
   })
 
   it('generates schema with items', () => {
@@ -110,7 +163,7 @@ describe('invoice template', () => {
       issuerName: 'My Company',
       items: [{ description: 'Service A', quantity: 2, unitPrice: 100 }],
     })
-    const tableNode = result.content.find((n: any) => n.type === 'table')
+    const tableNode = result.content.find(isTableNode)
     expect(tableNode).toBeDefined()
   })
 
@@ -126,28 +179,25 @@ describe('invoice template', () => {
       ],
     })
     // Subtotal: 3*50 + 1*200 = 350, Tax: 35, Total: 385
-    const totalNode = result.content.find(
-      (n: any) =>
-        n.type === 'paragraph'
-        && typeof n.text === 'string'
-        && n.text.startsWith('Total:'),
-    )
+    const totalNode = result.content
+      .filter(isTextParagraphNode)
+      .find(node => node.text.startsWith('Total:'))
     expect(totalNode).toBeDefined()
-    expect((totalNode as any)!.text).toContain('385.00')
+    expect(totalNode?.text ?? '').toContain('385.00')
   })
 })
 
 describe('resume template', () => {
   // eslint-disable-next-line vitest/expect-expect
   it('has valid structure', () => {
-    validateTemplate(resumeTemplate as any)
+    validateTemplate(resumeTemplate)
   })
 
   it('generates schema with name', () => {
     const result = resumeTemplate.generate({ name: 'John Doe' })
     expect(result.content).toBeInstanceOf(Array)
     const nameHeading = result.content.find(
-      (n: any) => n.type === 'heading' && n.text === 'John Doe',
+      node => isHeadingNode(node) && node.text === 'John Doe',
     )
     expect(nameHeading).toBeDefined()
   })
@@ -166,10 +216,10 @@ describe('resume template', () => {
       ],
     })
     const expHeading = result.content.find(
-      (n: any) => n.type === 'heading' && n.text === 'Experience',
+      node => isHeadingNode(node) && node.text === 'Experience',
     )
     expect(expHeading).toBeDefined()
-    const bulletList = result.content.find((n: any) => n.type === 'bulletList')
+    const bulletList = result.content.find(node => node.type === 'bulletList')
     expect(bulletList).toBeDefined()
   })
 
@@ -179,7 +229,7 @@ describe('resume template', () => {
       name: 'John Doe',
     })
     const eduHeading = result.content.find(
-      (n: any) => n.type === 'heading' && n.text === 'Education',
+      node => isHeadingNode(node) && node.text === 'Education',
     )
     expect(eduHeading).toBeDefined()
   })
@@ -190,14 +240,14 @@ describe('resume template', () => {
       skills: ['TypeScript', 'React', 'Node.js'],
     })
     const skillsHeading = result.content.find(
-      (n: any) => n.type === 'heading' && n.text === 'Skills',
+      node => isHeadingNode(node) && node.text === 'Skills',
     )
     expect(skillsHeading).toBeDefined()
     const skillsParagraph = result.content.find(
-      (n: any) =>
-        n.type === 'paragraph'
-        && typeof n.text === 'string'
-        && n.text.includes('TypeScript'),
+      node =>
+        isParagraphNode(node)
+        && typeof node.text === 'string'
+        && node.text.includes('TypeScript'),
     )
     expect(skillsParagraph).toBeDefined()
   })
@@ -206,7 +256,7 @@ describe('resume template', () => {
 describe('letter template', () => {
   // eslint-disable-next-line vitest/expect-expect
   it('has valid structure', () => {
-    validateTemplate(letterTemplate as any)
+    validateTemplate(letterTemplate)
   })
 
   it('generates schema with sender and recipient', () => {
@@ -226,10 +276,10 @@ describe('letter template', () => {
       senderName: 'Alice',
     })
     const salutation = result.content.find(
-      (n: any) =>
-        n.type === 'paragraph'
-        && typeof n.text === 'string'
-        && n.text.startsWith('Dear'),
+      node =>
+        isParagraphNode(node)
+        && typeof node.text === 'string'
+        && node.text.startsWith('Dear'),
     )
     expect(salutation).toBeDefined()
   })
@@ -240,8 +290,8 @@ describe('letter template', () => {
       recipientName: 'Bob',
       senderName: 'Alice',
     })
-    const signature = result.content.find(
-      (n: any) => n.type === 'plugin' && n.name === 'signatureBlock',
+    const signature = result.content.find(node =>
+      isPluginNode(node, 'signatureBlock'),
     )
     expect(signature).toBeDefined()
   })
@@ -253,10 +303,10 @@ describe('letter template', () => {
       recipientName: 'Bob',
       senderName: 'Alice',
     })
-    const signature = result.content.find(
-      (n: any) => n.type === 'plugin' && n.name === 'signatureBlock',
+    const signature = result.content.find(node =>
+      isPluginNode(node, 'signatureBlock'),
     )
     expect(signature).toBeDefined()
-    expect((signature as any).options.closing).toBe('Best regards')
+    expect(signature?.options).toMatchObject({ closing: 'Best regards' })
   })
 })

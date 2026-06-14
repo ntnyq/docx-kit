@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { resolveStyle } from '../src/style/normalizeStyle'
-import type { StyleSheet } from '../src/types/style'
+import type { StyleSheet } from '@docxkit/types'
 
 describe('resolveStyle', () => {
   it('returns empty object with no inputs', () => {

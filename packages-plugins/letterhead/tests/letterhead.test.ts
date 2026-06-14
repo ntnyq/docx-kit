@@ -20,9 +20,10 @@ describe('letterheadPlugin', () => {
     )
 
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).every(item => item instanceof Paragraph)).toBe(
-      true,
-    )
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.every(item => item instanceof Paragraph)).toBe(true)
     const xml = JSON.stringify(result)
     expect(xml).toContain('Acme Corp')
     expect(xml).toContain('info@acme.com')

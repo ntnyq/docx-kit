@@ -1,6 +1,26 @@
 import { describe, expect, it } from 'vitest'
 import { DocxBuilder } from '../../src/builder/DocxBuilder'
-import type { BulletItem } from '../../src/dsl/nodes'
+import type {
+  BulletItem,
+  BulletListNode,
+  NumberedListNode,
+} from '@docxkit/types'
+
+function isBulletListNode(node: unknown): node is BulletListNode {
+  return (
+    typeof node === 'object'
+    && node !== null
+    && (node as { type?: string }).type === 'bulletList'
+  )
+}
+
+function isNumberedListNode(node: unknown): node is NumberedListNode {
+  return (
+    typeof node === 'object'
+    && node !== null
+    && (node as { type?: string }).type === 'numberedList'
+  )
+}
 
 describe('DocxBuilder - bulletList', () => {
   it('creates a bullet list with string items', () => {
@@ -25,7 +45,12 @@ describe('DocxBuilder - bulletList', () => {
 
     const json = doc.toJSON()
     expect(json.content).toHaveLength(1)
-    expect((json.content[0] as any).items).toEqual(items)
+    const listNode = json.content[0]
+    expect(isBulletListNode(listNode)).toBe(true)
+    if (!isBulletListNode(listNode)) {
+      throw new Error('expected bulletList node')
+    }
+    expect(listNode.items).toEqual(items)
   })
 
   it('supports custom bullet character', () => {
@@ -33,7 +58,12 @@ describe('DocxBuilder - bulletList', () => {
     doc.bulletList(['A', 'B'], { bullet: '\u25CB' })
 
     const json = doc.toJSON()
-    expect((json.content[0] as any).bullet).toBe('\u25CB')
+    const listNode = json.content[0]
+    expect(isBulletListNode(listNode)).toBe(true)
+    if (!isBulletListNode(listNode)) {
+      throw new Error('expected bulletList node')
+    }
+    expect(listNode.bullet).toBe('\u25CB')
   })
 })
 
@@ -58,8 +88,13 @@ describe('DocxBuilder - numberedList', () => {
     })
 
     const json = doc.toJSON()
-    expect((json.content[0] as any).numberingFormat).toBe('upperRoman')
-    expect((json.content[0] as any).start).toBe(5)
+    const listNode = json.content[0]
+    expect(isNumberedListNode(listNode)).toBe(true)
+    if (!isNumberedListNode(listNode)) {
+      throw new Error('expected numberedList node')
+    }
+    expect(listNode.numberingFormat).toBe('upperRoman')
+    expect(listNode.start).toBe(5)
   })
 })
 

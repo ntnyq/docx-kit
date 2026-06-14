@@ -76,8 +76,8 @@ export function buildFreeformPrompt(
  * @param userContext - Additional context from the user
  * @returns A complete prompt string for LLM consumption
  */
-export function buildPrompt(
-  template: AiTemplate,
+export function buildPrompt<TParams extends object>(
+  template: AiTemplate<TParams>,
   userContext?: string,
 ): string {
   const parts = [

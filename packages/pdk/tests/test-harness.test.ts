@@ -11,7 +11,7 @@ import {
   createPluginTestContext,
   renderPlugin,
 } from '../src/index'
-import type { DocxPlugin } from '@docxkit/core'
+import type { DocxPlugin, ParagraphNode } from '@docxkit/core'
 
 const callout = calloutPlugin()
 
@@ -79,8 +79,8 @@ describe('createPluginTestContext', () => {
 
   it('compileNode returns the node as-is', async () => {
     const ctx = createPluginTestContext()
-    const node = { text: 'hello', type: 'paragraph' }
-    const result = await ctx.compileNode(node as any)
+    const node: ParagraphNode = { text: 'hello', type: 'paragraph' }
+    const result = await ctx.compileNode(node)
     expect(result).toBe(node)
   })
 

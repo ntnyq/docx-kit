@@ -7,8 +7,8 @@
  * @module ai/templates/letter
  */
 
-import type { DocxSchema } from '@docxkit/core'
-import type { AiTemplate } from '../types'
+import type { BlockNode, DocxSchema, PluginNode } from '@docxkit/core'
+import type { AiTemplate, AiTemplateSchema } from '../types'
 
 /** Letter template parameters. */
 export interface LetterParams {
@@ -48,7 +48,7 @@ Use the following docx-kit node types:
 Maintain a professional tone appropriate for the letter type.
 `
 
-const schema = {
+const schema: AiTemplateSchema = {
   title: 'LetterParams',
   type: 'object',
   description:
@@ -84,7 +84,7 @@ const schema = {
  * @returns A DocxSchema ready for rendering
  */
 function generate(params: LetterParams): DocxSchema {
-  const content: any[] = [{ text: params.senderName, type: 'paragraph' }]
+  const content: BlockNode[] = [{ text: params.senderName, type: 'paragraph' }]
 
   if (params.senderAddress) {
     content.push({ text: params.senderAddress, type: 'paragraph' })
@@ -107,22 +107,23 @@ function generate(params: LetterParams): DocxSchema {
   for (const paragraph of params.body) {
     content.push({ text: paragraph, type: 'paragraph' })
   }
-  content.push({
+  const signatureBlockNode: PluginNode<'signatureBlock'> = {
     name: 'signatureBlock',
     type: 'plugin',
     options: {
       closing: params.closing ?? 'Sincerely',
       parties: [{ name: params.senderName, role: '' }],
     },
-  })
+  }
+  content.push(signatureBlockNode)
 
-  return { content } as any as DocxSchema
+  return { content }
 }
 
 export const letterTemplate: AiTemplate<LetterParams> = {
   generate,
   name: 'letter',
-  schema: schema as any,
+  schema,
   systemPrompt,
   description:
     'Formal letter with sender/recipient info, date, subject, body, and closing',

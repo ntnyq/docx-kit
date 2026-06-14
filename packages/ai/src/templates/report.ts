@@ -7,8 +7,8 @@
  * @module ai/templates/report
  */
 
-import type { DocxSchema } from '@docxkit/core'
-import type { AiTemplate } from '../types'
+import type { BlockNode, DocxSchema, PluginNode } from '@docxkit/core'
+import type { AiTemplate, AiTemplateSchema } from '../types'
 
 /** Report template parameters. */
 export interface ReportParams {
@@ -48,7 +48,7 @@ Use the following docx-kit node types:
 Keep the content professional, concise, and well-structured.
 `
 
-const schema = {
+const schema: AiTemplateSchema = {
   title: 'ReportParams',
   type: 'object',
   description:
@@ -91,18 +91,17 @@ const schema = {
  * @returns A DocxSchema ready for rendering
  */
 function generate(params: ReportParams): DocxSchema {
-  const content: any[] = [
-    {
-      name: 'coverPage',
-      type: 'plugin',
-      options: {
-        author: params.author ?? '',
-        date: params.date ?? '',
-        title: params.title,
-      },
+  const coverPageNode: PluginNode<'coverPage'> = {
+    name: 'coverPage',
+    type: 'plugin',
+    options: {
+      author: params.author ?? '',
+      date: params.date ?? '',
+      title: params.title,
     },
-    { type: 'pageBreak' },
-  ]
+  }
+
+  const content: BlockNode[] = [coverPageNode, { type: 'pageBreak' }]
 
   if (params.executiveSummary && params.executiveSummary.length > 0) {
     content.push({ level: 1, text: 'Executive Summary', type: 'heading' })
@@ -131,13 +130,13 @@ function generate(params: ReportParams): DocxSchema {
     )
   }
 
-  return { content } as any as DocxSchema
+  return { content }
 }
 
 export const reportTemplate: AiTemplate<ReportParams> = {
   generate,
   name: 'report',
-  schema: schema as any,
+  schema,
   systemPrompt,
   description:
     'Business report with cover page, executive summary, body sections, and conclusion',

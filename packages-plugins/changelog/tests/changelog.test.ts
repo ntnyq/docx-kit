@@ -24,8 +24,11 @@ describe('changelogPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[])[0]).toBeInstanceOf(Paragraph)
-    expect((result as any[])[1]).toBeInstanceOf(Table)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result[0]).toBeInstanceOf(Paragraph)
+    expect(result[1]).toBeInstanceOf(Table)
   })
 
   it('renders an empty state when no entries exist', () => {
@@ -36,8 +39,11 @@ describe('changelogPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(2)
-    expect((result as any[])[0]).toBeInstanceOf(Paragraph)
-    expect((result as any[])[1]).toBeInstanceOf(Paragraph)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(2)
+    expect(result[0]).toBeInstanceOf(Paragraph)
+    expect(result[1]).toBeInstanceOf(Paragraph)
   })
 })

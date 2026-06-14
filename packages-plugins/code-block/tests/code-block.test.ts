@@ -14,8 +14,11 @@ describe('codeBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(1)
-    expect((result as any[])[0]).toBeInstanceOf(Paragraph)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(1)
+    expect(result[0]).toBeInstanceOf(Paragraph)
   })
 
   it('renders a multi-line code block', async () => {
@@ -24,7 +27,10 @@ describe('codeBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(3)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(3)
   })
 
   it('renders with line numbers', async () => {
@@ -33,7 +39,10 @@ describe('codeBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(3)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(3)
   })
 
   it('renders empty code', async () => {
@@ -42,7 +51,10 @@ describe('codeBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(1)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(1)
   })
 
   it('falls back to plain rendering when language is specified but highlight.js is missing', async () => {
@@ -56,8 +68,11 @@ describe('codeBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(1)
-    expect((result as any[])[0]).toBeInstanceOf(Paragraph)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(1)
+    expect(result[0]).toBeInstanceOf(Paragraph)
   })
 
   it('renders JavaScript code as plain text', async () => {
@@ -69,6 +84,9 @@ describe('codeBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(3)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(3)
   })
 })

@@ -11,6 +11,9 @@ import { watermarkPlugin } from '../../../packages-plugins/watermark/src/index'
 import type { DocxPlugin, PluginManifest, PluginSource } from '@docxkit/core'
 
 const callout = calloutPlugin() as DocxPlugin
+type TestablePluginLoader = PluginLoader & {
+  _forceManifestForTesting?: PluginManifest | null
+}
 
 // Reusable manifest template with all required fields
 const TEST_MANIFEST: PluginManifest = {
@@ -178,7 +181,8 @@ describe('PluginLoader', () => {
         },
       })
       // Inject manifest to trigger allowExecute
-      loader._forceManifestForTesting = TEST_MANIFEST
+      const testLoader = loader as TestablePluginLoader
+      testLoader._forceManifestForTesting = TEST_MANIFEST
 
       try {
         await loader.load({ plugin: callout, type: 'inline' })
@@ -195,7 +199,8 @@ describe('PluginLoader', () => {
           allowExecute: () => true,
         },
       })
-      loader._forceManifestForTesting = TEST_MANIFEST
+      const testLoader = loader as TestablePluginLoader
+      testLoader._forceManifestForTesting = TEST_MANIFEST
 
       const result = await loader.load({ plugin: callout, type: 'inline' })
       expect(result.plugin.name).toBe('callout')
@@ -286,21 +291,13 @@ describe('PluginLoader', () => {
   })
 })
 
-// Extend PluginLoader with a testing hook
-// We add _forceManifestForTesting to override inline loading behavior
-declare module '../../core/src/loader/PluginLoader' {
-  interface PluginLoader {
-    _forceManifestForTesting?: PluginManifest | null
-  }
-}
-
 // Monkey-patch the _loadInline method on PluginLoader prototype
 // to support testing the allowExecute security hook.
 // @ts-expect-error — accessing protected member for test purposes
 const originalLoadInline = PluginLoader.prototype._loadInline
 // @ts-expect-error — assigning to protected member; return type widened for testing
 PluginLoader.prototype._loadInline = function (
-  this: PluginLoader & { _forceManifestForTesting?: PluginManifest | null },
+  this: TestablePluginLoader,
   plugin: DocxPlugin,
 ): { manifest: PluginManifest | null; plugin: DocxPlugin } {
   if (this._forceManifestForTesting !== undefined) {

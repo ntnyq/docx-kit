@@ -26,11 +26,13 @@ describe('meetingMinutesPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    const arr = result as any[]
-    expect(arr.length).toBe(3) // title + meta + table
-    expect(arr[0]).toBeInstanceOf(Paragraph) // title
-    expect(arr[1]).toBeInstanceOf(Paragraph) // meta
-    expect(arr[2]).toBeInstanceOf(Table) // agenda
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(3) // title + meta + table
+    expect(result[0]).toBeInstanceOf(Paragraph) // title
+    expect(result[1]).toBeInstanceOf(Paragraph) // meta
+    expect(result[2]).toBeInstanceOf(Table) // agenda
   })
 
   it('renders without agenda items', () => {
@@ -44,7 +46,10 @@ describe('meetingMinutesPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(2) // title + meta only
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(2) // title + meta only
   })
 
   it('renders multiple agenda items', () => {
@@ -67,8 +72,11 @@ describe('meetingMinutesPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(3)
-    expect((result as any[])[2]).toBeInstanceOf(Table)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(3)
+    expect(result[2]).toBeInstanceOf(Table)
   })
 
   it('handles Chinese text in all fields', () => {
@@ -89,7 +97,10 @@ describe('meetingMinutesPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[]).length).toBe(3)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result.length).toBe(3)
   })
 
   it('handles single attendee', () => {

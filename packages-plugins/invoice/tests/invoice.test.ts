@@ -22,8 +22,11 @@ describe('invoicePlugin', () => {
     )
 
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[])[0]).toBeInstanceOf(Paragraph)
-    expect((result as any[]).some(item => item instanceof Table)).toBe(true)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result[0]).toBeInstanceOf(Paragraph)
+    expect(result.some(item => item instanceof Table)).toBe(true)
     expect(JSON.stringify(result)).toContain('INV-001')
     expect(JSON.stringify(result)).toContain('11,000.00')
   })

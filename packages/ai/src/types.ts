@@ -34,6 +34,18 @@ export interface AiTemplate<TParams extends object = Record<string, unknown>> {
   generate: (params: TParams) => DocxSchema
 }
 
+export interface AiTemplateArraySchema extends AiTemplateSchemaBase {
+  /** Nested item schema. */
+  items: AiTemplateSchema
+  /** Schema type. */
+  type: 'array'
+}
+
+export interface AiTemplateBooleanSchema extends AiTemplateSchemaBase {
+  /** Schema type. */
+  type: 'boolean'
+}
+
 /**
  * Metadata about a template (without the generator).
  *
@@ -50,32 +62,35 @@ export interface AiTemplateInfo {
   systemPrompt: string
 }
 
-/**
- * JSON Schema definition for template parameters.
- *
- * Used by LLM function calling and MCP tool input validation.
- */
-export interface AiTemplateSchema {
-  /** Schema type (always 'object'). */
+export interface AiTemplateNumberSchema extends AiTemplateSchemaBase {
+  /** Schema type. */
+  type: 'number'
+}
+
+export interface AiTemplateObjectSchema extends AiTemplateSchemaBase {
+  /** Schema properties (name → type definition). */
+  properties: Record<string, AiTemplateSchema>
+  /** Schema type. */
   type: 'object'
   /** Schema title. */
   title?: string
-  /** Schema properties (name → type definition). */
-  properties: Record<
-    string,
-    {
-      /** Property type. */
-      type: 'array' | 'boolean' | 'number' | 'object' | 'string'
-      /** Property description (helps LLMs understand the field). */
-      description?: string
-      /** Enum values for string fields. */
-      enum?: string[]
-      /** For array/object types — nested item/property schema. */
-      items?: AiTemplateSchema
-      /** Whether this property is required. */
-      required?: boolean
-    }
-  >
+}
+
+/**
+ * JSON Schema subset used for AI template parameters.
+ */
+export type AiTemplateSchema =
+  | AiTemplateArraySchema
+  | AiTemplateBooleanSchema
+  | AiTemplateNumberSchema
+  | AiTemplateObjectSchema
+  | AiTemplateStringSchema
+
+export interface AiTemplateStringSchema extends AiTemplateSchemaBase {
+  /** Schema type. */
+  type: 'string'
+  /** Enum values for string fields. */
+  enum?: string[]
 }
 
 /**
@@ -86,4 +101,16 @@ export interface GenerateToolDefinitionsOptions {
   plugins?: string[]
   /** Template name to include in tool definitions. */
   template?: string
+}
+
+/**
+ * JSON Schema definition for template parameters.
+ *
+ * Used by LLM function calling and MCP tool input validation.
+ */
+interface AiTemplateSchemaBase {
+  /** Property description (helps LLMs understand the field). */
+  description?: string
+  /** Whether this property is required. */
+  required?: boolean
 }

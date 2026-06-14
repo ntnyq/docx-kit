@@ -14,27 +14,24 @@ import { reportTemplate } from '../src/templates'
 
 describe('buildPrompt', () => {
   it('includes system prompt from template', () => {
-    const prompt = buildPrompt(reportTemplate as any)
+    const prompt = buildPrompt(reportTemplate)
     expect(prompt).toContain(reportTemplate.systemPrompt)
   })
 
   it('includes template schema', () => {
-    const prompt = buildPrompt(reportTemplate as any)
+    const prompt = buildPrompt(reportTemplate)
     expect(prompt).toContain('Template: report')
     expect(prompt).toContain('Input Schema')
   })
 
   it('includes user context when provided', () => {
-    const prompt = buildPrompt(
-      reportTemplate as any,
-      'Focus on quarterly metrics',
-    )
+    const prompt = buildPrompt(reportTemplate, 'Focus on quarterly metrics')
     expect(prompt).toContain('User Requirements')
     expect(prompt).toContain('Focus on quarterly metrics')
   })
 
   it('includes output format reminder', () => {
-    const prompt = buildPrompt(reportTemplate as any)
+    const prompt = buildPrompt(reportTemplate)
     expect(prompt).toContain('Output Format')
     expect(prompt).toContain('DocxSchema')
   })

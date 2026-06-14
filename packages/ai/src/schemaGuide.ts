@@ -6,7 +6,8 @@
  */
 
 import { BUILTIN_TEMPLATES } from './templates'
-import type { AiTemplate, GenerateToolDefinitionsOptions } from './types'
+import type { BuiltinAiTemplate } from './templates'
+import type { GenerateToolDefinitionsOptions } from './types'
 
 /**
  * Generate a human-readable schema guide for LLMs.
@@ -301,7 +302,7 @@ export function generateToolDefinitions(
 /**
  * Generate tool definitions for a specific template.
  */
-function generateTemplateTools(template: AiTemplate): Array<{
+function generateTemplateTools(template: BuiltinAiTemplate): Array<{
   type: 'function'
   function: {
     description: string
@@ -309,6 +310,13 @@ function generateTemplateTools(template: AiTemplate): Array<{
     parameters: Record<string, unknown>
   }
 }> {
+  const required =
+    template.schema.type === 'object'
+      ? Object.entries(template.schema.properties)
+          .filter(([, definition]) => definition.required)
+          .map(([key]) => key)
+      : []
+
   return [
     {
       type: 'function',
@@ -317,9 +325,7 @@ function generateTemplateTools(template: AiTemplate): Array<{
         name: `apply_template_${template.name}`,
         parameters: {
           ...(template.schema as unknown as Record<string, unknown>),
-          required: Object.entries(template.schema.properties)
-            .filter(([, def]) => def.required)
-            .map(([key]) => key),
+          required,
         },
       },
     },

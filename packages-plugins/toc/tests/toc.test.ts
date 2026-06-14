@@ -14,8 +14,11 @@ describe('tocPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    expect((result as any[])[0]).toBeInstanceOf(Paragraph)
-    expect((result as any[])[1]).toBeInstanceOf(TableOfContents)
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    expect(result[0]).toBeInstanceOf(Paragraph)
+    expect(result[1]).toBeInstanceOf(TableOfContents)
   })
 
   it('uses a custom title and heading range', () => {
@@ -33,7 +36,10 @@ describe('tocPlugin', () => {
       { maxLevel: 3, title: 'Contents' },
       createPluginTestContext(),
     )
-    const xml = JSON.stringify((result as any[])[0])
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+    const xml = JSON.stringify(result[0])
     expect(xml).not.toContain('Heading1')
   })
 

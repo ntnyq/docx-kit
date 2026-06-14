@@ -38,8 +38,13 @@ export interface BuiltinPluginMap extends PluginRegistry {}
  *
  * @template TName — The plugin name (string literal type)
  * @template TOptions — The shape of the user-provided options
+ * @template TRender — The render output type produced by the plugin
  */
-export interface DocxPlugin<TName extends string = string, TOptions = unknown> {
+export interface DocxPlugin<
+  TName extends string = string,
+  TOptions = unknown,
+  TRender = unknown,
+> {
   /** Unique plugin name, used as the node discriminator. */
   name: TName
   /** One-time setup called when the plugin is registered. */
@@ -54,7 +59,7 @@ export interface DocxPlugin<TName extends string = string, TOptions = unknown> {
   render: (
     options: TOptions,
     context: PluginRenderContext,
-  ) => MaybePromise<unknown>
+  ) => MaybePromise<TRender>
 }
 
 /**
@@ -97,9 +102,6 @@ export interface PluginRenderContext {
 /**
  * Define a type-safe plugin with full inference.
  *
- * @param plugin - — The plugin definition object
- * @returns The same plugin with `const` type inference
- *
  * @example
  * ```ts
  * const myPlugin = definePlugin<'badge', { text: string }>({
@@ -111,8 +113,12 @@ export interface PluginRenderContext {
  * })
  * ```
  */
-export function definePlugin<const TName extends string, TOptions>(
-  plugin: DocxPlugin<TName, TOptions>,
-): DocxPlugin<TName, TOptions> {
+export function definePlugin<
+  const TName extends string,
+  TOptions,
+  TRender = unknown,
+>(
+  plugin: DocxPlugin<TName, TOptions, TRender>,
+): DocxPlugin<TName, TOptions, TRender> {
   return plugin
 }

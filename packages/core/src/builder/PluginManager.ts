@@ -59,7 +59,7 @@ export class PluginManager<
    * @returns The manager with the new plugin type merged into `TPlugins`
    */
   register<TName extends string, TOptions>(
-    plugin: DocxPlugin<TName, TOptions>,
+    plugin: DocxPlugin<TName, TOptions, unknown>,
   ): PluginManager<Record<TName, TOptions> & TPlugins> {
     if (this._map.has(plugin.name)) {
       console.warn(

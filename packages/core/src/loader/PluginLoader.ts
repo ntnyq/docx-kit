@@ -42,12 +42,13 @@ export interface PluginLoaderOptions {
 export interface PluginLoadResult<
   TName extends string = string,
   TOptions = unknown,
+  TRender = unknown,
 > {
   /** Resolved manifest (`null` for inline sources). */
   manifest: PluginManifest | null
 
   /** The loaded plugin instance. */
-  plugin: DocxPlugin<TName, TOptions>
+  plugin: DocxPlugin<TName, TOptions, TRender>
 
   /** The source used to load this plugin. */
   source: PluginSource
@@ -164,9 +165,11 @@ export class PluginLoader {
    * @throws {DocxKitError} `MANIFEST_INVALID` on manifest validation failure
    * @throws {DocxKitError} `PLUGIN_VERSION_MISMATCH` on incompatible version
    */
-  async load<TName extends string = string, TOptions = unknown>(
-    source: PluginSource,
-  ): Promise<PluginLoadResult<TName, TOptions>> {
+  async load<
+    TName extends string = string,
+    TOptions = unknown,
+    TRender = unknown,
+  >(source: PluginSource): Promise<PluginLoadResult<TName, TOptions, TRender>> {
     // Security check: allowLoad
     await this.checkAllowLoad(source)
 
@@ -210,7 +213,7 @@ export class PluginLoader {
 
     return {
       manifest: result.manifest,
-      plugin: result.plugin as DocxPlugin<TName, TOptions>,
+      plugin: result.plugin as DocxPlugin<TName, TOptions, TRender>,
       source,
     }
   }

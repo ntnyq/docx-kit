@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { resolveStyle } from '../../src/style/normalizeStyle'
 import { resolveThemeTokens } from '../../src/style/theme'
-import type { DocxTheme } from '../../src/types/document'
+import type { DocxStyleRule, DocxTheme } from '@docxkit/types'
 
 // -------------------------------------------------------------------
 // Theme token resolution
@@ -20,54 +20,57 @@ describe('resolveThemeTokens', () => {
   }
 
   it('resolves $colors.token references', () => {
-    const rule = { backgroundColor: '$colors.muted', color: '$colors.primary' }
-    const resolved = resolveThemeTokens(rule as any, theme)
+    const rule: DocxStyleRule = {
+      backgroundColor: '$colors.muted',
+      color: '$colors.primary',
+    }
+    const resolved = resolveThemeTokens(rule, theme)
     expect(resolved).toEqual({ backgroundColor: '#6b7280', color: '#1a56db' })
   })
 
   it('resolves $fonts.token references', () => {
-    const rule = { fontFamily: '$fonts.heading' }
-    const resolved = resolveThemeTokens(rule as any, theme)
+    const rule: DocxStyleRule = { fontFamily: '$fonts.heading' }
+    const resolved = resolveThemeTokens(rule, theme)
     expect(resolved).toEqual({ fontFamily: 'Georgia' })
   })
 
   it('resolves $spacing.token references', () => {
-    const rule = { marginBottom: '$spacing.lg' }
-    const resolved = resolveThemeTokens(rule as any, theme)
+    const rule: DocxStyleRule = { marginBottom: '$spacing.lg' }
+    const resolved = resolveThemeTokens(rule, theme)
     expect(resolved).toEqual({ marginBottom: 24 })
   })
 
   it('resolves $fontSize.token references', () => {
-    const rule = { fontSize: '$fontSize.lg' }
-    const resolved = resolveThemeTokens(rule as any, theme)
+    const rule: DocxStyleRule = { fontSize: '$fontSize.lg' }
+    const resolved = resolveThemeTokens(rule, theme)
     expect(resolved).toEqual({ fontSize: 16 })
   })
 
   it('returns original rule unchanged when no theme provided', () => {
-    const rule = { color: '$colors.primary', fontSize: 12 }
-    const resolved = resolveThemeTokens(rule as any, undefined)
+    const rule: DocxStyleRule = { color: '$colors.primary', fontSize: 12 }
+    const resolved = resolveThemeTokens(rule, undefined)
     expect(resolved).toEqual({ color: '$colors.primary', fontSize: 12 })
   })
 
   it('leaves unknown token references as-is', () => {
-    const rule = { color: '$colors.unknown' }
-    const resolved = resolveThemeTokens(rule as any, theme)
+    const rule: DocxStyleRule = { color: '$colors.unknown' }
+    const resolved = resolveThemeTokens(rule, theme)
     expect(resolved).toEqual({ color: '$colors.unknown' })
   })
 
   it('leaves non-token string values as-is', () => {
-    const rule = { color: '#ff0000', fontFamily: 'Arial' }
-    const resolved = resolveThemeTokens(rule as any, theme)
+    const rule: DocxStyleRule = { color: '#ff0000', fontFamily: 'Arial' }
+    const resolved = resolveThemeTokens(rule, theme)
     expect(resolved).toEqual({ color: '#ff0000', fontFamily: 'Arial' })
   })
 
   it('resolves mixed token and literal values', () => {
-    const rule = {
+    const rule: DocxStyleRule = {
       color: '$colors.primary',
       fontFamily: '$fonts.body',
       fontSize: 14,
     }
-    const resolved = resolveThemeTokens(rule as any, theme)
+    const resolved = resolveThemeTokens(rule, theme)
     expect(resolved).toEqual({
       color: '#1a56db',
       fontFamily: 'Arial',
@@ -76,7 +79,7 @@ describe('resolveThemeTokens', () => {
   })
 
   it('does not mutate the input rule', () => {
-    const rule = { color: '$colors.primary' } as any
+    const rule: DocxStyleRule = { color: '$colors.primary' }
     resolveThemeTokens(rule, theme)
     expect(rule.color).toBe('$colors.primary')
   })

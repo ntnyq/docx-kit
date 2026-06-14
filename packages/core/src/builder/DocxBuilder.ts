@@ -418,8 +418,8 @@ export class DocxBuilder<
    *   .plugin('qrcode', { text: 'https://example.com' })
    * ```
    */
-  use<TName extends string, TOptions>(
-    plugin: DocxPlugin<TName, TOptions>,
+  use<TName extends string, TOptions, TRender>(
+    plugin: DocxPlugin<TName, TOptions, TRender>,
   ): DocxBuilder<TStyles, Record<TName, TOptions> & TPlugins> {
     this.plugins.register(plugin)
     return this as unknown as DocxBuilder<

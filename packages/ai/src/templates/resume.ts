@@ -7,8 +7,8 @@
  * @module ai/templates/resume
  */
 
-import type { DocxSchema } from '@docxkit/core'
-import type { AiTemplate } from '../types'
+import type { BlockNode, DocxSchema, PluginNode } from '@docxkit/core'
+import type { AiTemplate, AiTemplateSchema } from '../types'
 
 /** Resume template parameters. */
 export interface ResumeParams {
@@ -64,7 +64,7 @@ Use the following docx-kit node types:
 Maintain a professional tone appropriate for the resume type.
 `
 
-const schema = {
+const schema: AiTemplateSchema = {
   description: 'Professional resume/CV with experience, education, and skills',
   title: 'ResumeParams',
   type: 'object',
@@ -124,13 +124,15 @@ const schema = {
  * @returns A DocxSchema ready for rendering
  */
 function generate(params: ResumeParams): DocxSchema {
-  const content: any[] = [{ level: 1, text: params.name, type: 'heading' }]
+  const content: BlockNode[] = [
+    { level: 1, text: params.name, type: 'heading' },
+  ]
 
   // Name header
 
   // Contact info
 
-  const contactItems: any[] = []
+  const contactItems: { key: string; value: string }[] = []
   if (params.email) {
     contactItems.push({ key: 'Email', value: params.email })
   }
@@ -139,11 +141,12 @@ function generate(params: ResumeParams): DocxSchema {
   }
 
   if (contactItems.length > 0) {
-    content.push({
+    const propertyTableNode: PluginNode<'propertyTable'> = {
       name: 'propertyTable',
       options: { items: contactItems },
       type: 'plugin',
-    })
+    }
+    content.push(propertyTableNode)
   }
 
   // Summary
@@ -192,13 +195,13 @@ function generate(params: ResumeParams): DocxSchema {
     )
   }
 
-  return { content } as any as DocxSchema
+  return { content }
 }
 
 export const resumeTemplate: AiTemplate<ResumeParams> = {
   description: 'Professional resume/CV with experience, education, and skills',
   generate,
   name: 'resume',
-  schema: schema as any,
+  schema,
   systemPrompt,
 }
