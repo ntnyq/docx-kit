@@ -73,6 +73,7 @@ For individual package work:
 - Plugin packages depend on `@docxkit/core` via `peerDependencies: { "@docxkit/core": "workspace:*" }`.
 - Each sub-package's tsconfig extends root `../../tsconfig.json`.
 - tsdown configs use `platform: 'neutral'` for platform-agnostic packages (outputs `.js`/`.d.ts`).
+- All non-private packages **must** include `"publishConfig": { "access": "public" }` in their `package.json` to ensure npm publish works correctly for scoped packages.
 
 ## Project Pitfalls
 
