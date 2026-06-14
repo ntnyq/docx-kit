@@ -39,6 +39,8 @@ export function invoicePlugin() {
   return definePlugin<'invoice', InvoiceOptions>({
     name: 'invoice',
     render(options) {
+      validateInvoiceOptions(options)
+
       const currency = options.currency ?? ''
       const subtotal = options.items.reduce(
         (sum, item) => sum + item.quantity * item.unitPrice,
@@ -201,4 +203,25 @@ function partyLines(label: string, party: InvoiceParty) {
       new TextRun({ text: values.join(' · ') }),
     ],
   })
+}
+
+function validateInvoiceOptions(options: InvoiceOptions) {
+  for (const item of options.items) {
+    if (!Number.isFinite(item.quantity) || item.quantity <= 0) {
+      throw new Error('Invoice item quantity must be a positive number')
+    }
+
+    if (!Number.isFinite(item.unitPrice) || item.unitPrice < 0) {
+      throw new Error('Invoice item unit price must be a non-negative number')
+    }
+  }
+
+  if (
+    options.taxRate != null
+    && (!Number.isFinite(options.taxRate)
+      || options.taxRate < 0
+      || options.taxRate > 1)
+  ) {
+    throw new Error('Invoice tax rate must be between 0 and 1')
+  }
 }

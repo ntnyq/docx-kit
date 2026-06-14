@@ -1,5 +1,5 @@
 import { definePlugin } from '@docxkit/core'
-import { HeadingLevel, Paragraph, TableOfContents, TextRun } from 'docx'
+import { Paragraph, TableOfContents, TextRun } from 'docx'
 
 export interface TocOptions {
   maxLevel?: number
@@ -10,12 +10,14 @@ export function tocPlugin() {
   return definePlugin<'toc', TocOptions>({
     name: 'toc',
     render(options) {
-      const maxLevel = options.maxLevel ?? 3
+      const maxLevel = Math.min(
+        9,
+        Math.max(1, Math.trunc(options.maxLevel ?? 3)),
+      )
       const range = `1-${maxLevel}`
 
       return [
         new Paragraph({
-          heading: HeadingLevel.HEADING_1,
           spacing: { after: 200 },
           children: [
             new TextRun({

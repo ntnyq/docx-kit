@@ -27,4 +27,23 @@ describe('tocPlugin', () => {
     expect(xml).toContain('目录')
     expect(xml).toContain('1-2')
   })
+
+  it('does not render the title as an indexed heading', () => {
+    const result = tocPlugin().render(
+      { maxLevel: 3, title: 'Contents' },
+      createPluginTestContext(),
+    )
+    const xml = JSON.stringify((result as any[])[0])
+    expect(xml).not.toContain('Heading1')
+  })
+
+  it('clamps maxLevel to a valid heading range', () => {
+    const result = tocPlugin().render(
+      { maxLevel: 0, title: 'Contents' },
+      createPluginTestContext(),
+    )
+    const xml = JSON.stringify(result)
+    expect(xml).toContain('1-1')
+    expect(xml).not.toContain('1-0')
+  })
 })

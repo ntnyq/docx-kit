@@ -49,4 +49,35 @@ describe('invoicePlugin', () => {
     expect(xml).toContain('Thank you for your business.')
     expect(xml).toContain('1,200.00')
   })
+
+  it('rejects negative line item quantities', () => {
+    expect(() =>
+      invoicePlugin().render(
+        {
+          date: '2026-06-14',
+          from: { name: 'Acme Corp' },
+          invoiceNumber: 'INV-003',
+          items: [{ description: 'Consulting', quantity: -1, unitPrice: 5000 }],
+          to: { name: 'Client Inc' },
+        },
+        createPluginTestContext(),
+      ),
+    ).toThrow(/quantity/i)
+  })
+
+  it('rejects out-of-range tax rates', () => {
+    expect(() =>
+      invoicePlugin().render(
+        {
+          date: '2026-06-14',
+          from: { name: 'Acme Corp' },
+          invoiceNumber: 'INV-004',
+          items: [{ description: 'Consulting', quantity: 1, unitPrice: 5000 }],
+          taxRate: 1.5,
+          to: { name: 'Client Inc' },
+        },
+        createPluginTestContext(),
+      ),
+    ).toThrow(/tax/i)
+  })
 })

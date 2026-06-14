@@ -5,24 +5,24 @@
  * @module docx-kit/plugin-map
  */
 
+import type { BadgeOptions } from '@docxkit/plugin-badge'
 import type { CalloutOptions } from '@docxkit/plugin-callout'
+import type { ChangelogOptions } from '@docxkit/plugin-changelog'
 import type { CodeBlockOptions } from '@docxkit/plugin-code-block'
 import type { CoverPageOptions } from '@docxkit/plugin-cover-page'
 import type { DataTableOptions } from '@docxkit/plugin-data-table'
+import type { DividerOptions } from '@docxkit/plugin-divider'
 import type { EChartsPluginOptions } from '@docxkit/plugin-echarts'
+import type { InvoiceOptions } from '@docxkit/plugin-invoice'
+import type { LetterheadOptions } from '@docxkit/plugin-letterhead'
 import type { MeetingMinutesOptions } from '@docxkit/plugin-meeting-minutes'
 import type { PageNumberOptions } from '@docxkit/plugin-page-number'
 import type { PropertyTableOptions } from '@docxkit/plugin-property-table'
 import type { QRCodePluginOptions } from '@docxkit/plugin-qrcode'
 import type { SignatureBlockOptions } from '@docxkit/plugin-signature-block'
 import type { TimelineOptions } from '@docxkit/plugin-timeline'
+import type { TocOptions } from '@docxkit/plugin-toc'
 import type { WatermarkOptions } from '@docxkit/plugin-watermark'
-import type { BadgeOptions } from '../../../../packages-plugins/badge/src'
-import type { ChangelogOptions } from '../../../../packages-plugins/changelog/src'
-import type { DividerOptions } from '../../../../packages-plugins/divider/src'
-import type { InvoiceOptions } from '../../../../packages-plugins/invoice/src'
-import type { LetterheadOptions } from '../../../../packages-plugins/letterhead/src'
-import type { TocOptions } from '../../../../packages-plugins/toc/src'
 
 declare module '@docxkit/core' {
   export interface BuiltinPluginMap {

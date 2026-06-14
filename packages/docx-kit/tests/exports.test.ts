@@ -58,3 +58,18 @@ describe('browser.ts — platform exports', () => {
     expect(mod.normalizeImageData).toBeDefined()
   })
 })
+
+describe('dist exports — published package smoke tests', () => {
+  it('loads browser dist entrypoint', async () => {
+    const mod = await import('../dist/browser.js')
+    expect(mod.badgePlugin).toBeDefined()
+    expect(mod.invoicePlugin).toBeDefined()
+    expect(mod.tocPlugin).toBeDefined()
+  })
+
+  it('loads node dist entrypoint', async () => {
+    const mod = await import('../dist/node.js')
+    expect(mod.saveDocument).toBeDefined()
+    expect(mod.letterheadPlugin).toBeDefined()
+  })
+})
