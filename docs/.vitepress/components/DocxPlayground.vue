@@ -1,8 +1,18 @@
 <script setup lang="ts">
 import { createDocxPreview } from 'docx-kit'
-import { nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import {
+  nextTick,
+  onBeforeUnmount,
+  ref,
+  shallowRef,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import { useDocxPlayground } from '../composables/useDocxPlayground'
+import ThemeStudio from './theme-studio/ThemeStudio.vue'
 import type { DocxPreview } from 'docx-kit'
+
+const activeMode = shallowRef<'code' | 'theme'>('code')
 
 const {
   activePreset,
@@ -79,146 +89,172 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="playground-container">
-    <div class="editor-panel">
-      <div class="panel-header">
-        <span class="panel-title">Code Editor</span>
-        <div class="panel-actions">
-          <!-- Style preset selector -->
-          <div class="style-preset-bar">
-            <span class="style-preset-label">Style:</span>
-            <button
-              @click="selectStylePreset(null)"
-              :class="{ active: activeStylePreset === null }"
-              class="style-preset-btn"
-              type="button"
-            >
-              None
-            </button>
-            <button
-              @click="selectStylePreset(sp)"
-              v-for="sp in stylePresets"
-              :key="sp.id"
-              :class="{ active: activeStylePreset?.id === sp.id }"
-              :title="sp.description"
-              class="style-preset-btn"
-              type="button"
-            >
-              {{ sp.name }}
-            </button>
-          </div>
-          <button
-            @click="resetCode"
-            class="btn btn-ghost"
-            title="Reset to default example"
-            type="button"
-          >
-            Reset
-          </button>
-          <button
-            @click="run"
-            :disabled="loading"
-            class="btn btn-primary"
-            type="button"
-          >
-            {{ loading ? 'Running...' : '▶ Run' }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Example preset tabs -->
-      <div class="preset-tabs">
-        <button
-          @click="loadPreset(preset)"
-          v-for="preset in presets"
-          :key="preset.label"
-          :class="{ active: activePreset === preset.label }"
-          class="preset-tab"
-          type="button"
-        >
-          {{ preset.label }}
-        </button>
-      </div>
-
-      <div
-        v-if="editorError"
-        class="editor-error"
+  <div class="playground-shell">
+    <div class="mode-switch">
+      <button
+        @click="activeMode = 'code'"
+        :class="{ active: activeMode === 'code' }"
+        class="mode-switch-btn"
+        type="button"
       >
-        <strong>Editor Error:</strong>
-        <pre>{{ editorError }}</pre>
-      </div>
-      <div
-        ref="editorContainer"
-        :class="{ hidden: !!editorError }"
-        class="editor-wrapper"
-      />
+        Code Lab
+      </button>
+      <button
+        @click="activeMode = 'theme'"
+        :class="{ active: activeMode === 'theme' }"
+        class="mode-switch-btn"
+        type="button"
+      >
+        Theme Studio
+      </button>
     </div>
 
-    <div class="preview-panel">
-      <div class="panel-header">
-        <span class="panel-title">Preview</span>
-        <div class="panel-actions">
+    <ThemeStudio v-if="activeMode === 'theme'" />
+
+    <div
+      v-else
+      class="playground-container"
+    >
+      <div class="editor-panel">
+        <div class="panel-header">
+          <span class="panel-title">Code Editor</span>
+          <div class="panel-actions">
+            <!-- Style preset selector -->
+            <div class="style-preset-bar">
+              <span class="style-preset-label">Style:</span>
+              <button
+                @click="selectStylePreset(null)"
+                :class="{ active: activeStylePreset === null }"
+                class="style-preset-btn"
+                type="button"
+              >
+                None
+              </button>
+              <button
+                @click="selectStylePreset(sp)"
+                v-for="sp in stylePresets"
+                :key="sp.id"
+                :class="{ active: activeStylePreset?.id === sp.id }"
+                :title="sp.description"
+                class="style-preset-btn"
+                type="button"
+              >
+                {{ sp.name }}
+              </button>
+            </div>
+            <button
+              @click="resetCode"
+              class="btn btn-ghost"
+              title="Reset to default example"
+              type="button"
+            >
+              Reset
+            </button>
+            <button
+              @click="run"
+              :disabled="loading"
+              class="btn btn-primary"
+              type="button"
+            >
+              {{ loading ? 'Running...' : '▶ Run' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Example preset tabs -->
+        <div class="preset-tabs">
           <button
-            @click="download"
-            :disabled="!resultBlob"
-            class="btn btn-success"
-            title="Download .docx file"
+            @click="loadPreset(preset)"
+            v-for="preset in presets"
+            :key="preset.label"
+            :class="{ active: activePreset === preset.label }"
+            class="preset-tab"
             type="button"
           >
-            ⤓ Download
+            {{ preset.label }}
           </button>
         </div>
+
+        <div
+          v-if="editorError"
+          class="editor-error"
+        >
+          <strong>Editor Error:</strong>
+          <pre>{{ editorError }}</pre>
+        </div>
+        <div
+          ref="editorContainer"
+          :class="{ hidden: !!editorError }"
+          class="editor-wrapper"
+        />
       </div>
-      <div class="preview-content">
-        <!-- Run error: blocks everything -->
-        <div
-          v-if="error"
-          class="error-box"
-        >
-          <strong>Run Error:</strong>
-          <pre>{{ error }}</pre>
-        </div>
 
-        <!-- Stage: rendered preview + overlays -->
-        <div
-          v-else-if="resultBlob"
-          class="preview-stage"
-        >
-          <div
-            ref="previewContainer"
-            class="preview-renderer"
-          />
-
-          <!-- Loading overlay -->
-          <div
-            v-if="previewLoading"
-            class="preview-overlay loading-overlay"
-          >
-            <div class="spinner" />
-            <p>Rendering preview…</p>
-          </div>
-
-          <!-- Preview error overlay -->
-          <div
-            v-if="previewError"
-            class="preview-overlay error-overlay"
-          >
-            <strong>Preview Error</strong>
-            <pre>{{ previewError }}</pre>
-            <p class="hint">
-              You can still download the .docx file using the button above.
-            </p>
+      <div class="preview-panel">
+        <div class="panel-header">
+          <span class="panel-title">Preview</span>
+          <div class="panel-actions">
+            <button
+              @click="download"
+              :disabled="!resultBlob"
+              class="btn btn-success"
+              title="Download .docx file"
+              type="button"
+            >
+              ⤓ Download
+            </button>
           </div>
         </div>
+        <div class="preview-content">
+          <!-- Run error: blocks everything -->
+          <div
+            v-if="error"
+            class="error-box"
+          >
+            <strong>Run Error:</strong>
+            <pre>{{ error }}</pre>
+          </div>
 
-        <!-- Placeholder: no result yet -->
-        <div
-          v-else
-          class="placeholder"
-        >
-          <div class="placeholder-icon">&#128196;</div>
-          <p>Click <strong>Run</strong> to generate a document.</p>
-          <p class="hint">Select an example above or write your own code.</p>
+          <!-- Stage: rendered preview + overlays -->
+          <div
+            v-else-if="resultBlob"
+            class="preview-stage"
+          >
+            <div
+              ref="previewContainer"
+              class="preview-renderer"
+            />
+
+            <!-- Loading overlay -->
+            <div
+              v-if="previewLoading"
+              class="preview-overlay loading-overlay"
+            >
+              <div class="spinner" />
+              <p>Rendering preview…</p>
+            </div>
+
+            <!-- Preview error overlay -->
+            <div
+              v-if="previewError"
+              class="preview-overlay error-overlay"
+            >
+              <strong>Preview Error</strong>
+              <pre>{{ previewError }}</pre>
+              <p class="hint">
+                You can still download the .docx file using the button above.
+              </p>
+            </div>
+          </div>
+
+          <!-- Placeholder: no result yet -->
+          <div
+            v-else
+            class="placeholder"
+          >
+            <div class="placeholder-icon">&#128196;</div>
+            <p>Click <strong>Run</strong> to generate a document.</p>
+            <p class="hint">Select an example above or write your own code.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -226,6 +262,41 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.playground-shell {
+  display: grid;
+  gap: 14px;
+}
+
+.mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 6px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  background: var(--vp-c-bg-soft);
+}
+
+.mode-switch-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.mode-switch-btn.active {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
 .playground-container {
   display: flex;
   gap: 0;
@@ -467,6 +538,16 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 768px) {
+  .playground-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .editor-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--vp-c-divider);
+  }
+
   .preview-renderer {
     padding: 12px;
   }
