@@ -1,110 +1,35 @@
-# AGENTS
+# Repository Guidelines
 
-Agent operating notes for this repository.
+## Project Structure & Module Organization
 
-## Goal
+This is a pnpm TypeScript monorepo for `docx-kit`, a plugin-extensible DOCX generation toolkit. Workspace packages are declared in `pnpm-workspace.yaml` and live in `packages/*`, `packages-plugins/*`, `packages-presets/*`, and `packages-themes/*`. Each package generally contains `src/` for implementation, `tests/` for Vitest coverage, its own `package.json`, `tsconfig.json`, and `tsdown.config.ts`. Documentation is in `docs/`, including VitePress guide, API, ecosystem, and example pages. Shared build and test configuration lives at the repository root.
 
-- Maintain and extend a TypeScript DOCX generation library with a CSS-like style DSL and plugin-based rendering.
-- Keep public API stable unless the task explicitly requests a breaking change.
+## Build, Test, and Development Commands
 
-## Monorepo Structure
+Use pnpm 11.8.0, as specified in `package.json`.
 
-This is a **pnpm workspace monorepo** with packages organized by category:
+- `pnpm install`: install workspace dependencies.
+- `pnpm run build`: build all non-docs packages through recursive package scripts.
+- `pnpm run dev`: run package development tasks in parallel, excluding docs.
+- `pnpm run docs:dev`: start the documentation site locally.
+- `pnpm run docs:build`: build the documentation site.
+- `pnpm run lint`: run ESLint across the repository.
+- `pnpm run typecheck`: run `tsc --noEmit` in every workspace package.
+- `pnpm test`: run the Vitest suite.
+- `pnpm run release:check`: run lint, typecheck, and tests before versioning.
 
-```
-packages/            — Core infrastructure packages
-  core/              — @docxkit/core: builder, compiler, DSL, style, types, utilities, PluginLoader
-  docx-kit/          — docx-kit umbrella: re-exports all, browser/node platform entries
-  loader/            — @docxkit/loader: plugin loading (inline, npm, url, local)
-  pdk/               — @docxkit/pdk: plugin development kit
-  registry/          — @docxkit/registry: plugin registry search
-  ai/                — @docxkit/ai: AI template system
-  mcp/               — @docxkit/mcp: MCP server
-  create-plugin/     — @docxkit/create-plugin: scaffold CLI
+## Coding Style & Naming Conventions
 
-packages-plugins/    — 12 plugin packages (@docxkit/plugin-{name})
-packages-presets/    — 3 style presets (@docxkit/preset-{name})
-packages-themes/     — 3 themes (@docxkit/theme-{name})
-```
+Use TypeScript ESM. Follow `.editorconfig`: UTF-8, LF endings, final newline, 2-space indentation, and trimmed trailing whitespace except in Markdown. ESLint uses `@ntnyq/eslint-config` with perfectionist sorting enabled; Prettier uses `@ntnyq/prettier-config`. Prefer descriptive camelCase for variables and functions, PascalCase for classes and exported types, and kebab-case for package or documentation file names.
 
-Each package uses **tsdown** for building with `platform: 'neutral'` (outputs `.js`/`.d.ts`).
+## Testing Guidelines
 
-The legacy `src/` and `tests/` directories still exist for the root package but will eventually be removed.
+Tests use Vitest and are colocated in each package’s `tests/` directory. Name tests by behavior or module, using `*.test.ts` such as `renderer.test.ts` or `PluginLoader.test.ts`. Add focused tests for new public APIs, plugin behavior, rendering changes, and error handling. Run `pnpm test` before submitting broad changes, and pair it with `pnpm run typecheck` for type-level changes.
 
-## Essential Commands
+## Commit & Pull Request Guidelines
 
-- Install: `pnpm install --frozen-lockfile`
-- Lint: `pnpm run lint`
-- Typecheck: `pnpm run typecheck` (runs `tsc --noEmit` in all packages)
-- Test: `pnpm run test` (runs vitest in all packages)
-- Build: `pnpm run build` (builds all packages via tsdown)
-- Release gate equivalent: `pnpm run lint && pnpm run typecheck && pnpm run test`
+Recent history follows Conventional Commit-style subjects, for example `feat: add package types`, `fix: validate plugin parameters`, and `docs: add theme studio`. Keep commits scoped and imperative. Pull requests should include a short description, affected packages or docs paths, linked issues when available, and the commands run for verification. Include screenshots only for visible docs or playground changes.
 
-For individual package work:
-- `cd packages/core && pnpm run build` — build a single package
-- `cd packages-plugins/echarts && npx tsc --noEmit` — typecheck a single package
-- `cd packages/core && pnpm run test` — run tests for a single package
+## Agent-Specific Instructions
 
-## Project Map
-
-- **Core engine**: [packages/core/src/index.ts](packages/core/src/index.ts)
-- Umbrella package: [packages/docx-kit/src/browser.ts](packages/docx-kit/src/browser.ts), [packages/docx-kit/src/node.ts](packages/docx-kit/src/node.ts)
-- Fluent builder API: [packages/core/src/builder/DocxBuilder.ts](packages/core/src/builder/DocxBuilder.ts)
-- JSON schema entry/factory: [packages/core/src/builder/createDocx.ts](packages/core/src/builder/createDocx.ts)
-- Document orchestration: [packages/core/src/compiler/compileDocument.ts](packages/core/src/compiler/compileDocument.ts)
-- Node compilation switch: [packages/core/src/compiler/compileNode.ts](packages/core/src/compiler/compileNode.ts)
-- Style compilation: [packages/core/src/compiler/compileStyle.ts](packages/core/src/compiler/compileStyle.ts)
-- Unit conversion rules: [packages/core/src/compiler/units.ts](packages/core/src/compiler/units.ts)
-- Style cascade resolution: [packages/core/src/style/normalizeStyle.ts](packages/core/src/style/normalizeStyle.ts)
-- Node DSL types: [packages/core/src/dsl/nodes.ts](packages/core/src/dsl/nodes.ts)
-- Plugin contracts: [packages/core/src/types/plugin.ts](packages/core/src/types/plugin.ts)
-- PluginLoader: [packages/core/src/loader/PluginLoader.ts](packages/core/src/loader/PluginLoader.ts)
-- Built-in plugins: [packages-plugins/](packages-plugins/) (12 packages)
-
-## Conventions To Follow
-
-- Preserve discriminated unions for node handling (`type` field in node shapes).
-- Keep compiler branching exhaustive; unknown node types should fail with `DocxKitError`.
-- Maintain generic type flow for style and plugin safety (`TStyles`, `TPlugins`).
-- Prefer type-only imports where possible.
-- Keep style precedence unchanged: base -> className(s) -> inline.
-- Keep error codes structured via [packages/core/src/errors.ts](packages/core/src/errors.ts).
-- New plugins go in `packages-plugins/` as independent packages named `@docxkit/plugin-{name}`.
-- Plugin packages depend on `@docxkit/core` via `peerDependencies: { "@docxkit/core": "workspace:*" }`.
-- Each sub-package's tsconfig extends root `../../tsconfig.json`.
-- tsdown configs use `platform: 'neutral'` for platform-agnostic packages (outputs `.js`/`.d.ts`).
-- All non-private packages **must** include `"publishConfig": { "access": "public" }` in their `package.json` to ensure npm publish works correctly for scoped packages.
-
-## Project Pitfalls
-
-- Unit defaults differ by context:
-  - `toPtHalf`: bare numbers are points.
-  - `toTwip`: bare numbers are points.
-  - `toPx`: bare numbers are pixels.
-- Optional peer dependencies are loaded dynamically:
-  - `echarts` and `qrcode` and `highlight.js` are peer deps, not required unless those plugins are used.
-- Plugin nodes require prior registration via `builder.use(...)`; otherwise compile should throw plugin-not-registered.
-- **tsdown extension**: `platform: 'neutral'` or `platform: 'browser'` outputs `.js`/`.d.ts`; `platform: 'node'` with `fixedExtension: false` also outputs `.js`/`.d.ts`. Without either, it defaults to `.mjs`/`.d.mts`.
-
-## Validation Expectations For Changes
-
-- For code changes, run at least:
-  - `pnpm run lint`
-  - `pnpm run typecheck`
-  - `pnpm run test`
-- If changing exports, verify the umbrella package's [packages/docx-kit/src/browser.ts](packages/docx-kit/src/browser.ts) and build output.
-- If changing compiler behavior, update or add tests in the appropriate package's `__tests__/` directory.
-- If adding a new plugin, create a package under `packages-plugins/` with proper build config.
-
-## CI Reference
-
-- Main CI checks: [.github/workflows/ci.yml](.github/workflows/ci.yml)
-- Auto-fix workflow: [.github/workflows/autofix.yml](.github/workflows/autofix.yml)
-- Release workflow: [.github/workflows/release.yml](.github/workflows/release.yml)
-
-## Additional Context
-
-- Overview and package description: [README.md](README.md)
-- Build/lint/test scripts and dependency policy: [package.json](package.json)
-- Workspace config: [pnpm-workspace.yaml](pnpm-workspace.yaml)
-- Test count: 526 (as of 2026-06-12)
+When using shell commands in this repository, prefix commands with `rtk`, for example `rtk pnpm test` or `rtk git status`.

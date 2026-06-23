@@ -2,7 +2,7 @@
   "name": "docx-kit",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@11.5.2",
+  "packageManager": "pnpm@11.8.0",
   "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
   "license": "MIT",
   "scripts": {
@@ -21,20 +21,20 @@
   "devDependencies": {
     "@ntnyq/eslint-config": "^6.1.5",
     "@ntnyq/prettier-config": "^3.0.1",
-    "@types/node": "^25.9.2",
+    "@types/node": "^26.0.0",
     "@types/qrcode": "^1.5.6",
     "bumpp": "^11.1.0",
     "echarts": "^6.1.0",
-    "eslint": "^10.4.1",
+    "eslint": "^10.5.0",
     "husky": "^9.1.7",
     "nano-staged": "^1.0.2",
-    "npm-run-all2": "^9.0.1",
+    "npm-run-all2": "^9.0.2",
     "prettier": "^3.8.4",
     "qrcode": "^1.5.4",
-    "tsdown": "^0.22.2",
+    "tsdown": "^0.22.3",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.9"
   },
   "nano-staged": {
     "*.{js,ts,mjs,cjs,md,vue,yml,yaml,toml,json}": "eslint --fix",

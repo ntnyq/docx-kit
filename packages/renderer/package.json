@@ -40,6 +40,6 @@
   },
   "devDependencies": {
     "@docxkit/core": "workspace:*",
-    "happy-dom": "^15.11.7"
+    "happy-dom": "^20.10.6"
   }
 }
