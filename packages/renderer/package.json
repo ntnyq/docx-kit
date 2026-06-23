@@ -35,11 +35,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@docxkit/types": "workspace:*",
     "docx-preview": "0.3.7",
     "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "@docxkit/core": "workspace:*",
     "happy-dom": "^20.10.6"
   }
 }

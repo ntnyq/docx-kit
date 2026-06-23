@@ -13,6 +13,10 @@
  * @module utils/dataUrl
  */
 
+interface BufferConstructorLike {
+  from(data: string, encoding: 'base64'): Uint8Array
+}
+
 /**
  * Decode a base64 data-URL to raw bytes (works in both browser & Node.js).
  *
@@ -32,7 +36,12 @@
 export async function dataUrlToUint8Array(
   dataUrl: string,
 ): Promise<Uint8Array> {
-  const base64 = dataUrl.split(',')[1]
+  const payloadStart = dataUrl.indexOf(',')
+  if (payloadStart === -1) {
+    throw new Error('Expected a base64 data URL payload')
+  }
+
+  const base64 = dataUrl.slice(payloadStart + 1)
 
   // Browser path: use atob
   if (typeof atob === 'function') {
@@ -45,7 +54,21 @@ export async function dataUrlToUint8Array(
     return bytes
   }
 
-  // Node.js path: use Buffer
-  const { Buffer } = await import('node:buffer')
-  return new Uint8Array(Buffer.from(base64, 'base64'))
+  // Node.js path: use the global Buffer without importing `node:buffer`, so
+  // neutral/browser bundles do not need to resolve Node built-ins.
+  const bufferConstructor = Reflect.get(globalThis, 'Buffer') as unknown
+  if (!isBufferConstructorLike(bufferConstructor)) {
+    throw new Error('No base64 decoder is available in this environment')
+  }
+  return new Uint8Array(bufferConstructor.from(base64, 'base64'))
+}
+
+function isBufferConstructorLike(
+  value: unknown,
+): value is BufferConstructorLike {
+  return (
+    (typeof value === 'function'
+      || (typeof value === 'object' && value !== null))
+    && typeof Reflect.get(value, 'from') === 'function'
+  )
 }

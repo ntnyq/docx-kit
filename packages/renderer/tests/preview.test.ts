@@ -202,6 +202,7 @@ describe('createDocxPreview', () => {
 
   describe('Microsoft renderer', () => {
     it('embeds iframe for URL input', async () => {
+      container.remove()
       preview = createDocxPreview(container, { renderer: 'microsoft' })
 
       await preview.render('https://example.com/test.docx')
@@ -214,6 +215,7 @@ describe('createDocxPreview', () => {
     })
 
     it('supports custom microsoftViewerUrl', async () => {
+      container.remove()
       preview = createDocxPreview(container, {
         microsoftViewerUrl: 'https://oos.example.com/view?src=',
         renderer: 'microsoft',

@@ -1,6 +1,6 @@
 # docx-kit vs docxjs (dolanmiu/docx) — Feature Gap Analysis
 
-> Generated: 2026-06-11 | docx-kit v? | docxjs v9.7.1
+> Updated: 2026-06-23 | docx-kit v0.3.0 | docxjs v9.7.1
 
 ---
 
@@ -13,8 +13,8 @@
 | Priority | Count | Impact |
 |----------|-------|--------|
 | **P0 — Critical** | 4 | ✅ All implemented |
-| **P1 — High** | 8 | Common document features not yet exposed |
-| **P2 — Medium** | 12 | Nice-to-have, possible with docx escape hatch |
+| **P1 — High** | 2 remaining | Cell merging and nested numbering remain common high-value gaps |
+| **P2 — Medium** | 10 remaining | Nice-to-have, possible with docx escape hatch or plugins |
 | **P3 — Low/Niche** | 8 | Advanced/rarely-used features |
 
 ---
@@ -44,7 +44,7 @@
 | Multiple columns | ✅ | ❌ | — | P2 |
 | Column breaks | ✅ | ❌ | — | P3 |
 | Line numbers | ✅ | ❌ | — | P3 |
-| Page numbers | ✅ | ❌ | Not exposed | P1 |
+| Page numbers | ✅ | ✅ | `@docxkit/plugin-page-number` | P1 ✅ |
 | Restart page numbers | ✅ | ❌ | — | P2 |
 | Section types (continuous/next page) | ✅ | ❌ | — | P1 |
 | Page break before | ✅ | ❌ (only `pageBreak()` node) | — | P2 |
@@ -61,9 +61,9 @@
 | **Numbering / bullet lists** | ✅ | ✅ | `.bulletList()` / `.numberedList()` | **P0** ✅ |
 | **Numbered (ordered) lists** | ✅ | ✅ | `.numberedList({ numberingFormat })` | **P0** ✅ |
 | Nested numbering | ✅ | ❌ | — | P1 |
-| **Hyperlinks** | ✅ | ❌ | Commonly needed | P1 |
+| **Hyperlinks** | ✅ | ✅ | `HyperlinkNode` + `.hyperlink()` | P1 ✅ |
 | **Bookmarks** | ✅ | ❌ | — | P2 |
-| Table of Contents | ✅ | ❌ | — | P2 |
+| Table of Contents | ✅ | ✅ | `@docxkit/plugin-toc` field plugin | P2 ✅ |
 | Horizontal rule / line | ✅ | ❌ | — | P3 |
 | Text box / text frame | ✅ | ❌ | — | P3 |
 | Tab stops | ✅ | ❌ | — | P2 |
@@ -83,7 +83,7 @@
 | Column width (percentage) | ✅ | ✅ | — | — |
 | Column alignment | ✅ | ✅ | — | — |
 | **Cell merging** | ✅ | ❌ | Common in reports | P1 |
-| Cell shading / background | ✅ | Partial (via `cellStyle.backgroundColor`) | Style → cell mapping | P1 |
+| Cell shading / background | ✅ | ✅ | `backgroundColor` → cell shading | P1 ✅ |
 | Table style presets ("table look") | ✅ | ❌ | — | P2 |
 | Side-by-side tables | ✅ | ❌ | — | P2 |
 | Floating tables | ✅ | ❌ | — | P3 |
@@ -111,9 +111,9 @@
 
 | Property | docxjs Support | Priority | Recommendation |
 |----------|---------------|----------|----------------|
-| `highlight` | `TextRun.highlight` | **P1** | Add with named colors (yellow, green, etc.) |
-| `superScript` / `subScript` | `TextRun.superScript` / `TextRun.subScript` | P1 | Boolean + optional offset |
-| `smallCaps` | `TextRun.smallCaps` | P2 | Boolean |
+| `highlight` | `TextRun.highlight` | **P1** ✅ | Implemented with Word highlight palette |
+| `superScript` / `subScript` | `TextRun.superScript` / `TextRun.subScript` | P1 ✅ | Boolean toggles implemented |
+| `smallCaps` | `TextRun.smallCaps` | P2 ✅ | Boolean implemented |
 | `doubleStrike` | `TextRun.doubleStrike` | P3 | Boolean |
 | `rightToLeft` | `TextRun.rightToLeft` | P2 | Boolean |
 | `characterSpacing` | `TextRun.characterSpacing` | P2 | Number (twips) |
@@ -136,14 +136,14 @@
 
 | Property | docxjs Support | Priority | Recommendation |
 |----------|---------------|----------|----------------|
-| `keepLines` (keep together) | `Paragraph.keepLines` | P2 | Boolean |
-| `keepNext` (keep with next) | `Paragraph.keepNext` | P2 | Boolean |
+| `keepLines` (keep together) | `Paragraph.keepLines` | P2 ✅ | Boolean implemented |
+| `keepNext` (keep with next) | `Paragraph.keepNext` | P2 ✅ | Boolean implemented |
 | `widowControl` | `Paragraph.widowControl` | P3 | Boolean (default true) |
-| `pageBreakBefore` | `Paragraph.pageBreakBefore` | P2 | Boolean |
+| `pageBreakBefore` | `Paragraph.pageBreakBefore` | P2 ✅ | Boolean implemented |
 | `outlineLevel` | `Paragraph.outlineLevel` | P3 | Number (0–9) |
 | `tabStops` | `Paragraph.tabStops` | P2 | Array of tab stop positions |
 | `bullet` / `numbering` | `Paragraph.numbering` | **P0** | Numbering reference |
-| Paragraph borders | `Paragraph.borders` | P1 | Already in type but compiles to cell border only |
+| Paragraph borders | `Paragraph.borders` | P1 ✅ | Paragraph-level border compiler implemented |
 
 ### 3.5 Border System
 
@@ -154,7 +154,7 @@
 | Border styles (dashed/dotted/double/none/single) | ✅ | Enum mapped |
 | Border color | ✅ | Hex → docx border color |
 | Border width | ✅ | pt → twips |
-| **Paragraph borders** | ❌ | Currently compiles as cell border only — need `compileParagraphBorder` |
+| **Paragraph borders** | ✅ | `compileParagraphBorder` maps paragraph borders separately |
 
 ---
 
@@ -174,8 +174,8 @@
 | `table` (built-in) | **P0** | Expose docx's native table as a plugin for advanced options |
 | `numbering` (built-in) | **P0** | Bullet + ordered list support |
 | `header` / `footer` | P1 | Expose header/footer as config + plugin |
-| `toc` | P2 | Auto-generate table of contents from headings |
-| `watermark` | P2 | Text or image watermark |
+| `toc` | P2 ✅ | Field-based table-of-contents plugin |
+| `watermark` | P2 ✅ | Text watermark plugin for header/footer placement |
 | `barcode` | P3 | Companion to QRCode |
 
 ---
@@ -248,25 +248,25 @@
 
 | # | Feature | Effort | Approach |
 |---|---------|--------|----------|
-| 5 | Hyperlinks | Small | `TextRun` with `link` property; new `HyperlinkNode` |
-| 6 | Text highlighting | Small | Add `highlight` to `DocxStyleRule` + compile |
-| 7 | SuperScript / subScript | Small | Add to `DocxStyleRule` + compile |
+| 5 | Hyperlinks | Small | `HyperlinkNode` + `.hyperlink()` | ✅ Done |
+| 6 | Text highlighting | Small | `highlight` in `DocxStyleRule` + compile | ✅ Done |
+| 7 | SuperScript / subScript | Small | `DocxStyleRule` + compile | ✅ Done |
 | 8 | Cell merging (rowspan/colspan) | Medium | Add `rowSpan`/`colSpan` to data objects or column config |
-| 9 | Page numbers | Small | Expose via `PageConfig` or header/footer config |
+| 9 | Page numbers | Small | `@docxkit/plugin-page-number` for header/footer use | ✅ Done |
 | 10 | Nested numbering | Medium | Part of numbering system |
-| 11 | Paragraph borders (compile fix) | Small | Add `compileParagraphBorder` function |
-| 12 | Cell shading (compile fix) | Small | Map `backgroundColor` → cell fill correctly |
+| 11 | Paragraph borders (compile fix) | Small | Add `compileParagraphBorder` function | ✅ Done |
+| 12 | Cell shading (compile fix) | Small | Map `backgroundColor` → cell fill correctly | ✅ Done |
 
 ### P2 — Medium Priority
 
 | # | Feature | Effort | Approach |
 |---|---------|--------|----------|
 | 13 | Bookmarks | Small | New `BookmarkNode` |
-| 14 | Table of Contents | Medium | Collect headings, generate TOC field |
+| 14 | Table of Contents | Medium | Field-based `@docxkit/plugin-toc` | ✅ Done |
 | 15 | Table style presets | Small | Pass through to docx table properties |
 | 16 | Odd/even headers | Small | Config option |
-| 17 | Keep with next / keep together | Small | Add to `DocxStyleRule` |
-| 18 | Page break before (style) | Small | Add to `DocxStyleRule` |
+| 17 | Keep with next / keep together | Small | Add to `DocxStyleRule` | ✅ Done |
+| 18 | Page break before (style) | Small | Add to `DocxStyleRule` | ✅ Done |
 | 19 | Tab stops | Medium | New `TabStop` type |
 | 20 | Right-to-left text | Small | Add to `DocxStyleRule` |
 | 21 | Page borders | Medium | Add to `PageConfig` |
@@ -285,7 +285,7 @@
 | 29 | Checkboxes / form fields |
 | 30 | Text boxes / frames |
 | 31 | Custom fonts embedding |
-| 32 | Watermark |
+| 32 | Watermark | ✅ Plugin implemented |
 
 ---
 

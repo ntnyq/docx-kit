@@ -59,6 +59,84 @@ importers:
 
   docs:
     dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../packages/core
+      '@docxkit/plugin-badge':
+        specifier: workspace:*
+        version: link:../packages-plugins/badge
+      '@docxkit/plugin-callout':
+        specifier: workspace:*
+        version: link:../packages-plugins/callout
+      '@docxkit/plugin-changelog':
+        specifier: workspace:*
+        version: link:../packages-plugins/changelog
+      '@docxkit/plugin-code-block':
+        specifier: workspace:*
+        version: link:../packages-plugins/code-block
+      '@docxkit/plugin-cover-page':
+        specifier: workspace:*
+        version: link:../packages-plugins/cover-page
+      '@docxkit/plugin-data-table':
+        specifier: workspace:*
+        version: link:../packages-plugins/data-table
+      '@docxkit/plugin-divider':
+        specifier: workspace:*
+        version: link:../packages-plugins/divider
+      '@docxkit/plugin-echarts':
+        specifier: workspace:*
+        version: link:../packages-plugins/echarts
+      '@docxkit/plugin-invoice':
+        specifier: workspace:*
+        version: link:../packages-plugins/invoice
+      '@docxkit/plugin-letterhead':
+        specifier: workspace:*
+        version: link:../packages-plugins/letterhead
+      '@docxkit/plugin-meeting-minutes':
+        specifier: workspace:*
+        version: link:../packages-plugins/meeting-minutes
+      '@docxkit/plugin-page-number':
+        specifier: workspace:*
+        version: link:../packages-plugins/page-number
+      '@docxkit/plugin-property-table':
+        specifier: workspace:*
+        version: link:../packages-plugins/property-table
+      '@docxkit/plugin-qrcode':
+        specifier: workspace:*
+        version: link:../packages-plugins/qrcode
+      '@docxkit/plugin-signature-block':
+        specifier: workspace:*
+        version: link:../packages-plugins/signature-block
+      '@docxkit/plugin-timeline':
+        specifier: workspace:*
+        version: link:../packages-plugins/timeline
+      '@docxkit/plugin-toc':
+        specifier: workspace:*
+        version: link:../packages-plugins/toc
+      '@docxkit/plugin-watermark':
+        specifier: workspace:*
+        version: link:../packages-plugins/watermark
+      '@docxkit/preset-academic':
+        specifier: workspace:*
+        version: link:../packages-presets/academic
+      '@docxkit/preset-classic':
+        specifier: workspace:*
+        version: link:../packages-presets/classic
+      '@docxkit/preset-modern':
+        specifier: workspace:*
+        version: link:../packages-presets/modern
+      '@docxkit/renderer':
+        specifier: workspace:*
+        version: link:../packages/renderer
+      '@docxkit/theme-minimal':
+        specifier: workspace:*
+        version: link:../packages-themes/minimal
+      '@docxkit/theme-ocean':
+        specifier: workspace:*
+        version: link:../packages-themes/ocean
+      '@docxkit/theme-warm':
+        specifier: workspace:*
+        version: link:../packages-themes/warm
       '@ntnyq/utils':
         specifier: ^0.15.0
         version: 0.15.0
@@ -551,6 +629,9 @@ importers:
 
   packages/renderer:
     dependencies:
+      '@docxkit/types':
+        specifier: workspace:*
+        version: link:../types
       docx-preview:
         specifier: 0.3.7
         version: 0.3.7
@@ -558,9 +639,6 @@ importers:
         specifier: ^3.10.1
         version: 3.10.1
     devDependencies:
-      '@docxkit/core':
-        specifier: workspace:*
-        version: link:../core
       happy-dom:
         specifier: ^20.10.6
         version: 20.10.6

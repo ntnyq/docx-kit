@@ -10,7 +10,7 @@
  * @module renderer/errors
  */
 
-import { DocxKitError } from '@docxkit/core'
+import { DocxKitError } from '@docxkit/types'
 
 /**
  * Renderer-specific error codes.
