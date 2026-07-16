@@ -36,8 +36,7 @@ export async function loadUrlPlugin(
   let mod: DocxPlugin | { default?: unknown }
   try {
     mod = (await import(/* @vite-ignore */ url)) as
-      | DocxPlugin
-      | { default?: unknown }
+      DocxPlugin | { default?: unknown }
   } catch (err) {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',

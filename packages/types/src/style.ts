@@ -86,17 +86,7 @@ export interface DocxStyleRule
  * following the CSS `font-weight` spec.
  */
 export type FontWeight =
-  | 'bold'
-  | 'normal'
-  | 100
-  | 200
-  | 300
-  | 400
-  | 500
-  | 600
-  | 700
-  | 800
-  | 900
+  'bold' | 'normal' | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
 
 /** Text highlight / marker colors (matches Word highlight palette). */
 export type HighlightColor =
