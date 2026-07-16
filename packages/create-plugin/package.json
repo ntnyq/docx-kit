@@ -29,9 +29,9 @@
   },
   "devDependencies": {
     "@types/prompts": "^2.4.9",
-    "eslint": "^10.5.0",
-    "tsdown": "^0.22.3",
+    "eslint": "^10.7.0",
+    "tsdown": "^0.22.9",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   }
 }

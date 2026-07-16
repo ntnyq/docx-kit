@@ -39,7 +39,7 @@
     "test": "echo 'No tests for @docxkit/types'"
   },
   "devDependencies": {
-    "tsdown": "^0.22.3",
+    "tsdown": "^0.22.9",
     "typescript": "^6.0.3"
   }
 }

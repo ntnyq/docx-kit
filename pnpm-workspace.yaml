@@ -5,6 +5,9 @@ packages:
   - packages-themes/*
   - packages/*
 
+overrides:
+  monaco-editor>dompurify: 3.4.12
+
 allowBuilds:
   esbuild: true
   unrs-resolver: true
