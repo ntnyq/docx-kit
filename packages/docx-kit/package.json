@@ -34,40 +34,40 @@
       "default": "./dist/browser.js"
     },
     "./ai": {
-      "types": "./dist/ai-proxy.d.ts",
-      "default": "./dist/ai-proxy.js"
+      "types": "./dist/ai.d.ts",
+      "default": "./dist/ai.js"
     },
     "./browser": {
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
     },
     "./loader": {
-      "types": "./dist/loader-proxy.d.ts",
-      "default": "./dist/loader-proxy.js"
+      "types": "./dist/loader.d.ts",
+      "default": "./dist/loader.js"
     },
     "./loader/browser": {
-      "types": "./dist/loader-proxy.d.ts",
-      "default": "./dist/loader-proxy.js"
+      "types": "./dist/loader-browser.d.ts",
+      "default": "./dist/loader-browser.js"
     },
     "./loader/node": {
-      "types": "./dist/loader-proxy.d.ts",
-      "default": "./dist/loader-proxy.js"
+      "types": "./dist/loader-node.d.ts",
+      "default": "./dist/loader-node.js"
     },
     "./mcp": {
-      "types": "./dist/mcp-proxy.d.ts",
-      "default": "./dist/mcp-proxy.js"
+      "types": "./dist/mcp.d.ts",
+      "default": "./dist/mcp.js"
     },
     "./node": {
       "types": "./dist/node.d.ts",
       "default": "./dist/node.js"
     },
     "./pdk": {
-      "types": "./dist/pdk-proxy.d.ts",
-      "default": "./dist/pdk-proxy.js"
+      "types": "./dist/pdk.d.ts",
+      "default": "./dist/pdk.js"
     },
     "./registry": {
-      "types": "./dist/registry-proxy.d.ts",
-      "default": "./dist/registry-proxy.js"
+      "types": "./dist/registry.d.ts",
+      "default": "./dist/registry.js"
     }
   },
   "main": "./dist/browser.js",

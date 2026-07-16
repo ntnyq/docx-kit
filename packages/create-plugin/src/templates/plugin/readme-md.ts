@@ -4,6 +4,8 @@
  * @module templates/plugin/readme-md
  */
 
+import { toIdentifier } from './naming'
+
 /**
  * Render a README.md for a docx-kit plugin.
  *
@@ -18,6 +20,7 @@ export function renderReadme(
   description: string = 'A docx-kit plugin',
   author: string = '',
 ): string {
+  const identifier = toIdentifier(shortName)
   return `# ${pluginName}
 
 ${description}
@@ -32,13 +35,13 @@ npm install ${pluginName}
 
 \`\`\`ts
 import { createDocx } from 'docx-kit'
-import { ${shortName}Plugin } from '${pluginName}'
+import { ${identifier}Plugin } from '${pluginName}'
 
 const doc = createDocx()
-  .use(${shortName}Plugin())
-  .${shortName}({ text: 'Hello' })
+  .use(${identifier}Plugin())
+  .plugin('${shortName}', { text: 'Hello' })
 
-doc.pack()
+const bytes = await doc.toUint8Array()
 \`\`\`
 
 ## Plugin Manifest

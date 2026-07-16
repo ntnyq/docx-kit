@@ -37,8 +37,6 @@
     "docx": "^9.7.1"
   },
   "devDependencies": {
-    "@docxkit/core": "workspace:*",
-    "@docxkit/plugin-callout": "workspace:*",
-    "@docxkit/plugin-watermark": "workspace:*"
+    "@docxkit/core": "workspace:*"
   }
 }

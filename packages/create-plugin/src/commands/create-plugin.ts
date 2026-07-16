@@ -9,12 +9,14 @@ import path from 'node:path'
 import process from 'node:process'
 import prompts from 'prompts'
 import {
+  renderEslintConfig,
   renderManifest,
   renderPackageJson,
   renderPluginSource,
   renderPluginTest,
   renderReadme,
   renderTsconfigJson,
+  renderTsdownConfig,
 } from '../templates/plugin/index'
 
 /**
@@ -78,11 +80,12 @@ export async function createPlugin(nameArg?: string): Promise<void> {
  * Removes `docx-kit-plugin-` prefix if present.
  */
 function deriveShortName(packageName: string): string {
+  const unscopedName = packageName.split('/').at(-1) ?? packageName
   const prefix = 'docx-kit-plugin-'
-  if (packageName.startsWith(prefix)) {
-    return packageName.slice(prefix.length)
+  if (unscopedName.startsWith(prefix)) {
+    return unscopedName.slice(prefix.length)
   }
-  return packageName
+  return unscopedName
 }
 
 /**
@@ -173,7 +176,7 @@ async function writeScaffold(
     renderManifest(
       options.pluginName,
       options.version,
-      '^0.2.0',
+      '^0.3.0',
       options.description,
     ),
   )
@@ -203,6 +206,16 @@ async function writeScaffold(
   await fs.writeFile(
     path.join(targetDir, 'tsconfig.json'),
     renderTsconfigJson(),
+  )
+
+  await fs.writeFile(
+    path.join(targetDir, 'tsdown.config.ts'),
+    renderTsdownConfig(),
+  )
+
+  await fs.writeFile(
+    path.join(targetDir, 'eslint.config.mjs'),
+    renderEslintConfig(),
   )
 
   await fs.writeFile(

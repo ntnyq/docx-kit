@@ -34,6 +34,11 @@
   },
   "dependencies": {
     "@docxkit/types": "workspace:*",
-    "docx": "^9.7.1"
+    "docx": "^9.7.1",
+    "semver": "^7.8.5"
+  },
+  "devDependencies": {
+    "@types/semver": "^7.7.1",
+    "jszip": "^3.10.1"
   }
 }

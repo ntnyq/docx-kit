@@ -4,6 +4,8 @@
  * @module templates/plugin/package-json
  */
 
+/* eslint-disable perfectionist/sort-objects */
+
 /**
  * Render a package.json for a docx-kit plugin.
  *
@@ -24,29 +26,44 @@ export function renderPackageJson(
 ): string {
   return JSON.stringify(
     {
-      author,
+      name: pluginName,
+      type: 'module',
+      version,
       description,
       keywords: ['docx-kit-plugin', shortName],
       license,
+      author,
+      exports: {
+        '.': {
+          types: './dist/index.d.ts',
+          default: './dist/index.js',
+        },
+      },
       main: './dist/index.js',
-      name: pluginName,
-      type: 'module',
       types: './dist/index.d.ts',
-      version,
-      devDependencies: {
-        docx: '^9.7.1',
-        'docx-kit': '^0.2.0',
-        typescript: '^6.0.3',
-        vitest: '^3.2.3',
+      files: ['README.md', 'dist', 'docx-kit.plugin.json'],
+      publishConfig: {
+        access: 'public',
       },
-      peerDependencies: {
-        'docx-kit': '^0.2.0',
-      },
+      sideEffects: false,
       scripts: {
         build: 'tsdown',
         lint: 'eslint',
         test: 'vitest run',
         typecheck: 'tsc --noEmit',
+      },
+      peerDependencies: {
+        docx: '^9.7.1',
+        'docx-kit': '^0.3.0',
+      },
+      devDependencies: {
+        '@ntnyq/eslint-config': '^6.1.5',
+        docx: '^9.7.1',
+        'docx-kit': '^0.3.0',
+        eslint: '^10.7.0',
+        tsdown: '^0.22.9',
+        typescript: '^6.0.3',
+        vitest: '^4.1.10',
       },
     },
     null,

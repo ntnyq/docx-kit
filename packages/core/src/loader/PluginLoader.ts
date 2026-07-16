@@ -9,6 +9,7 @@
  */
 
 import { DocxKitError } from '@docxkit/types'
+import { satisfies, valid, validRange } from 'semver'
 import { validateManifest } from './manifest'
 import type { DocxPlugin, MaybePromise } from '@docxkit/types'
 import type { PluginManifest } from './manifest'
@@ -253,52 +254,21 @@ export class PluginLoader {
    * Check that the plugin's `docxKit` semver range is compatible
    * with the running version.
    *
-   * This is a simple string check for now. A full semver-range
-   * implementation (using the `semver` package at runtime) can
-   * be added in a future release.
-   *
    * @internal
    */
   protected _checkCompatibility(manifest: PluginManifest): void {
     const range = manifest.docxKit.trim()
-
-    // `*` means "any version" — always compatible
-    if (range === '*') {
-      return
-    }
-
     const kitVersion = this.options.kitVersion
 
-    // Loose "major.minor" prefix matching for caret-like ranges.
-    // This is intentionally simple; production use of semver ranges
-    // should be handled by the consumer or a future semver integration.
-    if (range.startsWith('^') || range.startsWith('~')) {
-      const cleaned = range.slice(1)
-      const parts = cleaned.split('.')
-      const kitParts = kitVersion.split('.')
-
-      // ^x.y.z requires same major, >= minor
-      // ~x.y.z requires same major.minor, >= patch
-      if (range.startsWith('^')) {
-        if (parts[0] && kitParts[0] !== parts[0]) {
-          throw new DocxKitError(
-            'PLUGIN_VERSION_MISMATCH',
-            `Plugin "${manifest.plugin.name}" requires docx-kit range "${range}" but ${kitVersion} is installed`,
-          )
-        }
-      } else {
-        // ~
-        if (
-          parts[0]
-          && parts[1]
-          && (kitParts[0] !== parts[0] || kitParts[1] !== parts[1])
-        ) {
-          throw new DocxKitError(
-            'PLUGIN_VERSION_MISMATCH',
-            `Plugin "${manifest.plugin.name}" requires docx-kit range "${range}" but ${kitVersion} is installed`,
-          )
-        }
-      }
+    if (
+      !valid(kitVersion)
+      || !validRange(range)
+      || !satisfies(kitVersion, range)
+    ) {
+      throw new DocxKitError(
+        'PLUGIN_VERSION_MISMATCH',
+        `Plugin "${manifest.plugin.name}" requires docx-kit range "${range}" but ${kitVersion} is installed`,
+      )
     }
   }
 

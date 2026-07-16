@@ -4,22 +4,25 @@
  * @module templates/plugin/src-index
  */
 
+import { toIdentifier, toPascalCase } from './naming'
+
 /**
  * Render the plugin source entry file.
  *
  * @param pluginName - — The plugin name (e.g. `chart`)
  */
 export function renderPluginSource(pluginName: string): string {
-  const capitalized = capitalize(pluginName)
-  return `import { definePlugin } from 'docx-kit'
-import { Paragraph } from 'docx'
+  const identifier = toIdentifier(pluginName)
+  const typeName = toPascalCase(pluginName)
+  return `import { Paragraph } from 'docx'
+import { definePlugin } from 'docx-kit'
 
-export interface ${capitalized}Options {
+export interface ${typeName}Options {
   text: string
 }
 
-export function ${pluginName}Plugin() {
-  return definePlugin<'${pluginName}', ${capitalized}Options>({
+export function ${identifier}Plugin() {
+  return definePlugin<'${pluginName}', ${typeName}Options>({
     name: '${pluginName}',
     render(options) {
       // TODO: implement plugin rendering
@@ -28,11 +31,4 @@ export function ${pluginName}Plugin() {
   })
 }
 `
-}
-
-/**
- * Capitalize the first letter of a string.
- */
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
 }

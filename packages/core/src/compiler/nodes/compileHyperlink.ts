@@ -7,13 +7,30 @@
 import { ExternalHyperlink, Paragraph, TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileTextStyle } from '../compileStyle'
-import type { DocxKitConfig, HyperlinkNode, StyleSheet } from '@docxkit/types'
+import type {
+  DocxKitConfig,
+  DocxStyleRule,
+  HyperlinkNode,
+  StyleSheet,
+} from '@docxkit/types'
 
 export function compileHyperlink<TStyles extends StyleSheet>(
   node: HyperlinkNode<TStyles>,
   config: DocxKitConfig<TStyles>,
 ) {
+  return new Paragraph({
+    children: [compileInlineHyperlink(node, config)],
+  })
+}
+
+/** Compile a hyperlink for use inside another paragraph-like container. */
+export function compileInlineHyperlink<TStyles extends StyleSheet>(
+  node: HyperlinkNode<TStyles>,
+  config: DocxKitConfig<TStyles>,
+  baseStyle?: DocxStyleRule,
+) {
   const style = resolveStyle({
+    base: baseStyle,
     className: node.className,
     inline: node.style,
     styles: config.styles,
@@ -38,12 +55,8 @@ export function compileHyperlink<TStyles extends StyleSheet>(
     })
   })
 
-  return new Paragraph({
-    children: [
-      new ExternalHyperlink({
-        children,
-        link: node.url,
-      }),
-    ],
+  return new ExternalHyperlink({
+    children,
+    link: node.url,
   })
 }

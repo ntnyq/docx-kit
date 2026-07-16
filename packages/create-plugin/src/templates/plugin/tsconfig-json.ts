@@ -4,22 +4,24 @@
  * @module templates/plugin/tsconfig-json
  */
 
+/* eslint-disable perfectionist/sort-objects */
+
 /**
  * Render a tsconfig.json for a docx-kit plugin project.
  */
 export function renderTsconfigJson(): string {
   return JSON.stringify(
     {
-      include: ['src'],
       compilerOptions: {
-        declaration: true,
-        esModuleInterop: true,
+        target: 'ESNext',
         module: 'ESNext',
         moduleResolution: 'bundler',
-        outDir: './dist',
+        noEmit: true,
+        esModuleInterop: true,
         strict: true,
-        target: 'ESNext',
+        skipLibCheck: true,
       },
+      include: ['src', 'tests', 'tsdown.config.ts'],
     },
     null,
     2,

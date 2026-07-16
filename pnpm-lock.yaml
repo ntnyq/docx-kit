@@ -462,6 +462,16 @@ importers:
       docx:
         specifier: ^9.7.1
         version: 9.7.1
+      semver:
+        specifier: ^7.8.5
+        version: 7.8.5
+    devDependencies:
+      '@types/semver':
+        specifier: ^7.7.1
+        version: 7.7.1
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
 
   packages/create-plugin:
     dependencies:
@@ -617,12 +627,6 @@ importers:
       '@docxkit/core':
         specifier: workspace:*
         version: link:../core
-      '@docxkit/plugin-callout':
-        specifier: workspace:*
-        version: link:../../packages-plugins/callout
-      '@docxkit/plugin-watermark':
-        specifier: workspace:*
-        version: link:../../packages-plugins/watermark
 
   packages/registry:
     dependencies:
@@ -1502,6 +1506,9 @@ packages:
 
   '@types/qrcode@1.5.6':
     resolution: {integrity: sha512-te7NQcV2BOvdj2b1hCAHzAoMNuj65kNBMz0KBaxM6c3VGBOhU0dURQKOtH8CFNI/dsKkwlv32p26qYQTWoB5bw==}
+
+  '@types/semver@7.7.1':
+    resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -5022,6 +5029,8 @@ snapshots:
   '@types/qrcode@1.5.6':
     dependencies:
       '@types/node': 26.1.1
+
+  '@types/semver@7.7.1': {}
 
   '@types/trusted-types@2.0.7':
     optional: true

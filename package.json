@@ -12,8 +12,11 @@
     "docs:dev": "pnpm -C docs run dev",
     "lint": "eslint",
     "prepare": "husky",
-    "release": "run-s release:check release:version",
+    "release": "run-s release:verify release:version",
+    "release:artifacts": "node scripts/check-package-artifacts.mjs",
     "release:check": "run-s lint typecheck test",
+    "release:consumer": "node scripts/smoke-test-package.mjs",
+    "release:verify": "run-s build release:check release:artifacts release:consumer",
     "release:version": "bumpp -r",
     "test": "vitest",
     "typecheck": "pnpm -r exec tsc --noEmit"

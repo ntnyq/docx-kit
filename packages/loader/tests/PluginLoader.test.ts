@@ -217,8 +217,8 @@ describe('PluginLoader', () => {
       expect(() => testLoader._checkCompatibility(manifest)).not.toThrow()
     })
 
-    it('accepts caret range with matching major version', () => {
-      const loader = createPluginLoader({ kitVersion: '0.3.0' })
+    it('accepts caret range within the same zero-major minor line', () => {
+      const loader = createPluginLoader({ kitVersion: '0.2.5' })
       const manifest: PluginManifest = { ...TEST_MANIFEST, docxKit: '^0.2.0' }
       const testLoader = loader as unknown as {
         _checkCompatibility(m: PluginManifest): void
@@ -226,8 +226,8 @@ describe('PluginLoader', () => {
       expect(() => testLoader._checkCompatibility(manifest)).not.toThrow()
     })
 
-    it('rejects caret range with mismatched major version', () => {
-      const loader = createPluginLoader({ kitVersion: '2.0.0' })
+    it('rejects caret range outside the zero-major minor line', () => {
+      const loader = createPluginLoader({ kitVersion: '0.3.0' })
       const manifest: PluginManifest = { ...TEST_MANIFEST, docxKit: '^0.2.0' }
       const testLoader = loader as unknown as {
         _checkCompatibility(m: PluginManifest): void
@@ -265,6 +265,36 @@ describe('PluginLoader', () => {
           ERROR_CODES.PLUGIN_VERSION_MISMATCH,
         )
       }
+    })
+
+    it.each([
+      ['0.3.0', '0.3.0'],
+      ['0.3.4', '>=0.3.0 <0.4.0'],
+      ['0.4.0-beta.1', '^0.4.0-beta.1'],
+    ])('accepts version %s for range %s', (kitVersion, docxKit) => {
+      const loader = createPluginLoader({ kitVersion })
+      const manifest: PluginManifest = { ...TEST_MANIFEST, docxKit }
+      const testLoader = loader as unknown as {
+        _checkCompatibility(m: PluginManifest): void
+      }
+      expect(() => testLoader._checkCompatibility(manifest)).not.toThrow()
+    })
+
+    it.each([
+      ['0.3.1', '0.3.0'],
+      ['0.4.0-beta.1', '^0.3.0'],
+      ['not-a-version', '*'],
+      ['0.3.0', 'not-a-range'],
+    ])('rejects version %s for range %s', (kitVersion, docxKit) => {
+      const loader = createPluginLoader({ kitVersion })
+      const manifest: PluginManifest = { ...TEST_MANIFEST, docxKit }
+      const testLoader = loader as unknown as {
+        _checkCompatibility(m: PluginManifest): void
+      }
+
+      expect(() => testLoader._checkCompatibility(manifest)).toThrowError(
+        DocxKitError,
+      )
     })
   })
 

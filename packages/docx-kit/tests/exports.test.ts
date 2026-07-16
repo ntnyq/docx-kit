@@ -72,4 +72,17 @@ describe('dist exports — published package smoke tests', () => {
     expect(mod.saveDocument).toBeDefined()
     expect(mod.letterheadPlugin).toBeDefined()
   })
+
+  it.each([
+    ['docx-kit/ai', 'buildPrompt'],
+    ['docx-kit/loader', 'createPluginLoader'],
+    ['docx-kit/loader/browser', 'loadUrlPlugin'],
+    ['docx-kit/loader/node', 'loadNpmPlugin'],
+    ['docx-kit/mcp', 'TOOL_DEFINITIONS'],
+    ['docx-kit/pdk', 'createPluginTestContext'],
+    ['docx-kit/registry', 'createPluginRegistry'],
+  ] as const)('loads package export %s', async (specifier, exportName) => {
+    const mod = await import(specifier)
+    expect(mod[exportName]).toBeDefined()
+  })
 })

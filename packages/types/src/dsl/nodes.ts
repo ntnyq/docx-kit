@@ -57,10 +57,12 @@ export type BlockNode<TStyles extends StyleSheet = StyleSheet> =
 export interface BulletItem<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Item text content. */
-  text: string
   /** Optional inline children override (instead of text). */
   children?: InlineNode<TStyles>[]
+  /** Per-item nested list level (0–8). Overrides the list-level default. */
+  level?: number
+  /** Item text content, used when `children` is absent. */
+  text?: string
 }
 
 // ---- Block nodes ----
@@ -171,9 +173,7 @@ export interface ImageNode<
  * @template TStyles — The user's stylesheet type
  */
 export type InlineNode<TStyles extends StyleSheet = StyleSheet> =
-  | HyperlinkNode<TStyles>
-  | ImageNode<TStyles>
-  | TextNode<TStyles>
+  HyperlinkNode<TStyles> | ImageNode<TStyles> | TextNode<TStyles>
 
 /**
  * A numbered / ordered list node.
@@ -197,11 +197,7 @@ export interface NumberedListNode<
    * e.g. `'decimal'`, `'upperRoman'`, `'lowerLetter'`
    */
   numberingFormat?:
-    | 'decimal'
-    | 'lowerLetter'
-    | 'lowerRoman'
-    | 'upperLetter'
-    | 'upperRoman'
+    'decimal' | 'lowerLetter' | 'lowerRoman' | 'upperLetter' | 'upperRoman'
 }
 
 /**
@@ -285,8 +281,9 @@ export interface TableColumn<
   /**
    * Span multiple rows vertically (per-cell via data hints).
    *
-   * Set `rowSpan` on individual data objects using `_rowSpan: N` or keep it
-   * as a static column default.
+   * Set a keyed `_${key}_rowSpan: N` hint on an individual data object,
+   * use `_rowSpan: N` for every cell in that row, or keep this as a static
+   * column default.
    */
   rowSpan?: number
   /** Column width. Supports percentage strings (e.g. `"30%"`). */

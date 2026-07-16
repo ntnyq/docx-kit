@@ -145,6 +145,8 @@ interface TableColumn<TData> {
   key: string
   title: string
   align?: 'left' | 'center' | 'right'
+  colSpan?: number
+  rowSpan?: number
   width?: UnitValue
   render?: (
     value: unknown,
@@ -154,13 +156,17 @@ interface TableColumn<TData> {
 }
 ```
 
+Data rows can override spans with `_${key}_colSpan` and
+`_${key}_rowSpan` fields. A row-level `_rowSpan` applies to every cell in
+that row.
+
 ## `HyperlinkNode<TStyles>`
 
 ```ts
 interface HyperlinkNode<TStyles> extends BaseNode<TStyles> {
   type: 'hyperlink'
   url: string
-  children: InlineNode<TStyles>[]
+  children: (string | TextNode<TStyles>)[]
 }
 ```
 
@@ -218,10 +224,15 @@ interface PluginNode<TName, TOptions, TStyles> extends BaseNode<TStyles> {
 
 ## `BulletItem<TStyles>`
 
-A list item can be a plain string or a rich inline content array.
+A list item can be a plain string or a structured item with styled inline
+children and an optional per-item nesting level.
 
 ```ts
-type BulletItem<TStyles> = string | InlineNode<TStyles>[]
+interface BulletItem<TStyles> extends BaseNode<TStyles> {
+  text?: string
+  children?: InlineNode<TStyles>[]
+  level?: number // 0–8; overrides the list-level default
+}
 ```
 
 ## `ClassName<TStyles>`

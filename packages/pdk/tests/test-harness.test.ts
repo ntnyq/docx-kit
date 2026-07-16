@@ -1,7 +1,5 @@
 /* eslint-disable vitest/no-conditional-expect */
-import { DocxKitError, ERROR_CODES } from '@docxkit/core'
-import { calloutPlugin } from '@docxkit/plugin-callout'
-import { watermarkPlugin } from '@docxkit/plugin-watermark'
+import { definePlugin, DocxKitError, ERROR_CODES } from '@docxkit/core'
 import { Paragraph, TextRun } from 'docx'
 import { describe, expect, it, vi } from 'vitest'
 import {
@@ -13,11 +11,21 @@ import {
 } from '../src/index'
 import type { DocxPlugin, ParagraphNode } from '@docxkit/core'
 
-const callout = calloutPlugin()
+const callout = definePlugin<
+  'callout',
+  { content: string; type: 'info' | 'warning' }
+>({
+  name: 'callout',
+  render: options => new Paragraph({ text: options.content }),
+})
+const watermark = definePlugin<'watermark', { text: string }>({
+  name: 'watermark',
+  render: options => new Paragraph({ text: options.text }),
+})
 
 describe('renderPlugin', () => {
   it('renders a plugin in isolation', async () => {
-    const result = await renderPlugin(watermarkPlugin(), { text: 'DRAFT' })
+    const result = await renderPlugin(watermark, { text: 'DRAFT' })
     expect(result).toBeDefined()
   })
 

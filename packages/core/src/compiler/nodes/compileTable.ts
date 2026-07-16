@@ -8,9 +8,15 @@ import { DocxKitError } from '@docxkit/types'
 import { Paragraph, Table, TableCell, TableRow, WidthType } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileCellStyle, compileColumnWidth } from '../compileStyle'
-import type { DocxKitConfig, StyleSheet, TableNode } from '@docxkit/types'
+import { compileInlineNodes } from './compileInline'
+import type {
+  DocxKitConfig,
+  InlineNode,
+  StyleSheet,
+  TableNode,
+} from '@docxkit/types'
 
-export function compileTable<
+export async function compileTable<
   TData extends Record<string, unknown>,
   TStyles extends StyleSheet,
 >(node: TableNode<TData, TStyles>, config: DocxKitConfig<TStyles>) {
@@ -64,53 +70,78 @@ export function compileTable<
 
   // Data rows
   rows.push(
-    ...node.data.map(
-      (row, rowIndex) =>
-        new TableRow({
-          children: node.columns.map(col => {
-            const raw = row[col.key]
-            const rendered = col.render
-              ? col.render(raw, row, rowIndex)
-              : String(raw ?? '')
+    ...(await Promise.all(
+      node.data.map(
+        async (row, rowIndex) =>
+          new TableRow({
+            children: await Promise.all(
+              node.columns.map(async col => {
+                const raw = row[col.key]
+                const rendered = col.render
+                  ? col.render(raw, row, rowIndex)
+                  : String(raw ?? '')
 
-            const cellColSpan =
-              (row[`_${col.key}_colSpan` as string] as number) ?? col.colSpan
+                const cellColSpan =
+                  (row[`_${col.key}_colSpan` as string] as number)
+                  ?? col.colSpan
+                const cellRowSpan =
+                  (row[`_${col.key}_rowSpan` as string] as number)
+                  ?? (row._rowSpan as number)
+                  ?? col.rowSpan
 
-            const isEvenRow = rowIndex % 2 === 1
+                const isEvenRow = rowIndex % 2 === 1
 
-            // Resolve cell style: base from table-level style, then inline cellStyle
-            const resolvedCellStyle = tableStyle
-              ? resolveStyle({
-                  base: tableStyle,
-                  inline: node.cellStyle,
-                  styles: config.styles,
-                  theme: config.theme,
+                // Resolve cell style: base from table-level style, then inline cellStyle
+                const resolvedCellStyle = tableStyle
+                  ? resolveStyle({
+                      base: tableStyle,
+                      inline: node.cellStyle,
+                      styles: config.styles,
+                      theme: config.theme,
+                    })
+                  : node.cellStyle
+
+                const baseCellStyle: Record<string, unknown> = resolvedCellStyle
+                  ? { ...compileCellStyle(resolvedCellStyle) }
+                  : {}
+
+                const inlineNodes: InlineNode<TStyles>[] =
+                  typeof rendered === 'string'
+                    ? [{ text: rendered, type: 'text' }]
+                    : (rendered as InlineNode<TStyles>[])
+
+                return new TableCell({
+                  ...baseCellStyle,
+                  ...(node.striped && isEvenRow && baseCellStyle.shading
+                    ? {
+                        shading: {
+                          ...(baseCellStyle.shading as Record<string, unknown>),
+                          fill: 'F2F2F2',
+                        },
+                      }
+                    : {}),
+                  children: [
+                    new Paragraph({
+                      children: await compileInlineNodes(
+                        inlineNodes,
+                        config,
+                        resolvedCellStyle,
+                      ),
+                    }),
+                  ],
+                  ...(cellColSpan && cellColSpan > 1
+                    ? { columnSpan: cellColSpan }
+                    : {}),
+                  ...(cellRowSpan && cellRowSpan > 1
+                    ? { rowSpan: cellRowSpan }
+                    : {}),
+                  width: compileColumnWidth(col.width),
                 })
-              : node.cellStyle
-
-            const baseCellStyle: Record<string, unknown> = resolvedCellStyle
-              ? { ...compileCellStyle(resolvedCellStyle) }
-              : {}
-
-            return new TableCell({
-              ...baseCellStyle,
-              ...(node.striped && isEvenRow && baseCellStyle.shading
-                ? {
-                    shading: {
-                      ...(baseCellStyle.shading as Record<string, unknown>),
-                      fill: 'F2F2F2',
-                    },
-                  }
-                : {}),
-              children: [new Paragraph(String(rendered))],
-              ...(cellColSpan && cellColSpan > 1
-                ? { columnSpan: cellColSpan }
-                : {}),
-              width: compileColumnWidth(col.width),
-            })
+              }),
+            ),
           }),
-        }),
-    ),
+      ),
+    )),
   )
 
   return new Table({
