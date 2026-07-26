@@ -6,7 +6,7 @@ This is a pnpm TypeScript monorepo for `docx-kit`, a plugin-extensible DOCX gene
 
 ## Build, Test, and Development Commands
 
-Use pnpm 11.8.0, as specified in `package.json`.
+Use pnpm 11.13.1, as specified in `package.json`.
 
 - `pnpm install`: install workspace dependencies.
 - `pnpm run build`: build all non-docs packages through recursive package scripts.
