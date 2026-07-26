@@ -17,10 +17,11 @@ vi.mock('prompts', () => ({
 }))
 
 const repositoryRoot = path.resolve(import.meta.dirname, '../../..')
+const pnpmCommand = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
 
 function runPnpm(cwd: string, args: string[]): void {
   try {
-    execFileSync('pnpm', args, {
+    execFileSync(pnpmCommand, args, {
       cwd,
       encoding: 'utf8',
       env: { ...process.env, CI: '1' },
