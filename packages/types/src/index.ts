@@ -48,6 +48,7 @@ export type {
   ParagraphStyleRule,
   StyleSheet,
   StyleSheetEntry,
+  TabStopRule,
   TextAlign,
   TextStyleRule,
   VerticalAlign,

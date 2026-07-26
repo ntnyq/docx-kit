@@ -39,6 +39,47 @@ describe('compileTextStyle - new properties', () => {
     const result = compileTextStyle({ characterSpacing: 2 })
     expect(result.characterSpacing).toBe(2)
   })
+
+  it('compiles CSS-like letterSpacing units to twips', () => {
+    const result = compileTextStyle({ letterSpacing: '1pt' })
+    expect(result.characterSpacing).toBe(20)
+  })
+
+  it('compiles advanced run effects and direction', () => {
+    const result = compileTextStyle({
+      doubleStrike: true,
+      emboss: true,
+      imprint: true,
+      rightToLeft: true,
+    })
+
+    expect(result.doubleStrike).toBe(true)
+    expect(result.emboss).toBe(true)
+    expect(result.imprint).toBe(true)
+    expect(result.rightToLeft).toBe(true)
+  })
+
+  it('honors bold and italic convenience overrides', () => {
+    const result = compileTextStyle({
+      bold: false,
+      fontStyle: 'italic',
+      fontWeight: 'bold',
+      italic: false,
+    })
+
+    expect(result.bold).toBe(false)
+    expect(result.italics).toBe(false)
+  })
+
+  it('compiles double underline and run shading', () => {
+    const result = compileTextStyle({
+      backgroundColor: '#abcdef',
+      underline: 'double',
+    })
+
+    expect(result.underline).toEqual({ type: 'double' })
+    expect(result.shading).toEqual({ fill: 'abcdef', type: 'clear' })
+  })
 })
 
 describe('compileParagraphStyle - new properties', () => {
@@ -55,6 +96,30 @@ describe('compileParagraphStyle - new properties', () => {
   it('compiles pageBreakBefore property', () => {
     const result = compileParagraphStyle({ pageBreakBefore: true })
     expect(result.pageBreakBefore).toBe(true)
+  })
+
+  it('compiles outline, tab stops, and widow control', () => {
+    const result = compileParagraphStyle({
+      outlineLevel: 2,
+      widowControl: false,
+      tabStops: [
+        {
+          leader: 'dot',
+          position: '2in',
+          type: 'right',
+        },
+      ],
+    })
+
+    expect(result.outlineLevel).toBe(2)
+    expect(result.tabStops).toEqual([
+      {
+        leader: 'dot',
+        position: 2880,
+        type: 'right',
+      },
+    ])
+    expect(result.widowControl).toBe(false)
   })
 
   it('compiles paragraph borders', () => {

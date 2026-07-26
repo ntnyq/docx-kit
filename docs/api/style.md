@@ -12,22 +12,38 @@ interface DocxStyleRule {
   fontSize?: UnitValue
   fontWeight?: FontWeight
   fontStyle?: 'italic' | 'normal'
+  bold?: boolean
+  italic?: boolean
   fontFamily?: LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>
   color?: string | HexColor
   backgroundColor?: string | HexColor
   highlight?: HighlightColor
-  underline?: boolean | 'single' | 'double' | 'dash' | 'dotDash'
+  underline?: boolean | 'single' | 'double'
   strike?: boolean
+  doubleStrike?: boolean
   allCaps?: boolean
+  smallCaps?: boolean
+  subScript?: boolean
+  superScript?: boolean
+  rightToLeft?: boolean
+  emboss?: boolean
+  imprint?: boolean
+  characterSpacing?: number
   letterSpacing?: UnitValue
 
   // ── Spacing ──
   lineHeight?: number | UnitValue
+  keepLines?: boolean
+  keepNext?: boolean
+  pageBreakBefore?: boolean
+  widowControl?: boolean
 
   // ── Alignment ──
   textAlign?: TextAlign
   textIndent?: UnitValue
   verticalAlign?: VerticalAlign
+  outlineLevel?: number
+  tabStops?: TabStopRule[]
 
   // ── Box model ──
   margin?:
@@ -78,6 +94,17 @@ type HighlightColor =
 
 ```ts
 type TextAlign = 'left' | 'center' | 'right' | 'justify'
+```
+
+## `TabStopRule`
+
+```ts
+interface TabStopRule {
+  position: UnitValue
+  type: 'bar' | 'center' | 'clear' | 'decimal' | 'end'
+    | 'left' | 'num' | 'right' | 'start'
+  leader?: 'dot' | 'hyphen' | 'middleDot' | 'none' | 'underscore'
+}
 ```
 
 ## `VerticalAlign`
@@ -188,10 +215,10 @@ const styles = defineStyles({
 
 | Category | Properties |
 |---|---|
-| **Text** | `fontFamily`, `fontSize`, `fontWeight`, `fontStyle`, `color`, `highlight`, `underline`, `strike`, `allCaps`, `backgroundColor`, `letterSpacing` |
-| **Spacing** | `lineHeight` |
+| **Text** | `fontFamily`, `fontSize`, `fontWeight`, `fontStyle`, `bold`, `italic`, `color`, `highlight`, `underline`, `strike`, `doubleStrike`, `allCaps`, `smallCaps`, `subScript`, `superScript`, `rightToLeft`, `emboss`, `imprint`, `backgroundColor`, `characterSpacing`, `letterSpacing` |
+| **Spacing** | `lineHeight`, `keepLines`, `keepNext`, `pageBreakBefore`, `widowControl` |
 | **Margins** | `margin`, `marginTop`, `marginRight`, `marginBottom`, `marginLeft` |
-| **Alignment** | `textAlign`, `textIndent`, `verticalAlign` |
+| **Alignment** | `textAlign`, `textIndent`, `verticalAlign`, `outlineLevel`, `tabStops` |
 | **Borders** | `border`, `borderTop`, `borderRight`, `borderBottom`, `borderLeft` |
 | **Size** | `width`, `height` |
 | **Escape** | `docx` — merge directly into docxjs options |

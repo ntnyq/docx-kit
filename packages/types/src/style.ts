@@ -141,12 +141,18 @@ export interface ParagraphStyleRule {
   marginRight?: UnitValue
   /** Top margin. */
   marginTop?: UnitValue
+  /** Outline level used by Word navigation and table-of-contents fields (0–9). */
+  outlineLevel?: number
   /** Force page break before this paragraph. */
   pageBreakBefore?: boolean
+  /** Custom tab stops for this paragraph. */
+  tabStops?: TabStopRule[]
   /** Horizontal text alignment. */
   textAlign?: TextAlign
   /** First-line indent. */
   textIndent?: UnitValue
+  /** Prevent isolated first or last lines across page boundaries. */
+  widowControl?: boolean
   /**
    * CSS-like margin shorthand.
    *
@@ -194,6 +200,25 @@ export interface StyleSheetEntry extends DocxStyleRule {
   extends?: string | string[]
 }
 
+/** A paragraph tab stop. */
+export interface TabStopRule {
+  /** Position from the paragraph's left edge. */
+  position: UnitValue
+  /** Optional leader characters before the tab stop. */
+  leader?: 'dot' | 'hyphen' | 'middleDot' | 'none' | 'underscore'
+  /** Tab alignment. */
+  type:
+    | 'bar'
+    | 'center'
+    | 'clear'
+    | 'decimal'
+    | 'end'
+    | 'left'
+    | 'num'
+    | 'right'
+    | 'start'
+}
+
 /** Horizontal text alignment. */
 export type TextAlign = 'center' | 'justify' | 'left' | 'right'
 
@@ -218,7 +243,7 @@ export interface TextStyleRule {
    * Takes precedence over `fontWeight` when both are set.
    */
   bold?: boolean
-  /** Character spacing (letter-spacing). */
+  /** Raw OOXML character spacing in twips. Prefer `letterSpacing` for CSS units. */
   characterSpacing?: number
   /** Text / foreground color (hex, named, or theme token like `"$colors.primary"`). */
   color?: HexColor | StyleToken<string>
@@ -227,6 +252,10 @@ export interface TextStyleRule {
    * Use for properties not yet covered by the CSS-like mapping.
    */
   docx?: Record<string, unknown>
+  /** Double strikethrough toggle. */
+  doubleStrike?: boolean
+  /** Embossed text effect. */
+  emboss?: boolean
   /**
    * Font family name (e.g. `"Arial"`, or theme token like `"$fonts.heading"`).
    */
@@ -239,13 +268,17 @@ export interface TextStyleRule {
   fontWeight?: FontWeight
   /** Text highlight color (background marker). */
   highlight?: HighlightColor
+  /** Imprinted (engraved) text effect. */
+  imprint?: boolean
   /**
    * Convenience boolean: `true` maps to `fontStyle: 'italic'`.
    * Takes precedence over `fontStyle` when both are set.
    */
   italic?: boolean
-  /** Character spacing. */
+  /** CSS-like character spacing with unit conversion. */
   letterSpacing?: UnitValue
+  /** Right-to-left run direction. */
+  rightToLeft?: boolean
   /** Small caps text variant. */
   smallCaps?: boolean
   /** Strikethrough toggle. */

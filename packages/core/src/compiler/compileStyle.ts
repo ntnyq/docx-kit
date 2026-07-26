@@ -12,6 +12,7 @@ import {
   BorderStyle,
   HighlightColor,
   ShadingType,
+  UnderlineType,
   VerticalAlign,
   WidthType,
 } from 'docx'
@@ -189,8 +190,15 @@ export function compileParagraphStyle(style: ParagraphStyleRule) {
     indent,
     keepLines: style.keepLines,
     keepNext: style.keepNext,
+    outlineLevel: style.outlineLevel,
     pageBreakBefore: style.pageBreakBefore,
     spacing,
+    widowControl: style.widowControl,
+    tabStops: style.tabStops?.map(tabStop => ({
+      leader: tabStop.leader,
+      position: toTwip(tabStop.position)!,
+      type: tabStop.type,
+    })),
   }
 }
 
@@ -214,18 +222,39 @@ export function compileParagraphStyle(style: ParagraphStyleRule) {
 export function compileTextStyle(style: TextStyleRule) {
   const result: Record<string, unknown> = {
     allCaps: style.allCaps,
-    bold: style.fontWeight === 'bold' || Number(style.fontWeight) >= 600,
-    characterSpacing: style.characterSpacing,
     color: normalizeColor(style.color),
+    doubleStrike: style.doubleStrike,
+    emboss: style.emboss,
     font: style.fontFamily,
     highlight: compileHighlight(style.highlight),
-    italics: style.fontStyle === 'italic',
+    imprint: style.imprint,
+    italics: style.italic ?? style.fontStyle === 'italic',
+    rightToLeft: style.rightToLeft,
     size: toPtHalf(style.fontSize),
     smallCaps: style.smallCaps,
     strike: style.strike,
     subScript: style.subScript,
     superScript: style.superScript,
-    underline: style.underline ? {} : undefined,
+    bold:
+      style.bold
+      ?? (style.fontWeight === 'bold' || Number(style.fontWeight) >= 600),
+    characterSpacing:
+      style.letterSpacing == null
+        ? style.characterSpacing
+        : toTwip(style.letterSpacing),
+    shading:
+      style.backgroundColor == null
+        ? undefined
+        : {
+            fill: normalizeColor(style.backgroundColor),
+            type: ShadingType.CLEAR,
+          },
+    underline:
+      style.underline === 'double'
+        ? { type: UnderlineType.DOUBLE }
+        : style.underline
+          ? { type: UnderlineType.SINGLE }
+          : undefined,
   }
 
   // Merge docx escape hatch

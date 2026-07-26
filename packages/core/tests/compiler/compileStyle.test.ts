@@ -59,7 +59,9 @@ describe('compileTextStyle', () => {
   })
 
   it('compiles underline', () => {
-    expect(compileTextStyle({ underline: true }).underline).toEqual({})
+    expect(compileTextStyle({ underline: true }).underline).toEqual({
+      type: 'single',
+    })
     expect(compileTextStyle({}).underline).toBeUndefined()
   })
 

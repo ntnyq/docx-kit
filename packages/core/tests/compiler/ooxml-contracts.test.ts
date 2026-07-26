@@ -24,6 +24,55 @@ async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
 }
 
 describe('compiler OOXML contracts', () => {
+  it('emits advanced run and paragraph style properties', async () => {
+    const pkg = await renderPackage([
+      {
+        type: 'paragraph',
+        children: [
+          {
+            text: 'Styled text',
+            type: 'text',
+            style: {
+              backgroundColor: '#abcdef',
+              doubleStrike: true,
+              emboss: true,
+              imprint: true,
+              letterSpacing: '1pt',
+              rightToLeft: true,
+              underline: 'double',
+            },
+          },
+        ],
+        style: {
+          outlineLevel: 2,
+          widowControl: false,
+          tabStops: [
+            {
+              leader: 'dot',
+              position: '2in',
+              type: 'right',
+            },
+          ],
+        },
+      },
+    ])
+
+    const documentXml = await pkg.read('word/document.xml')
+
+    expect(documentXml).toContain('<w:widowControl w:val="false"/>')
+    expect(documentXml).toContain('<w:outlineLvl w:val="2"/>')
+    expect(documentXml).toContain(
+      '<w:tab w:val="right" w:pos="2880" w:leader="dot"/>',
+    )
+    expect(documentXml).toContain('<w:dstrike/>')
+    expect(documentXml).toContain('<w:rtl/>')
+    expect(documentXml).toContain('<w:emboss/>')
+    expect(documentXml).toContain('<w:imprint/>')
+    expect(documentXml).toContain('<w:spacing w:val="20"/>')
+    expect(documentXml).toContain('<w:u w:val="double"/>')
+    expect(documentXml).toContain('<w:shd w:fill="abcdef" w:val="clear"/>')
+  })
+
   it('emits advanced first-section layout properties and column breaks', async () => {
     const pkg = await renderPackage([
       {

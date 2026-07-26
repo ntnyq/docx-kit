@@ -93,6 +93,7 @@ export type {
   StyleTokenCategory,
   TableColumn,
   TableNode,
+  TabStopRule,
   TextAlign,
   TextNode,
   ThemeColors,
