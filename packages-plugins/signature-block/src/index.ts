@@ -21,7 +21,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { definePlugin, DocxKitError } from '@docxkit/core'
 import {
   AlignmentType,
   Paragraph,
@@ -60,6 +60,13 @@ export function signatureBlockPlugin() {
     name: 'signatureBlock',
     render(options) {
       const { columns = 2, parties } = options
+
+      if (!Number.isSafeInteger(columns) || columns <= 0) {
+        throw new DocxKitError(
+          'PLUGIN_RENDER_FAILED',
+          'Signature block columns must be a positive integer',
+        )
+      }
 
       if (!parties.length) {
         return new Paragraph({

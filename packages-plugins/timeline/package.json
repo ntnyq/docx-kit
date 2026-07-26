@@ -42,6 +42,7 @@
     "docx": "^9.7.1"
   },
   "devDependencies": {
-    "@docxkit/pdk": "workspace:*"
+    "@docxkit/pdk": "workspace:*",
+    "jszip": "^3.10.1"
   }
 }

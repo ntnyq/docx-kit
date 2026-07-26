@@ -13,8 +13,10 @@
 
 import { DocxKitError } from '@docxkit/core'
 import { isDocxPlugin } from '../utils'
+import { resolveManifest } from './options'
 
-import type { DocxPlugin, PluginManifest } from '@docxkit/core'
+import type { DocxPlugin } from '@docxkit/core'
+import type { ExternalPluginLoadOptions } from './options'
 
 /**
  * Load a plugin from a local file path.
@@ -25,14 +27,20 @@ import type { DocxPlugin, PluginManifest } from '@docxkit/core'
  *
  * @param path - — The file path to load
  * @param options - — Optional loading options
- * @param options.manifest - — Pre-resolved manifest (avoids re-reading)
+ * @param options.manifest - — Manifest resolved before importing code
+ * @param options.authorizeManifest - — Pre-import manifest authorization
  * @returns The loaded plugin and its manifest
  * @throws {DocxKitError} `PLUGIN_LOAD_FAILED` if import fails
  */
 export async function loadLocalPlugin(
   path: string,
-  options?: { manifest?: PluginManifest },
-): Promise<{ manifest: PluginManifest; plugin: DocxPlugin }> {
+  options?: ExternalPluginLoadOptions,
+): Promise<{
+  manifest: Awaited<ReturnType<typeof resolveManifest>>
+  plugin: DocxPlugin
+}> {
+  const manifest = await resolveManifest(options)
+
   let mod: DocxPlugin | { default?: unknown }
   try {
     // Dynamic import works for both Node.js (file:// URLs)
@@ -59,7 +67,7 @@ export async function loadLocalPlugin(
   }
 
   return {
-    manifest: options?.manifest ?? (null as unknown as PluginManifest),
+    manifest,
     plugin: plugin as DocxPlugin,
   }
 }

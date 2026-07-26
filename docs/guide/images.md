@@ -52,7 +52,8 @@ doc.image({ data: dataUrl, width: 200, height: 200 })
 
 ## Sizing
 
-Images can be sized with absolute values or `auto` for one dimension:
+Images can be sized with absolute values. Omit one dimension to preserve the
+source image's aspect ratio:
 
 ```ts
 // Both dimensions specified
@@ -64,8 +65,6 @@ doc.image({ data: imageBytes, width: 200 })
 // Height only
 doc.image({ data: imageBytes, height: 150 })
 
-// Percentage width (useful for full-width images)
-doc.image({ data: imageBytes, width: '100%' })
 ```
 
 ## Image Format

@@ -7,7 +7,7 @@
  * @module ai/templates/report
  */
 
-import type { BlockNode, DocxSchema, PluginNode } from '@docxkit/core'
+import type { BlockNode, DocxSchema } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
 
 /** Report template parameters. */
@@ -43,7 +43,7 @@ Use the following docx-kit node types:
 - { type: "heading", level: N, text: "..." } for section headings
 - { type: "paragraph", text: "..." } for body text
 - { type: "pageBreak" } for page breaks between sections
-- { type: "plugin", name: "coverPage", options: { ... } } for cover pages
+- { type: "heading", level: 1, text: "..." } for the cover title
 
 Keep the content professional, concise, and well-structured.
 `
@@ -91,17 +91,16 @@ const schema: AiTemplateSchema = {
  * @returns A DocxSchema ready for rendering
  */
 function generate(params: ReportParams): DocxSchema {
-  const coverPageNode: PluginNode<'coverPage'> = {
-    name: 'coverPage',
-    type: 'plugin',
-    options: {
-      author: params.author ?? '',
-      date: params.date ?? '',
-      title: params.title,
-    },
+  const content: BlockNode[] = [
+    { level: 1, text: params.title, type: 'heading' },
+  ]
+  if (params.author) {
+    content.push({ text: params.author, type: 'paragraph' })
   }
-
-  const content: BlockNode[] = [coverPageNode, { type: 'pageBreak' }]
+  if (params.date) {
+    content.push({ text: params.date, type: 'paragraph' })
+  }
+  content.push({ type: 'pageBreak' })
 
   if (params.executiveSummary && params.executiveSummary.length > 0) {
     content.push({ level: 1, text: 'Executive Summary', type: 'heading' })

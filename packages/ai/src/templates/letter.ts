@@ -7,7 +7,7 @@
  * @module ai/templates/letter
  */
 
-import type { BlockNode, DocxSchema, PluginNode } from '@docxkit/core'
+import type { BlockNode, DocxSchema } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
 
 /** Letter template parameters. */
@@ -42,8 +42,7 @@ The letter should include:
 
 Use the following docx-kit node types:
 - { type: "paragraph", text: "..." } for body text
-- { type: "plugin", name: "propertyTable", options: { ... } } for address info
-- { type: "plugin", name: "signatureBlock", options: { ... } } for signature
+- { type: "paragraph", text: "..." } for address and signature information
 
 Maintain a professional tone appropriate for the letter type.
 `
@@ -107,15 +106,10 @@ function generate(params: LetterParams): DocxSchema {
   for (const paragraph of params.body) {
     content.push({ text: paragraph, type: 'paragraph' })
   }
-  const signatureBlockNode: PluginNode<'signatureBlock'> = {
-    name: 'signatureBlock',
-    type: 'plugin',
-    options: {
-      closing: params.closing ?? 'Sincerely',
-      parties: [{ name: params.senderName, role: '' }],
-    },
-  }
-  content.push(signatureBlockNode)
+  content.push(
+    { text: params.closing ?? 'Sincerely', type: 'paragraph' },
+    { text: params.senderName, type: 'paragraph' },
+  )
 
   return { content }
 }

@@ -1,0 +1,9 @@
+{
+  "docxKit": "^0.4.0",
+  "main": "./index.mjs",
+  "name": "docx-kit-plugin-fixture",
+  "plugin": {
+    "name": "fixture"
+  },
+  "version": "1.0.0"
+}

@@ -4,6 +4,7 @@
  * @module tests/ai/templates
  */
 
+import { renderDocx } from '@docxkit/core'
 import { describe, expect, it } from 'vitest'
 import {
   invoiceTemplate,
@@ -15,7 +16,6 @@ import type {
   BlockNode,
   HeadingNode,
   ParagraphNode,
-  PluginNode,
   TableNode,
 } from '@docxkit/core'
 import type {
@@ -36,13 +36,6 @@ function isObjectSchema(
 
 function isParagraphNode(node: BlockNode): node is ParagraphNode {
   return node.type === 'paragraph'
-}
-
-function isPluginNode<TName extends string>(
-  node: BlockNode,
-  name: TName,
-): node is PluginNode<TName> {
-  return node.type === 'plugin' && node.name === name
 }
 
 function isTableNode(
@@ -86,12 +79,14 @@ describe('report template', () => {
     expect(result.content.length).toBeGreaterThan(0)
   })
 
-  it('generates cover page plugin node', () => {
+  it('generates a core-only cover page', () => {
     const result = reportTemplate.generate({ author: 'Alice', title: 'Report' })
-    const coverNode = result.content.find(node =>
-      isPluginNode(node, 'coverPage'),
+    const title = result.content.find(
+      node => isHeadingNode(node) && node.text === 'Report',
     )
-    expect(coverNode).toBeDefined()
+    expect(title).toBeDefined()
+    expect(result.content.some(node => node.type === 'pageBreak')).toBe(true)
+    expect(result.content.some(node => node.type === 'plugin')).toBe(false)
   })
 
   it('generates executive summary section', () => {
@@ -284,16 +279,21 @@ describe('letter template', () => {
     expect(salutation).toBeDefined()
   })
 
-  it('generates signature block', () => {
+  it('generates closing and sender paragraphs', () => {
     const result = letterTemplate.generate({
       body: ['Body text.'],
       recipientName: 'Bob',
       senderName: 'Alice',
     })
-    const signature = result.content.find(node =>
-      isPluginNode(node, 'signatureBlock'),
+    const closing = result.content.find(
+      node => isTextParagraphNode(node) && node.text === 'Sincerely',
     )
-    expect(signature).toBeDefined()
+    const sender = result.content.find(
+      node => isTextParagraphNode(node) && node.text === 'Alice',
+    )
+    expect(closing).toBeDefined()
+    expect(sender).toBeDefined()
+    expect(result.content.some(node => node.type === 'plugin')).toBe(false)
   })
 
   it('uses custom closing phrase', () => {
@@ -303,10 +303,55 @@ describe('letter template', () => {
       recipientName: 'Bob',
       senderName: 'Alice',
     })
-    const signature = result.content.find(node =>
-      isPluginNode(node, 'signatureBlock'),
+    const closing = result.content.find(
+      node => isTextParagraphNode(node) && node.text === 'Best regards',
     )
-    expect(signature).toBeDefined()
-    expect(signature?.options).toMatchObject({ closing: 'Best regards' })
+    expect(closing).toBeDefined()
   })
+})
+
+describe('template rendering', () => {
+  it.each([
+    [
+      'report',
+      reportTemplate.generate({
+        author: 'Alice',
+        executiveSummary: ['Summary'],
+        title: 'Report',
+      }),
+    ],
+    [
+      'invoice',
+      invoiceTemplate.generate({
+        clientName: 'Client',
+        invoiceNumber: 'INV-1',
+        issuerName: 'Issuer',
+        items: [{ description: 'Service', quantity: 1, unitPrice: 100 }],
+      }),
+    ],
+    [
+      'resume',
+      resumeTemplate.generate({
+        email: 'alice@example.com',
+        name: 'Alice',
+        skills: ['TypeScript'],
+      }),
+    ],
+    [
+      'letter',
+      letterTemplate.generate({
+        body: ['Hello'],
+        recipientName: 'Bob',
+        senderName: 'Alice',
+      }),
+    ],
+  ])(
+    'renders the %s template without plugin registration',
+    async (_, schema) => {
+      const document = await renderDocx(schema)
+      const buffer = await document.toBuffer()
+
+      expect(buffer.byteLength).toBeGreaterThan(0)
+    },
+  )
 })

@@ -4,6 +4,7 @@
  * @module mcp-server/tools/getPluginHelp
  */
 
+import { findBuiltinPlugin } from '../plugins/catalog'
 import type { DocxPlugin } from '@docxkit/core'
 
 /**
@@ -49,39 +50,15 @@ export const getPluginHelpToolDefinition = {
  * @returns PluginHelpInfo with description, name, and usage example
  */
 export function buildPluginHelp(plugin: DocxPlugin): PluginHelpInfo {
-  const usageExamples: Record<string, string> = {
-    pageNumber: '{ type: "plugin", name: "pageNumber", options: {} }',
-    barcode:
-      '{ type: "plugin", name: "barcode", options: { text: "DOCX-KIT-2026", format: "code128" } }',
-    callout:
-      '{ type: "plugin", name: "callout", options: { title: "Note", variant: "info", text: "Important message" } }',
-    codeBlock:
-      '{ type: "plugin", name: "codeBlock", options: { code: "console.log(\'hello\')", language: "javascript" } }',
-    coverPage:
-      '{ type: "plugin", name: "coverPage", options: { title: "Annual Report", author: "John Doe", date: "2026-06-12" } }',
-    dataTable:
-      '{ type: "plugin", name: "dataTable", options: { columns: [...], data: [...], striped: true } }',
-    echarts:
-      '{ type: "plugin", name: "echarts", options: { option: { ...echarts config... }, width: 400, height: 300 } }',
-    meetingMinutes:
-      '{ type: "plugin", name: "meetingMinutes", options: { title: "Team Meeting", date: "2026-06-12", attendees: ["Alice", "Bob"] } }',
-    propertyTable:
-      '{ type: "plugin", name: "propertyTable", options: { items: [{ key: "Name", value: "Alice" }] } }',
-    qrcode:
-      '{ type: "plugin", name: "qrcode", options: { text: "https://example.com", width: 100 } }',
-    signatureBlock:
-      '{ type: "plugin", name: "signatureBlock", options: { parties: [{ name: "Alice", role: "Manager" }] } }',
-    timeline:
-      '{ type: "plugin", name: "timeline", options: { events: [{ date: "2026-01", title: "Kickoff" }] } }',
-    watermark:
-      '{ type: "plugin", name: "watermark", options: { text: "CONFIDENTIAL", opacity: 0.3 } }',
-  }
+  const metadata = findBuiltinPlugin(plugin.name)
 
   return {
-    description: `Built-in docx-kit plugin: ${plugin.name}. Renders ${plugin.name} content in the document.`,
     name: plugin.name,
+    description:
+      metadata?.description
+      ?? `Plugin: ${plugin.name}. Renders ${plugin.name} content in the document.`,
     usageExample:
-      usageExamples[plugin.name]
+      metadata?.usageExample
       ?? `{ type: "plugin", name: "${plugin.name}", options: { ... } }`,
   }
 }

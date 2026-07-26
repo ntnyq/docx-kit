@@ -157,6 +157,14 @@ describe('assertRendersParagraph', () => {
       assertRendersParagraph(paragraphs, 'Target text'),
     ).not.toThrow()
   })
+
+  it('fails when Paragraph output does not contain the expected text', () => {
+    const paragraph = new Paragraph({ text: 'Different text' })
+
+    expect(() =>
+      assertRendersParagraph(paragraph, 'Expected text'),
+    ).toThrowError(/containing "Expected text"/)
+  })
 })
 
 describe('assertRendersChildType', () => {

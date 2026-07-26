@@ -18,12 +18,6 @@ export const DOCX_MIME =
 export interface NormalizedDocx {
   /** The DOCX data as a Blob. */
   blob: Blob
-  /**
-   * An object URL created via `URL.createObjectURL`, or `null` if none was
-   * created. The caller is responsible for revoking this URL via
-   * `URL.revokeObjectURL` when no longer needed.
-   */
-  objectUrl: string | null
 }
 
 /**
@@ -38,7 +32,7 @@ export interface NormalizedDocx {
  *
  * @param input - The DOCX input to normalize
  * @param signal - Optional `AbortSignal` to cancel fetch operations
- * @returns A `NormalizedDocx` containing the Blob and an optional object URL
+ * @returns A `NormalizedDocx` containing the Blob
  * @throws {DocxKitError} `PREVIEW_INPUT_INVALID` for invalid inputs
  * @throws {DocxKitError} `PREVIEW_FETCH_FAILED` for fetch errors
  */
@@ -48,14 +42,13 @@ export async function normalizeDocxInput(
 ): Promise<NormalizedDocx> {
   // Blob or File — pass through unchanged
   if (input instanceof Blob) {
-    return { blob: input, objectUrl: null }
+    return { blob: input }
   }
 
   // ArrayBuffer — wrap in a Blob
   if (input instanceof ArrayBuffer) {
     return {
       blob: new Blob([input], { type: DOCX_MIME }),
-      objectUrl: null,
     }
   }
 
@@ -63,7 +56,6 @@ export async function normalizeDocxInput(
   if (input instanceof Uint8Array) {
     return {
       blob: new Blob([input as BlobPart], { type: DOCX_MIME }),
-      objectUrl: null,
     }
   }
 
@@ -99,7 +91,7 @@ async function fetchDocxFromUrl(
       )
     }
     const blob = await response.blob()
-    return { blob, objectUrl: null }
+    return { blob }
   } catch (error) {
     // Re-throw AbortError as-is so callers can distinguish cancellation
     if (error instanceof Error && error.name === 'AbortError') {

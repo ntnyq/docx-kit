@@ -121,24 +121,27 @@ export function assertRendersParagraph(
   }
 
   // Attempt to find a Paragraph-like object
-  let foundParagraph = false
+  let foundMatchingParagraph = false
   for (const item of results) {
     if (!isParagraph(item)) {
       continue
     }
-    foundParagraph = true
     if (expectedText === undefined) {
+      foundMatchingParagraph = true
       break
     }
     if (hasText(item, expectedText)) {
+      foundMatchingParagraph = true
       break
     }
   }
 
-  if (!foundParagraph) {
+  if (!foundMatchingParagraph) {
     throw new DocxKitError(
       'PLUGIN_RENDER_FAILED',
-      'Plugin did not render a Paragraph',
+      expectedText === undefined
+        ? 'Plugin did not render a Paragraph'
+        : `Plugin did not render a Paragraph containing "${expectedText}"`,
     )
   }
 }
@@ -223,6 +226,32 @@ export async function renderPlugin<
 
 // ---------- Internal Helpers ----------
 
+function collectText(value: unknown, seen: WeakSet<object>): string {
+  if (typeof value === 'string') {
+    return value
+  }
+  if (!value || typeof value !== 'object' || seen.has(value)) {
+    return ''
+  }
+
+  seen.add(value)
+  if (Array.isArray(value)) {
+    return value.map(item => collectText(item, seen)).join('')
+  }
+
+  const object = value as Record<string, unknown>
+  if (typeof object.text === 'string') {
+    return object.text
+  }
+  if (object.root !== undefined) {
+    return collectText(object.root, seen)
+  }
+  if (object.options !== undefined) {
+    return collectText(object.options, seen)
+  }
+  return ''
+}
+
 /**
  * Check if a Paragraph-like object contains the expected text.
  *
@@ -230,32 +259,7 @@ export async function renderPlugin<
  * and plain objects with a `text` property.
  */
 function hasText(value: unknown, expectedText: string): boolean {
-  if (!value || typeof value !== 'object') {
-    return false
-  }
-
-  // Check if it's a TextRun-like object with text
-  const obj = value as Record<string, unknown>
-  const opts = obj.options as Record<string, unknown> | undefined
-  if (opts?.text && typeof opts.text === 'string') {
-    return opts.text.includes(expectedText)
-  }
-
-  // Check children array for text content
-  const children = opts?.children as unknown[] | undefined
-  if (Array.isArray(children)) {
-    return children.some(child => {
-      if (typeof child === 'string') {
-        return child.includes(expectedText)
-      }
-      if (child && typeof child === 'object') {
-        return hasText(child, expectedText)
-      }
-      return false
-    })
-  }
-
-  return false
+  return collectText(value, new WeakSet()).includes(expectedText)
 }
 
 /**

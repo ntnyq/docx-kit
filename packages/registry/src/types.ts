@@ -62,8 +62,8 @@ export interface RegistryPluginEntry {
   /** Weekly download count from npm. */
   downloads: number
 
-  /** Parsed plugin manifest. */
-  manifest: PluginManifest
+  /** Parsed plugin manifest, or null when it has not been verified. */
+  manifest: PluginManifest | null
 
   /** npm package name. */
   name: string

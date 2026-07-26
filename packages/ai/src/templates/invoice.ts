@@ -11,7 +11,6 @@ import type {
   BlockNode,
   DocxSchema,
   ParagraphNode,
-  PluginNode,
   TableNode,
 } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
@@ -65,7 +64,7 @@ Use the following docx-kit node types:
 - { type: "heading", level: N, text: "..." } for headers
 - { type: "paragraph", text: "..." } for info lines
 - { type: "table", columns: [...], data: [...] } for the charges table
-- { type: "plugin", name: "propertyTable", options: { ... } } for key-value info
+- { type: "table", columns: [...], data: [...] } for key-value info
 
 Make sure all monetary values are formatted consistently.
 `
@@ -183,10 +182,14 @@ function generate(params: InvoiceParams): DocxSchema {
     unitPrice: `$${item.unitPrice.toFixed(2)}`,
   }))
 
-  const propertyTableNode: PluginNode<'propertyTable'> = {
-    name: 'propertyTable',
-    options: { items: propItems },
-    type: 'plugin',
+  const metadataTableNode: TableNode<Record<string, unknown>> = {
+    data: propItems,
+    header: false,
+    type: 'table',
+    columns: [
+      { key: 'key', title: 'Field' },
+      { key: 'value', title: 'Value' },
+    ],
   }
 
   const columns: TableNode<Record<string, unknown>>['columns'] = [
@@ -223,7 +226,7 @@ function generate(params: InvoiceParams): DocxSchema {
     { level: 1, text: 'INVOICE', type: 'heading' },
     { text: params.issuerName, type: 'paragraph' },
     ...issuerLines,
-    propertyTableNode,
+    metadataTableNode,
     itemsTableNode,
     subtotalNode,
     ...(taxNode ? [taxNode] : []),

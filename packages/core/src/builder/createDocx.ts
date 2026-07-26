@@ -11,7 +11,7 @@
 import { createPluginLoader } from '../loader/PluginLoader'
 import { DocxBuilder } from './DocxBuilder'
 import type { BlockNode, DocxKitConfig, StyleSheet } from '@docxkit/types'
-import type { PluginSource } from '../loader/PluginLoader'
+import type { PluginLoader, PluginSource } from '../loader/PluginLoader'
 
 /**
  * JSON schema for `renderDocx()`.
@@ -52,6 +52,12 @@ export interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
   plugins?: PluginSource[]
   /** Named stylesheet entries. */
   styles?: TStyles
+}
+
+/** Runtime adapters used while rendering a declarative schema. */
+export interface RenderDocxOptions {
+  /** Platform-aware loader for npm, URL, or local plugin sources. */
+  pluginLoader?: PluginLoader
 }
 
 /**
@@ -134,14 +140,17 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
  */
 export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   schema: DocxSchema<TStyles>,
+  options: RenderDocxOptions = {},
 ): Promise<DocxBuilder<TStyles>> {
   const { content, plugins, ...config } = schema
   const builder = new DocxBuilder<TStyles>(config as DocxKitConfig<TStyles>)
 
   // Load and register plugins before compiling content
   if (plugins && plugins.length > 0) {
-    const loader = createPluginLoader()
-    const results = await loader.loadAll(plugins)
+    const loader = options.pluginLoader ?? createPluginLoader()
+    const results = await Promise.all(
+      plugins.map(source => loader.load(source)),
+    )
     for (const result of results) {
       builder.use(result.plugin)
     }

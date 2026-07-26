@@ -103,6 +103,16 @@ export function codeBlockPlugin() {
   })
 }
 
+function decodeHighlightText(value: string): string {
+  return value
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#x27;', "'")
+    .replaceAll('&#39;', "'")
+    .replaceAll('&amp;', '&')
+}
+
 /**
  * Render plain (unhighlighted) code lines as Paragraphs.
  *
@@ -155,77 +165,39 @@ function linesToParagraphs(
  */
 function parseHighlightHtml(html: string): TextRun[] {
   const results: TextRun[] = []
-  const regex = /<span\s+class="([^"]*)">(.*?)<\/span>/g
+  const colorStack: (string | undefined)[] = [undefined]
+  const tokenRegex = /<span\b[^>]*>|<\/span>|[^<]+/g
 
-  let lastIndex = 0
-  let match = regex.exec(html)
-
-  while (match !== null) {
-    const classAttr = match[1]
-    const tokenMatch = /hljs-(\w+)/.exec(classAttr)
-
-    // Skip spans that are not highlight.js spans
-    if (!tokenMatch) {
-      lastIndex = match.index + match[0].length
-      match = regex.exec(html)
+  for (const match of html.matchAll(tokenRegex)) {
+    const token = match[0]
+    if (token.startsWith('<span')) {
+      const classMatch = /class="([^"]*)"/.exec(token)
+      const tokenMatch = classMatch ? /hljs-([\w-]+)/.exec(classMatch[1]) : null
+      colorStack.push(
+        tokenMatch
+          ? (TOKEN_COLORS[tokenMatch[1]] ?? 'D4D4D4')
+          : colorStack.at(-1),
+      )
+      continue
+    }
+    if (token === '</span>') {
+      if (colorStack.length > 1) {
+        colorStack.pop()
+      }
       continue
     }
 
-    const type = tokenMatch[1]
-
-    // Text before this span
-    if (match.index > lastIndex) {
-      const before = html.slice(lastIndex, match.index)
-      if (before) {
-        results.push(
-          new TextRun({
-            font: MONO_FONT,
-            size: FONT_SIZE,
-            text: before,
-          }),
-        )
-      }
-    }
-
-    const text = match[2]
-    const color = TOKEN_COLORS[type] ?? 'D4D4D4'
-
-    results.push(
-      new TextRun({
-        color,
-        font: MONO_FONT,
-        size: FONT_SIZE,
-        text,
-      }),
-    )
-
-    lastIndex = match.index + match[0].length
-    match = regex.exec(html)
-  }
-
-  // Remaining text after last span
-  if (lastIndex < html.length) {
-    const after = html.slice(lastIndex)
-    if (after) {
+    const text = decodeHighlightText(token)
+    if (text.length > 0) {
       results.push(
         new TextRun({
+          color: colorStack.at(-1),
           font: MONO_FONT,
           size: FONT_SIZE,
-          text: after,
+          text,
         }),
       )
     }
-  }
-
-  // If no spans were found, return the line as plain text
-  if (results.length === 0 && html) {
-    results.push(
-      new TextRun({
-        font: MONO_FONT,
-        size: FONT_SIZE,
-        text: html,
-      }),
-    )
   }
 
   return results

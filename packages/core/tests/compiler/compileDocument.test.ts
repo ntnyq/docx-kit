@@ -58,6 +58,7 @@ describe('compileDocument', () => {
         {
           data: new Uint8Array([1, 2, 3]),
           height: 200,
+          imageType: 'png',
           type: 'image',
           width: 300,
         },

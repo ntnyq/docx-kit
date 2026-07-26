@@ -13,14 +13,19 @@
  * @module mcp-server
  */
 
+import packageJson from '../package.json'
+import { findBuiltinPlugin } from './plugins/catalog'
 import { docxSchemaResource } from './resources/schema'
 import {
   applyTemplate,
   applyTemplateToolDefinition,
 } from './tools/applyTemplate'
-import { createDocxToolDefinition } from './tools/createDocx'
+import { createDocument, createDocxToolDefinition } from './tools/createDocx'
 import { getPluginHelpToolDefinition } from './tools/getPluginHelp'
-import { listPluginsToolDefinition } from './tools/listPlugins'
+import {
+  buildBuiltinPluginInfoList,
+  listPluginsToolDefinition,
+} from './tools/listPlugins'
 import {
   buildTemplateInfoList,
   listTemplatesToolDefinition,
@@ -29,6 +34,7 @@ import {
   validateSchema,
   validateSchemaToolDefinition,
 } from './tools/validateSchema'
+import type { PluginLoader } from '@docxkit/core'
 
 /**
  * All MCP tool definitions for docx-kit.
@@ -46,6 +52,13 @@ export const TOOL_DEFINITIONS = [
  * All MCP resource definitions for docx-kit.
  */
 export const RESOURCE_DEFINITIONS = [docxSchemaResource] as const
+
+export interface CreateDocxKitServerOptions {
+  /** Directory that contains every path create_document may write. */
+  outputDirectory?: string
+  /** Explicitly authorized plugin loader for create_document schemas. */
+  pluginLoader?: PluginLoader
+}
 
 /**
  * Create a docx-kit MCP server.
@@ -69,14 +82,16 @@ export const RESOURCE_DEFINITIONS = [docxSchemaResource] as const
  * await server.connect(transport)
  * ```
  */
-export async function createDocxKitServer(): Promise<unknown> {
+export async function createDocxKitServer(
+  options: CreateDocxKitServerOptions = {},
+): Promise<unknown> {
   // Dynamic import — SDK is an optional peer dependency
   const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js')
   const { z } = await import('zod')
 
   const server = new McpServer({
     name: 'docx-kit',
-    version: '0.2.0',
+    version: packageJson.version,
   })
 
   // Tool: create_document
@@ -92,8 +107,6 @@ export async function createDocxKitServer(): Promise<unknown> {
       },
     },
     async (input: { outputPath: string; schema: Record<string, unknown> }) => {
-      // For MCP, we return a text description (actual file saving
-      // must be handled by the caller with renderDocx() + save())
       const docSchema = input.schema
       const validation = validateSchema(docSchema as never)
 
@@ -109,13 +122,35 @@ export async function createDocxKitServer(): Promise<unknown> {
         }
       }
 
-      return {
-        content: [
+      try {
+        const result = await createDocument(
           {
-            text: `Document schema is valid. Use renderDocx() to generate the document and save to: ${input.outputPath}`,
-            type: 'text' as const,
+            outputPath: input.outputPath,
+            schema: docSchema as never,
           },
-        ],
+          {
+            outputDirectory: options.outputDirectory,
+            pluginLoader: options.pluginLoader,
+          },
+        )
+        return {
+          content: [
+            {
+              text: JSON.stringify(result, null, 2),
+              type: 'text' as const,
+            },
+          ],
+        }
+      } catch (error) {
+        return {
+          isError: true,
+          content: [
+            {
+              text: `Document creation failed: ${(error as Error).message}`,
+              type: 'text' as const,
+            },
+          ],
+        }
       }
     },
   )
@@ -156,31 +191,7 @@ export async function createDocxKitServer(): Promise<unknown> {
       },
     },
     async (input: { filter?: string }) => {
-      // Built-in plugin names (no runtime plugin list available in MCP context)
-      const builtInNames = [
-        'barcode',
-        'callout',
-        'codeBlock',
-        'coverPage',
-        'dataTable',
-        'echarts',
-        'meetingMinutes',
-        'pageNumber',
-        'propertyTable',
-        'qrcode',
-        'signatureBlock',
-        'timeline',
-        'watermark',
-      ]
-      const infoList = builtInNames.map(name => ({
-        description: `Built-in docx-kit plugin: ${name}`,
-        name,
-      }))
-      const filtered = input.filter
-        ? infoList.filter(p =>
-            p.name.toLowerCase().includes(input.filter!.toLowerCase()),
-          )
-        : infoList
+      const filtered = buildBuiltinPluginInfoList(input.filter)
 
       return {
         content: [
@@ -203,43 +214,10 @@ export async function createDocxKitServer(): Promise<unknown> {
       },
     },
     async (input: { pluginName: string }) => {
-      // Create a minimal DocxPlugin reference for help
-      const helpInfo: Record<string, unknown> = {
-        description: `Built-in docx-kit plugin: ${input.pluginName}`,
+      const helpInfo = findBuiltinPlugin(input.pluginName) ?? {
+        description: `Plugin: ${input.pluginName}`,
         name: input.pluginName,
         usageExample: `{ type: "plugin", name: "${input.pluginName}", options: { ... } }`,
-      }
-
-      const usageExamples: Record<string, string> = {
-        pageNumber: '{ type: "plugin", name: "pageNumber", options: {} }',
-        barcode:
-          '{ type: "plugin", name: "barcode", options: { text: "DOCX-KIT-2026", format: "code128" } }',
-        callout:
-          '{ type: "plugin", name: "callout", options: { title: "Note", variant: "info", text: "Important message" } }',
-        codeBlock:
-          '{ type: "plugin", name: "codeBlock", options: { code: "console.log(\'hello\')", language: "javascript" } }',
-        coverPage:
-          '{ type: "plugin", name: "coverPage", options: { title: "Annual Report", author: "John Doe", date: "2026-06-12" } }',
-        dataTable:
-          '{ type: "plugin", name: "dataTable", options: { columns: [...], data: [...], striped: true } }',
-        echarts:
-          '{ type: "plugin", name: "echarts", options: { option: { ...echarts config... }, width: 400, height: 300 } }',
-        meetingMinutes:
-          '{ type: "plugin", name: "meetingMinutes", options: { title: "Team Meeting", date: "2026-06-12", attendees: ["Alice", "Bob"] } }',
-        propertyTable:
-          '{ type: "plugin", name: "propertyTable", options: { items: [{ key: "Name", value: "Alice" }] } }',
-        qrcode:
-          '{ type: "plugin", name: "qrcode", options: { text: "https://example.com", width: 100 } }',
-        signatureBlock:
-          '{ type: "plugin", name: "signatureBlock", options: { parties: [{ name: "Alice", role: "Manager" }] } }',
-        timeline:
-          '{ type: "plugin", name: "timeline", options: { events: [{ date: "2026-01", title: "Kickoff" }] } }',
-        watermark:
-          '{ type: "plugin", name: "watermark", options: { text: "CONFIDENTIAL", opacity: 0.3 } }',
-      }
-
-      if (usageExamples[input.pluginName]) {
-        helpInfo.usageExample = usageExamples[input.pluginName]
       }
 
       return {
@@ -332,7 +310,7 @@ export async function createDocxKitServer(): Promise<unknown> {
 }
 
 export { docxSchemaResource } from './resources/schema'
-export { createDocxToolDefinition } from './tools/createDocx'
+export { createDocument, createDocxToolDefinition } from './tools/createDocx'
 // Re-export individual tool/resource modules for programmatic use
 export {
   applyTemplate,
@@ -343,10 +321,6 @@ export {
   getPluginHelpToolDefinition,
 } from './tools/getPluginHelp'
 export {
-  buildPluginInfoList,
-  listPluginsToolDefinition,
-} from './tools/listPlugins'
-export {
   validateSchema,
   validateSchemaToolDefinition,
 } from './tools/validateSchema'
@@ -354,12 +328,13 @@ export {
   buildTemplateInfoList,
   listTemplatesToolDefinition,
 } from './tools/listTemplates'
+export {
+  buildBuiltinPluginInfoList,
+  buildPluginInfoList,
+  listPluginsToolDefinition,
+} from './tools/listPlugins'
 export type { PluginInfo } from './tools/listPlugins'
 export type { PluginHelpInfo } from './tools/getPluginHelp'
-export type {
-  CreateDocumentInput,
-  CreateDocumentOutput,
-} from './tools/createDocx'
 export type {
   ValidateSchemaOutput,
   ValidationError,
@@ -368,3 +343,8 @@ export type {
   ApplyTemplateInput,
   ApplyTemplateOutput,
 } from './tools/applyTemplate'
+export type {
+  CreateDocumentInput,
+  CreateDocumentOptions,
+  CreateDocumentOutput,
+} from './tools/createDocx'

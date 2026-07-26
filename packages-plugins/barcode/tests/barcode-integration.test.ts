@@ -1,5 +1,5 @@
 import { createPluginTestContext } from '@docxkit/pdk'
-import { Document, Packer } from 'docx'
+import { Document, Packer, Paragraph } from 'docx'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 
@@ -15,6 +15,12 @@ describe('barcodePlugin integration', () => {
       },
       createPluginTestContext(),
     )
+    if (
+      !Array.isArray(children)
+      || !children.every(child => child instanceof Paragraph)
+    ) {
+      throw new TypeError('Expected barcode paragraphs')
+    }
     const document = new Document({
       sections: [{ children }],
     })

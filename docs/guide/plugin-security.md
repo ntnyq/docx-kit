@@ -11,9 +11,9 @@ Plugins fall into four trust tiers based on their origin and verification:
 | **Built-in** | Included in docx-kit source               | Tested & reviewed with each release       | Minimal |
 | **Verified** | Published by the docx-kit team            | Manifest validated, version checked       | Low     |
 | **Community**| Published by third parties on npm         | Manifest validated, keyword tagged        | Medium  |
-| **Untrusted**| Loaded from arbitrary URLs or local paths | No guaranteed verification                | High    |
+| **Untrusted**| Loaded from arbitrary URLs or local paths | Manifest validated; publisher not trusted | High    |
 
-Built-in plugins (callout, watermark, echarts, qrcode, etc.) are compiled and tested as part of the docx-kit release cycle. Verified plugins follow the same review process but live in separate packages. Community plugins are only validated at the manifest level. Untrusted plugins carry the highest risk since they may bypass manifest validation.
+Built-in plugins (callout, watermark, echarts, qrcode, etc.) are compiled and tested as part of the docx-kit release cycle. Verified plugins follow the same review process but live in separate packages. Community and URL/local plugins are validated at the manifest level. URL and local plugins still carry the highest risk because a valid manifest does not make executable code trustworthy.
 
 ## Permission Hooks
 
@@ -68,10 +68,11 @@ This hook gives you access to the manifest metadata (author, version range, depe
 
 Every plugin loaded from npm, URL, or local sources goes through `validateManifest()` by default. This ensures:
 
-- Required fields (`name`, `version`, `docxKit`, `plugin.name`) are present and correctly typed
+- Required fields (`name`, `version`, `docxKit`, `main`, `plugin.name`) are present and correctly typed
 - `version` is valid semver (e.g. `1.0.0`)
 - `docxKit` is a valid semver range (e.g. `^0.2.0`, `~0.3.0`, `*`)
-- Optional fields (`main`, `types`, `dependencies`, `peerDependencies`) have correct types
+- `main` and optional `types` are safe package-relative paths beginning with `./`
+- Optional dependency and export maps contain only string values
 
 You can disable manifest validation when loading trusted or test plugins:
 

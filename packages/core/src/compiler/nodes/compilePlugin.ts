@@ -16,11 +16,13 @@ import type {
   StyleSheet,
 } from '@docxkit/types'
 import type { FileChild } from 'docx'
+import type { CompilationSession } from '../numbers'
 
 export async function compilePlugin<TStyles extends StyleSheet>(
   node: PluginNode<string, unknown, TStyles>,
   plugins: Map<string, DocxPlugin>,
   config: DocxKitConfig<TStyles>,
+  session: CompilationSession,
 ): Promise<FileChild | FileChild[]> {
   const plugin = plugins.get(node.name)
   if (!plugin) {
@@ -44,6 +46,7 @@ export async function compilePlugin<TStyles extends StyleSheet>(
         config: config as DocxKitConfig,
         node: childNode,
         plugins,
+        session,
       }),
   }
 

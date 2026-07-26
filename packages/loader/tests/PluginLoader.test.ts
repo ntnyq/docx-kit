@@ -1,4 +1,5 @@
 /* eslint-disable vitest/no-conditional-expect */
+import { fileURLToPath } from 'node:url'
 import {
   createPluginLoader,
   DocxKitError,
@@ -8,12 +9,16 @@ import {
 import { describe, expect, it, vi } from 'vitest'
 import { calloutPlugin } from '../../../packages-plugins/callout/src/index'
 import { watermarkPlugin } from '../../../packages-plugins/watermark/src/index'
-import type { DocxPlugin, PluginManifest, PluginSource } from '@docxkit/core'
+import { createPluginLoader as createBrowserPluginLoader } from '../src/loader-browser'
+import { createPluginLoader as createNodePluginLoader } from '../src/loader-node'
+import type {
+  DocxPlugin,
+  PluginManifest,
+  PluginManifestAuthorizer,
+  PluginSource,
+} from '@docxkit/core'
 
 const callout = calloutPlugin() as DocxPlugin
-type TestablePluginLoader = PluginLoader & {
-  _forceManifestForTesting?: PluginManifest | null
-}
 
 // Reusable manifest template with all required fields
 const TEST_MANIFEST: PluginManifest = {
@@ -22,6 +27,20 @@ const TEST_MANIFEST: PluginManifest = {
   name: 'test',
   plugin: { name: 'test' },
   version: '1.0.0',
+}
+
+class AuthorizedNpmLoader extends PluginLoader {
+  readonly events: string[] = []
+
+  protected override async _loadNpm(
+    _packageName: string,
+    authorizeManifest: PluginManifestAuthorizer,
+  ) {
+    this.events.push('manifest')
+    const manifest = await authorizeManifest(TEST_MANIFEST)
+    this.events.push('execute')
+    return { manifest, plugin: callout }
+  }
 }
 
 describe('PluginLoader', () => {
@@ -185,37 +204,87 @@ describe('PluginLoader', () => {
 
   describe('security policy — allowExecute', () => {
     it('blocks execution when allowExecute returns false', async () => {
-      const loader = createPluginLoader({
+      const loader = new AuthorizedNpmLoader({
+        kitVersion: '1.0.0',
         security: {
-          allowExecute: () => false,
+          allowExecute: () => {
+            loader.events.push('policy')
+            return false
+          },
         },
       })
-      // Inject manifest to trigger allowExecute
-      const testLoader = loader as TestablePluginLoader
-      testLoader._forceManifestForTesting = TEST_MANIFEST
 
-      try {
-        await loader.load({ plugin: callout, type: 'inline' })
-      } catch (error) {
-        expect(error instanceof DocxKitError).toBe(true)
-        expect((error as DocxKitError).code).toBe(
-          ERROR_CODES.PLUGIN_LOAD_FAILED,
-        )
-        expect((error as DocxKitError).message).toContain('security policy')
-      }
+      await expect(
+        loader.load({ package: 'test-plugin', type: 'npm' }),
+      ).rejects.toMatchObject({
+        code: ERROR_CODES.PLUGIN_LOAD_FAILED,
+      })
+      expect(loader.events).toEqual(['manifest', 'policy'])
     })
 
     it('allows execution when allowExecute returns true', async () => {
-      const loader = createPluginLoader({
+      const loader = new AuthorizedNpmLoader({
+        kitVersion: '1.0.0',
         security: {
-          allowExecute: () => true,
+          allowExecute: () => {
+            loader.events.push('policy')
+            return true
+          },
         },
       })
-      const testLoader = loader as TestablePluginLoader
-      testLoader._forceManifestForTesting = TEST_MANIFEST
 
-      const result = await loader.load({ plugin: callout, type: 'inline' })
+      const result = await loader.load({
+        package: 'test-plugin',
+        type: 'npm',
+      })
       expect(result.plugin.name).toBe('callout')
+      expect(loader.events).toEqual(['manifest', 'policy', 'execute'])
+    })
+  })
+
+  describe('Node platform factory', () => {
+    it('loads a local plugin using its adjacent manifest', async () => {
+      const loader = createNodePluginLoader()
+      const pluginDirectory = fileURLToPath(
+        new URL('./fixtures/node-plugin', import.meta.url),
+      )
+
+      const result = await loader.load({
+        path: pluginDirectory,
+        type: 'local',
+      })
+
+      expect(result.plugin.name).toBe('fixture')
+      expect(result.manifest?.main).toBe('./index.mjs')
+    })
+  })
+
+  describe('browser platform factory', () => {
+    it('loads a URL plugin after fetching its adjacent manifest', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        Response.json(
+          {
+            ...TEST_MANIFEST,
+            docxKit: '^0.4.0',
+            main: './index.mjs',
+            plugin: { name: 'fixture' },
+          },
+          { status: 200 },
+        ),
+      )
+      const loader = createBrowserPluginLoader()
+      const moduleUrl = new URL(
+        './fixtures/node-plugin/index.mjs',
+        import.meta.url,
+      ).href
+
+      const result = await loader.load({ type: 'url', url: moduleUrl })
+
+      expect(result.plugin.name).toBe('fixture')
+      expect(fetchSpy).toHaveBeenCalledWith(
+        new URL('./fixtures/node-plugin/docx-kit.plugin.json', import.meta.url),
+      )
+      fetchSpy.mockRestore()
     })
   })
 
@@ -332,23 +401,3 @@ describe('PluginLoader', () => {
     })
   })
 })
-
-// Monkey-patch the _loadInline method on PluginLoader prototype
-// to support testing the allowExecute security hook.
-// @ts-expect-error — accessing protected member for test purposes
-const originalLoadInline = PluginLoader.prototype._loadInline
-/* eslint-disable unicorn/no-this-outside-of-class -- Prototype patch requires a dynamic method receiver. */
-// @ts-expect-error — assigning to protected member; return type widened for testing
-PluginLoader.prototype._loadInline = function (
-  this: TestablePluginLoader,
-  plugin: DocxPlugin,
-): { manifest: PluginManifest | null; plugin: DocxPlugin } {
-  if (this._forceManifestForTesting !== undefined) {
-    return {
-      manifest: this._forceManifestForTesting,
-      plugin,
-    }
-  }
-  return originalLoadInline.call(this, plugin)
-}
-/* eslint-enable unicorn/no-this-outside-of-class */

@@ -6,6 +6,8 @@
 
 /* eslint-disable perfectionist/sort-objects */
 
+import { DOCX_KIT_RANGE } from '../../version'
+
 /**
  * Render a package.json for a docx-kit plugin.
  *
@@ -54,12 +56,12 @@ export function renderPackageJson(
       },
       peerDependencies: {
         docx: '^9.7.1',
-        'docx-kit': '^0.3.0',
+        'docx-kit': DOCX_KIT_RANGE,
       },
       devDependencies: {
         '@ntnyq/eslint-config': '^6.1.5',
         docx: '^9.7.1',
-        'docx-kit': '^0.3.0',
+        'docx-kit': DOCX_KIT_RANGE,
         eslint: '^10.7.0',
         tsdown: '^0.22.9',
         typescript: '^6.0.3',

@@ -34,7 +34,8 @@ describe('searchPlugins', () => {
 
     expect(results).toHaveLength(1)
     expect(results[0].name).toBe('docx-kit-plugin-chart')
-    expect(results[0].manifest.plugin.name).toBe('chart')
+    expect(results[0].manifest).toBeNull()
+    expect(results[0].quality.hasManifest).toBe(false)
 
     // Verify URL contains keyword and query (URL-encoded)
     const calledUrl = mockFetch.mock.calls[0][0] as string
@@ -86,12 +87,47 @@ describe('getPlugin', () => {
         },
       }),
     })
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        docxKit: '^0.4.0',
+        main: './dist/index.js',
+        name: 'docx-kit-plugin-chart',
+        plugin: { name: 'chart' },
+        version: '1.0.0',
+      }),
+    })
 
     const result = await getPlugin('docx-kit-plugin-chart')
 
     expect(result).not.toBeNull()
     expect(result!.name).toBe('docx-kit-plugin-chart')
-    expect(result!.manifest.plugin.name).toBe('chart')
+    expect(result!.manifest?.plugin.name).toBe('chart')
+    expect(result!.quality.hasManifest).toBe(true)
+    expect(mockFetch).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not fabricate a missing manifest', async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          description: 'A chart plugin',
+          'dist-tags': { latest: '1.0.0' },
+          keywords: ['docx-kit-plugin'],
+          name: 'docx-kit-plugin-chart',
+          versions: {
+            '1.0.0': { keywords: ['docx-kit-plugin', 'chart'] },
+          },
+        }),
+      })
+      .mockResolvedValueOnce({ ok: false, status: 404 })
+
+    const result = await getPlugin('docx-kit-plugin-chart')
+
+    expect(result).not.toBeNull()
+    expect(result?.manifest).toBeNull()
+    expect(result?.quality.hasManifest).toBe(false)
   })
 
   it('returns null for non-existent package', async () => {

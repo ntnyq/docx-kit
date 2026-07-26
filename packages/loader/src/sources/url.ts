@@ -17,8 +17,10 @@
 
 import { DocxKitError } from '@docxkit/core'
 import { isDocxPlugin } from '../utils'
+import { resolveManifest } from './options'
 
-import type { DocxPlugin, PluginManifest } from '@docxkit/core'
+import type { DocxPlugin } from '@docxkit/core'
+import type { ExternalPluginLoadOptions } from './options'
 
 /**
  * Load a plugin from a remote URL (browser).
@@ -31,8 +33,13 @@ import type { DocxPlugin, PluginManifest } from '@docxkit/core'
  */
 export async function loadUrlPlugin(
   url: string,
-  options?: { manifest?: PluginManifest },
-): Promise<{ manifest: PluginManifest | null; plugin: DocxPlugin }> {
+  options?: ExternalPluginLoadOptions,
+): Promise<{
+  manifest: Awaited<ReturnType<typeof resolveManifest>>
+  plugin: DocxPlugin
+}> {
+  const manifest = await resolveManifest(options)
+
   let mod: DocxPlugin | { default?: unknown }
   try {
     mod = (await import(/* @vite-ignore */ url)) as
@@ -57,15 +64,15 @@ export async function loadUrlPlugin(
   }
 
   // If a manifest was provided, verify plugin name matches
-  if (options?.manifest && plugin.name !== options.manifest.plugin.name) {
+  if (manifest && plugin.name !== manifest.plugin.name) {
     console.warn(
-      `[docx-kit] Plugin name mismatch: manifest declares "${options.manifest.plugin.name}" `
+      `[docx-kit] Plugin name mismatch: manifest declares "${manifest.plugin.name}" `
         + `but loaded plugin has "${plugin.name}"`,
     )
   }
 
   return {
-    manifest: options?.manifest ?? null,
+    manifest,
     plugin: plugin as DocxPlugin,
   }
 }

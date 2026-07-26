@@ -62,7 +62,7 @@ describe('createPlugin', () => {
     )
     expect(manifest.name).toBe('docx-kit-plugin-test')
     expect(manifest.plugin.name).toBe('test')
-    expect(manifest.docxKit).toBe('^0.3.0')
+    expect(manifest.docxKit).toBe('^0.4.0')
 
     // Verify package.json content
     const pkg = JSON.parse(
@@ -70,6 +70,7 @@ describe('createPlugin', () => {
     )
     expect(pkg.name).toBe('docx-kit-plugin-test')
     expect(pkg.keywords).toContain('docx-kit-plugin')
+    expect(pkg.peerDependencies['docx-kit']).toBe('^0.4.0')
     expect(pkg.devDependencies.tsdown).toBe('^0.22.9')
   })
 

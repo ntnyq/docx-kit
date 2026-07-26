@@ -171,6 +171,7 @@ defaultRegistry
       node as PluginNode<string, unknown, StyleSheet>,
       ctx.plugins,
       ctx.config as DocxKitConfig,
+      ctx.session,
     ),
   )
 

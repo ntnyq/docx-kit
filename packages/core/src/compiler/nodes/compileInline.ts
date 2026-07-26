@@ -4,13 +4,18 @@
  * @module compiler/nodes/compileInline
  */
 
+import { DocxKitError } from '@docxkit/types'
 import { TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
-import { createImageRun } from '../../utils/image'
+import {
+  createImageRun,
+  readImageMetadata,
+  resolveImageDimensions,
+} from '../../utils/image'
 import { compileTextStyle } from '../compileStyle'
 import { toPx } from '../units'
 import { compileInlineHyperlink } from './compileHyperlink'
-import { normalizeImageData } from './compileImage'
+import { compileImageFloating, normalizeImageData } from './compileImage'
 import {
   compileBookmark,
   compileCheckbox,
@@ -83,29 +88,18 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
   return compiled.flat()
 }
 
-function compileFloating(
-  floating: ImageNode['floating'],
-): Record<string, unknown> | undefined {
-  if (!floating) {
-    return undefined
-  }
-  if (floating === true) {
-    return {}
-  }
-  return {
-    horizontalPosition:
-      floating.x === undefined ? undefined : { offset: floating.x },
-    verticalPosition:
-      floating.y === undefined ? undefined : { offset: floating.y },
-  }
-}
-
 async function compileInlineImage<TStyles extends StyleSheet>(
   node: ImageNode<TStyles>,
   config: DocxKitConfig<TStyles>,
 ) {
   const data = await normalizeImageData(node.data)
-  const imageType = node.imageType ?? 'png'
+  const metadata = readImageMetadata(data, node.imageType)
+  if (!metadata) {
+    throw new DocxKitError(
+      'IMAGE_INVALID_DATA',
+      'Image format could not be detected; provide a supported imageType',
+    )
+  }
   const inlineStyle = resolveStyle({
     base: config.defaults?.image,
     className: node.className,
@@ -113,12 +107,20 @@ async function compileInlineImage<TStyles extends StyleSheet>(
     styles: config.styles,
     theme: config.theme,
   })
+  const defaultHeight = toPx(inlineStyle.fontSize) ?? 16
+  const dimensions = resolveImageDimensions(
+    toPx(node.width),
+    toPx(node.height) ?? (node.width === undefined ? defaultHeight : undefined),
+    metadata,
+    { height: defaultHeight, width: defaultHeight },
+  )
 
   return createImageRun({
+    alt: node.alt,
     data,
-    floating: compileFloating(node.floating),
-    height: toPx(node.height) ?? toPx(inlineStyle.fontSize) ?? 16,
-    type: imageType,
-    width: toPx(node.width),
+    floating: compileImageFloating(node.floating),
+    height: dimensions.height,
+    type: metadata.type,
+    width: dimensions.width,
   })
 }

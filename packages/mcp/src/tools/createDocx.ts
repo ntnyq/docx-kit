@@ -4,7 +4,12 @@
  * @module mcp-server/tools/createDocx
  */
 
-import type { DocxSchema } from '@docxkit/core'
+import { constants } from 'node:fs'
+import { mkdir, open, realpath } from 'node:fs/promises'
+import path from 'node:path'
+import process from 'node:process'
+import { createPluginLoader, renderDocx } from '@docxkit/core'
+import type { DocxSchema, PluginLoader } from '@docxkit/core'
 
 /**
  * Input schema for the create_document MCP tool.
@@ -14,6 +19,18 @@ export interface CreateDocumentInput {
   outputPath: string
   /** The docx-kit DocxSchema defining the document. */
   schema: DocxSchema
+}
+
+/** Filesystem boundary for the create_document tool. */
+export interface CreateDocumentOptions {
+  /** Directory that contains every path the tool may write. @default process.cwd() */
+  outputDirectory?: string
+  /**
+   * Explicit plugin loader for schemas that execute external plugins.
+   *
+   * The default core loader intentionally supports inline plugins only.
+   */
+  pluginLoader?: PluginLoader
 }
 
 /**
@@ -53,4 +70,71 @@ export const createDocxToolDefinition = {
       },
     },
   },
+}
+
+/** Render and save a DOCX inside the configured output directory. */
+export async function createDocument(
+  input: CreateDocumentInput,
+  options: CreateDocumentOptions = {},
+): Promise<CreateDocumentOutput> {
+  const outputDirectory = path.resolve(options.outputDirectory ?? process.cwd())
+  const filePath = path.resolve(outputDirectory, input.outputPath)
+  const relativePath = path.relative(outputDirectory, filePath)
+
+  if (
+    relativePath.startsWith(`..${path.sep}`)
+    || relativePath === '..'
+    || path.isAbsolute(relativePath)
+  ) {
+    throw new Error(
+      `Output path must stay inside the configured directory: ${outputDirectory}`,
+    )
+  }
+  if (path.extname(filePath).toLowerCase() !== '.docx') {
+    throw new Error('Output path must use the .docx extension')
+  }
+
+  await mkdir(outputDirectory, { recursive: true })
+  await mkdir(path.dirname(filePath), { recursive: true })
+
+  const realOutputDirectory = await realpath(outputDirectory)
+  const realParentDirectory = await realpath(path.dirname(filePath))
+  const realRelativePath = path.relative(
+    realOutputDirectory,
+    realParentDirectory,
+  )
+  if (
+    realRelativePath.startsWith(`..${path.sep}`)
+    || realRelativePath === '..'
+    || path.isAbsolute(realRelativePath)
+  ) {
+    throw new Error(
+      `Output path must stay inside the configured directory: ${outputDirectory}`,
+    )
+  }
+
+  const safeFilePath = path.join(realParentDirectory, path.basename(filePath))
+  const document = await renderDocx(input.schema, {
+    pluginLoader: options.pluginLoader ?? createPluginLoader(),
+  })
+  const bytes = await document.toBuffer()
+
+  const file = await open(
+    safeFilePath,
+    constants.O_CREAT
+      | constants.O_NOFOLLOW
+      | constants.O_TRUNC
+      | constants.O_WRONLY,
+    0o600,
+  )
+  try {
+    await file.writeFile(bytes)
+  } finally {
+    await file.close()
+  }
+
+  return {
+    filePath,
+    size: bytes.byteLength,
+  }
 }

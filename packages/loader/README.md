@@ -11,8 +11,18 @@ npm install @docxkit/loader
 ## Usage
 
 ```ts
-import { PluginLoader } from '@docxkit/loader'
+import { createPluginLoader } from '@docxkit/loader/node'
 
-const loader = new PluginLoader()
-await loader.load({ name: 'my-plugin', source: 'inline', definition: {...} })
+const loader = createPluginLoader({
+  security: {
+    allowExecute: manifest => manifest.plugin.author === 'trusted-author',
+  },
+})
+
+const { plugin, manifest } = await loader.load({
+  package: 'docx-kit-plugin-chart',
+  type: 'npm',
+})
 ```
+
+Use `@docxkit/loader/browser` for URL and same-origin browser sources. External plugins must publish a valid `docx-kit.plugin.json`; its manifest is authorized before module code executes.

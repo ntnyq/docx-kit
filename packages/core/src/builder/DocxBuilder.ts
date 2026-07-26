@@ -26,7 +26,6 @@ import { PluginManager } from './PluginManager'
 import type {
   BlockNode,
   BookmarkNode,
-  BuiltinPluginMap,
   BulletItem,
   BulletListNode,
   CheckboxNode,
@@ -65,7 +64,7 @@ import type {
  */
 export class DocxBuilder<
   TStyles extends StyleSheet = StyleSheet,
-  TPlugins extends PluginRegistry = BuiltinPluginMap,
+  TPlugins extends PluginRegistry = Record<never, never>,
 > {
   /**
    * Save the document to a file (Node.js only).

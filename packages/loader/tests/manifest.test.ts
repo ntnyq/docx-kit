@@ -25,6 +25,7 @@ describe('validateManifest', () => {
     it('accepts a manifest with minimal required fields', () => {
       const minimal = {
         docxKit: '*',
+        main: './dist/index.js',
         name: 'my-plugin',
         plugin: { name: 'myPlugin' },
         version: '0.1.0',
@@ -216,12 +217,12 @@ describe('validateManifest', () => {
     })
   })
 
-  describe('optional field validation', () => {
-    it('accepts manifest without main field', () => {
+  describe('entry and optional field validation', () => {
+    it('rejects manifest without main field', () => {
       const manifest = { ...VALID_MANIFEST, main: undefined }
-      expect(
+      expect(() =>
         validateManifest(manifest as unknown as Record<string, unknown>),
-      ).toBeDefined()
+      ).toThrow(DocxKitError)
     })
 
     it('rejects non-string main field', () => {
@@ -230,6 +231,15 @@ describe('validateManifest', () => {
         validateManifest(manifest as unknown as Record<string, unknown>),
       ).toThrow(DocxKitError)
     })
+
+    it.each(['../index.js', '/tmp/index.js', './dist/../secret.js'])(
+      'rejects unsafe main path %s',
+      main => {
+        expect(() => validateManifest({ ...VALID_MANIFEST, main })).toThrow(
+          DocxKitError,
+        )
+      },
+    )
 
     it('accepts manifest without types field', () => {
       const manifest = { ...VALID_MANIFEST, types: undefined }
@@ -264,6 +274,21 @@ describe('validateManifest', () => {
       const manifest = { ...VALID_MANIFEST, dependencies: null }
       expect(() =>
         validateManifest(manifest as unknown as Record<string, unknown>),
+      ).toThrow(DocxKitError)
+    })
+
+    it('rejects dependency arrays and non-string versions', () => {
+      expect(() =>
+        validateManifest({
+          ...VALID_MANIFEST,
+          dependencies: ['docx'],
+        }),
+      ).toThrow(DocxKitError)
+      expect(() =>
+        validateManifest({
+          ...VALID_MANIFEST,
+          dependencies: { docx: 9 },
+        }),
       ).toThrow(DocxKitError)
     })
 

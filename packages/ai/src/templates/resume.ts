@@ -7,7 +7,7 @@
  * @module ai/templates/resume
  */
 
-import type { BlockNode, DocxSchema, PluginNode } from '@docxkit/core'
+import type { BlockNode, DocxSchema, TableNode } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
 
 /** Resume template parameters. */
@@ -59,7 +59,7 @@ Use the following docx-kit node types:
 - { type: "heading", level: N, text: "..." } for section headers
 - { type: "paragraph", text: "..." } for text content
 - { type: "bulletList", items: [...] } for bulleted lists
-- { type: "plugin", name: "propertyTable", options: { ... } } for contact info
+- { type: "table", columns: [...], data: [...] } for contact info
 
 Maintain a professional tone appropriate for the resume type.
 `
@@ -141,12 +141,16 @@ function generate(params: ResumeParams): DocxSchema {
   }
 
   if (contactItems.length > 0) {
-    const propertyTableNode: PluginNode<'propertyTable'> = {
-      name: 'propertyTable',
-      options: { items: contactItems },
-      type: 'plugin',
+    const contactTableNode: TableNode<Record<string, unknown>> = {
+      data: contactItems,
+      header: false,
+      type: 'table',
+      columns: [
+        { key: 'key', title: 'Contact' },
+        { key: 'value', title: 'Details' },
+      ],
     }
-    content.push(propertyTableNode)
+    content.push(contactTableNode)
   }
 
   // Summary

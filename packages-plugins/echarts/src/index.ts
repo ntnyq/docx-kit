@@ -73,6 +73,11 @@ interface RenderImageResult {
   data: Uint8Array
   /** Image format (`"png"` or `"svg"`). */
   type: 'png' | 'svg'
+  /** Raster fallback for SVG output. */
+  fallback?: {
+    data: Uint8Array
+    type: 'png'
+  }
 }
 
 /**
@@ -107,8 +112,20 @@ export function echartsPlugin() {
     async render(options) {
       const width = options.width ?? 640
       const height = options.height ?? 360
-      const imageType = options.imageType ?? 'png'
-      const renderer = options.renderer ?? 'canvas'
+      const imageType =
+        options.imageType ?? (options.renderer === 'svg' ? 'svg' : 'png')
+      const renderer =
+        options.renderer ?? (imageType === 'svg' ? 'svg' : 'canvas')
+
+      if (
+        (imageType === 'svg' && renderer !== 'svg')
+        || (imageType === 'png' && renderer !== 'canvas')
+      ) {
+        throw new DocxKitError(
+          ERROR_CODES.PLUGIN_RENDER_FAILED,
+          `ECharts imageType "${imageType}" requires renderer "${imageType === 'svg' ? 'svg' : 'canvas'}"`,
+        )
+      }
 
       const image = await renderEChartsToImage(options.option, {
         height,
@@ -119,6 +136,7 @@ export function echartsPlugin() {
 
       const imageRun = createImageRun({
         data: image.data,
+        fallback: image.fallback,
         height,
         type: image.type,
         width,
@@ -177,7 +195,7 @@ async function renderInBrowser(
   container.style.cssText = `width:${config.width}px;height:${config.height}px;position:fixed;left:-99999px;`
   document.body.append(container)
 
-  const chart = echarts.init(container, undefined, {
+  let chart = echarts.init(container, undefined, {
     height: config.height,
     renderer: config.renderer,
     width: config.width,
@@ -191,9 +209,34 @@ async function renderInBrowser(
   })
 
   chart.dispose()
-  container.remove()
 
-  return { data: await dataUrlToUint8Array(dataUrl), type: config.imageType }
+  if (config.imageType === 'svg') {
+    chart = echarts.init(container, undefined, {
+      height: config.height,
+      renderer: 'canvas',
+      width: config.width,
+    })
+    chart.setOption({ ...option, animation: false })
+    const fallbackUrl = chart.getDataURL({
+      backgroundColor: '#ffffff',
+      pixelRatio: 2,
+      type: 'png',
+    })
+    chart.dispose()
+    container.remove()
+
+    return {
+      data: await dataUrlToUint8Array(dataUrl),
+      type: 'svg',
+      fallback: {
+        data: await dataUrlToUint8Array(fallbackUrl),
+        type: 'png',
+      },
+    }
+  }
+
+  container.remove()
+  return { data: await dataUrlToUint8Array(dataUrl), type: 'png' }
 }
 
 /**

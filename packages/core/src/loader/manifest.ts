@@ -135,6 +135,8 @@ export function validateManifest(json: unknown): PluginManifest {
   assertSemver(obj.version as string, 'manifest.version')
   assertString(obj.docxKit, 'manifest.docxKit')
   assertRange(obj.docxKit as string, 'manifest.docxKit')
+  assertString(obj.main, 'manifest.main')
+  assertRelativePath(obj.main as string, 'manifest.main')
 
   // Validate plugin sub-object
   const pluginObj = obj.plugin
@@ -149,31 +151,21 @@ export function validateManifest(json: unknown): PluginManifest {
   assertString(plugin.name, 'manifest.plugin.name')
 
   // Optional fields: validate types if present
-  if (obj.main !== undefined) {
-    assertString(obj.main, 'manifest.main')
-  }
   if (obj.types !== undefined) {
     assertString(obj.types, 'manifest.types')
+    assertRelativePath(obj.types as string, 'manifest.types')
   }
 
-  if (
-    obj.dependencies !== undefined
-    && (!obj.dependencies || typeof obj.dependencies !== 'object')
-  ) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      'Plugin manifest field "dependencies" must be an object',
-    )
+  if (obj.dependencies !== undefined) {
+    assertStringRecord(obj.dependencies, 'manifest.dependencies')
   }
 
-  if (
-    obj.peerDependencies !== undefined
-    && (!obj.peerDependencies || typeof obj.peerDependencies !== 'object')
-  ) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      'Plugin manifest field "peerDependencies" must be an object',
-    )
+  if (obj.exports !== undefined) {
+    assertStringRecord(obj.exports, 'manifest.exports')
+  }
+
+  if (obj.peerDependencies !== undefined) {
+    assertStringRecord(obj.peerDependencies, 'manifest.peerDependencies')
   }
 
   return json as PluginManifest
@@ -186,6 +178,22 @@ function assertRange(range: string, field: string): void {
     throw new DocxKitError(
       'MANIFEST_INVALID',
       `Plugin manifest field "${field}" is not a valid semver range: "${range}"`,
+    )
+  }
+}
+
+function assertRelativePath(path: string, field: string): void {
+  const normalized = path.replaceAll('\\', '/')
+  const segments = normalized.split('/')
+
+  if (
+    !normalized.startsWith('./')
+    || normalized.startsWith('//')
+    || segments.includes('..')
+  ) {
+    throw new DocxKitError(
+      'MANIFEST_INVALID',
+      `Plugin manifest field "${field}" must be a safe relative path beginning with "./"`,
     )
   }
 }
@@ -205,5 +213,22 @@ function assertString(value: unknown, field: string): asserts value is string {
       'MANIFEST_INVALID',
       `Plugin manifest field "${field}" must be a non-empty string`,
     )
+  }
+}
+
+function assertStringRecord(
+  value: unknown,
+  field: string,
+): asserts value is Record<string, string> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new DocxKitError(
+      'MANIFEST_INVALID',
+      `Plugin manifest field "${field}" must be an object`,
+    )
+  }
+
+  for (const [key, entry] of Object.entries(value)) {
+    assertString(key, `${field} key`)
+    assertString(entry, `${field}.${key}`)
   }
 }

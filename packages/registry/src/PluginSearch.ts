@@ -60,17 +60,14 @@ export async function getPlugin(
       return null
     }
 
-    const manifest = extractManifest(data, latestVersion)
-    if (!manifest) {
-      return null
-    }
+    const manifest = await fetchManifest(data.name, latestVersion)
 
     return {
       description: data.description ?? '',
       downloads: 0,
       manifest,
       name: data.name,
-      quality: computeQuality(data, latestVersion),
+      quality: computeQuality(data, latestVersion, manifest !== null),
       version: latestVersion,
     }
   } catch {
@@ -123,6 +120,7 @@ export async function searchPlugins(
  * @param data.repository - — Repository info
  * @param data.repository.url - — Repository URL
  * @param version - — The package version to inspect
+ * @param hasManifest - — Whether a published manifest was fetched and validated
  * @returns Quality score object
  */
 function computeQuality(
@@ -132,12 +130,13 @@ function computeQuality(
     repository?: { url: string }
   },
   version: string,
+  hasManifest: boolean,
 ): QualityScore {
   const versionData = data.versions[version]
   const keywords = versionData?.keywords ?? data.keywords ?? []
 
   return {
-    hasManifest: true,
+    hasManifest,
     hasTests: keywords.includes('vitest') || keywords.includes('jest'),
     hasTypescript: keywords.includes('typescript'),
     stars: 0, // Would need GitHub API to resolve
@@ -145,37 +144,25 @@ function computeQuality(
 }
 
 /**
- * Extract and validate a manifest from npm package metadata.
+ * Fetch and validate a published manifest.
  *
- * Looks for a `docx-kit.plugin.json` in the package files
- * or falls back to a generated manifest from package metadata.
- *
- * @param data - — npm package metadata
- * @param data.name - — Package name
- * @param data.versions - — Package version map
- * @param data.keywords - — Top-level package keywords
+ * @param packageName - — npm package name
  * @param version - — The package version
- * @returns Validated manifest or null if extraction fails
+ * @returns Validated manifest or null if it is missing or invalid
  */
-function extractManifest(
-  data: {
-    name: string
-    versions: Record<string, { keywords?: string[] }>
-    keywords?: string[]
-  },
+async function fetchManifest(
+  packageName: string,
   version: string,
-): PluginManifest | null {
-  // Try to construct a manifest from package metadata
-  const shortName = data.name.replace(/^docx-kit-plugin-/, '')
-
+): Promise<PluginManifest | null> {
   try {
-    return validateManifest({
-      docxKit: '*',
-      main: './dist/index.js',
-      name: data.name,
-      plugin: { name: shortName },
-      version,
-    })
+    const url = `https://unpkg.com/${packageName}@${version}/docx-kit.plugin.json`
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      return null
+    }
+
+    return validateManifest(await response.json())
   } catch {
     return null
   }
@@ -184,8 +171,9 @@ function extractManifest(
 /**
  * Resolve a npm search result into a registry entry.
  *
- * Constructs a RegistryPluginEntry from the raw npm search API response,
- * including auto-detecting TypeScript and test keywords.
+ * Constructs a RegistryPluginEntry from npm's search metadata. Search results
+ * do not prove that a package contains a valid manifest, so the manifest is
+ * left unverified until the package is fetched directly.
  *
  * @param result - — Raw npm search result
  * @returns A fully populated registry plugin entry
@@ -193,24 +181,14 @@ function extractManifest(
 function resolveEntry(result: NpmSearchResult): RegistryPluginEntry {
   const pkg = result.package
 
-  const manifest: PluginManifest = {
-    docxKit: '*',
-    main: './dist/index.js',
-    name: pkg.name,
-    version: pkg.version,
-    plugin: {
-      name: pkg.name.replace(/^docx-kit-plugin-/, ''),
-    },
-  }
-
   return {
     description: pkg.description ?? '',
     downloads: result.downloads ?? 0,
-    manifest,
+    manifest: null,
     name: pkg.name,
     version: pkg.version,
     quality: {
-      hasManifest: true,
+      hasManifest: false,
       stars: 0,
       hasTests:
         (pkg.keywords?.includes('vitest') ?? false)

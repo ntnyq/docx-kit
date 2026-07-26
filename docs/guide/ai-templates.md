@@ -63,7 +63,7 @@ interface ReportParams {
 }
 ```
 
-Uses the `coverPage` plugin for the title page.
+Uses core heading, paragraph, and page-break nodes for a portable title page.
 
 #### Invoice (`invoiceTemplate`)
 
@@ -85,7 +85,7 @@ interface InvoiceParams {
 }
 ```
 
-Uses the `propertyTable` plugin for invoice metadata and calculates subtotal/tax/total automatically.
+Uses a core table for invoice metadata and calculates subtotal/tax/total automatically.
 
 #### Resume (`resumeTemplate`)
 
@@ -111,7 +111,7 @@ interface ResumeParams {
 }
 ```
 
-Uses the `propertyTable` plugin for contact info.
+Uses a core table for contact information.
 
 #### Letter (`letterTemplate`)
 
@@ -126,7 +126,7 @@ interface LetterParams {
 }
 ```
 
-Uses the `signatureBlock` plugin for the closing/signature area.
+Uses core paragraph nodes for the closing and signature area.
 
 ## Prompt Builder
 

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import { calloutPlugin } from '../../../../packages-plugins/callout/src/index'
 import { watermarkPlugin } from '../../../../packages-plugins/watermark/src/index'
 import { createDocx, renderDocx } from '../../src/builder/createDocx'
@@ -51,6 +51,12 @@ describe('createDocx', () => {
     const builder = createDocx({ page: { size: 'Letter' } })
     builder.h1('Test').p('Body')
     expect(builder.toJSON().content).toHaveLength(2)
+  })
+
+  it('starts without compile-time plugin registrations', () => {
+    const builder = createDocx()
+
+    expectTypeOf(builder.plugin).parameter(0).toEqualTypeOf<never>()
   })
 
   it('creates builder with full config', () => {
@@ -175,19 +181,15 @@ describe('renderDocx', () => {
     expect(builder.toJSON().content).toHaveLength(1)
   })
 
-  it('emits warnings for failed plugin sources but continues', async () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-
-    const builder = await renderDocx({
-      content: [{ text: 'Hello', type: 'paragraph' }],
-      plugins: [
-        { plugin: calloutPlugin() as DocxPlugin, type: 'inline' },
-        { package: 'nonexistent-plugin-xyz', type: 'npm' },
-      ],
-    })
-    expect(builder.toJSON().content).toHaveLength(1)
-    expect(warnSpy).toHaveBeenCalled()
-
-    warnSpy.mockRestore()
+  it('rejects when a declared plugin source cannot be loaded', async () => {
+    await expect(
+      renderDocx({
+        content: [{ text: 'Hello', type: 'paragraph' }],
+        plugins: [
+          { plugin: calloutPlugin() as DocxPlugin, type: 'inline' },
+          { package: 'nonexistent-plugin-xyz', type: 'npm' },
+        ],
+      }),
+    ).rejects.toThrow('npm plugin loading requires Node.js')
   })
 })

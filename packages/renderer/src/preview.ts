@@ -13,9 +13,10 @@ import type { DocxInput, DocxPreview, DocxPreviewOptions } from './types'
 
 /** Internal state of a preview instance. */
 interface PreviewState {
+  activeController: AbortController | null
   currentInput: DocxInput | null
   destroyed: boolean
-  objectUrls: string[]
+  renderId: number
 }
 
 /**
@@ -58,14 +59,18 @@ export function createDocxPreview(
   options?: DocxPreviewOptions,
 ): DocxPreview {
   const state: PreviewState = {
+    activeController: null,
     currentInput: null,
     destroyed: false,
-    objectUrls: [],
+    renderId: 0,
   }
 
   const instance: DocxPreview = {
     clear(): void {
-      container.innerHTML = ''
+      state.activeController?.abort()
+      state.activeController = null
+      state.renderId += 1
+      container.replaceChildren()
       state.currentInput = null
     },
 
@@ -82,16 +87,10 @@ export function createDocxPreview(
         return
       }
 
-      // Revoke any tracked object URLs
-      for (const url of state.objectUrls) {
-        URL.revokeObjectURL(url)
-      }
-      state.objectUrls = []
-
-      // Clear container
-      container.innerHTML = ''
-
-      // Reset state
+      state.activeController?.abort()
+      state.activeController = null
+      state.renderId += 1
+      container.replaceChildren()
       state.currentInput = null
       state.destroyed = true
     },
@@ -102,8 +101,45 @@ export function createDocxPreview(
           'DocxPreview has been destroyed. Create a new instance with createDocxPreview().',
         )
       }
-      state.currentInput = input
-      await renderDocxPreview(container, input, options)
+      state.activeController?.abort()
+
+      const controller = new AbortController()
+      const renderId = state.renderId + 1
+      const stagingContainer = container.ownerDocument.createElement(
+        container.tagName,
+      )
+
+      state.activeController = controller
+      state.renderId = renderId
+
+      try {
+        await renderDocxPreview(
+          stagingContainer,
+          input,
+          options,
+          controller.signal,
+        )
+
+        if (state.destroyed || state.renderId !== renderId) {
+          return
+        }
+
+        container.replaceChildren(...stagingContainer.childNodes)
+        state.currentInput = input
+      } catch (error) {
+        if (
+          controller.signal.aborted
+          || state.destroyed
+          || state.renderId !== renderId
+        ) {
+          return
+        }
+        throw error
+      } finally {
+        if (state.renderId === renderId) {
+          state.activeController = null
+        }
+      }
     },
   }
 

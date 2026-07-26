@@ -7,6 +7,8 @@
  * @module mcp-server/resources/schema
  */
 
+import { buildBlockNodeJsonSchemas } from '../schema/blockNodes'
+
 /**
  * DocxSchema JSON Schema for MCP resource exposure.
  *
@@ -27,143 +29,7 @@ export const docxSchemaResource = {
     type: 'object',
     definitions: {
       blockNode: {
-        oneOf: [
-          {
-            description: 'A bullet list',
-            required: ['type', 'items'],
-            type: 'object',
-            properties: {
-              type: { const: 'bulletList' },
-              items: {
-                items: { type: 'string' },
-                type: 'array',
-              },
-            },
-          },
-          {
-            description: 'A heading (h1–h6)',
-            required: ['type', 'level', 'text'],
-            type: 'object',
-            properties: {
-              className: { type: 'string' },
-              level: { enum: [1, 2, 3, 4, 5, 6], type: 'number' },
-              style: { additionalProperties: true, type: 'object' },
-              text: { type: 'string' },
-              type: { const: 'heading' },
-            },
-          },
-          {
-            description: 'A hyperlink',
-            required: ['type', 'url', 'children'],
-            type: 'object',
-            properties: {
-              type: { const: 'hyperlink' },
-              url: { type: 'string' },
-              children: {
-                items: { type: 'string' },
-                type: 'array',
-              },
-            },
-          },
-          {
-            description: 'An image',
-            required: ['type', 'data'],
-            type: 'object',
-            properties: {
-              alt: { type: 'string' },
-              data: { type: 'string' },
-              height: { type: 'number' },
-              type: { const: 'image' },
-              width: { type: 'number' },
-              imageType: {
-                enum: ['png', 'jpeg', 'jpg', 'gif', 'bmp'],
-                type: 'string',
-              },
-            },
-          },
-          {
-            description: 'A numbered list',
-            required: ['type', 'items'],
-            type: 'object',
-            properties: {
-              type: { const: 'numberedList' },
-              items: {
-                items: { type: 'string' },
-                type: 'array',
-              },
-            },
-          },
-          {
-            description: 'A page break',
-            properties: { type: { const: 'pageBreak' } },
-            required: ['type'],
-            type: 'object',
-          },
-          {
-            description: 'A paragraph of text',
-            required: ['type'],
-            type: 'object',
-            properties: {
-              className: { type: 'string' },
-              style: { additionalProperties: true, type: 'object' },
-              text: { type: 'string' },
-              type: { const: 'paragraph' },
-              children: {
-                items: { additionalProperties: true, type: 'object' },
-                type: 'array',
-              },
-            },
-          },
-          {
-            description: 'A plugin invocation',
-            required: ['type', 'name', 'options'],
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              options: { additionalProperties: true, type: 'object' },
-              type: { const: 'plugin' },
-            },
-          },
-          {
-            description: 'A section break',
-            required: ['type'],
-            type: 'object',
-            properties: {
-              config: { additionalProperties: true, type: 'object' },
-              type: { const: 'sectionBreak' },
-            },
-          },
-          {
-            description: 'A data table',
-            required: ['type', 'columns', 'data'],
-            type: 'object',
-            properties: {
-              header: { type: 'boolean' },
-              striped: { type: 'boolean' },
-              type: { const: 'table' },
-              columns: {
-                type: 'array',
-                items: {
-                  required: ['key', 'title'],
-                  type: 'object',
-                  properties: {
-                    key: { type: 'string' },
-                    title: { type: 'string' },
-                    width: { type: 'string' },
-                    align: {
-                      enum: ['left', 'center', 'right'],
-                      type: 'string',
-                    },
-                  },
-                },
-              },
-              data: {
-                items: { additionalProperties: true, type: 'object' },
-                type: 'array',
-              },
-            },
-          },
-        ],
+        oneOf: buildBlockNodeJsonSchemas(),
       },
       styleRule: {
         additionalProperties: true,

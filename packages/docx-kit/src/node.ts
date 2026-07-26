@@ -12,6 +12,7 @@ import {
   createDocx as createCoreDocx,
   renderDocx as renderCoreDocx,
 } from '@docxkit/core'
+import { createPluginLoader } from '@docxkit/loader/node'
 // ---------- Style Presets ----------
 import { academicPreset } from '@docxkit/preset-academic'
 import { classicPreset } from '@docxkit/preset-classic'
@@ -25,7 +26,6 @@ import { saveDocument, streamDocument } from './node/index'
 import './types/plugin-map'
 import type { Readable } from 'node:stream'
 import type {
-  BuiltinPluginMap,
   DocxBuilder,
   DocxKitConfig,
   DocxPlugin,
@@ -43,7 +43,7 @@ export * from '@docxkit/core'
  */
 export interface NodeDocxBuilder<
   TStyles extends StyleSheet = StyleSheet,
-  TPlugins extends PluginRegistry = BuiltinPluginMap & PluginRegistry,
+  TPlugins extends PluginRegistry = Record<never, never>,
 > extends DocxBuilder<TStyles, TPlugins> {
   /** Save the generated document to the local filesystem. */
   save: (filename: string) => Promise<void>
@@ -69,7 +69,11 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
 export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   schema: DocxSchema<TStyles>,
 ): Promise<NodeDocxBuilder<TStyles>> {
-  return attachNodeSave(await renderCoreDocx(schema))
+  return attachNodeSave(
+    await renderCoreDocx(schema, {
+      pluginLoader: createPluginLoader(),
+    }),
+  )
 }
 
 function attachNodeSave<

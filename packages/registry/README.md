@@ -11,8 +11,14 @@ npm install @docxkit/registry
 ## Usage
 
 ```ts
-import { PluginSearch } from '@docxkit/registry'
+import { createPluginRegistry } from '@docxkit/registry'
 
-const search = new PluginSearch()
-const results = await search.search('chart')
+const registry = createPluginRegistry()
+const results = await registry.search('chart')
+
+// Search metadata does not prove that a manifest exists.
+const plugin = await registry.get('docx-kit-plugin-chart')
+if (plugin?.manifest) {
+  console.log(plugin.manifest.plugin.name)
+}
 ```

@@ -10,6 +10,8 @@
  * @packageDocumentation
  */
 
+import { renderDocx as renderCoreDocx } from '@docxkit/core'
+import { createPluginLoader } from '@docxkit/loader/browser'
 import { academicPreset } from '@docxkit/preset-academic'
 import { classicPreset } from '@docxkit/preset-classic'
 import { modernPreset } from '@docxkit/preset-modern'
@@ -18,9 +20,24 @@ import { oceanTheme } from '@docxkit/theme-ocean'
 import { warmTheme } from '@docxkit/theme-warm'
 // Plugin type map augmentation (must be imported before any code that uses DocxBuilder)
 import './types/plugin-map'
-import type { DocxPreset, DocxTheme } from '@docxkit/core'
+import type {
+  DocxBuilder,
+  DocxPreset,
+  DocxSchema,
+  DocxTheme,
+  StyleSheet,
+} from '@docxkit/core'
 
 export * from '@docxkit/core'
+
+/** Render a schema with browser URL and same-origin plugin loading support. */
+export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
+  schema: DocxSchema<TStyles>,
+): Promise<DocxBuilder<TStyles>> {
+  return renderCoreDocx(schema, {
+    pluginLoader: createPluginLoader(),
+  })
+}
 
 export { tocPlugin } from '@docxkit/plugin-toc'
 // ---------- Built-in plugins ----------

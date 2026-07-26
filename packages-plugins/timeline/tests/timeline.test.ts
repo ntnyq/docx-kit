@@ -1,5 +1,6 @@
 import { createPluginTestContext } from '@docxkit/pdk'
-import { Paragraph, Table } from 'docx'
+import { Document, Packer, Paragraph, Table } from 'docx'
+import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 import { timelinePlugin } from '../src'
 
@@ -55,6 +56,27 @@ describe('timelinePlugin', () => {
       createPluginTestContext(),
     )
     expect(result).toBeInstanceOf(Table)
+  })
+
+  it('preserves dates in right-side rows', async () => {
+    const result = timelinePlugin().render(
+      {
+        events: [{ date: 'RIGHT-DATE', title: 'Right-side event' }],
+        layout: 'right',
+      },
+      createPluginTestContext(),
+    )
+    if (!(result instanceof Table)) {
+      throw new TypeError('Expected Table result')
+    }
+    const document = new Document({
+      sections: [{ children: [result] }],
+    })
+    const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
+    const documentXml = await archive.file('word/document.xml')?.async('string')
+
+    expect(documentXml).toContain('RIGHT-DATE')
+    expect(documentXml).toContain('Right-side event')
   })
 
   it('renders with custom accent color', () => {

@@ -120,12 +120,14 @@ export function dataTablePlugin() {
         })
       })
       const rows = [new TableRow({ children: headerCells })]
+      const resolvedAlignments = new Map(
+        columns.map(col => [col, align?.[col] ?? inferAlignment(col, data)]),
+      )
 
       // Data rows
-      for (let i = 0; i < data.length; i++) {
-        const row = data[i]
+      for (const [i, row] of data.entries()) {
         const cells = columns.map(col => {
-          const colAlign = align?.[col] ?? inferAlignment(col, data)
+          const colAlign = resolvedAlignments.get(col) ?? 'left'
           const val = formatValue(row[col], format?.[col])
 
           return new TableCell({

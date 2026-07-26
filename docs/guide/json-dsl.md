@@ -159,18 +159,16 @@ interface DocxSchema<TStyles> {
 }
 ```
 
-> **Important:** Plugin nodes require the plugin to be registered via `.use()` first. In `renderDocx()`, you register plugins on the returned builder before exporting.
+> **Important:** Plugin nodes require the plugin to be declared in the schema's `plugins` array, or registered with `.use()` before export.
 
 ```ts
 import { echartsPlugin, qrcodePlugin, renderDocx } from 'docx-kit'
 
-// renderDocx resolves to a DocxBuilder — register plugins on it:
 const doc = await renderDocx({ content: [...] })
 doc
   .use(qrcodePlugin())
   .use(echartsPlugin())
 
-// now .plugin(...) nodes will be resolved
 const blob = await doc.toBlob()
 ```
 
@@ -243,7 +241,7 @@ const report = {
   ],
 }
 
-// Build + register plugins + export in the browser
+// Build, register plugins, and export in the browser
 const doc = await renderDocx(report)
 doc
   .use(echartsPlugin())

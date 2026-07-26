@@ -4,6 +4,7 @@
  * @module mcp-server/tools/listPlugins
  */
 
+import { BUILTIN_PLUGIN_CATALOG } from '../plugins/catalog'
 import type { DocxPlugin } from '@docxkit/core'
 
 /**
@@ -14,6 +15,18 @@ export interface PluginInfo {
   description: string
   /** Plugin name. */
   name: string
+}
+
+/** Build plugin info for every built-in plugin in the canonical catalog. */
+export function buildBuiltinPluginInfoList(filter?: string): PluginInfo[] {
+  const normalizedFilter = filter?.toLowerCase()
+  return BUILTIN_PLUGIN_CATALOG.filter(
+    plugin =>
+      !normalizedFilter || plugin.name.toLowerCase().includes(normalizedFilter),
+  ).map(plugin => ({
+    description: plugin.description,
+    name: plugin.name,
+  }))
 }
 
 /**

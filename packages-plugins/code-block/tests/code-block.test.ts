@@ -1,5 +1,6 @@
 import { createPluginTestContext } from '@docxkit/pdk'
-import { Paragraph } from 'docx'
+import { Document, Packer, Paragraph } from 'docx'
+import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 import { codeBlockPlugin } from '../src'
 
@@ -14,8 +15,11 @@ describe('codeBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(Array.isArray(result)).toBe(true)
-    if (!Array.isArray(result)) {
-      throw new TypeError('Expected array result')
+    if (
+      !Array.isArray(result)
+      || !result.every(child => child instanceof Paragraph)
+    ) {
+      throw new TypeError('Expected Paragraph array result')
     }
     expect(result.length).toBe(1)
     expect(result[0]).toBeInstanceOf(Paragraph)
@@ -88,5 +92,32 @@ describe('codeBlockPlugin', () => {
       throw new TypeError('Expected array result')
     }
     expect(result.length).toBe(3)
+  })
+
+  it('decodes highlighted entities and nested spans exactly once', async () => {
+    const result = await codeBlockPlugin().render(
+      {
+        code: 'const values: Array<string> = ["<item>"]',
+        language: 'typescript',
+      },
+      createPluginTestContext(),
+    )
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected array result')
+    }
+
+    const document = new Document({
+      sections: [{ children: result }],
+    })
+    const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
+    const documentXml = await archive.file('word/document.xml')?.async('string')
+
+    expect(documentXml).toContain('>Array</w:t>')
+    expect(documentXml).toContain('>&lt;</w:t>')
+    expect(documentXml).toContain('>string</w:t>')
+    expect(documentXml).toContain('>&gt; = [</w:t>')
+    expect(documentXml).toContain('&quot;&lt;item&gt;&quot;')
+    expect(documentXml).not.toContain('&amp;lt;')
+    expect(documentXml).not.toContain('<span')
   })
 })

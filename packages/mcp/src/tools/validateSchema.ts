@@ -4,6 +4,9 @@
  * @module mcp-server/tools/validateSchema
  */
 
+import { BLOCK_NODE_DEFINITIONS } from '../schema/blockNodes'
+import type { BlockNodeType, SchemaFieldRule } from '../schema/blockNodes'
+
 /**
  * Output from the validate_schema MCP tool.
  */
@@ -68,22 +71,8 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
       path: '/content',
     })
   } else if (Array.isArray(content)) {
-    // Validate each node
-    const validNodeTypes = new Set([
-      'bulletList',
-      'heading',
-      'hyperlink',
-      'image',
-      'numberedList',
-      'pageBreak',
-      'paragraph',
-      'plugin',
-      'sectionBreak',
-      'table',
-    ])
-
     for (const [i, element] of content.entries()) {
-      const node = element as any
+      const node = element as Record<string, unknown>
       if (typeof node !== 'object' || node === null) {
         errors.push({
           message: `Node at index ${i} must be an object`,
@@ -92,8 +81,8 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
         continue
       }
 
-      const nodeType = node.type as string | undefined
-      if (!nodeType) {
+      const nodeType = node.type
+      if (typeof nodeType !== 'string' || nodeType.length === 0) {
         errors.push({
           message: `Node at index ${i} missing required "type" field`,
           path: `/content/${i}/type`,
@@ -101,50 +90,15 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
         continue
       }
 
-      if (!validNodeTypes.has(nodeType)) {
+      if (!(nodeType in BLOCK_NODE_DEFINITIONS)) {
         errors.push({
           message: `Invalid node type "${nodeType}" at index ${i}`,
           path: `/content/${i}/type`,
         })
+        continue
       }
 
-      // Type-specific required fields
-      if (nodeType === 'heading' && !node.text) {
-        errors.push({
-          message: `Heading node at index ${i} missing required "text" field`,
-          path: `/content/${i}/text`,
-        })
-      }
-      if (nodeType === 'heading' && !node.level) {
-        errors.push({
-          message: `Heading node at index ${i} missing required "level" field`,
-          path: `/content/${i}/level`,
-        })
-      }
-      if (nodeType === 'paragraph' && !node.text && !node.children) {
-        errors.push({
-          message: `Paragraph node at index ${i} must have "text" or "children"`,
-          path: `/content/${i}`,
-        })
-      }
-      if (nodeType === 'plugin' && !node.name) {
-        errors.push({
-          message: `Plugin node at index ${i} missing required "name" field`,
-          path: `/content/${i}/name`,
-        })
-      }
-      if (nodeType === 'table' && !node.columns) {
-        errors.push({
-          message: `Table node at index ${i} missing required "columns" field`,
-          path: `/content/${i}/columns`,
-        })
-      }
-      if (nodeType === 'table' && !node.data) {
-        errors.push({
-          message: `Table node at index ${i} missing required "data" field`,
-          path: `/content/${i}/data`,
-        })
-      }
+      validateNode(node, nodeType as BlockNodeType, `/content/${i}`, errors)
     }
   } else {
     errors.push({
@@ -156,5 +110,164 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
   return {
     errors,
     valid: errors.length === 0,
+  }
+}
+
+function article(kind: string): string {
+  return kind === 'array' || kind === 'object' ? 'an' : 'a'
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0
+}
+
+function matchesKind(value: unknown, kind: SchemaFieldRule['kind']): boolean {
+  switch (kind) {
+    case 'array':
+      return Array.isArray(value)
+    case 'boolean':
+      return typeof value === 'boolean'
+    case 'number':
+      return typeof value === 'number' && Number.isFinite(value)
+    case 'object':
+      return (
+        Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+      )
+    case 'string':
+      return typeof value === 'string'
+    case 'unknown':
+      return true
+  }
+}
+
+function validateField(
+  value: unknown,
+  field: string,
+  rule: SchemaFieldRule,
+  path: string,
+  errors: ValidationError[],
+): void {
+  if (rule.kind !== 'unknown' && !matchesKind(value, rule.kind)) {
+    errors.push({
+      message: `Field "${field}" must be ${article(rule.kind)} ${rule.kind}`,
+      path: `${path}/${field}`,
+    })
+    return
+  }
+
+  if (rule.enum && !rule.enum.includes(value as never)) {
+    errors.push({
+      message: `Field "${field}" must be one of: ${rule.enum.join(', ')}`,
+      path: `${path}/${field}`,
+    })
+  }
+
+  if (typeof value === 'number') {
+    if (rule.integer && !Number.isInteger(value)) {
+      errors.push({
+        message: `Field "${field}" must be an integer`,
+        path: `${path}/${field}`,
+      })
+    }
+    if (rule.minimum !== undefined && value < rule.minimum) {
+      errors.push({
+        message: `Field "${field}" must be at least ${rule.minimum}`,
+        path: `${path}/${field}`,
+      })
+    }
+    if (rule.maximum !== undefined && value > rule.maximum) {
+      errors.push({
+        message: `Field "${field}" must be at most ${rule.maximum}`,
+        path: `${path}/${field}`,
+      })
+    }
+  }
+
+  if (rule.nonEmpty && Array.isArray(value) && value.length === 0) {
+    errors.push({
+      message: `Field "${field}" must not be empty`,
+      path: `${path}/${field}`,
+    })
+  }
+  if (rule.nonEmpty && typeof value === 'string' && value.length === 0) {
+    errors.push({
+      message: `Field "${field}" must not be empty`,
+      path: `${path}/${field}`,
+    })
+  }
+}
+
+function validateNode(
+  node: Record<string, unknown>,
+  nodeType: BlockNodeType,
+  path: string,
+  errors: ValidationError[],
+): void {
+  const definition = BLOCK_NODE_DEFINITIONS[nodeType]
+
+  for (const [field, rule] of Object.entries(definition.fields)) {
+    const hasField = Object.hasOwn(node, field)
+    if (rule.required && !hasField) {
+      errors.push({
+        message: `${nodeType} node missing required "${field}" field`,
+        path: `${path}/${field}`,
+      })
+      continue
+    }
+    if (hasField) {
+      validateField(node[field], field, rule, path, errors)
+    }
+  }
+
+  if (
+    'requireOneOf' in definition
+    && definition.requireOneOf
+    && !definition.requireOneOf.some(field => isNonEmptyString(node[field]))
+  ) {
+    errors.push({
+      message: `${nodeType} node requires one of: ${definition.requireOneOf.join(', ')}`,
+      path,
+    })
+  }
+
+  if (nodeType === 'table') {
+    validateTableColumns(node.columns, path, errors)
+  }
+  if (nodeType === 'textBox') {
+    const box = node.box as Record<string, unknown> | undefined
+    if (box && !Object.hasOwn(box, 'width')) {
+      errors.push({
+        message: 'textBox box missing required "width" field',
+        path: `${path}/box/width`,
+      })
+    }
+  }
+}
+
+function validateTableColumns(
+  value: unknown,
+  path: string,
+  errors: ValidationError[],
+): void {
+  if (!Array.isArray(value)) {
+    return
+  }
+  for (const [index, column] of value.entries()) {
+    if (!column || typeof column !== 'object' || Array.isArray(column)) {
+      errors.push({
+        message: 'Table column must be an object',
+        path: `${path}/columns/${index}`,
+      })
+      continue
+    }
+    const record = column as Record<string, unknown>
+    for (const field of ['key', 'title']) {
+      if (!isNonEmptyString(record[field])) {
+        errors.push({
+          message: `Table column missing required "${field}" string`,
+          path: `${path}/columns/${index}/${field}`,
+        })
+      }
+    }
   }
 }

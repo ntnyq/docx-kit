@@ -2,13 +2,22 @@ import { Packer } from 'docx'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 import { compileDocument } from '../../src/compiler/compileDocument'
-import type { BlockNode, DocxKitConfig, TableNode } from '@docxkit/types'
+import type {
+  BlockNode,
+  DocxKitConfig,
+  DocxPlugin,
+  TableNode,
+} from '@docxkit/types'
 
-async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
+async function renderPackage(
+  nodes: BlockNode[],
+  config: DocxKitConfig = {},
+  plugins = new Map<string, DocxPlugin>(),
+) {
   const document = await compileDocument({
     config,
     nodes,
-    plugins: new Map(),
+    plugins,
   })
   const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
 
@@ -170,6 +179,52 @@ describe('compiler OOXML contracts', () => {
     expect(commentsXml).toContain('w:author="Ada Lovelace"')
     expect(commentsXml).toContain('w:initials="AL"')
     expect(commentsXml).toContain('Comment body')
+  })
+
+  it('emits image accessibility, floating, and aspect-ratio metadata', async () => {
+    const image = new Uint8Array(24)
+    image.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+    const view = new DataView(image.buffer)
+    view.setUint32(16, 400)
+    view.setUint32(20, 200)
+
+    const pkg = await renderPackage([
+      {
+        alt: 'Quarterly revenue chart',
+        data: image,
+        floating: { wrap: 'square', x: 10, y: 20 },
+        type: 'image',
+        width: 100,
+      },
+    ])
+    const documentXml = await pkg.read('word/document.xml')
+
+    expect(documentXml).toContain('descr="Quarterly revenue chart"')
+    expect(documentXml).toContain('<wp:anchor')
+    expect(documentXml).toContain('cx="952500" cy="476250"')
+    expect(documentXml).toContain('<wp:wrapSquare')
+  })
+
+  it('shares the compilation session with nodes rendered by plugins', async () => {
+    const plugin: DocxPlugin = {
+      name: 'nestedFootnote',
+      render: async (_options, context) =>
+        context.compileNode({
+          content: ['Nested footnote body'],
+          type: 'footnote',
+        }),
+    }
+    const pkg = await renderPackage(
+      [{ name: 'nestedFootnote', options: {}, type: 'plugin' }],
+      {},
+      new Map([[plugin.name, plugin]]),
+    )
+
+    const documentXml = await pkg.read('word/document.xml')
+    const footnotesXml = await pkg.read('word/footnotes.xml')
+
+    expect(documentXml).toContain('<w:footnoteReference w:id="1"/>')
+    expect(footnotesXml).toContain('Nested footnote body')
   })
 
   it('emits semantic content nodes and tracked revisions', async () => {

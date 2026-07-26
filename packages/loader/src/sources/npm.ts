@@ -11,11 +11,18 @@
 
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
-import { DocxKitError, validateManifest } from '@docxkit/core'
+import path from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { DocxKitError } from '@docxkit/core'
 import { isDocxPlugin } from '../utils'
+import { resolveManifest } from './options'
 
-import type { DocxPlugin, PluginManifest } from '@docxkit/core'
+import type { DocxPlugin, PluginManifestAuthorizer } from '@docxkit/core'
+
+export interface LoadNpmPluginOptions {
+  /** Authorize the parsed manifest before importing the package entry. */
+  authorizeManifest?: PluginManifestAuthorizer
+}
 
 /**
  * Load a plugin from an npm package in `node_modules`.
@@ -25,8 +32,8 @@ import type { DocxPlugin, PluginManifest } from '@docxkit/core'
  * then dynamically imports the plugin module.
  *
  * @param packageName - — npm package name (e.g. `"docx-kit-chart"`)
- * @param _options - — Optional loading options (reserved for future use)
- * @param _options.cwd - — Working directory override (reserved)
+ * @param options - — Optional loading controls
+ * @param options.authorizeManifest - — Pre-import manifest authorization
  * @returns The loaded plugin and its manifest
  * @throws {DocxKitError} `MANIFEST_MISSING` if manifest is not found
  * @throws {DocxKitError} `MANIFEST_INVALID` if manifest validation fails
@@ -34,8 +41,11 @@ import type { DocxPlugin, PluginManifest } from '@docxkit/core'
  */
 export async function loadNpmPlugin(
   packageName: string,
-  _options?: { cwd?: string },
-): Promise<{ manifest: PluginManifest; plugin: DocxPlugin }> {
+  options?: LoadNpmPluginOptions,
+): Promise<{
+  manifest: Awaited<ReturnType<typeof resolveManifest>>
+  plugin: DocxPlugin
+}> {
   // Resolve the package root directory
   let pkgPath: string
 
@@ -67,10 +77,13 @@ export async function loadNpmPlugin(
     )
   }
 
-  let manifest: PluginManifest
+  let manifest: NonNullable<Awaited<ReturnType<typeof resolveManifest>>>
   try {
     const raw = await readFile(manifestPath, 'utf-8')
-    manifest = validateManifest(JSON.parse(raw))
+    manifest = (await resolveManifest({
+      authorizeManifest: options?.authorizeManifest,
+      manifest: JSON.parse(raw),
+    }))!
   } catch (error) {
     if (error instanceof DocxKitError) {
       throw error
@@ -83,12 +96,20 @@ export async function loadNpmPlugin(
   }
 
   // Resolve the main entry relative to the package root
-  const entryPath = `${pkgPath}/${manifest.main}`
+  const entryPath = path.resolve(pkgPath, manifest.main)
+  const packagePrefix = `${path.resolve(pkgPath)}${path.sep}`
+  if (!entryPath.startsWith(packagePrefix)) {
+    throw new DocxKitError(
+      'MANIFEST_INVALID',
+      `Plugin entry "${manifest.main}" resolves outside package "${packageName}"`,
+    )
+  }
 
   // Dynamic import the plugin module
   let mod: DocxPlugin | { default?: unknown }
   try {
-    mod = (await import(entryPath)) as DocxPlugin | { default?: unknown }
+    mod = (await import(pathToFileURL(entryPath).href)) as
+      DocxPlugin | { default?: unknown }
   } catch (error) {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',

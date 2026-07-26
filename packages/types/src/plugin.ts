@@ -14,8 +14,9 @@ import type { MaybePromise } from './utility'
 /**
  * Built-in plugin type map.
  *
- * Users can extend this interface via module augmentation to add
- * custom plugin types that are available without explicit `.use()` calls.
+ * Users can extend this interface via module augmentation when they provide
+ * their own builder wrapper that pre-registers the corresponding plugins.
+ * The default builder starts with an empty registry and requires `.use()`.
  *
  * @example
  * ```ts

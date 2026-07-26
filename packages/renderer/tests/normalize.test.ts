@@ -12,7 +12,6 @@ describe('normalizeDocxInput', () => {
       const blob = new Blob(['test-data'], { type: 'application/octet-stream' })
       const result = await normalizeDocxInput(blob)
       expect(result.blob).toBe(blob)
-      expect(result.objectUrl).toBeNull()
     })
 
     it('passes File through unchanged', async () => {
@@ -21,7 +20,6 @@ describe('normalizeDocxInput', () => {
       })
       const result = await normalizeDocxInput(file)
       expect(result.blob).toBe(file)
-      expect(result.objectUrl).toBeNull()
     })
   })
 
@@ -30,7 +28,6 @@ describe('normalizeDocxInput', () => {
       const buffer = new ArrayBuffer(8)
       const result = await normalizeDocxInput(buffer)
       expect(result.blob).toBeInstanceOf(Blob)
-      expect(result.objectUrl).toBeNull()
       expect(result.blob.type).toBe(DOCX_MIME)
     })
 
@@ -38,7 +35,6 @@ describe('normalizeDocxInput', () => {
       const arr = new Uint8Array([80, 75, 3, 4]) // ZIP signature
       const result = await normalizeDocxInput(arr)
       expect(result.blob).toBeInstanceOf(Blob)
-      expect(result.objectUrl).toBeNull()
       expect(result.blob.type).toBe(DOCX_MIME)
     })
   })
@@ -52,7 +48,6 @@ describe('normalizeDocxInput', () => {
 
       const result = await normalizeDocxInput('https://example.com/doc.docx')
       expect(result.blob).toBeInstanceOf(Blob)
-      expect(result.objectUrl).toBeNull()
       expect(fetchSpy).toHaveBeenCalledWith('https://example.com/doc.docx', {
         signal: undefined,
       })

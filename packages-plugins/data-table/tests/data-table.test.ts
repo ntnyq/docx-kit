@@ -107,4 +107,28 @@ describe('dataTablePlugin', () => {
     )
     expect(result).toBeInstanceOf(Table)
   })
+
+  it('infers each column alignment only once', () => {
+    let propertyReads = 0
+    const data = Array.from(
+      { length: 100 },
+      (_, index) =>
+        new Proxy(
+          { a: index, b: index + 1, c: index + 2 },
+          {
+            get(target, property, receiver) {
+              if (typeof property === 'string' && property in target) {
+                propertyReads++
+              }
+              return Reflect.get(target, property, receiver)
+            },
+          },
+        ),
+    )
+
+    const result = dataTablePlugin().render({ data }, createPluginTestContext())
+
+    expect(result).toBeInstanceOf(Table)
+    expect(propertyReads).toBeLessThan(1000)
+  })
 })

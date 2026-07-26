@@ -30,19 +30,22 @@ export {
   span,
   type ErrorCode,
 } from '@docxkit/types'
-
-// ---------- Local types ----------
-export type { DocxSchema } from './builder/createDocx'
-
 export type { PluginManifest } from './loader/manifest'
 
 // ---------- Compiler internals (for plugin authors) ----------
 export type { CompilationSession } from './compiler/numbers'
+
+// ---------- Local types ----------
+export type { DocxSchema, RenderDocxOptions } from './builder/createDocx'
+
 export type {
+  PluginLoaderOptions,
   PluginLoadResult,
+  PluginManifestAuthorizer,
   PluginSecurityPolicy,
   PluginSource,
 } from './loader/PluginLoader'
+
 // Type exports
 export type {
   BaseNode,

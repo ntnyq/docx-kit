@@ -34,7 +34,7 @@ const DEFAULT_CACHE_TTL = 5 * 60 * 1000
  * console.log(plugins.map(p => p.name))
  *
  * const chartPlugin = await registry.get('docx-kit-plugin-chart')
- * if (chartPlugin) {
+ * if (chartPlugin?.manifest) {
  *   console.log(chartPlugin.manifest.plugin.name)
  * }
  * ```

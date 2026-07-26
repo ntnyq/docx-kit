@@ -33,12 +33,14 @@ const DEFAULT_OPTIONS = {
  * @param container - The target DOM element (will be cleared before rendering)
  * @param input - The DOCX data to render
  * @param options - Preview configuration options
+ * @param signal - Optional signal used to cancel URL fetches
  * @throws {DocxKitError} with `PREVIEW_*` or `MICROSOFT_URL_REQUIRED` code on failure
  */
 export async function renderDocxPreview(
   container: HTMLElement,
   input: DocxInput,
   options: DocxPreviewOptions = {},
+  signal?: AbortSignal,
 ): Promise<void> {
   // Microsoft renderer — only accepts URL strings
   if (options.renderer === 'microsoft') {
@@ -56,7 +58,7 @@ export async function renderDocxPreview(
   }
 
   // DOM renderer — normalize and render
-  const { blob } = await normalizeDocxInput(input)
+  const { blob } = await normalizeDocxInput(input, signal)
   container.innerHTML = ''
 
   // Map docx-kit's pageMode to docx-preview's breakPages

@@ -101,19 +101,6 @@ export function timelinePlugin() {
         return new Paragraph({ text: '(No events)' })
       }
 
-      // Create an empty cell with no border (for layout spacing)
-      const emptyCell = (width: number) =>
-        new TableCell({
-          children: [new Paragraph({ children: [] })],
-          width: { size: width, type: WidthType.DXA },
-          borders: {
-            bottom: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-          },
-        })
-
       const connectorCell = () =>
         new TableCell({
           width: { size: COL_WIDTHS.connector, type: WidthType.DXA },
@@ -225,9 +212,9 @@ export function timelinePlugin() {
 
         return new TableRow({
           children: [
-            emptyCell(COL_WIDTHS.date),
-            connectorCell(),
             contentCell(event.title, event.description),
+            connectorCell(),
+            dateCell(event.date),
           ],
         })
       })

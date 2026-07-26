@@ -212,6 +212,7 @@ describe('compileNode — image', () => {
         node: {
           data: new Uint8Array([1, 2, 3]),
           height: 100,
+          imageType: 'png',
           type: 'image',
           width: 200,
         },
@@ -231,6 +232,7 @@ describe('compileNode — image', () => {
         node: {
           data: new Uint8Array([1, 2, 3]),
           floating: { x: 100, y: 200 },
+          imageType: 'png',
           type: 'image',
         },
       }),
@@ -244,6 +246,7 @@ describe('compileNode — image', () => {
         node: {
           data: new Uint8Array([1, 2, 3]),
           floating: { x: 100, y: 200 },
+          imageType: 'png',
           type: 'image',
         },
       }),

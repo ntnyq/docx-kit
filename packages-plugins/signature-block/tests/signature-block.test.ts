@@ -64,4 +64,16 @@ describe('signatureBlockPlugin', () => {
     )
     expect(result).toBeInstanceOf(Paragraph)
   })
+
+  it.each([0, -1, 1.5])('rejects invalid column count %s', columns => {
+    expect(() =>
+      signatureBlockPlugin().render(
+        {
+          columns,
+          parties: [{ label: 'Signer' }],
+        },
+        createPluginTestContext(),
+      ),
+    ).toThrow('positive integer')
+  })
 })

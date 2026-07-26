@@ -23,8 +23,10 @@ export {
   validateManifest,
 } from '@docxkit/core'
 export type {
+  PluginLoaderOptions,
   PluginLoadResult,
   PluginManifest,
+  PluginManifestAuthorizer,
   PluginSecurityPolicy,
   PluginSource,
 } from '@docxkit/core'

@@ -1,5 +1,5 @@
 import { createPluginTestContext } from '@docxkit/pdk'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { echartsPlugin } from '../src'
 
@@ -19,6 +19,11 @@ const mockChart = {
   getDataURL: vi.fn().mockReturnValue('data:image/png;base64,iVBORw0KGgo='),
   setOption: vi.fn(),
 }
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  mockChart.getDataURL.mockReturnValue('data:image/png;base64,iVBORw0KGgo=')
+})
 
 // Mock echarts
 vi.mock('echarts', () => ({
@@ -117,33 +122,50 @@ describe('echartsPlugin', () => {
     expect(result).toBeDefined()
   })
 
-  it('renders with svg type (not directly supported by ImageRun)', async () => {
-    // SVG is not a standard ImageRun image type. The plugin attempts to
-    // pass it through, but ImageRun will reject it at runtime. This is
-    // expected behavior — customers should use png for charts.
+  it('renders SVG with the required PNG fallback', async () => {
     const plugin = echartsPlugin()
-    mockChart.getDataURL.mockReturnValue(
-      'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
-    )
-    await expect(
-      plugin.render(
-        {
-          imageType: 'svg' as any,
-          option: {
-            series: [{ data: [1], type: 'line' }],
-            xAxis: { data: ['X'] },
-            yAxis: {},
+    mockChart.getDataURL
+      .mockReturnValueOnce('data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=')
+      .mockReturnValueOnce('data:image/png;base64,iVBORw0KGgo=')
+
+    const result = await plugin.render(
+      {
+        imageType: 'svg',
+        option: {
+          series: [{ data: [1], type: 'line' }],
+          xAxis: { data: ['X'] },
+          yAxis: {},
+        },
+      },
+      createPluginTestContext({
+        utils: {
+          image: {
+            fromBlob: async () => new Uint8Array(),
+            fromDataUrl: () => new Uint8Array([1, 2, 3]),
           },
         },
-        createPluginTestContext({
-          utils: {
-            image: {
-              fromBlob: async () => new Uint8Array(),
-              fromDataUrl: () => new Uint8Array([1, 2, 3]),
-            },
-          },
-        }),
+      }),
+    )
+
+    expect(result).toBeDefined()
+    expect(mockChart.getDataURL).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'svg' }),
+    )
+    expect(mockChart.getDataURL).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'png' }),
+    )
+  })
+
+  it('rejects mismatched renderer and image formats', async () => {
+    await expect(
+      echartsPlugin().render(
+        {
+          imageType: 'svg',
+          option: {},
+          renderer: 'canvas',
+        },
+        createPluginTestContext(),
       ),
-    ).rejects.toThrow()
+    ).rejects.toThrow('requires renderer "svg"')
   })
 })

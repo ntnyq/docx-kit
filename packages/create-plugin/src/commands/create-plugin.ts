@@ -18,6 +18,7 @@ import {
   renderTsconfigJson,
   renderTsdownConfig,
 } from '../templates/plugin/index'
+import { DOCX_KIT_RANGE } from '../version'
 
 /**
  * Resolved scaffold options.
@@ -176,7 +177,7 @@ async function writeScaffold(
     renderManifest(
       options.pluginName,
       options.version,
-      '^0.3.0',
+      DOCX_KIT_RANGE,
       options.description,
     ),
   )

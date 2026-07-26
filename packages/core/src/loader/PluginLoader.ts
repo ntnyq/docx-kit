@@ -56,6 +56,14 @@ export interface PluginLoadResult<
 }
 
 /**
+ * Callback invoked by a platform source loader after reading a manifest
+ * and before importing the plugin module.
+ */
+export type PluginManifestAuthorizer = (
+  manifest: unknown,
+) => MaybePromise<PluginManifest>
+
+/**
  * Security policy for plugin loading.
  *
  * Consumers can implement sandboxing hooks to restrict
@@ -182,13 +190,19 @@ export class PluginLoader {
           result = this._loadInline(source.plugin)
           break
         case 'local':
-          result = await this._loadLocal(source.path)
+          result = await this._loadLocal(source.path, manifest =>
+            this.authorizeManifest(manifest, source),
+          )
           break
         case 'npm':
-          result = await this._loadNpm(source.package)
+          result = await this._loadNpm(source.package, manifest =>
+            this.authorizeManifest(manifest, source),
+          )
           break
         case 'url':
-          result = await this._loadUrl(source.url)
+          result = await this._loadUrl(source.url, manifest =>
+            this.authorizeManifest(manifest, source),
+          )
           break
         /* v8 ignore next 2 */
         default:
@@ -205,11 +219,6 @@ export class PluginLoader {
         `Failed to load plugin from ${source.type} source`,
         error,
       )
-    }
-
-    // Security check: allowExecute (only if manifest exists)
-    if (result.manifest) {
-      await this.checkAllowExecute(result.manifest, source)
     }
 
     return {
@@ -297,7 +306,8 @@ export class PluginLoader {
    */
   protected async _loadLocal(
     path: string,
-  ): Promise<{ manifest: PluginManifest; plugin: DocxPlugin }> {
+    _authorizeManifest: PluginManifestAuthorizer,
+  ): Promise<{ manifest: PluginManifest | null; plugin: DocxPlugin }> {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',
       `Local plugin loading not available in this environment. Cannot load: "${path}"`,
@@ -315,6 +325,7 @@ export class PluginLoader {
    */
   protected async _loadNpm(
     packageName: string,
+    _authorizeManifest: PluginManifestAuthorizer,
   ): Promise<{ manifest: PluginManifest; plugin: DocxPlugin }> {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',
@@ -336,6 +347,7 @@ export class PluginLoader {
    */
   protected async _loadUrl(
     url: string,
+    _authorizeManifest: PluginManifestAuthorizer,
   ): Promise<{ manifest: PluginManifest | null; plugin: DocxPlugin }> {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',
@@ -361,6 +373,23 @@ export class PluginLoader {
   }
 
   // ---------- Internal: Security ----------
+
+  /**
+   * Validate, compatibility-check, and authorize a manifest before import.
+   *
+   * Platform adapters receive this callback and must invoke it before
+   * evaluating any plugin module.
+   *
+   * @internal
+   */
+  private async authorizeManifest(
+    raw: unknown,
+    source: PluginSource,
+  ): Promise<PluginManifest> {
+    const manifest = this._validateAndCheck(raw)
+    await this.checkAllowExecute(manifest, source)
+    return manifest
+  }
 
   /**
    * Call the `allowExecute` security hook (if defined).
