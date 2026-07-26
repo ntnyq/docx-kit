@@ -36,19 +36,40 @@ export interface BaseNode<TStyles extends StyleSheet = StyleSheet> {
  * @template TStyles — The user's stylesheet type
  */
 export type BlockNode<TStyles extends StyleSheet = StyleSheet> =
+  | BookmarkNode<TStyles>
   | BulletListNode<TStyles>
+  | CheckboxNode<TStyles>
   | ColumnBreakNode
   | HeadingNode<TStyles>
   | HyperlinkNode<TStyles>
   | ImageNode<TStyles>
+  | MathNode
   | NumberedListNode<TStyles>
   | PageBreakNode
   | ParagraphNode<TStyles>
   | PluginNode<string, unknown, TStyles>
+  | RevisionNode<TStyles>
   | SectionBreakNode
   | TableNode<Record<string, unknown>, TStyles>
+  | TextBoxNode<TStyles>
+  | ThematicBreakNode<TStyles>
 
 // ---- Utility types ----
+
+/**
+ * A named bookmark that can be targeted by an internal hyperlink.
+ */
+export interface BookmarkNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** Text or styled text runs contained by the bookmark. */
+  children: (string | TextNode<TStyles>)[]
+  /** Stable bookmark name. */
+  name: string
+  type: 'bookmark'
+}
+
+// ---- Block nodes ----
 
 /**
  * A structured list item (for rich bullet/numbered items).
@@ -65,8 +86,6 @@ export interface BulletItem<
   /** Item text content, used when `children` is absent. */
   text?: string
 }
-
-// ---- Block nodes ----
 
 /**
  * A bullet list node.
@@ -85,6 +104,33 @@ export interface BulletListNode<
   bullet?: string
   /** Nested list level (0 = top-level). */
   level?: number
+}
+
+/**
+ * A Word checkbox content control.
+ */
+export interface CheckboxNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  type: 'checkbox'
+  /** Accessible alias for the checkbox control. */
+  alias?: string
+  /** Whether the checkbox is checked. */
+  checked?: boolean
+  /** Checked-state glyph and font. */
+  checkedState?: CheckboxSymbol
+  /** Optional label rendered after the checkbox. */
+  label?: string
+  /** Unchecked-state glyph and font. */
+  uncheckedState?: CheckboxSymbol
+}
+
+/** Checkbox glyph customization. */
+export interface CheckboxSymbol {
+  /** Font containing the glyph. */
+  font?: string
+  /** Unicode code point expressed as a hexadecimal string. */
+  value?: string
 }
 
 /**
@@ -132,8 +178,10 @@ export interface HyperlinkNode<
   /** Display text or inline children. */
   children: (string | TextNode<TStyles>)[]
   type: 'hyperlink'
-  /** Link target URL. */
-  url: string
+  /** Internal bookmark target (used instead of `url`). */
+  anchor?: string
+  /** External link target URL. */
+  url?: string
 }
 
 /**
@@ -181,7 +229,85 @@ export interface ImageNode<
  * @template TStyles — The user's stylesheet type
  */
 export type InlineNode<TStyles extends StyleSheet = StyleSheet> =
-  HyperlinkNode<TStyles> | ImageNode<TStyles> | TextNode<TStyles>
+  | BookmarkNode<TStyles>
+  | CheckboxNode<TStyles>
+  | HyperlinkNode<TStyles>
+  | ImageNode<TStyles>
+  | MathNode
+  | RevisionNode<TStyles>
+  | TextNode<TStyles>
+
+/**
+ * A recursive expression used by {@link MathNode}.
+ */
+export type MathExpression =
+  | MathFractionExpression
+  | MathFunctionExpression
+  | MathIntegralExpression
+  | MathRadicalExpression
+  | MathScriptExpression
+  | MathSumExpression
+  | MathTextExpression
+
+/** A mathematical fraction. */
+export interface MathFractionExpression {
+  denominator: MathExpression[]
+  numerator: MathExpression[]
+  type: 'fraction'
+}
+
+/** A named mathematical function. */
+export interface MathFunctionExpression {
+  arguments: MathExpression[]
+  name: MathExpression[]
+  type: 'function'
+}
+
+/** A mathematical integral. */
+export interface MathIntegralExpression {
+  children: MathExpression[]
+  type: 'integral'
+  subScript?: MathExpression[]
+  superScript?: MathExpression[]
+}
+
+/**
+ * An Office Math (OMML) expression.
+ */
+export interface MathNode {
+  /** Structured mathematical expression tree. */
+  children: MathExpression[]
+  type: 'math'
+}
+
+/** A mathematical radical with an optional degree. */
+export interface MathRadicalExpression {
+  children: MathExpression[]
+  type: 'radical'
+  degree?: MathExpression[]
+}
+
+/** Subscript, superscript, or combined script. */
+export interface MathScriptExpression {
+  children: MathExpression[]
+  type: 'script'
+  subScript?: MathExpression[]
+  superScript?: MathExpression[]
+}
+
+/** A mathematical sum. */
+export interface MathSumExpression {
+  children: MathExpression[]
+  type: 'sum'
+  subScript?: MathExpression[]
+  superScript?: MathExpression[]
+}
+
+/** Plain text inside a mathematical expression. */
+export interface MathTextExpression {
+  text: string
+  type: 'text'
+}
 
 /**
  * A numbered / ordered list node.
@@ -249,6 +375,24 @@ export interface PluginNode<
   /** Plugin-specific options. */
   options: TOptions
   type: 'plugin'
+}
+
+/**
+ * An inserted or deleted text revision.
+ */
+export interface RevisionNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** Revision author. */
+  author: string
+  /** Text or styled text runs in the revision. */
+  children: (string | TextNode<TStyles>)[]
+  /** ISO-8601 revision timestamp. */
+  date: string
+  /** Document-unique revision identifier. */
+  revisionId: number
+  /** Revision kind. */
+  type: 'deletedText' | 'insertedText'
 }
 
 /**
@@ -337,6 +481,37 @@ export interface TableNode<
 }
 
 /**
+ * A legacy Word text box positioned as a block-level shape.
+ */
+export interface TextBoxNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** Text box dimensions and positioning. */
+  box: TextBoxOptions
+  type: 'textBox'
+  /** Inline children (used instead of `text`). */
+  children?: InlineNode<TStyles>[]
+  /** Plain text content. */
+  text?: string
+}
+
+/** Text box dimensions and positioning. */
+export interface TextBoxOptions {
+  /** Text box width. */
+  width: UnitValue
+  /** Text box height. */
+  height?: UnitValue
+  /** Horizontal offset. */
+  left?: UnitValue
+  /** Shape positioning mode. */
+  position?: 'absolute' | 'relative' | 'static'
+  /** Vertical offset. */
+  top?: UnitValue
+  /** Text wrapping behavior. */
+  wrap?: 'none' | 'square'
+}
+
+/**
  * A text run node (inline content).
  *
  * @template TStyles — The user's stylesheet type
@@ -347,4 +522,13 @@ export interface TextNode<
   /** Text content. */
   text: string
   type: 'text'
+}
+
+/**
+ * A horizontal thematic break rendered as a paragraph border.
+ */
+export interface ThematicBreakNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  type: 'thematicBreak'
 }

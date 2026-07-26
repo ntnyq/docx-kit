@@ -148,6 +148,40 @@ describe('DocxBuilder', () => {
     })
   })
 
+  describe('semantic content', () => {
+    it('adds bookmark, checkbox, math, revision, text box, and divider nodes', () => {
+      const builder = new DocxBuilder()
+      builder
+        .bookmark('target', ['Target'])
+        .checkbox({ checked: true, label: 'Done' })
+        .math([{ text: 'x', type: 'text' }])
+        .insertedText({
+          author: 'Ada',
+          children: ['new'],
+          date: '2026-07-26T00:00:00Z',
+          revisionId: 1,
+        })
+        .deletedText({
+          author: 'Ada',
+          children: ['old'],
+          date: '2026-07-26T00:00:00Z',
+          revisionId: 2,
+        })
+        .textBox({ box: { width: '120pt' }, text: 'Aside' })
+        .thematicBreak()
+
+      expect(builder.toJSON().content.map(node => node.type)).toEqual([
+        'bookmark',
+        'checkbox',
+        'math',
+        'insertedText',
+        'deletedText',
+        'textBox',
+        'thematicBreak',
+      ])
+    })
+  })
+
   describe('plugin', () => {
     it('adds a plugin node', () => {
       const builder = new DocxBuilder() as any

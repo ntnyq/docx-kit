@@ -24,6 +24,75 @@ async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
 }
 
 describe('compiler OOXML contracts', () => {
+  it('emits semantic content nodes and tracked revisions', async () => {
+    const pkg = await renderPackage([
+      {
+        children: ['Chapter one'],
+        name: 'chapter_one',
+        type: 'bookmark',
+      },
+      {
+        anchor: 'chapter_one',
+        children: ['Jump to chapter'],
+        type: 'hyperlink',
+      },
+      {
+        checked: true,
+        label: 'Approved',
+        type: 'checkbox',
+      },
+      {
+        type: 'math',
+        children: [
+          {
+            denominator: [{ text: '2', type: 'text' }],
+            numerator: [{ text: '1', type: 'text' }],
+            type: 'fraction',
+          },
+        ],
+      },
+      {
+        author: 'Ada',
+        children: ['new'],
+        date: '2026-07-26T00:00:00Z',
+        revisionId: 7,
+        type: 'insertedText',
+      },
+      {
+        author: 'Ada',
+        children: ['old'],
+        date: '2026-07-26T00:00:00Z',
+        revisionId: 8,
+        type: 'deletedText',
+      },
+      {
+        text: 'Text box',
+        type: 'textBox',
+        box: {
+          height: '40pt',
+          position: 'absolute',
+          width: '120pt',
+        },
+      },
+      { type: 'thematicBreak' },
+    ])
+
+    const documentXml = await pkg.read('word/document.xml')
+    const settingsXml = await pkg.read('word/settings.xml')
+
+    expect(documentXml).toContain('w:name="chapter_one"')
+    expect(documentXml).toContain('w:anchor="chapter_one"')
+    expect(documentXml).toContain('<w14:checkbox>')
+    expect(documentXml).toContain('<m:oMath>')
+    expect(documentXml).toContain('<m:f>')
+    expect(documentXml).toContain('<w:ins w:id="7"')
+    expect(documentXml).toContain('<w:del w:id="8"')
+    expect(documentXml).toContain('<w:txbxContent>')
+    expect(documentXml).toContain('Text box')
+    expect(documentXml).toContain('<w:pBdr>')
+    expect(settingsXml).toContain('<w:trackRevisions/>')
+  })
+
   it('emits advanced run and paragraph style properties', async () => {
     const pkg = await renderPackage([
       {

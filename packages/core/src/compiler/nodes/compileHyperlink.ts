@@ -4,7 +4,7 @@
  * @module compiler/nodes/compileHyperlink
  */
 
-import { ExternalHyperlink, Paragraph, TextRun } from 'docx'
+import { ExternalHyperlink, InternalHyperlink, Paragraph, TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileTextStyle } from '../compileStyle'
 import type {
@@ -55,8 +55,15 @@ export function compileInlineHyperlink<TStyles extends StyleSheet>(
     })
   })
 
+  if (node.anchor) {
+    return new InternalHyperlink({
+      anchor: node.anchor,
+      children,
+    })
+  }
+
   return new ExternalHyperlink({
     children,
-    link: node.url,
+    link: node.url ?? '',
   })
 }

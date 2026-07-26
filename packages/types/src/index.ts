@@ -54,28 +54,6 @@ export type {
   VerticalAlign,
 } from './style'
 
-// ---------- DSL node types ----------
-export type {
-  BaseNode,
-  BlockNode,
-  BulletItem,
-  BulletListNode,
-  ClassName,
-  ColumnBreakNode,
-  HeadingNode,
-  HyperlinkNode,
-  ImageNode,
-  InlineNode,
-  NumberedListNode,
-  PageBreakNode,
-  ParagraphNode,
-  PluginNode,
-  SectionBreakNode,
-  TableColumn,
-  TableNode,
-  TextNode,
-} from './dsl/nodes'
-
 // ---------- Document types ----------
 export type {
   DocxKitConfig,
@@ -97,3 +75,41 @@ export type {
   ThemeFonts,
   ThemeSpacing,
 } from './document'
+
+// ---------- DSL node types ----------
+export type {
+  BaseNode,
+  BlockNode,
+  BookmarkNode,
+  BulletItem,
+  BulletListNode,
+  CheckboxNode,
+  CheckboxSymbol,
+  ClassName,
+  ColumnBreakNode,
+  HeadingNode,
+  HyperlinkNode,
+  ImageNode,
+  InlineNode,
+  MathExpression,
+  MathFractionExpression,
+  MathFunctionExpression,
+  MathIntegralExpression,
+  MathNode,
+  MathRadicalExpression,
+  MathScriptExpression,
+  MathSumExpression,
+  MathTextExpression,
+  NumberedListNode,
+  PageBreakNode,
+  ParagraphNode,
+  PluginNode,
+  RevisionNode,
+  SectionBreakNode,
+  TableColumn,
+  TableNode,
+  TextBoxNode,
+  TextBoxOptions,
+  TextNode,
+  ThematicBreakNode,
+} from './dsl/nodes'

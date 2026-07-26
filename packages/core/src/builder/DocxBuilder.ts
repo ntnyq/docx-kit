@@ -25,9 +25,11 @@
 import { PluginManager } from './PluginManager'
 import type {
   BlockNode,
+  BookmarkNode,
   BuiltinPluginMap,
   BulletItem,
   BulletListNode,
+  CheckboxNode,
   DocxKitConfig,
   DocxPlugin,
   DocxStyleRule,
@@ -35,13 +37,17 @@ import type {
   HyperlinkNode,
   ImageNode,
   InlineNode,
+  MathNode,
   NumberedListNode,
   ParagraphNode,
   PluginRegistry,
+  RevisionNode,
   SectionConfig,
   StyleSheet,
   TableNode,
+  TextBoxNode,
   TextNode,
+  ThematicBreakNode,
 } from '@docxkit/types'
 
 /**
@@ -92,6 +98,23 @@ export class DocxBuilder<
     return this
   }
 
+  /** Add a named bookmark. */
+  bookmark(
+    name: string,
+    children: (string | TextNode<TStyles>)[],
+    options: Omit<
+      Partial<BookmarkNode<TStyles>>,
+      'children' | 'name' | 'type'
+    > = {},
+  ): this {
+    return this.add({
+      children,
+      name,
+      type: 'bookmark',
+      ...options,
+    })
+  }
+
   /**
    * Add a bullet (unordered) list.
    */
@@ -107,9 +130,19 @@ export class DocxBuilder<
     return this.add(node)
   }
 
+  /** Add a Word checkbox content control. */
+  checkbox(options: Omit<CheckboxNode<TStyles>, 'type'> = {}): this {
+    return this.add({ type: 'checkbox', ...options })
+  }
+
   /** Add a forced column break. */
   columnBreak(): this {
     return this.add({ type: 'columnBreak' })
+  }
+
+  /** Add deleted text with tracked-revision metadata. */
+  deletedText(options: Omit<RevisionNode<TStyles>, 'type'>): this {
+    return this.add({ type: 'deletedText', ...options })
   }
 
   /**
@@ -224,6 +257,33 @@ export class DocxBuilder<
   inlineImg(options: Omit<ImageNode<TStyles>, 'type'>): ImageNode<TStyles> {
     const node: ImageNode<TStyles> = { type: 'image', ...options }
     return node
+  }
+
+  /** Add inserted text with tracked-revision metadata. */
+  insertedText(options: Omit<RevisionNode<TStyles>, 'type'>): this {
+    return this.add({ type: 'insertedText', ...options })
+  }
+
+  /** Add a hyperlink targeting a bookmark in the same document. */
+  internalLink(
+    anchor: string,
+    text: string,
+    options: Omit<
+      Partial<HyperlinkNode<TStyles>>,
+      'anchor' | 'children' | 'type' | 'url'
+    > = {},
+  ): this {
+    return this.add({
+      anchor,
+      children: [text],
+      type: 'hyperlink',
+      ...options,
+    })
+  }
+
+  /** Add a structured Office Math expression. */
+  math(children: MathNode['children']): this {
+    return this.add({ children, type: 'math' })
   }
 
   /**
@@ -350,6 +410,18 @@ export class DocxBuilder<
       ...options,
     }
     return this.add(node as unknown as BlockNode<TStyles>)
+  }
+
+  /** Add a positioned Word text box. */
+  textBox(options: Omit<TextBoxNode<TStyles>, 'type'>): this {
+    return this.add({ type: 'textBox', ...options })
+  }
+
+  /** Add a horizontal thematic break. */
+  thematicBreak(
+    options: Omit<Partial<ThematicBreakNode<TStyles>>, 'type'> = {},
+  ): this {
+    return this.add({ type: 'thematicBreak', ...options })
   }
 
   // ---------- Output ----------

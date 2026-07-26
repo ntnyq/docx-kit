@@ -40,11 +40,19 @@ class DocxBuilder<
   h5(text: string, opts?: StyleOptions): this
   h6(text: string, opts?: StyleOptions): this
   p(text: string | InlineNode[], opts?: StyleOptions): this
+  bookmark(name: string, children: (string | TextNode)[], opts?: StyleOptions): this
   bulletList(items: BulletItem[], opts?: StyleOptions): this
+  checkbox(options?: CheckboxOptions): this
+  math(children: MathExpression[]): this
   numberedList(items: BulletItem[], opts?: StyleOptions): this
   hyperlink(url: string, text: string, opts?: StyleOptions): this
+  internalLink(anchor: string, text: string, opts?: StyleOptions): this
+  insertedText(options: RevisionOptions): this
+  deletedText(options: RevisionOptions): this
   image(options: ImageNode): this
   table<T>(options: TableOptions<T>): this
+  textBox(options: TextBoxOptions): this
+  thematicBreak(opts?: StyleOptions): this
   columnBreak(): this
   pageBreak(): this
   section(config?: SectionConfig): this
@@ -82,11 +90,19 @@ class DocxBuilder<
 | `.h5(text, opts?)` | Level-5 heading |
 | `.h6(text, opts?)` | Level-6 heading |
 | `.p(text, opts?)` | Paragraph with optional inline children |
+| `.bookmark(name, children, opts?)` | Named bookmark target |
 | `.bulletList(items, opts?)` | Unordered list |
+| `.checkbox(options?)` | Word checkbox content control |
+| `.math(children)` | Structured Office Math expression |
 | `.numberedList(items, opts?)` | Ordered list |
 | `.hyperlink(url, text, opts?)` | Clickable hyperlink |
+| `.internalLink(anchor, text, opts?)` | Link to a bookmark in the document |
+| `.insertedText(options)` | Tracked insertion |
+| `.deletedText(options)` | Tracked deletion |
 | `.table({ columns, data, ... })` | Data table |
 | `.image({ data, width?, height?, ... })` | Embedded image |
+| `.textBox(options)` | Positioned Word text box |
+| `.thematicBreak(opts?)` | Horizontal thematic break |
 | `.columnBreak()` | Forced break to the next section column |
 | `.pageBreak()` | Forced page break |
 | `.section(config?)` | Start a new section |

@@ -36,6 +36,13 @@ export interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
     /** Default text run style. */
     text?: DocxStyleRule
   }
+  /** Document-level Word feature switches. */
+  features?: {
+    /** Enable tracked revision display and behavior. */
+    trackRevisions?: boolean
+    /** Ask Word to update fields when the document opens. */
+    updateFields?: boolean
+  }
   /** OOXML core properties (appear in File → Info). */
   metadata?: {
     /** Document author. */

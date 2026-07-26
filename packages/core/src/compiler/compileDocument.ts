@@ -170,12 +170,16 @@ export async function compileDocument<TStyles extends StyleSheet>(
     lastModifiedBy: options.config.metadata?.lastModifiedBy,
     subject: options.config.metadata?.subject,
     title: options.config.metadata?.title,
+    features: {
+      updateFields: options.config.features?.updateFields,
+      trackRevisions:
+        options.config.features?.trackRevisions
+        ?? hasTrackedRevisions(options.nodes),
+    },
     ...(numberingConfig ? { numbering: { config: numberingConfig } } : {}),
     sections,
   })
 }
-
-// ---------- Page / Section properties ----------
 
 function compileColumns(config?: SectionColumnsConfig) {
   if (!config) {
@@ -199,7 +203,7 @@ function compileColumns(config?: SectionColumnsConfig) {
   }
 }
 
-// ---------- Header / Footer (deduplicated) ----------
+// ---------- Page / Section properties ----------
 
 /**
  * Compile section headers or footers into `docx` `Header`/`Footer` objects.
@@ -236,6 +240,8 @@ async function compileHeaderFooter<TStyles extends StyleSheet>(
 
   return Object.keys(result).length > 0 ? result : undefined
 }
+
+// ---------- Header / Footer (deduplicated) ----------
 
 /**
  * Compile a `HeaderFooterContent` into `docx` `Paragraph` children.
@@ -363,6 +369,27 @@ function compileSectionProperties(
       },
     },
   }
+}
+
+function hasTrackedRevisions<TStyles extends StyleSheet>(
+  nodes: BlockNode<TStyles>[],
+): boolean {
+  return nodes.some(node => {
+    if (node.type === 'deletedText' || node.type === 'insertedText') {
+      return true
+    }
+    if (node.type === 'paragraph') {
+      return node.children?.some(
+        child => child.type === 'deletedText' || child.type === 'insertedText',
+      )
+    }
+    if (node.type === 'textBox') {
+      return node.children?.some(
+        child => child.type === 'deletedText' || child.type === 'insertedText',
+      )
+    }
+    return false
+  })
 }
 
 /**

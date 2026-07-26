@@ -8,17 +8,23 @@ Union of all top-level content nodes.
 
 ```ts
 type BlockNode<TStyles> =
+  | BookmarkNode<TStyles>
+  | CheckboxNode<TStyles>
   | HeadingNode<TStyles>
   | ParagraphNode<TStyles>
   | ImageNode<TStyles>
+  | MathNode
   | TableNode<Record<string, unknown>, TStyles>
   | PluginNode<string, unknown, TStyles>
   | HyperlinkNode<TStyles>
   | BulletListNode<TStyles>
   | NumberedListNode<TStyles>
+  | RevisionNode<TStyles>
   | ColumnBreakNode
   | PageBreakNode
   | SectionBreakNode
+  | TextBoxNode<TStyles>
+  | ThematicBreakNode<TStyles>
 ```
 
 ## `BaseNode<TStyles>`
@@ -92,7 +98,14 @@ Paragraph children support rich inline content:
 ## `InlineNode<TStyles>`
 
 ```ts
-type InlineNode<TStyles> = TextNode<TStyles> | ImageNode<TStyles>
+type InlineNode<TStyles> =
+  | BookmarkNode<TStyles>
+  | CheckboxNode<TStyles>
+  | HyperlinkNode<TStyles>
+  | ImageNode<TStyles>
+  | MathNode
+  | RevisionNode<TStyles>
+  | TextNode<TStyles>
 ```
 
 ## `TextNode<TStyles>`
@@ -166,9 +179,69 @@ that row.
 ```ts
 interface HyperlinkNode<TStyles> extends BaseNode<TStyles> {
   type: 'hyperlink'
-  url: string
+  url?: string       // external target
+  anchor?: string    // internal BookmarkNode name
   children: (string | TextNode<TStyles>)[]
 }
+```
+
+## Semantic and Advanced Content
+
+Bookmarks and internal links:
+
+```ts
+doc
+  .bookmark('details', ['Details'])
+  .internalLink('details', 'Jump to details')
+```
+
+Checkboxes are Word content controls:
+
+```ts
+doc.checkbox({ checked: true, label: 'Approved', alias: 'approval' })
+```
+
+Math nodes build native OMML. Expressions support text, fractions, functions,
+integrals, radicals, scripts, and sums:
+
+```ts
+doc.math([
+  {
+    type: 'fraction',
+    numerator: [{ type: 'text', text: '1' }],
+    denominator: [{ type: 'text', text: '2' }],
+  },
+])
+```
+
+Tracked insertions and deletions carry Word revision metadata. Adding either
+node enables tracked revisions automatically:
+
+```ts
+doc
+  .insertedText({
+    author: 'Ada',
+    date: '2026-07-26T00:00:00Z',
+    revisionId: 1,
+    children: ['new text'],
+  })
+  .deletedText({
+    author: 'Ada',
+    date: '2026-07-26T00:00:00Z',
+    revisionId: 2,
+    children: ['old text'],
+  })
+```
+
+Text boxes and thematic breaks are block nodes:
+
+```ts
+doc
+  .textBox({
+    box: { width: '180pt', height: '60pt', position: 'absolute' },
+    text: 'Sidebar',
+  })
+  .thematicBreak()
 ```
 
 ## `BulletListNode<TStyles>`

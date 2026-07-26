@@ -11,6 +11,12 @@ import { compileTextStyle } from '../compileStyle'
 import { toPx } from '../units'
 import { compileInlineHyperlink } from './compileHyperlink'
 import { normalizeImageData } from './compileImage'
+import {
+  compileBookmark,
+  compileCheckbox,
+  compileMath,
+  compileRevision,
+} from './compileSemantic'
 import type {
   DocxKitConfig,
   DocxStyleRule,
@@ -26,30 +32,41 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
   config: DocxKitConfig<TStyles>,
   baseStyle?: DocxStyleRule,
 ): Promise<ParagraphChild[]> {
-  return Promise.all(
+  const compiled = await Promise.all(
     nodes.map(async node => {
-      if (node.type === 'text') {
-        const style = resolveStyle({
-          base: baseStyle,
-          className: node.className,
-          inline: node.style,
-          styles: config.styles,
-          theme: config.theme,
-        })
+      switch (node.type) {
+        case 'bookmark':
+          return compileBookmark(node, config)
+        case 'checkbox':
+          return compileCheckbox(node, config)
+        case 'deletedText':
+        case 'insertedText':
+          return compileRevision(node, config)
+        case 'hyperlink':
+          return compileInlineHyperlink(node, config, baseStyle)
+        case 'image':
+          return compileInlineImage(node, config)
+        case 'math':
+          return compileMath(node)
+        case 'text': {
+          const style = resolveStyle({
+            base: baseStyle,
+            className: node.className,
+            inline: node.style,
+            styles: config.styles,
+            theme: config.theme,
+          })
 
-        return new TextRun({
-          text: node.text,
-          ...compileTextStyle(style),
-        })
+          return new TextRun({
+            text: node.text,
+            ...compileTextStyle(style),
+          })
+        }
       }
-
-      if (node.type === 'image') {
-        return compileInlineImage(node, config)
-      }
-
-      return compileInlineHyperlink(node, config, baseStyle)
     }),
   )
+
+  return compiled.flat()
 }
 
 function compileFloating(

@@ -16,6 +16,14 @@ import { compileImage } from './nodes/compileImage'
 import { compileBulletList, compileNumberedList } from './nodes/compileList'
 import { compileParagraph } from './nodes/compileParagraph'
 import { compilePlugin } from './nodes/compilePlugin'
+import {
+  compileBookmark,
+  compileCheckbox,
+  compileMath,
+  compileRevision,
+  compileTextBox,
+  compileThematicBreak,
+} from './nodes/compileSemantic'
 import { compileTable } from './nodes/compileTable'
 import {
   CompilationSession,
@@ -25,19 +33,25 @@ import {
 import { NodeCompilerRegistry } from './registry'
 import type {
   BlockNode,
+  BookmarkNode,
   BulletListNode,
+  CheckboxNode,
   DocxKitConfig,
   DocxPlugin,
   HeadingNode,
   HyperlinkNode,
   ImageNode,
+  MathNode,
   NumberedListNode,
   ParagraphNode,
   PluginNode,
+  RevisionNode,
   StyleSheet,
   TableNode,
+  TextBoxNode,
+  ThematicBreakNode,
 } from '@docxkit/types'
-import type { FileChild } from 'docx'
+import type { FileChild, ParagraphChild } from 'docx'
 
 /** Re-export for backward compatibility. */
 export { CompilationSession, numberingConfigMap, resetNumberingState }
@@ -51,6 +65,21 @@ export const defaultRegistry = new NodeCompilerRegistry()
 
 // Register all built-in node type compilers.
 defaultRegistry
+  .register('bookmark', async (node, ctx) =>
+    wrapParagraph(
+      compileBookmark(node as BookmarkNode, ctx.config as DocxKitConfig),
+    ),
+  )
+  .register('checkbox', async (node, ctx) =>
+    wrapParagraph(
+      compileCheckbox(node as CheckboxNode, ctx.config as DocxKitConfig),
+    ),
+  )
+  .register('deletedText', async (node, ctx) =>
+    wrapParagraph(
+      compileRevision(node as RevisionNode, ctx.config as DocxKitConfig),
+    ),
+  )
   .register('heading', async (node, ctx) =>
     compileHeading(node as HeadingNode, ctx.config as DocxKitConfig),
   )
@@ -63,6 +92,12 @@ defaultRegistry
   .register('image', async (node, ctx) =>
     compileImage(node as ImageNode, ctx.config as DocxKitConfig),
   )
+  .register('insertedText', async (node, ctx) =>
+    wrapParagraph(
+      compileRevision(node as RevisionNode, ctx.config as DocxKitConfig),
+    ),
+  )
+  .register('math', async node => wrapParagraph(compileMath(node as MathNode)))
   .register('bulletList', async (node, ctx) =>
     compileBulletList(
       node as BulletListNode,
@@ -80,6 +115,15 @@ defaultRegistry
   .register('table', async (node, ctx) =>
     compileTable(
       node as TableNode<Record<string, unknown>, StyleSheet>,
+      ctx.config as DocxKitConfig,
+    ),
+  )
+  .register('textBox', async (node, ctx) =>
+    compileTextBox(node as TextBoxNode, ctx.config as DocxKitConfig),
+  )
+  .register('thematicBreak', async (node, ctx) =>
+    compileThematicBreak(
+      node as ThematicBreakNode,
       ctx.config as DocxKitConfig,
     ),
   )
@@ -149,5 +193,11 @@ export async function compileNode<TStyles extends StyleSheet>(
     config: ctx.config as unknown as DocxKitConfig,
     plugins: ctx.plugins,
     session: ctx.session ?? new CompilationSession(),
+  })
+}
+
+function wrapParagraph(children: ParagraphChild | ParagraphChild[]): Paragraph {
+  return new Paragraph({
+    children: Array.isArray(children) ? children : [children],
   })
 }
