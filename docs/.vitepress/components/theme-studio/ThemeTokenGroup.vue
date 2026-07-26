@@ -11,7 +11,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   updateToken: [
     payload: {
       category: EditableThemeCategory
@@ -28,7 +28,7 @@ const orderedTokens = computed(() =>
 )
 
 function emitTokenUpdate(key: string, value: string) {
-  emits('updateToken', {
+  emit('updateToken', {
     category: props.category,
     key,
     value,

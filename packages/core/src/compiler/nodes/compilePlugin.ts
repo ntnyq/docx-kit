@@ -49,11 +49,11 @@ export async function compilePlugin<TStyles extends StyleSheet>(
 
   try {
     return (await plugin.render(node.options, ctx)) as FileChild | FileChild[]
-  } catch (err) {
+  } catch (error) {
     throw new DocxKitError(
       'PLUGIN_RENDER_FAILED',
       `Plugin render failed: ${plugin.name}`,
-      err,
+      error,
     )
   }
 }

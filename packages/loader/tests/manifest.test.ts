@@ -94,12 +94,12 @@ describe('validateManifest', () => {
     ): void {
       try {
         validateManifest(manifest as unknown as Record<string, unknown>)
-      } catch (err) {
-        if (err instanceof DocxKitError) {
-          checker(err)
+      } catch (error) {
+        if (error instanceof DocxKitError) {
+          checker(error)
           return
         }
-        throw err
+        throw error
       }
       throw new Error('Expected validateManifest to throw')
     }

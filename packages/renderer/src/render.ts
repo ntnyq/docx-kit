@@ -72,11 +72,11 @@ export async function renderDocxPreview(
 
   try {
     await renderAsync(blob, container, undefined, renderOptions)
-  } catch (err) {
+  } catch (error) {
     throw createPreviewError(
       PREVIEW_ERROR_CODES.PREVIEW_RENDER_FAILED,
-      `docx-preview renderAsync failed: ${(err as Error).message ?? String(err)}`,
-      err,
+      `docx-preview renderAsync failed: ${(error as Error).message ?? String(error)}`,
+      error,
     )
   }
 }

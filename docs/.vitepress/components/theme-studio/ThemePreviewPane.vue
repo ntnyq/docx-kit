@@ -46,8 +46,8 @@ watch(
         className: 'docxkit-theme-preview',
       })
       await previewInstance.render(blob)
-    } catch (err) {
-      renderError.value = String(err)
+    } catch (error) {
+      renderError.value = String(error)
     }
   },
   { flush: 'post' },

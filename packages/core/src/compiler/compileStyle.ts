@@ -150,7 +150,7 @@ export function compileCellStyle(style: CellStyleRule) {
 export function compileColumnWidth(width: unknown) {
   if (typeof width === 'string' && width.endsWith('%')) {
     return {
-      size: Number.parseFloat(width),
+      size: Number(width.slice(0, -1)),
       type: WidthType.PERCENTAGE,
     }
   }

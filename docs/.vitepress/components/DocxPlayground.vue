@@ -71,8 +71,8 @@ watch(
         className: 'docxkit-preview',
       })
       await previewInstance.render(blob)
-    } catch (err) {
-      previewError.value = String(err)
+    } catch (error_) {
+      previewError.value = String(error_)
     } finally {
       previewLoading.value = false
     }

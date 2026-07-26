@@ -100,19 +100,19 @@ async function fetchDocxFromUrl(
     }
     const blob = await response.blob()
     return { blob, objectUrl: null }
-  } catch (err) {
+  } catch (error) {
     // Re-throw AbortError as-is so callers can distinguish cancellation
-    if (err instanceof Error && err.name === 'AbortError') {
-      throw err
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw error
     }
     // Re-throw existing DocxKitError
-    if (err instanceof Error && err.message.startsWith('[')) {
-      throw err
+    if (error instanceof Error && error.message.startsWith('[')) {
+      throw error
     }
     throw createPreviewError(
       PREVIEW_ERROR_CODES.PREVIEW_FETCH_FAILED,
-      `Failed to fetch DOCX from URL: ${(err as Error).message ?? String(err)}`,
-      err,
+      `Failed to fetch DOCX from URL: ${(error as Error).message ?? String(error)}`,
+      error,
     )
   }
 }

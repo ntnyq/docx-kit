@@ -248,12 +248,12 @@ export function useThemeStudio() {
         minute: '2-digit',
         second: '2-digit',
       }).format(new Date())
-    } catch (err) {
+    } catch (error_) {
       if (token !== renderToken) {
         return
       }
 
-      error.value = String(err)
+      error.value = String(error_)
       previewBlob.value = null
     } finally {
       if (token === renderToken) {

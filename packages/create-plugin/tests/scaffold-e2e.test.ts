@@ -27,13 +27,13 @@ function runPnpm(cwd: string, args: string[]): void {
       shell: process.platform === 'win32',
       timeout: 120_000,
     })
-  } catch (err) {
-    const failure = err as Error & { stderr?: string; stdout?: string }
+  } catch (error) {
+    const failure = error as Error & { stderr?: string; stdout?: string }
     throw new Error(
       [failure.message, failure.stdout, failure.stderr]
         .filter(Boolean)
         .join('\n'),
-      { cause: err },
+      { cause: error },
     )
   }
 }

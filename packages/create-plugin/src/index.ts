@@ -12,7 +12,7 @@ import { createPlugin } from './commands/create-plugin'
 
 const nameArg = process.argv[2]
 
-createPlugin(nameArg).catch((err: unknown) => {
-  console.error('Failed to scaffold plugin project:', err)
+createPlugin(nameArg).catch((error: unknown) => {
+  console.error('Failed to scaffold plugin project:', error)
   process.exit(1)
 })

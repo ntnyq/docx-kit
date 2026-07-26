@@ -148,7 +148,7 @@ export function toPtHalf(
     return Math.round(value * HALF_POINTS_PER_POINT)
   }
 
-  const n = Number.parseFloat(value)
+  const n = Number(value.replace(/[%a-z]+$/i, ''))
   if (value.endsWith('pt')) {
     return Math.round(n * HALF_POINTS_PER_POINT)
   }
@@ -191,7 +191,7 @@ export function toPx(value: number | string | undefined): number | undefined {
     return value
   }
 
-  const n = Number.parseFloat(value)
+  const n = Number(value.replace(/[%a-z]+$/i, ''))
   if (value.endsWith('px')) {
     return n
   }
@@ -235,7 +235,7 @@ export function toTwip(value: number | string | undefined): number | undefined {
     return Math.round(value * TWIPS_PER_POINT)
   }
 
-  const n = Number.parseFloat(value)
+  const n = Number(value.replace(/[%a-z]+$/i, ''))
   if (value.endsWith('pt')) {
     return Math.round(n * TWIPS_PER_POINT)
   }

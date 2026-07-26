@@ -8,10 +8,10 @@ describe('loadLocalPlugin', () => {
     // Local import will fail in test environment for arbitrary paths
     try {
       await loadLocalPlugin('/nonexistent/path/plugin.js')
-    } catch (err) {
-      expect(err instanceof DocxKitError).toBe(true)
-      expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
-      expect((err as DocxKitError).message).toContain('local path')
+    } catch (error) {
+      expect(error instanceof DocxKitError).toBe(true)
+      expect((error as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
+      expect((error as DocxKitError).message).toContain('local path')
     }
   })
 

@@ -198,8 +198,11 @@ describe('paragraph with inline image', () => {
 
     expect(para.type).toBe('paragraph')
     expect(para.children).toHaveLength(2)
-    expect(para.children[0]).toMatchObject({ text: 'See: ', type: 'text' })
-    expect(para.children[1]).toMatchObject({
+    expect(para.children.at(0)).toMatchObject({
+      text: 'See: ',
+      type: 'text',
+    })
+    expect(para.children.at(1)).toMatchObject({
       height: 16,
       type: 'image',
       width: 16,
@@ -217,7 +220,7 @@ describe('paragraph with inline image', () => {
     const json = builder.toJSON()
     const para = json.content![0] as any
     expect(para.children).toHaveLength(2)
-    expect(para.children[1]).toMatchObject({
+    expect(para.children.at(1)).toMatchObject({
       height: 20,
       type: 'image',
       width: 20,

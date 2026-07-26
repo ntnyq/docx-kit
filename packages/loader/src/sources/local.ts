@@ -39,11 +39,11 @@ export async function loadLocalPlugin(
     // and browser (same-origin paths). The caller is responsible
     // for providing a valid absolute path or URL.
     mod = (await import(path)) as DocxPlugin | { default?: unknown }
-  } catch (err) {
+  } catch (error) {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',
       `Failed to import plugin from local path: "${path}"`,
-      err,
+      error,
     )
   }
 

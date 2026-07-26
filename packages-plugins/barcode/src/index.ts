@@ -132,10 +132,10 @@ async function loadBarcodeRenderer(): Promise<BarcodeRenderer> {
   try {
     const module = await import('bwip-js')
     return (module.default ?? module) as BarcodeRenderer
-  } catch (err) {
+  } catch (error) {
     throw new Error(
       'The barcode plugin requires the optional "bwip-js" package. Install it before rendering barcodes.',
-      { cause: err },
+      { cause: error },
     )
   }
 }

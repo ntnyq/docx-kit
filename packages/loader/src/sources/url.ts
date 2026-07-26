@@ -37,11 +37,11 @@ export async function loadUrlPlugin(
   try {
     mod = (await import(/* @vite-ignore */ url)) as
       DocxPlugin | { default?: unknown }
-  } catch (err) {
+  } catch (error) {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',
       `Failed to import plugin from URL: "${url}"`,
-      err,
+      error,
     )
   }
 

@@ -133,9 +133,9 @@ export function useDocxPlayground() {
           isInternalChange = false
         })
       })
-    } catch (err) {
-      editorError.value = String(err)
-      console.error('Monaco editor init failed:', err)
+    } catch (error_) {
+      editorError.value = String(error_)
+      console.error('Monaco editor init failed:', error_)
     }
   })
 
@@ -222,8 +222,8 @@ export function useDocxPlayground() {
           })
         }
       }
-    } catch (err) {
-      error.value = String(err)
+    } catch (error_) {
+      error.value = String(error_)
     } finally {
       loading.value = false
     }

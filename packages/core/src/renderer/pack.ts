@@ -27,11 +27,11 @@ import type { Document } from 'docx'
 export async function packToBase64String(doc: Document): Promise<string> {
   try {
     return await Packer.toBase64String(doc)
-  } catch (err) {
+  } catch (error) {
     throw new DocxKitError(
       'EXPORT_FAILED',
       'Failed to pack document to base64',
-      err,
+      error,
     )
   }
 }
@@ -52,11 +52,11 @@ export async function packToBase64String(doc: Document): Promise<string> {
 export async function packToBlob(doc: Document): Promise<Blob> {
   try {
     return await Packer.toBlob(doc)
-  } catch (err) {
+  } catch (error) {
     throw new DocxKitError(
       'EXPORT_FAILED',
       'Failed to pack document to blob',
-      err,
+      error,
     )
   }
 }
@@ -82,11 +82,11 @@ export async function packToBuffer(doc: Document): Promise<Uint8Array> {
   try {
     const buffer = await Packer.toBuffer(doc)
     return new Uint8Array(buffer)
-  } catch (err) {
+  } catch (error) {
     throw new DocxKitError(
       'EXPORT_FAILED',
       'Failed to pack document to buffer',
-      err,
+      error,
     )
   }
 }

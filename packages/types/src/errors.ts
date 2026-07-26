@@ -59,6 +59,7 @@ export class DocxKitError extends Error {
    * @param message - — Human-readable description
    * @param cause - — Optional underlying error
    */
+  // eslint-disable-next-line unicorn/custom-error-definition -- Public API uses a code-first signature for structured errors.
   constructor(code: string | ErrorCode, message: string, cause?: unknown) {
     super(message)
     this.name = 'DocxKitError'

@@ -71,14 +71,14 @@ export async function loadNpmPlugin(
   try {
     const raw = await readFile(manifestPath, 'utf-8')
     manifest = validateManifest(JSON.parse(raw))
-  } catch (err) {
-    if (err instanceof DocxKitError) {
-      throw err
+  } catch (error) {
+    if (error instanceof DocxKitError) {
+      throw error
     }
     throw new DocxKitError(
       'MANIFEST_INVALID',
       `Failed to parse manifest for "${packageName}"`,
-      err,
+      error,
     )
   }
 
@@ -89,11 +89,11 @@ export async function loadNpmPlugin(
   let mod: DocxPlugin | { default?: unknown }
   try {
     mod = (await import(entryPath)) as DocxPlugin | { default?: unknown }
-  } catch (err) {
+  } catch (error) {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',
       `Failed to import plugin module "${manifest.main}" from "${packageName}"`,
-      err,
+      error,
     )
   }
 

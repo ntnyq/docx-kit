@@ -40,6 +40,6 @@
     "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "happy-dom": "^20.10.6"
+    "happy-dom": "^20.11.1"
   }
 }

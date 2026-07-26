@@ -99,7 +99,7 @@ export function meetingMinutesPlugin() {
         children: [
           new TextRun({ bold: true, text: '日期：' }),
           new TextRun({ text: options.date }),
-          new TextRun({ text: '    ' }),
+          new TextRun({ text: ' '.repeat(4) }),
           new TextRun({ bold: true, text: '参会人员：' }),
           new TextRun({ text: options.attendees.join('、') }),
         ],

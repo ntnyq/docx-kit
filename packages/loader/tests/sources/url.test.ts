@@ -11,11 +11,11 @@ describe('loadUrlPlugin', () => {
 
     try {
       await loadUrlPlugin('https://invalid.example.com/plugin.js')
-    } catch (err) {
+    } catch (error) {
       // eslint-disable-next-line vitest/no-conditional-expect
-      expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
+      expect((error as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
       // eslint-disable-next-line vitest/no-conditional-expect
-      expect((err as DocxKitError).message).toContain('URL')
+      expect((error as DocxKitError).message).toContain('URL')
     }
   })
 

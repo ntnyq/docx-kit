@@ -338,7 +338,7 @@ function toVmlLength(value?: UnitValue): VmlLength | undefined {
   if (typeof value === 'number') {
     return `${value}pt`
   }
-  const numericValue = Number.parseFloat(value)
+  const numericValue = Number(value.replace(/(?:%|cm|in|mm|pt|px)$/, ''))
   if (value.endsWith('%')) {
     return `${numericValue}%`
   }

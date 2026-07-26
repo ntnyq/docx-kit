@@ -128,8 +128,10 @@ describe('assertRendersParagraph', () => {
     )
     try {
       assertRendersParagraph('not a paragraph')
-    } catch (err) {
-      expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_RENDER_FAILED)
+    } catch (error) {
+      expect((error as DocxKitError).code).toBe(
+        ERROR_CODES.PLUGIN_RENDER_FAILED,
+      )
     }
   })
 
@@ -177,8 +179,10 @@ describe('assertRendersChildType', () => {
     ).toThrowError(DocxKitError)
     try {
       assertRendersChildType('string value', Paragraph)
-    } catch (err) {
-      expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_RENDER_FAILED)
+    } catch (error) {
+      expect((error as DocxKitError).code).toBe(
+        ERROR_CODES.PLUGIN_RENDER_FAILED,
+      )
     }
   })
 
@@ -197,9 +201,11 @@ describe('assertRendersChildType', () => {
     )
     try {
       assertRendersChildType(paragraphs, Paragraph, 3)
-    } catch (err) {
-      expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_RENDER_FAILED)
-      expect((err as DocxKitError).message).toContain('Expected 3')
+    } catch (error) {
+      expect((error as DocxKitError).code).toBe(
+        ERROR_CODES.PLUGIN_RENDER_FAILED,
+      )
+      expect((error as DocxKitError).message).toContain('Expected 3')
     }
   })
 })
@@ -217,9 +223,11 @@ describe('assertPluginDefined', () => {
     expect(() => assertPluginDefined(null)).toThrowError(DocxKitError)
     try {
       assertPluginDefined(null)
-    } catch (err) {
-      expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_NOT_REGISTERED)
-      expect((err as DocxKitError).message).toContain('not an object')
+    } catch (error) {
+      expect((error as DocxKitError).code).toBe(
+        ERROR_CODES.PLUGIN_NOT_REGISTERED,
+      )
+      expect((error as DocxKitError).message).toContain('not an object')
     }
   })
 
@@ -229,8 +237,8 @@ describe('assertPluginDefined', () => {
     )
     try {
       assertPluginDefined({ render: () => {} })
-    } catch (err) {
-      expect((err as DocxKitError).message).toContain('missing "name"')
+    } catch (error) {
+      expect((error as DocxKitError).message).toContain('missing "name"')
     }
   })
 
@@ -240,8 +248,8 @@ describe('assertPluginDefined', () => {
     )
     try {
       assertPluginDefined({ name: 'test' })
-    } catch (err) {
-      expect((err as DocxKitError).message).toContain('missing "render"')
+    } catch (error) {
+      expect((error as DocxKitError).message).toContain('missing "render"')
     }
   })
 
@@ -251,8 +259,8 @@ describe('assertPluginDefined', () => {
     )
     try {
       assertPluginDefined(callout, 'wrongName')
-    } catch (err) {
-      expect((err as DocxKitError).message).toContain(
+    } catch (error) {
+      expect((error as DocxKitError).message).toContain(
         'Expected plugin name "wrongName"',
       )
     }

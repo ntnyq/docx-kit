@@ -61,9 +61,9 @@ describe('searchPlugins', () => {
 
     try {
       await searchPlugins('test')
-    } catch (err) {
-      expect(err instanceof Error).toBe(true)
-      expect((err as Error).message).toContain('500')
+    } catch (error) {
+      expect(error instanceof Error).toBe(true)
+      expect((error as Error).message).toContain('500')
     }
   })
 })

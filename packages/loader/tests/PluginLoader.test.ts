@@ -49,10 +49,12 @@ describe('PluginLoader', () => {
       const loader = createPluginLoader()
       try {
         await loader.load({ package: 'some-plugin', type: 'npm' })
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
-        expect((err as DocxKitError).message).toContain('npm')
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
+          ERROR_CODES.PLUGIN_LOAD_FAILED,
+        )
+        expect((error as DocxKitError).message).toContain('npm')
       }
     })
 
@@ -60,10 +62,12 @@ describe('PluginLoader', () => {
       const loader = createPluginLoader()
       try {
         await loader.load({ type: 'url', url: 'https://example.com/plugin.js' })
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
-        expect((err as DocxKitError).message).toContain('browser')
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
+          ERROR_CODES.PLUGIN_LOAD_FAILED,
+        )
+        expect((error as DocxKitError).message).toContain('browser')
       }
     })
 
@@ -71,10 +75,12 @@ describe('PluginLoader', () => {
       const loader = createPluginLoader()
       try {
         await loader.load({ path: './plugin.js', type: 'local' })
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
-        expect((err as DocxKitError).message).toContain('Local')
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
+          ERROR_CODES.PLUGIN_LOAD_FAILED,
+        )
+        expect((error as DocxKitError).message).toContain('Local')
       }
     })
   })
@@ -139,10 +145,12 @@ describe('PluginLoader', () => {
 
       try {
         await loader.load({ plugin: callout, type: 'inline' })
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
-        expect((err as DocxKitError).message).toContain('security policy')
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
+          ERROR_CODES.PLUGIN_LOAD_FAILED,
+        )
+        expect((error as DocxKitError).message).toContain('security policy')
       }
     })
 
@@ -166,9 +174,11 @@ describe('PluginLoader', () => {
 
       try {
         await loader.load({ plugin: callout, type: 'inline' })
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
+          ERROR_CODES.PLUGIN_LOAD_FAILED,
+        )
       }
     })
   })
@@ -186,10 +196,12 @@ describe('PluginLoader', () => {
 
       try {
         await loader.load({ plugin: callout, type: 'inline' })
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(ERROR_CODES.PLUGIN_LOAD_FAILED)
-        expect((err as DocxKitError).message).toContain('security policy')
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
+          ERROR_CODES.PLUGIN_LOAD_FAILED,
+        )
+        expect((error as DocxKitError).message).toContain('security policy')
       }
     })
 
@@ -234,9 +246,9 @@ describe('PluginLoader', () => {
       }
       try {
         testLoader._checkCompatibility(manifest)
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
           ERROR_CODES.PLUGIN_VERSION_MISMATCH,
         )
       }
@@ -259,9 +271,9 @@ describe('PluginLoader', () => {
       }
       try {
         testLoader._checkCompatibility(manifest)
-      } catch (err) {
-        expect(err instanceof DocxKitError).toBe(true)
-        expect((err as DocxKitError).code).toBe(
+      } catch (error) {
+        expect(error instanceof DocxKitError).toBe(true)
+        expect((error as DocxKitError).code).toBe(
           ERROR_CODES.PLUGIN_VERSION_MISMATCH,
         )
       }
@@ -325,6 +337,7 @@ describe('PluginLoader', () => {
 // to support testing the allowExecute security hook.
 // @ts-expect-error — accessing protected member for test purposes
 const originalLoadInline = PluginLoader.prototype._loadInline
+/* eslint-disable unicorn/no-this-outside-of-class -- Prototype patch requires a dynamic method receiver. */
 // @ts-expect-error — assigning to protected member; return type widened for testing
 PluginLoader.prototype._loadInline = function (
   this: TestablePluginLoader,
@@ -338,3 +351,4 @@ PluginLoader.prototype._loadInline = function (
   }
   return originalLoadInline.call(this, plugin)
 }
+/* eslint-enable unicorn/no-this-outside-of-class */

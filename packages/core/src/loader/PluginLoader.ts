@@ -196,14 +196,14 @@ export class PluginLoader {
             `Unknown plugin source type: ${(source as { type: string }).type}`,
           )
       }
-    } catch (err) {
-      if (err instanceof DocxKitError) {
-        throw err
+    } catch (error) {
+      if (error instanceof DocxKitError) {
+        throw error
       }
       throw new DocxKitError(
         'PLUGIN_LOAD_FAILED',
         `Failed to load plugin from ${source.type} source`,
-        err,
+        error,
       )
     }
 
