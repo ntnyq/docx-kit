@@ -1,55 +1,76 @@
 import { unindent } from '@ntnyq/utils'
 
 /**
- * Plugins playground preset — showcases all 12 built-in plugins.
+ * Plugins playground preset — showcases all 19 built-in plugins.
  *
  * Plugin list:
- *   1. callout       — colored info/warning/success/danger boxes
- *   2. codeBlock     — syntax-highlighted code blocks
- *   3. coverPage     — professional title page
- *   4. dataTable     — auto-inferred table from object arrays
- *   5. echarts       — charts as embedded images (browser only)
- *   6. meetingMinutes — structured meeting notes
- *   7. pageNumber    — page number field for headers/footers
- *   8. propertyTable — key-value styled table
- *   9. qrcode        — QR code images (needs qrcode peer dep)
- *  10. signatureBlock — signature lines for contracts
- *  11. timeline      — chronological timeline table
- *  12. watermark     — text watermark for branding
+ *   1. badge          — short status labels
+ *   2. barcode        — linear barcode images (needs bwip-js peer dep)
+ *   3. callout        — colored info/warning/success/danger boxes
+ *   4. changelog      — structured release notes
+ *   5. codeBlock      — syntax-highlighted code blocks
+ *   6. coverPage      — professional title page
+ *   7. dataTable      — auto-inferred table from object arrays
+ *   8. divider        — configurable horizontal rules
+ *   9. echarts        — charts as embedded images (browser only)
+ *  10. invoice        — invoice header, line items, and totals
+ *  11. letterhead     — branded company heading
+ *  12. meetingMinutes — structured meeting notes
+ *  13. pageNumber     — page number field for headers/footers
+ *  14. propertyTable  — key-value styled table
+ *  15. qrcode         — QR code images (needs qrcode peer dep)
+ *  16. signatureBlock — signature lines for contracts
+ *  17. timeline       — chronological timeline table
+ *  18. toc            — Word table of contents field
+ *  19. watermark      — text watermark for branding
  */
 export const PLUGIN_CODE = unindent(`
   import {
     createDocx,
+    badgePlugin,
+    barcodePlugin,
     calloutPlugin,
+    changelogPlugin,
     codeBlockPlugin,
     coverPagePlugin,
     dataTablePlugin,
+    dividerPlugin,
     echartsPlugin,
+    invoicePlugin,
+    letterheadPlugin,
     meetingMinutesPlugin,
     pageNumberPlugin,
     propertyTablePlugin,
     qrcodePlugin,
     signatureBlockPlugin,
     timelinePlugin,
+    tocPlugin,
     watermarkPlugin,
   } from 'docx-kit'
 
-  // 1. Register all 12 built-in plugins (chain \`.use()\` for type-safe \`.plugin()\` calls)
+  // Register all built-in plugins (chain \`.use()\` for type-safe \`.plugin()\` calls)
   const doc = createDocx({
     page: { size: 'A4', margin: '20mm 25mm' },
     metadata: { title: 'Built-in Plugins Showcase', creator: 'docx-kit' },
   })
+    .use(badgePlugin())
+    .use(barcodePlugin())
     .use(calloutPlugin())
+    .use(changelogPlugin())
     .use(codeBlockPlugin())
     .use(coverPagePlugin())
     .use(dataTablePlugin())
+    .use(dividerPlugin())
     .use(echartsPlugin())
+    .use(invoicePlugin())
+    .use(letterheadPlugin())
     .use(meetingMinutesPlugin())
     .use(pageNumberPlugin())
     .use(propertyTablePlugin())
     .use(qrcodePlugin())
     .use(signatureBlockPlugin())
     .use(timelinePlugin())
+    .use(tocPlugin())
     .use(watermarkPlugin())
 
   // ════════════════════════════════════════════════════════════
@@ -57,7 +78,7 @@ export const PLUGIN_CODE = unindent(`
   // ════════════════════════════════════════════════════════════
   doc.plugin('coverPage', {
     title: 'docx-kit Built-in Plugins',
-    subtitle: 'All 12 plugins in one document',
+    subtitle: 'All 19 plugins in one document',
     author: 'Playground',
     date: new Date().toISOString().slice(0, 10),
     organization: 'docx-kit',
@@ -216,7 +237,18 @@ export const PLUGIN_CODE = unindent(`
     })
 
   doc
-    .h1('10. ECharts')
+    .h1('10. Barcode')
+    .p('Linear barcodes for inventory, retail, and logistics workflows.')
+
+    .plugin('barcode', {
+      text: 'DOCX-KIT-2026',
+      caption: 'Code 128 inventory identifier',
+      format: 'code128',
+      width: 280,
+    })
+
+  doc
+    .h1('11. ECharts')
     .p('ECharts charts rendered as embedded images (browser only, requires echarts peer dependency).')
 
     .plugin('echarts', {
@@ -231,6 +263,52 @@ export const PLUGIN_CODE = unindent(`
       height: 280,
       caption: 'Revenue in millions (USD)',
     })
+
+  doc
+    .h1('12. Badge')
+    .p('Compact labels for status, severity, and category metadata.')
+    .plugin('badge', { text: 'Production Ready', color: 'success' })
+
+    .h1('13. Changelog')
+    .plugin('changelog', {
+      title: 'Recent Changes',
+      entries: [
+        { version: '0.4.0', date: '2026-07-26', type: 'added', changes: 'Barcode generation and advanced document features' },
+        { version: '0.3.1', date: '2026-07-20', type: 'fixed', changes: 'Cross-platform package verification' },
+      ],
+    })
+
+    .h1('14. Divider')
+    .p('Content before a configurable horizontal rule.')
+    .plugin('divider', { color: '4472C4', style: 'double' })
+    .p('Content after the rule.')
+
+    .h1('15. Invoice')
+    .plugin('invoice', {
+      invoiceNumber: 'INV-2026-0042',
+      date: '2026-07-26',
+      dueDate: '2026-08-09',
+      currency: 'USD',
+      from: { name: 'Docx Kit Studio', email: 'hello@example.com' },
+      to: { name: 'Example Customer', address: '123 Sample Street' },
+      items: [
+        { description: 'Document automation setup', quantity: 1, unitPrice: 1200 },
+        { description: 'Template customization', quantity: 3, unitPrice: 250 },
+      ],
+      taxRate: 0.08,
+    })
+
+    .h1('16. Letterhead')
+    .plugin('letterhead', {
+      companyName: 'Docx Kit Studio',
+      tagline: 'Typed documents, built to scale',
+      email: 'hello@example.com',
+      website: 'https://github.com/ntnyq/docx-kit',
+    })
+
+    .h1('17. Table of Contents')
+    .p('Open the generated file in Word and update fields to refresh page numbers.')
+    .plugin('toc', { title: 'Document Contents', maxLevel: 2 })
 
   doc.toBlob()
 `)

@@ -26,6 +26,9 @@ importers:
       bumpp:
         specifier: ^11.1.0
         version: 11.1.0
+      bwip-js:
+        specifier: ^4.11.2
+        version: 4.11.2
       echarts:
         specifier: ^6.1.0
         version: 6.1.0
@@ -68,6 +71,9 @@ importers:
       '@docxkit/plugin-badge':
         specifier: workspace:*
         version: link:../packages-plugins/badge
+      '@docxkit/plugin-barcode':
+        specifier: workspace:*
+        version: link:../packages-plugins/barcode
       '@docxkit/plugin-callout':
         specifier: workspace:*
         version: link:../packages-plugins/callout
@@ -181,6 +187,25 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+
+  packages-plugins/barcode:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      bwip-js:
+        specifier: '>=4.10.0'
+        version: 4.11.2
+      docx:
+        specifier: ^9.7.1
+        version: 9.7.1
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
 
   packages-plugins/callout:
     dependencies:
@@ -515,6 +540,9 @@ importers:
       '@docxkit/plugin-badge':
         specifier: workspace:*
         version: link:../../packages-plugins/badge
+      '@docxkit/plugin-barcode':
+        specifier: workspace:*
+        version: link:../../packages-plugins/barcode
       '@docxkit/plugin-callout':
         specifier: workspace:*
         version: link:../../packages-plugins/callout
@@ -2213,6 +2241,10 @@ packages:
   bumpp@11.1.0:
     resolution: {integrity: sha512-jdwOGMyX8JIqpQ0N2RMRR87DHZaoJnUtui5lU9LqFfFK5JC0H8qY9uWqXoa+dEWt/K7rOmmsoyiZB8RBM7RPBQ==}
     engines: {node: '>=20.19.0'}
+    hasBin: true
+
+  bwip-js@4.11.2:
+    resolution: {integrity: sha512-gAjZvO0a8n6NmzbtqRY5gLrYO4vNWtbmUXfyWG/NMG8/qJE66ahbzA8J0MvBkWnYY69zx3qfJQq4q9qu3Bm3FQ==}
     hasBin: true
 
   bytes@3.1.2:
@@ -5622,6 +5654,8 @@ snapshots:
       tinyglobby: 0.2.17
       unconfig: 7.5.0
       yaml: 2.9.0
+
+  bwip-js@4.11.2: {}
 
   bytes@3.1.2: {}
 

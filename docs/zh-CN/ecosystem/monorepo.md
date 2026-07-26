@@ -3,7 +3,7 @@
 仓库采用 pnpm workspace monorepo，当前文档已按最新结构覆盖以下目录：
 
 - `packages/`：10 个基础包，含 `renderer` 与 `types`
-- `packages-plugins/`：18 个内置插件包
+- `packages-plugins/`：19 个内置插件包
 - `packages-presets/`：3 个样式预设
 - `packages-themes/`：3 个主题包
 

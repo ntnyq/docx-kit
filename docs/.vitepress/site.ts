@@ -104,6 +104,7 @@ export const guideLinks: LinkItem[] = [
 export const pluginLinks: LinkItem[] = [
   { link: '/plugins/', text: 'Overview' },
   { link: '/plugins/badge', text: 'Badge' },
+  { link: '/plugins/barcode', text: 'Barcode' },
   { link: '/plugins/callout', text: 'Callout' },
   { link: '/plugins/changelog', text: 'Changelog' },
   { link: '/plugins/code-block', text: 'Code Block' },
@@ -136,6 +137,7 @@ export const zhEcosystemLinks: LinkItem[] = [
 export const zhPluginLinks: LinkItem[] = [
   { link: '/plugins/', text: '插件总览' },
   { link: '/plugins/badge', text: 'Badge' },
+  { link: '/plugins/barcode', text: 'Barcode' },
   { link: '/plugins/callout', text: 'Callout' },
   { link: '/plugins/changelog', text: 'Changelog' },
   { link: '/plugins/code-block', text: 'Code Block' },

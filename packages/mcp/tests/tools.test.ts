@@ -202,6 +202,13 @@ describe('buildPluginInfoList', () => {
 })
 
 describe('buildPluginHelp', () => {
+  it('builds barcode usage help', () => {
+    const plugin: DocxPlugin = { name: 'barcode', render: () => 'barcode' }
+    const help = buildPluginHelp(plugin)
+
+    expect(help.usageExample).toContain('code128')
+  })
+
   it('builds help info for known plugin', () => {
     const plugin: DocxPlugin = { name: 'qrcode', render: () => 'qr' }
     const help = buildPluginHelp(plugin)

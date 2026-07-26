@@ -24,12 +24,12 @@ const doc = createDocx()
 
 ## Built-in Coverage
 
-docx-kit now includes **18 built-in plugins** across the workspace:
+docx-kit now includes **19 built-in plugins** across the workspace:
 
 - Content blocks: `badge`, `callout`, `codeBlock`, `divider`, `watermark`
 - Report scaffolding: `coverPage`, `letterhead`, `toc`, `pageNumber`
 - Structured business data: `dataTable`, `propertyTable`, `timeline`, `invoice`, `meetingMinutes`, `changelog`
-- Media and embeds: `echarts`, `qrcode`
+- Media and embeds: `barcode`, `echarts`, `qrcode`
 - Approval workflows: `signatureBlock`
 
 The full reference lives in the [Plugins section](/plugins/).
@@ -41,6 +41,7 @@ Each built-in plugin is published as its own package under `packages-plugins/`:
 ```text
 packages-plugins/
   badge/
+  barcode/
   callout/
   changelog/
   code-block/
@@ -68,6 +69,7 @@ Some plugins intentionally keep their heavyweight runtime dependencies optional:
 
 | Plugin | Why it is optional |
 | --- | --- |
+| `@docxkit/plugin-barcode` | `bwip-js` is only needed when generating barcode images |
 | `@docxkit/plugin-code-block` | `highlight.js` is only needed for syntax coloring |
 | `@docxkit/plugin-echarts` | `echarts` is only needed when chart rendering is used |
 | `@docxkit/plugin-qrcode` | `qrcode` is only needed when generating QR images |

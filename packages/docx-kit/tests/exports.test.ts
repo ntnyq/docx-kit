@@ -25,6 +25,7 @@ describe('shared.ts — shared exports', () => {
     expect(mod.qrcodePlugin).toBeDefined()
     expect(mod.echartsPlugin).toBeDefined()
     expect(mod.badgePlugin).toBeDefined()
+    expect(mod.barcodePlugin).toBeDefined()
     expect(mod.invoicePlugin).toBeDefined()
     expect(mod.tocPlugin).toBeDefined()
   })
@@ -78,6 +79,7 @@ describe('dist exports — published package smoke tests', () => {
   it('loads browser dist entrypoint', async () => {
     const mod = await import('../dist/browser.js')
     expect(mod.badgePlugin).toBeDefined()
+    expect(mod.barcodePlugin).toBeDefined()
     expect(mod.invoicePlugin).toBeDefined()
     expect(mod.tocPlugin).toBeDefined()
   })

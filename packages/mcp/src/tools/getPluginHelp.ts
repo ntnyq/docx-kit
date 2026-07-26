@@ -51,6 +51,8 @@ export const getPluginHelpToolDefinition = {
 export function buildPluginHelp(plugin: DocxPlugin): PluginHelpInfo {
   const usageExamples: Record<string, string> = {
     pageNumber: '{ type: "plugin", name: "pageNumber", options: {} }',
+    barcode:
+      '{ type: "plugin", name: "barcode", options: { text: "DOCX-KIT-2026", format: "code128" } }',
     callout:
       '{ type: "plugin", name: "callout", options: { title: "Note", variant: "info", text: "Important message" } }',
     codeBlock:

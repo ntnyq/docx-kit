@@ -158,6 +158,7 @@ export async function createDocxKitServer(): Promise<unknown> {
     async (input: { filter?: string }) => {
       // Built-in plugin names (no runtime plugin list available in MCP context)
       const builtInNames = [
+        'barcode',
         'callout',
         'codeBlock',
         'coverPage',
@@ -211,6 +212,8 @@ export async function createDocxKitServer(): Promise<unknown> {
 
       const usageExamples: Record<string, string> = {
         pageNumber: '{ type: "plugin", name: "pageNumber", options: {} }',
+        barcode:
+          '{ type: "plugin", name: "barcode", options: { text: "DOCX-KIT-2026", format: "code128" } }',
         callout:
           '{ type: "plugin", name: "callout", options: { title: "Note", variant: "info", text: "Important message" } }',
         codeBlock:

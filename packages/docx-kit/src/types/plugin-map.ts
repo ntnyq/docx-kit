@@ -6,6 +6,7 @@
  */
 
 import type { BadgeOptions } from '@docxkit/plugin-badge'
+import type { BarcodeOptions } from '@docxkit/plugin-barcode'
 import type { CalloutOptions } from '@docxkit/plugin-callout'
 import type { ChangelogOptions } from '@docxkit/plugin-changelog'
 import type { CodeBlockOptions } from '@docxkit/plugin-code-block'
@@ -27,6 +28,7 @@ import type { WatermarkOptions } from '@docxkit/plugin-watermark'
 declare module '@docxkit/core' {
   export interface BuiltinPluginMap {
     badge: BadgeOptions
+    barcode: BarcodeOptions
     callout: CalloutOptions
     changelog: ChangelogOptions
     codeBlock: CodeBlockOptions

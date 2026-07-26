@@ -62,7 +62,7 @@ const doc = createDocx()
     events: [
       { date: '2024-Q1', title: 'v0.1 — Prototype', description: 'Proof of concept with core DSL and builder' },
       { date: '2024-Q3', title: 'v0.5 — Alpha', description: 'Plugin system, unit system, CSS-like styles' },
-      { date: '2025-Q1', title: 'v1.0 — Stable', description: '12 built-in plugins, VitePress docs, full test suite' },
+      { date: '2025-Q1', title: 'v1.0 — Stable', description: '19 built-in plugins, VitePress docs, full test suite' },
     ],
   })
   .save('history.docx')

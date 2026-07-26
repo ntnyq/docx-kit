@@ -93,6 +93,7 @@
     "@docxkit/mcp": "workspace:*",
     "@docxkit/pdk": "workspace:*",
     "@docxkit/plugin-badge": "workspace:*",
+    "@docxkit/plugin-barcode": "workspace:*",
     "@docxkit/plugin-callout": "workspace:*",
     "@docxkit/plugin-changelog": "workspace:*",
     "@docxkit/plugin-code-block": "workspace:*",

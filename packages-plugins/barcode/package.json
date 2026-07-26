@@ -1,0 +1,55 @@
+{
+  "name": "@docxkit/plugin-barcode",
+  "type": "module",
+  "version": "0.3.0",
+  "description": "Linear barcode generation — docx-kit plugin",
+  "keywords": [
+    "barcode",
+    "docx",
+    "docx-kit",
+    "docx-kit-plugin"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "ntnyq",
+    "email": "ntnyq13@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ntnyq/docx-kit",
+    "directory": "packages-plugins/barcode"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch"
+  },
+  "peerDependencies": {
+    "@docxkit/core": "workspace:*",
+    "bwip-js": ">=4.10.0",
+    "docx": "^9.7.1"
+  },
+  "peerDependenciesMeta": {
+    "bwip-js": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@docxkit/pdk": "workspace:*",
+    "jszip": "^3.10.1"
+  }
+}

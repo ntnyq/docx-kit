@@ -39,6 +39,7 @@ export function buildFreeformPrompt(
     '- plugin: { type: "plugin", name: "...", options: { ... } }',
     '',
     '## Available Plugins',
+    '- barcode: Linear barcode generation',
     '- coverPage: Cover page with title, author, date',
     '- callout: Highlighted callout box',
     '- watermark: Page watermark text',

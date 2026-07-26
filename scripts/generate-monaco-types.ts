@@ -42,17 +42,24 @@ const UMBRELLA_DTS = 'packages/docx-kit/dist/browser.d.ts'
 
 const DOCXKIT_LEAF_PACKAGES = [
   'packages/core/dist/index.d.ts',
+  'packages-plugins/badge/dist/index.d.ts',
+  'packages-plugins/barcode/dist/index.d.ts',
   'packages-plugins/callout/dist/index.d.ts',
+  'packages-plugins/changelog/dist/index.d.ts',
   'packages-plugins/code-block/dist/index.d.ts',
   'packages-plugins/cover-page/dist/index.d.ts',
   'packages-plugins/data-table/dist/index.d.ts',
+  'packages-plugins/divider/dist/index.d.ts',
   'packages-plugins/echarts/dist/index.d.ts',
+  'packages-plugins/invoice/dist/index.d.ts',
+  'packages-plugins/letterhead/dist/index.d.ts',
   'packages-plugins/meeting-minutes/dist/index.d.ts',
   'packages-plugins/page-number/dist/index.d.ts',
   'packages-plugins/property-table/dist/index.d.ts',
   'packages-plugins/qrcode/dist/index.d.ts',
   'packages-plugins/signature-block/dist/index.d.ts',
   'packages-plugins/timeline/dist/index.d.ts',
+  'packages-plugins/toc/dist/index.d.ts',
   'packages-plugins/watermark/dist/index.d.ts',
   'packages-presets/academic/dist/index.d.ts',
   'packages-presets/classic/dist/index.d.ts',
@@ -171,17 +178,24 @@ function stripImportsAndExports(source: string): string {
  */
 const BUILTIN_PLUGIN_MAP_AUGMENTATION = `
 interface BuiltinPluginMap {
+  badge: BadgeOptions;
+  barcode: BarcodeOptions;
   callout: CalloutOptions;
+  changelog: ChangelogOptions;
   codeBlock: CodeBlockOptions;
   coverPage: CoverPageOptions;
   dataTable: DataTableOptions;
+  divider: DividerOptions;
   echarts: EChartsPluginOptions;
+  invoice: InvoiceOptions;
+  letterhead: LetterheadOptions;
   meetingMinutes: MeetingMinutesOptions;
   pageNumber: PageNumberOptions;
   propertyTable: PropertyTableOptions;
   qrcode: QRCodePluginOptions;
   signatureBlock: SignatureBlockOptions;
   timeline: TimelineOptions;
+  toc: TocOptions;
   watermark: WatermarkOptions;
 }
 `.trim()

@@ -1,10 +1,11 @@
 # 插件总览
 
-当前共有 **18 个内置插件**，每个插件都对应一个独立 package 与一个独立文档页。
+当前共有 **19 个内置插件**，每个插件都对应一个独立 package 与一个独立文档页。
 
 | 插件 | 节点名 | 包名 | 说明 |
 | --- | --- | --- | --- |
 | [Badge](./badge) | `badge` | `@docxkit/plugin-badge` | 状态标签 |
+| [Barcode](./barcode) | `barcode` | `@docxkit/plugin-barcode` | 一维条形码 |
 | [Callout](./callout) | `callout` | `@docxkit/plugin-callout` | 提示 / 警告块 |
 | [Changelog](./changelog) | `changelog` | `@docxkit/plugin-changelog` | 版本变更表 |
 | [Code Block](./code-block) | `codeBlock` | `@docxkit/plugin-code-block` | 代码块 |
@@ -26,5 +27,6 @@
 ## 额外依赖说明
 
 - `codeBlock` 可选安装 `highlight.js`
+- `barcode` 需要 `bwip-js`
 - `echarts` 需要 `echarts`
 - `qrcode` 需要 `qrcode`

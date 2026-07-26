@@ -1,10 +1,11 @@
 # 外掛總覽
 
-目前共有 **18 個內建外掛**，每個外掛都對應一個獨立 package 與一個獨立文件頁。
+目前共有 **19 個內建外掛**，每個外掛都對應一個獨立 package 與一個獨立文件頁。
 
 | 外掛 | 節點名 | 套件名 | 說明 |
 | --- | --- | --- | --- |
 | [Badge](./badge) | `badge` | `@docxkit/plugin-badge` | 狀態標籤 |
+| [Barcode](./barcode) | `barcode` | `@docxkit/plugin-barcode` | 一維條碼 |
 | [Callout](./callout) | `callout` | `@docxkit/plugin-callout` | 提示 / 警告區塊 |
 | [Changelog](./changelog) | `changelog` | `@docxkit/plugin-changelog` | 版本變更表 |
 | [Code Block](./code-block) | `codeBlock` | `@docxkit/plugin-code-block` | 程式碼區塊 |
@@ -26,5 +27,6 @@
 ## 額外依賴說明
 
 - `codeBlock` 可選安裝 `highlight.js`
+- `barcode` 需要 `bwip-js`
 - `echarts` 需要 `echarts`
 - `qrcode` 需要 `qrcode`

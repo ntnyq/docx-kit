@@ -18,12 +18,12 @@ const doc = createDocx()
 
 ## 当前内置插件
 
-当前 workspace 内共有 **18 个内置插件**，并且每个插件都拥有独立包与独立文档页。
+当前 workspace 内共有 **19 个内置插件**，并且每个插件都拥有独立包与独立文档页。
 
 - 内容块：`badge`、`callout`、`codeBlock`、`divider`、`watermark`
 - 文档结构：`coverPage`、`letterhead`、`toc`、`pageNumber`
 - 结构化数据：`dataTable`、`propertyTable`、`timeline`、`invoice`、`meetingMinutes`、`changelog`
-- 媒体与嵌入：`echarts`、`qrcode`
+- 媒体与嵌入：`barcode`、`echarts`、`qrcode`
 - 审批签署：`signatureBlock`
 
 完整列表见 [插件总览](/zh-CN/plugins/)。

@@ -8,7 +8,7 @@ docx-kit's type system is organized by functional domain. Choose a section below
 | [Styles](./style) | `DocxStyleRule`, `StyleSheet`, `StyleSheetEntry`, `BorderRule`, `FontWeight`, `defineStyles()`, `extends` inheritance |
 | [DSL Nodes](./nodes) | `BlockNode`, `HeadingNode`, `ParagraphNode`, `ImageNode`, `TableNode`, `HyperlinkNode`, `BulletListNode`, and all child types |
 | [Builder](./builder) | `DocxBuilder` class API, `createDocx()`, `renderDocx()`, `DocxSchema`, `span()`, `inlineImg()`, export methods |
-| [Plugins](./plugins) | `DocxPlugin`, `definePlugin()`, `PluginRenderContext`, all 12 built-in plugin option types |
+| [Plugins](./plugins) | `DocxPlugin`, `definePlugin()`, `PluginRenderContext`, all 19 built-in plugin option types |
 
 ## Utility Types
 

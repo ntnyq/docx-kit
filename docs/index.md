@@ -25,8 +25,8 @@ features:
     details: "Chain `.h1()`, `.p()`, `.table()`, `.image()`, `.section()` and `.plugin()` calls to build documents incrementally with strong type inference."
 
   - icon: 🧩
-    title: 18 Built-in Plugins
-    details: "Built-in plugins cover badges, callouts, changelogs, code blocks, cover pages, dividers, invoices, letterheads, QR codes, timelines, TOCs, and more."
+    title: 19 Built-in Plugins
+    details: "Built-in plugins cover badges, barcodes, callouts, code blocks, cover pages, invoices, QR codes, timelines, TOCs, and more."
 
   - icon: 📦
     title: Monorepo Package Surface

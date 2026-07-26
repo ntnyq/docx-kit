@@ -32,6 +32,7 @@ This page is the package-level map of the current docx-kit monorepo. It compleme
 | Package | Focus |
 | --- | --- |
 | `@docxkit/plugin-badge` | Status labels |
+| `@docxkit/plugin-barcode` | Linear barcodes |
 | `@docxkit/plugin-callout` | Admonition blocks |
 | `@docxkit/plugin-changelog` | Release-note tables |
 | `@docxkit/plugin-code-block` | Source code formatting |

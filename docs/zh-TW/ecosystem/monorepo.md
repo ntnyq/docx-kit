@@ -3,7 +3,7 @@
 倉庫使用 pnpm workspace monorepo，目前文件已依照最新結構覆蓋：
 
 - `packages/`：10 個基礎套件，包含 `renderer` 與 `types`
-- `packages-plugins/`：18 個內建外掛套件
+- `packages-plugins/`：19 個內建外掛套件
 - `packages-presets/`：3 個樣式預設
 - `packages-themes/`：3 個主題套件
 

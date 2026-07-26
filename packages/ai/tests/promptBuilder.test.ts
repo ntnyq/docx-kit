@@ -53,6 +53,7 @@ describe('buildFreeformPrompt', () => {
 
   it('lists all available plugins', () => {
     const prompt = buildFreeformPrompt('report')
+    expect(prompt).toContain('barcode')
     expect(prompt).toContain('coverPage')
     expect(prompt).toContain('callout')
     expect(prompt).toContain('qrcode')
@@ -90,6 +91,7 @@ describe('generateSchemaGuide', () => {
 
   it('includes built-in plugins', () => {
     const guide = generateSchemaGuide()
+    expect(guide).toContain('barcode')
     expect(guide).toContain('callout')
     expect(guide).toContain('qrcode')
     expect(guide).toContain('watermark')

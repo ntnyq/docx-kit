@@ -189,7 +189,7 @@ import { createDocxKitServer } from 'docx-kit/mcp'
 
 ### I want to use a built-in plugin (QR, charts, signatures...)
 
-→ [Plugins guide](/guide/plugins) — 12 built-in plugins
+→ [Plugins guide](/guide/plugins) — 19 built-in plugins
 
 ## Next Steps (Detailed)
 

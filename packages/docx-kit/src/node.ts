@@ -91,6 +91,7 @@ export { dataUrlToUint8Array } from './node/index'
 // ---------- Built-in plugins (except echarts — browser only) ----------
 export { badgePlugin } from '@docxkit/plugin-badge'
 export { qrcodePlugin } from '@docxkit/plugin-qrcode'
+export { barcodePlugin } from '@docxkit/plugin-barcode'
 export { calloutPlugin } from '@docxkit/plugin-callout'
 export { dividerPlugin } from '@docxkit/plugin-divider'
 export { invoicePlugin } from '@docxkit/plugin-invoice'
@@ -118,6 +119,7 @@ export type { CodeBlockOptions } from '@docxkit/plugin-code-block'
 export type { CoverPageOptions } from '@docxkit/plugin-cover-page'
 export type { LetterheadOptions } from '@docxkit/plugin-letterhead'
 export type { PageNumberOptions } from '@docxkit/plugin-page-number'
+export type { BarcodeFormat, BarcodeOptions } from '@docxkit/plugin-barcode'
 export type { TimelineEvent, TimelineOptions } from '@docxkit/plugin-timeline'
 export type {
   ChangelogEntry,

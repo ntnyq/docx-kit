@@ -97,6 +97,11 @@ export function generateSchemaGuide(): string {
 
   const pluginDescriptions: [string, string, string][] = [
     [
+      'barcode',
+      'Linear barcode generation',
+      '{ text: string, format?: string, width?: number }',
+    ],
+    [
       'callout',
       'Highlighted callout box',
       '{ type: "callout", title?: string, variant?: "info"|"warning"|"success"|"danger" }',

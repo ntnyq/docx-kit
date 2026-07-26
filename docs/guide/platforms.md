@@ -11,6 +11,7 @@ docx-kit works in both Node.js and browser environments. Platform-specific APIs 
 | `defineStyles()` | ✅ | — | — |
 | `definePlugin()` | ✅ | — | — |
 | `DocxBuilder` | ✅ | — | — |
+| `barcodePlugin` | ✅ | ✅ | ✅ |
 | `qrcodePlugin` | ✅ | — | — |
 | `echartsPlugin` | ✅ (browser) | ❌ | ✅ (built-in) |
 | `dataUrlToUint8Array()` | ✅ | ✅ | ✅ |

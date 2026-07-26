@@ -1,12 +1,13 @@
 # Plugins
 
-docx-kit currently ships with **18 built-in plugins**. Each plugin lives in its own workspace package under `packages-plugins/`, can be registered with `.use(...)`, and is invoked through `.plugin(name, options)`.
+docx-kit currently ships with **19 built-in plugins**. Each plugin lives in its own workspace package under `packages-plugins/`, can be registered with `.use(...)`, and is invoked through `.plugin(name, options)`.
 
 ## Catalog
 
 | Plugin | Package | Node Name | Description |
 | --- | --- | --- | --- |
 | [Badge](./badge) | `@docxkit/plugin-badge` | `badge` | Status chips and short labels |
+| [Barcode](./barcode) | `@docxkit/plugin-barcode` | `barcode` | Code 128, EAN, UPC, and other linear barcodes |
 | [Callout](./callout) | `@docxkit/plugin-callout` | `callout` | Info, warning, success, and danger boxes |
 | [Changelog](./changelog) | `@docxkit/plugin-changelog` | `changelog` | Release-note tables with typed entries |
 | [Code Block](./code-block) | `@docxkit/plugin-code-block` | `codeBlock` | Monospaced source blocks with optional highlighting |
@@ -43,6 +44,7 @@ const doc = createDocx()
 
 | Plugin | Extra dependency or runtime note |
 | --- | --- |
+| `barcode` | Requires the `bwip-js` package |
 | `codeBlock` | Optional `highlight.js` peer dependency for syntax coloring |
 | `echarts` | Requires `echarts`; browser DOM is the primary target |
 | `qrcode` | Requires the `qrcode` package |
@@ -54,6 +56,6 @@ const doc = createDocx()
 - Use content plugins like `callout`, `codeBlock`, `badge`, and `divider` when you need presentational blocks inside a normal document flow.
 - Use document-structure plugins like `coverPage`, `toc`, `pageNumber`, and `letterhead` when you want reusable report scaffolding.
 - Use data plugins like `dataTable`, `propertyTable`, `timeline`, `invoice`, and `meetingMinutes` when your source data already has a clear schema.
-- Use media plugins like `echarts` and `qrcode` when the document needs scannable or visual output.
+- Use media plugins like `barcode`, `echarts`, and `qrcode` when the document needs scannable or visual output.
 
 Custom plugins are still supported through `definePlugin()`. See the [Plugins guide](/guide/plugins) and the [package catalog](/ecosystem/packages) for the package-level view.
