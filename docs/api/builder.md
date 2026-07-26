@@ -45,6 +45,7 @@ class DocxBuilder<
   hyperlink(url: string, text: string, opts?: StyleOptions): this
   image(options: ImageNode): this
   table<T>(options: TableOptions<T>): this
+  columnBreak(): this
   pageBreak(): this
   section(config?: SectionConfig): this
   add(node: BlockNode): this
@@ -86,6 +87,7 @@ class DocxBuilder<
 | `.hyperlink(url, text, opts?)` | Clickable hyperlink |
 | `.table({ columns, data, ... })` | Data table |
 | `.image({ data, width?, height?, ... })` | Embedded image |
+| `.columnBreak()` | Forced break to the next section column |
 | `.pageBreak()` | Forced page break |
 | `.section(config?)` | Start a new section |
 | `.plugin(name, options, opts?)` | Invoke registered plugin |

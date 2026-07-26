@@ -107,6 +107,11 @@ export class DocxBuilder<
     return this.add(node)
   }
 
+  /** Add a forced column break. */
+  columnBreak(): this {
+    return this.add({ type: 'columnBreak' })
+  }
+
   /**
    * Add a level-1 heading.
    */

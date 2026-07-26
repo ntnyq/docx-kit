@@ -2,11 +2,11 @@ import { Packer } from 'docx'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 import { compileDocument } from '../../src/compiler/compileDocument'
-import type { BlockNode, TableNode } from '@docxkit/types'
+import type { BlockNode, DocxKitConfig, TableNode } from '@docxkit/types'
 
-async function renderPackage(nodes: BlockNode[]) {
+async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
   const document = await compileDocument({
-    config: {},
+    config,
     nodes,
     plugins: new Map(),
   })
@@ -24,6 +24,75 @@ async function renderPackage(nodes: BlockNode[]) {
 }
 
 describe('compiler OOXML contracts', () => {
+  it('emits advanced first-section layout properties and column breaks', async () => {
+    const pkg = await renderPackage([
+      {
+        type: 'sectionBreak',
+        config: {
+          type: 'continuous',
+          columns: {
+            count: 2,
+            separator: true,
+            spacing: '12pt',
+          },
+          lineNumbers: {
+            countBy: 5,
+            distance: '6pt',
+            restart: 'newSection',
+            start: 3,
+          },
+          page: {
+            footerDistance: '10mm',
+            gutter: '5mm',
+            headerDistance: '8mm',
+            margin: '20mm',
+            borders: {
+              display: 'allPages',
+              offsetFrom: 'page',
+              zOrder: 'front',
+              top: {
+                color: '#336699',
+                style: 'double',
+                width: '1pt',
+              },
+            },
+            pageNumber: {
+              format: 'upperRoman',
+              start: 7,
+            },
+          },
+        },
+      },
+      { text: 'First column', type: 'paragraph' },
+      { type: 'columnBreak' },
+      { text: 'Second column', type: 'paragraph' },
+    ])
+
+    const documentXml = await pkg.read('word/document.xml')
+
+    expect(documentXml.match(/<w:sectPr/g)).toHaveLength(1)
+    expect(documentXml).toContain('<w:br w:type="column"/>')
+    expect(documentXml).toContain('w:header="454"')
+    expect(documentXml).toContain('w:footer="567"')
+    expect(documentXml).toContain('w:gutter="283"')
+    expect(documentXml).toContain(
+      '<w:pgNumType w:start="7" w:fmt="upperRoman"/>',
+    )
+    expect(documentXml).toContain(
+      '<w:pgBorders w:display="allPages" w:offsetFrom="page" w:zOrder="front">',
+    )
+    expect(documentXml).toContain(
+      '<w:top w:val="double" w:color="336699" w:sz="20"/>',
+    )
+    expect(documentXml).toContain(
+      '<w:lnNumType w:countBy="5" w:start="3" w:restart="newSection" w:distance="120"/>',
+    )
+    expect(documentXml).toContain(
+      '<w:cols w:space="240" w:num="2" w:sep="true"/>',
+    )
+    expect(documentXml).toContain('<w:type w:val="continuous"/>')
+  })
+
   it('preserves an inline hyperlink inside a paragraph', async () => {
     const pkg = await renderPackage([
       {

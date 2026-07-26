@@ -37,22 +37,6 @@ export type {
   UnitValue,
 } from './utility'
 
-// ---------- Document types ----------
-export type {
-  DocxKitConfig,
-  DocxPreset,
-  DocxTheme,
-  HeaderFooterConfig,
-  HeaderFooterContent,
-  Orientation,
-  PageConfig,
-  PageSize,
-  SectionConfig,
-  ThemeColors,
-  ThemeFonts,
-  ThemeSpacing,
-} from './document'
-
 // ---------- Style types ----------
 export type {
   BorderRule,
@@ -76,6 +60,7 @@ export type {
   BulletItem,
   BulletListNode,
   ClassName,
+  ColumnBreakNode,
   HeadingNode,
   HyperlinkNode,
   ImageNode,
@@ -89,3 +74,25 @@ export type {
   TableNode,
   TextNode,
 } from './dsl/nodes'
+
+// ---------- Document types ----------
+export type {
+  DocxKitConfig,
+  DocxPreset,
+  DocxTheme,
+  HeaderFooterConfig,
+  HeaderFooterContent,
+  Orientation,
+  PageBorderConfig,
+  PageConfig,
+  PageNumberConfig,
+  PageSize,
+  SectionColumn,
+  SectionColumnsConfig,
+  SectionConfig,
+  SectionLineNumberConfig,
+  SectionType,
+  ThemeColors,
+  ThemeFonts,
+  ThemeSpacing,
+} from './document'

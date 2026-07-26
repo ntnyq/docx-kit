@@ -37,6 +37,7 @@ export interface BaseNode<TStyles extends StyleSheet = StyleSheet> {
  */
 export type BlockNode<TStyles extends StyleSheet = StyleSheet> =
   | BulletListNode<TStyles>
+  | ColumnBreakNode
   | HeadingNode<TStyles>
   | HyperlinkNode<TStyles>
   | ImageNode<TStyles>
@@ -95,6 +96,13 @@ export type ClassName<TStyles extends StyleSheet> = Extract<
   keyof TStyles,
   string
 >
+
+/**
+ * A forced column break.
+ */
+export interface ColumnBreakNode {
+  type: 'columnBreak'
+}
 
 // ---- Inline nodes ----
 

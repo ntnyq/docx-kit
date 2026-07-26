@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { DocxBuilder } from '../../src/builder/DocxBuilder'
 
 describe('DocxBuilder - section', () => {
+  it('inserts a columnBreak node when .columnBreak() is called', () => {
+    const doc = new DocxBuilder()
+    doc.p('Column 1').columnBreak().p('Column 2')
+
+    expect(doc.toJSON().content[1]).toEqual({ type: 'columnBreak' })
+  })
+
   it('inserts a sectionBreak node when .section() is called', () => {
     const doc = new DocxBuilder()
     doc.p('Section 1').section().p('Section 2')

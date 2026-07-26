@@ -38,12 +38,30 @@ interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
 
 ```ts
 interface PageConfig {
-  size?: PageSize | { width: UnitValue; height: UnitValue }
-  orientation?: 'portrait' | 'landscape'
+  borders?: PageBorderConfig
+  footerDistance?: UnitValue
+  gutter?: UnitValue
+  headerDistance?: UnitValue
   margin?:
     | UnitValue
     | `${string} ${string}`
     | `${string} ${string} ${string} ${string}`
+  pageNumber?: {
+    format?: 'decimal' | 'lowerLetter' | 'lowerRoman' | 'upperLetter' | 'upperRoman'
+    start?: number
+  }
+  size?: PageSize | { width: UnitValue; height: UnitValue }
+  orientation?: 'portrait' | 'landscape'
+}
+
+interface PageBorderConfig {
+  top?: BorderRule
+  right?: BorderRule
+  bottom?: BorderRule
+  left?: BorderRule
+  display?: 'allPages' | 'firstPage' | 'notFirstPage'
+  offsetFrom?: 'page' | 'text'
+  zOrder?: 'back' | 'front'
 }
 ```
 
@@ -135,10 +153,44 @@ Multi-section document configuration.
 
 ```ts
 interface SectionConfig {
-  page?: PageConfig
-  header?: HeaderFooterConfig
+  columns?: {
+    count?: number
+    spacing?: UnitValue
+    separator?: boolean
+    equalWidth?: boolean
+    columns?: { width: UnitValue; spacing?: UnitValue }[]
+  }
   footer?: HeaderFooterConfig
+  header?: HeaderFooterConfig
+  lineNumbers?: {
+    countBy?: number
+    distance?: UnitValue
+    restart?: 'continuous' | 'newPage' | 'newSection'
+    start?: number
+  }
+  page?: PageConfig
+  type?: 'continuous' | 'evenPage' | 'nextColumn' | 'nextPage' | 'oddPage'
 }
+```
+
+Calling `.section(config)` before adding content configures the first section
+without creating an empty leading section:
+
+```ts
+const doc = createDocx()
+  .section({
+    columns: { count: 2, separator: true, spacing: '12pt' },
+    lineNumbers: { countBy: 5, restart: 'newPage' },
+    page: {
+      headerDistance: '8mm',
+      footerDistance: '10mm',
+      pageNumber: { format: 'upperRoman', start: 1 },
+    },
+    type: 'continuous',
+  })
+  .p('First column')
+  .columnBreak()
+  .p('Second column')
 ```
 
 ## `HeaderFooterConfig`

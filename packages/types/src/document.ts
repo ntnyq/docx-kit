@@ -5,7 +5,7 @@
  */
 
 import type { BlockNode } from './dsl/nodes'
-import type { DocxStyleRule, StyleSheet } from './style'
+import type { BorderRule, DocxStyleRule, StyleSheet } from './style'
 import type { UnitValue } from './utility'
 
 /**
@@ -117,12 +117,40 @@ export interface HeaderFooterContent {
 /** Page orientation. */
 export type Orientation = 'landscape' | 'portrait'
 
+/** Page border configuration. */
+export interface PageBorderConfig {
+  /** Bottom page border. */
+  bottom?: BorderRule
+  /** Pages that display the border. */
+  display?: 'allPages' | 'firstPage' | 'notFirstPage'
+  /** Left page border. */
+  left?: BorderRule
+  /** Measure border offsets from the page edge or text area. */
+  offsetFrom?: 'page' | 'text'
+  /** Right page border. */
+  right?: BorderRule
+  /** Top page border. */
+  top?: BorderRule
+  /** Render the border behind or in front of document content. */
+  zOrder?: 'back' | 'front'
+}
+
 /**
  * Page configuration (size, orientation, margin).
  */
 export interface PageConfig {
+  /** Page border configuration. */
+  borders?: PageBorderConfig
+  /** Distance between the footer and the page edge. */
+  footerDistance?: UnitValue
+  /** Extra gutter width for binding. */
+  gutter?: UnitValue
+  /** Distance between the header and the page edge. */
+  headerDistance?: UnitValue
   /** Page orientation (`"portrait"` default). */
   orientation?: Orientation
+  /** Page-number sequence configuration for this section. */
+  pageNumber?: PageNumberConfig
   /** Page size: preset name or explicit dimensions. */
   size?: PageSize | { height: UnitValue; width: UnitValue }
   /**
@@ -137,8 +165,39 @@ export interface PageConfig {
     | UnitValue
 }
 
+/** Per-section page-number sequence configuration. */
+export interface PageNumberConfig {
+  /** First page number in the section. */
+  start?: number
+  /** Page number format. */
+  format?:
+    'decimal' | 'lowerLetter' | 'lowerRoman' | 'upperLetter' | 'upperRoman'
+}
+
 /** Available page size presets. */
 export type PageSize = 'A3' | 'A4' | 'Legal' | 'Letter'
+
+/** An explicitly sized section column. */
+export interface SectionColumn {
+  /** Column width. */
+  width: UnitValue
+  /** Space after this column. */
+  spacing?: UnitValue
+}
+
+/** Multi-column layout for a section. */
+export interface SectionColumnsConfig {
+  /** Explicit column widths for unequal-width layouts. */
+  columns?: SectionColumn[]
+  /** Number of equal-width columns. */
+  count?: number
+  /** Whether Word should keep columns equally sized. */
+  equalWidth?: boolean
+  /** Draw a separator line between columns. */
+  separator?: boolean
+  /** Default spacing between columns. */
+  spacing?: UnitValue
+}
 
 /**
  * Per-section configuration.
@@ -148,13 +207,35 @@ export type PageSize = 'A3' | 'A4' | 'Legal' | 'Letter'
  * sections.
  */
 export interface SectionConfig {
+  /** Multi-column layout. */
+  columns?: SectionColumnsConfig
   /** Section footer(s). */
   footer?: HeaderFooterConfig
   /** Section header(s). */
   header?: HeaderFooterConfig
+  /** Line numbering. */
+  lineNumbers?: SectionLineNumberConfig
   /** Section-specific page dimensions (overrides document-level `page`). */
   page?: PageConfig
+  /** Section break behavior. */
+  type?: SectionType
 }
+
+/** Line-numbering configuration for a section. */
+export interface SectionLineNumberConfig {
+  /** Number every Nth line. */
+  countBy?: number
+  /** Distance between line numbers and text. */
+  distance?: UnitValue
+  /** When line numbering restarts. */
+  restart?: 'continuous' | 'newPage' | 'newSection'
+  /** Starting line number. */
+  start?: number
+}
+
+/** Section break behavior. */
+export type SectionType =
+  'continuous' | 'evenPage' | 'nextColumn' | 'nextPage' | 'oddPage'
 
 /**
  * Theme color palette — semantic color tokens referenced by name.

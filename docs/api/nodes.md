@@ -16,6 +16,7 @@ type BlockNode<TStyles> =
   | HyperlinkNode<TStyles>
   | BulletListNode<TStyles>
   | NumberedListNode<TStyles>
+  | ColumnBreakNode
   | PageBreakNode
   | SectionBreakNode
 ```
@@ -198,6 +199,14 @@ interface NumberedListNode<TStyles> extends BaseNode<TStyles> {
 ```ts
 interface PageBreakNode {
   type: 'pageBreak'
+}
+```
+
+## `ColumnBreakNode`
+
+```ts
+interface ColumnBreakNode {
+  type: 'columnBreak'
 }
 ```
 

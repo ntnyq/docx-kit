@@ -12,12 +12,14 @@
  */
 
 import {
+  Column,
   Document,
   Footer as DocxFooter,
   Header as DocxHeader,
   Paragraph,
 } from 'docx'
 import { compileNode } from './compileNode'
+import { compileBorderRule } from './compileStyle'
 import { CompilationSession } from './numbers'
 import { parseShorthandTwip, toTwip } from './units'
 import type {
@@ -26,9 +28,12 @@ import type {
   DocxPlugin,
   HeaderFooterConfig,
   HeaderFooterContent,
+  PageBorderConfig,
   PageConfig,
   SectionBreakNode as SectionBreakNodeType,
+  SectionColumnsConfig,
   SectionConfig,
+  SectionLineNumberConfig,
   StyleSheet,
 } from '@docxkit/types'
 import type { FileChild, ISectionOptions } from 'docx'
@@ -90,10 +95,21 @@ export async function compileDocument<TStyles extends StyleSheet>(
 
   for (const node of options.nodes) {
     if (node.type === 'sectionBreak') {
-      sectionGroups.push({
-        config: (node as SectionBreakNodeType).config,
-        nodes: [],
-      })
+      const sectionBreak = node as SectionBreakNodeType
+      const currentGroup = sectionGroups[sectionGroups.length - 1]
+
+      if (
+        sectionGroups.length === 1
+        && currentGroup.nodes.length === 0
+        && currentGroup.config === undefined
+      ) {
+        currentGroup.config = sectionBreak.config
+      } else {
+        sectionGroups.push({
+          config: sectionBreak.config,
+          nodes: [],
+        })
+      }
     } else {
       sectionGroups[sectionGroups.length - 1].nodes.push(node)
     }
@@ -102,7 +118,7 @@ export async function compileDocument<TStyles extends StyleSheet>(
   // Compile each section
   const sections: ISectionOptions[] = []
 
-  for (const [i, group] of sectionGroups.entries()) {
+  for (const group of sectionGroups) {
     const children: FileChild[] = []
 
     for (const node of group.nodes) {
@@ -120,26 +136,24 @@ export async function compileDocument<TStyles extends StyleSheet>(
       }
     }
 
-    // First section uses top-level config; subsequent sections use section-level overrides
     const sectionConfig = group.config
-    const pageConfig =
-      i === 0 ? options.config : mergePageConfig(options.config, sectionConfig)
+    const pageConfig = mergePageConfig(options.config, sectionConfig)
 
     const footers = await compileHeaderFooter(
       DocxFooter,
-      i === 0 ? undefined : sectionConfig?.footer,
+      sectionConfig?.footer,
       options,
       session,
     )
     const headers = await compileHeaderFooter(
       DocxHeader,
-      i === 0 ? undefined : sectionConfig?.header,
+      sectionConfig?.header,
       options,
       session,
     )
 
     sections.push({
-      ...compileSectionProperties(pageConfig),
+      ...compileSectionProperties(pageConfig, sectionConfig),
       children,
       footers,
       headers,
@@ -159,6 +173,30 @@ export async function compileDocument<TStyles extends StyleSheet>(
     ...(numberingConfig ? { numbering: { config: numberingConfig } } : {}),
     sections,
   })
+}
+
+// ---------- Page / Section properties ----------
+
+function compileColumns(config?: SectionColumnsConfig) {
+  if (!config) {
+    return undefined
+  }
+
+  const columns = config.columns?.map(
+    column =>
+      new Column({
+        space: toTwip(column.spacing),
+        width: toTwip(column.width)!,
+      }),
+  )
+
+  return {
+    children: columns,
+    count: config.count,
+    equalWidth: config.equalWidth ?? (columns ? false : undefined),
+    separate: config.separator,
+    space: toTwip(config.spacing),
+  }
 }
 
 // ---------- Header / Footer (deduplicated) ----------
@@ -241,36 +279,87 @@ async function compileHeaderFooterChildren<TStyles extends StyleSheet>(
   return result
 }
 
-// ---------- Page / Section properties ----------
+function compileLineNumbers(config?: SectionLineNumberConfig) {
+  if (!config) {
+    return undefined
+  }
+
+  return {
+    countBy: config.countBy,
+    distance: toTwip(config.distance),
+    restart: config.restart,
+    start: config.start,
+  }
+}
+
+function compilePageBorders(config?: PageBorderConfig) {
+  if (!config) {
+    return undefined
+  }
+
+  return {
+    pageBorderLeft: config.left ? compileBorderRule(config.left) : undefined,
+    pageBorderRight: config.right ? compileBorderRule(config.right) : undefined,
+    pageBorderTop: config.top ? compileBorderRule(config.top) : undefined,
+    pageBorderBottom: config.bottom
+      ? compileBorderRule(config.bottom)
+      : undefined,
+    pageBorders: {
+      display: config.display,
+      offsetFrom: config.offsetFrom,
+      zOrder: config.zOrder,
+    },
+  }
+}
 
 /**
  * Compile a single page margin value (shorthand or explicit) into twips.
  */
-function compilePageMargin(margin: PageMarginValue) {
-  if (!margin) {
+function compilePageMargin(config?: PageConfig) {
+  const parsed = config?.margin
+    ? parseShorthandTwip(config.margin as PageMarginValue)
+    : undefined
+  const footer = toTwip(config?.footerDistance)
+  const gutter = toTwip(config?.gutter)
+  const header = toTwip(config?.headerDistance)
+
+  if (!parsed && footer == null && gutter == null && header == null) {
     return undefined
   }
-  const parsed = parseShorthandTwip(margin)
-  if (!parsed) {
-    return undefined
-  }
+
   return {
-    bottom: parsed.bottom,
-    left: parsed.left,
-    right: parsed.right,
-    top: parsed.top,
+    bottom: parsed?.bottom,
+    footer,
+    gutter,
+    header,
+    left: parsed?.left,
+    right: parsed?.right,
+    top: parsed?.top,
   }
 }
 
 /**
  * Build the section properties (page size, margin) for the `Document`.
  */
-function compileSectionProperties(config: DocxKitConfig) {
+function compileSectionProperties(
+  config: DocxKitConfig,
+  sectionConfig?: SectionConfig,
+) {
   return {
     properties: {
+      column: compileColumns(sectionConfig?.columns),
+      lineNumbers: compileLineNumbers(sectionConfig?.lineNumbers),
+      type: sectionConfig?.type,
       page: {
-        margin: compilePageMargin(config.page?.margin),
+        borders: compilePageBorders(config.page?.borders),
+        margin: compilePageMargin(config.page),
         size: compilePageSize(config.page?.size, config.page?.orientation),
+        pageNumbers: config.page?.pageNumber
+          ? {
+              formatType: config.page.pageNumber.format,
+              start: config.page.pageNumber.start,
+            }
+          : undefined,
       },
     },
   }

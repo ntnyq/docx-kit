@@ -51,14 +51,27 @@ export function compileBorder(style: CellStyleRule | ParagraphStyleRule) {
   }
 
   return {
-    bottom: bb ? compileSingleBorder(bb!) : undefined,
-    left: bl ? compileSingleBorder(bl!) : undefined,
-    right: br ? compileSingleBorder(br!) : undefined,
-    top: bt ? compileSingleBorder(bt!) : undefined,
+    bottom: bb ? compileBorderRule(bb!) : undefined,
+    left: bl ? compileBorderRule(bl!) : undefined,
+    right: br ? compileBorderRule(br!) : undefined,
+    top: bt ? compileBorderRule(bt!) : undefined,
   }
 }
 
-// ---------- Paragraph ----------
+// ---------- Border ----------
+
+/**
+ * Compile a single border side into `docx` border options.
+ */
+export function compileBorderRule(rule: NonNullable<DocxStyleRule['border']>) {
+  return {
+    color: normalizeColor(rule.color),
+    size: rule.width == null ? 1 : toTwip(rule.width),
+    style: compileBorderStyle(rule.style),
+  }
+}
+
+// ---------- Cell ----------
 
 /**
  * Compile a `DocxStyleRule` into `docx` table cell options
@@ -115,7 +128,7 @@ export function compileCellStyle(style: CellStyleRule) {
   }
 }
 
-// ---------- Cell ----------
+// ---------- Border ----------
 
 /**
  * Compile a column width value.
@@ -142,8 +155,6 @@ export function compileColumnWidth(width: unknown) {
   return undefined
 }
 
-// ---------- Border ----------
-
 /** Compile paragraph-level borders (separate from cell borders). */
 export function compileParagraphBorder(style: ParagraphStyleRule) {
   const borders = compileBorder(style)
@@ -152,6 +163,8 @@ export function compileParagraphBorder(style: ParagraphStyleRule) {
   }
   return { border: borders }
 }
+
+// ---------- Column width ----------
 
 /**
  * Compile a `DocxStyleRule` into `docx` paragraph-level options
@@ -181,7 +194,7 @@ export function compileParagraphStyle(style: ParagraphStyleRule) {
   }
 }
 
-// ---------- Column width ----------
+// ---------- Helpers ----------
 
 /**
  * Compile a `DocxStyleRule` into `docx` run-level options
@@ -222,8 +235,6 @@ export function compileTextStyle(style: TextStyleRule) {
 
   return result
 }
-
-// ---------- Helpers ----------
 
 /**
  * Map the CSS-like text-align value to a `docx` `AlignmentType`.
@@ -276,17 +287,6 @@ function compileLineHeight(value: DocxStyleRule['lineHeight']) {
     return Math.round(value * 240)
   }
   return toTwip(value)
-}
-
-/**
- * Compile a single border side into `docx` border options.
- */
-function compileSingleBorder(rule: NonNullable<DocxStyleRule['border']>) {
-  return {
-    color: normalizeColor(rule.color),
-    size: rule.width == null ? 1 : toTwip(rule.width),
-    style: compileBorderStyle(rule.style),
-  }
 }
 
 /**

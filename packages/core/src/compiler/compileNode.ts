@@ -9,7 +9,7 @@
  */
 
 import { DocxKitError } from '@docxkit/types'
-import { PageBreak, Paragraph } from 'docx'
+import { ColumnBreak, PageBreak, Paragraph } from 'docx'
 import { compileHeading } from './nodes/compileHeading'
 import { compileHyperlink } from './nodes/compileHyperlink'
 import { compileImage } from './nodes/compileImage'
@@ -82,6 +82,10 @@ defaultRegistry
       node as TableNode<Record<string, unknown>, StyleSheet>,
       ctx.config as DocxKitConfig,
     ),
+  )
+  .register(
+    'columnBreak',
+    async () => new Paragraph({ children: [new ColumnBreak()] }),
   )
   .register(
     'pageBreak',
