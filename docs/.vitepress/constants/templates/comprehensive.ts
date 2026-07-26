@@ -59,9 +59,8 @@ export const COMPREHENSIVE_CODE = unindent(`
     },
     page: { size: 'A4', margin: '2cm' },
   })
-
-  /** Register custom plugins */
-  doc.use(sectionDividerPlugin).use(infoBoxPlugin)
+    .use(sectionDividerPlugin)
+    .use(infoBoxPlugin)
 
   // ═══════════════════════════════════════════════════════════════════════
   // SECTION 1 — Overview (A4 Portrait)
