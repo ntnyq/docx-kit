@@ -7,6 +7,6 @@ Cover page plugin for docx-kit.
 ```ts
 import { coverPagePlugin } from '@docxkit/plugin-cover-page'
 
-builder.use(coverPagePlugin)
+builder.use(coverPagePlugin())
 builder.coverPage({ title: 'Annual Report', subtitle: '2026' })
 ```

@@ -5,7 +5,7 @@ Showcase the `extends` feature in `defineStyles()` for CSS-like style inheritanc
 ## Full Code
 
 ```ts
-import { createDocx, defineStyles } from 'docx-kit'
+import { createDocx, defineStyles } from 'docx-kit/node'
 
 // 1. Define styles with extends (inheritance chain)
 const styles = defineStyles({

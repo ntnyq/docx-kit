@@ -21,10 +21,10 @@ import { pageNumberPlugin, type PageNumberOptions } from 'docx-kit'
 ### Simple Page Number
 
 ```ts
-import { createDocx, pageNumberPlugin } from 'docx-kit'
+import { createDocx, pageNumberPlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(pageNumberPlugin)
+  .use(pageNumberPlugin())
   .plugin('pageNumber', {})
   .save('page-number.docx')
 ```
@@ -33,7 +33,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(pageNumberPlugin)
+  .use(pageNumberPlugin())
   .h1('Report')
   .p('This report contains multiple pages.')
   .plugin('pageNumber', {
@@ -48,7 +48,7 @@ const doc = createDocx()
 import { AlignmentType } from 'docx'
 
 const doc = createDocx()
-  .use(pageNumberPlugin)
+  .use(pageNumberPlugin())
   .h1('Document')
   .plugin('pageNumber', {
     alignment: AlignmentType.LEFT,
@@ -61,7 +61,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(pageNumberPlugin)
+  .use(pageNumberPlugin())
   .h1('Large Print Document')
   .plugin('pageNumber', {
     fontSize: 28, // 14pt

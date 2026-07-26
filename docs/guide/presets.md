@@ -52,7 +52,7 @@ for (const p of PRESET_LIST) {
 The simplest usage is to spread the preset's `config` into `createDocx()`:
 
 ```ts
-import { createDocx, modernPreset } from 'docx-kit'
+import { createDocx, modernPreset } from 'docx-kit/node'
 
 const doc = createDocx(modernPreset.config)
 

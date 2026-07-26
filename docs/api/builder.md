@@ -137,6 +137,10 @@ interface TableOptions<TData> {
 ### Export Methods
 
 ```ts
+import { createDocx } from 'docx-kit/node'
+
+const doc = createDocx()
+
 await doc.toBlob()         // → Blob (browser & Node.js)
 await doc.toUint8Array()   // → Uint8Array
 await doc.toBuffer()       // → Uint8Array (alias)
@@ -153,7 +157,7 @@ AI/LLM-friendly JSON entry point for document generation.
 ```ts
 import { renderDocx } from 'docx-kit'
 
-const blob = await renderDocx({
+const doc = await renderDocx({
   content: [
     { type: 'heading', level: 1, text: 'AI-Generated Report' },
     { type: 'paragraph', text: 'Generated from structured JSON.' },
@@ -168,6 +172,7 @@ const blob = await renderDocx({
   ],
   styles: { accent: { color: '#2563eb', fontWeight: 'bold' } },
 })
+const blob = await doc.toBlob()
 ```
 
 ## `DocxSchema<TStyles>`
@@ -177,6 +182,6 @@ interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
   content: BlockNode<TStyles>[]
   page?: DocxKitConfig<TStyles>['page']
   styles?: TStyles
-  plugins?: DocxPlugin[]
+  plugins?: PluginSource[]
 }
 ```

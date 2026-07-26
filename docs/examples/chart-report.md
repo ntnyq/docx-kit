@@ -8,8 +8,8 @@ Generate an analytics report with embedded ECharts bar charts, pie charts, line 
 import {
   createDocx,
   defineStyles,
-  qrcodePlugin,
   echartsPlugin,
+  qrcodePlugin,
 } from 'docx-kit'
 
 // 1. Styles
@@ -68,8 +68,8 @@ const doc = createDocx({
 
 doc
   // Register plugins
-  .use(echartsPlugin)
-  .use(qrcodePlugin)
+  .use(echartsPlugin())
+  .use(qrcodePlugin())
 
   // === Cover ===
   .h1('Analytics Dashboard', { className: 'title' })
@@ -295,8 +295,14 @@ doc
     style: { fontSize: 8, color: '#d4d4d4', textAlign: 'center' },
   })
 
-  // 3. Export
-  .save('analytics-report-june-2026.docx')
+// 3. Export in the browser
+const blob = await doc.toBlob()
+const url = URL.createObjectURL(blob)
+const anchor = document.createElement('a')
+anchor.href = url
+anchor.download = 'analytics-report-june-2026.docx'
+anchor.click()
+URL.revokeObjectURL(url)
 ```
 
 ## What This Demonstrates

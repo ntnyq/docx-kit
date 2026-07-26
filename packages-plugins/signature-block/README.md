@@ -7,6 +7,6 @@ Signature block plugin for docx-kit.
 ```ts
 import { signatureBlockPlugin } from '@docxkit/plugin-signature-block'
 
-builder.use(signatureBlockPlugin)
+builder.use(signatureBlockPlugin())
 builder.signatureBlock({ parties: [{ name: 'Alice', title: 'Manager' }] })
 ```

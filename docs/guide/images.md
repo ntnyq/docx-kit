@@ -5,7 +5,7 @@ Embed images in your documents with sizing, floating layout, and alt text suppor
 ## Basic Image
 
 ```ts
-import { createDocx } from 'docx-kit'
+import { createDocx } from 'docx-kit/node'
 import { readFileSync } from 'node:fs'
 
 const imageBytes = readFileSync('./logo.png')
@@ -142,8 +142,7 @@ doc
 ```ts
 // HTML: <input type="file" id="fileInput" accept="image/*" />
 
-import { createDocx } from 'docx-kit'
-import { normalizeImageData } from 'docx-kit/browser'
+import { createDocx, normalizeImageData } from 'docx-kit/browser'
 
 const input = document.querySelector('#fileInput') as HTMLInputElement
 const file = input.files![0]
@@ -155,7 +154,13 @@ const doc = createDocx()
 doc
   .h1('User-Uploaded Image')
   .image({ data, width: 300, height: 200 })
-  .save('upload.docx')
+
+const url = URL.createObjectURL(await doc.toBlob())
+const anchor = document.createElement('a')
+anchor.href = url
+anchor.download = 'upload.docx'
+anchor.click()
+URL.revokeObjectURL(url)
 ```
 
 ## Browser: Loading Image from URL
@@ -184,7 +189,7 @@ doc
 ### Product Catalog with Images
 
 ```ts
-import { createDocx } from 'docx-kit'
+import { createDocx } from 'docx-kit/node'
 import { readFileSync } from 'node:fs'
 
 const doc = createDocx({

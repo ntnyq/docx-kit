@@ -15,7 +15,7 @@ class DocxKitError extends Error {
 ### Catching Errors
 
 ```ts
-import { DocxKitError, ERROR_CODES } from 'docx-kit'
+import { DocxKitError, ERROR_CODES } from 'docx-kit/node'
 
 try {
   await doc.save('output.docx')
@@ -78,12 +78,12 @@ try {
 ```ts
 try {
   await doc
-    // Forgot .use(qrcodePlugin)!
+    // Forgot .use(qrcodePlugin())!
     .plugin('qrcode', { text: 'https://example.com' })
     .save('output.docx')
 } catch (err) {
   if (err instanceof DocxKitError && err.code === ERROR_CODES.PLUGIN_NOT_REGISTERED) {
-    console.error('Plugin "qrcode" was not registered. Call .use(qrcodePlugin) first.')
+    console.error('Plugin "qrcode" was not registered. Call .use(qrcodePlugin()) first.')
   }
 }
 ```
@@ -147,7 +147,7 @@ try {
 ### Type-safe Error Matching
 
 ```ts
-import { DocxKitError, ERROR_CODES } from 'docx-kit'
+import { DocxKitError, ERROR_CODES } from 'docx-kit/node'
 
 function isDocxError(err: unknown, code: keyof typeof ERROR_CODES): err is DocxKitError {
   return err instanceof DocxKitError && err.code === ERROR_CODES[code]

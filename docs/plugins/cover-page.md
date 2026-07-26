@@ -26,10 +26,10 @@ import { coverPagePlugin, type CoverPageOptions } from 'docx-kit'
 ### Simple Title Page
 
 ```ts
-import { createDocx, coverPagePlugin } from 'docx-kit'
+import { createDocx, coverPagePlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(coverPagePlugin)
+  .use(coverPagePlugin())
   .plugin('coverPage', {
     title: 'Q3 Operations Report',
     subtitle: 'Data-Driven · Intelligent Decisions',
@@ -45,7 +45,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(coverPagePlugin)
+  .use(coverPagePlugin())
   .plugin('coverPage', {
     title: 'Annual Report 2026',
     subtitle: 'Building the Future Together',
@@ -62,7 +62,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(coverPagePlugin)
+  .use(coverPagePlugin())
   .plugin('coverPage', {
     title: 'Confidential',
     subtitle: 'For Internal Use Only',
@@ -81,7 +81,7 @@ const doc = createDocx()
 import { AlignmentType } from 'docx'
 
 const doc = createDocx()
-  .use(coverPagePlugin)
+  .use(coverPagePlugin())
   .plugin('coverPage', {
     title: 'Project Proposal',
     subtitle: 'Phase II Implementation',
@@ -96,7 +96,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(coverPagePlugin)
+  .use(coverPagePlugin())
   .plugin('coverPage', {
     title: 'Weekly Status Report',
     subtitle: 'June 11, 2026',

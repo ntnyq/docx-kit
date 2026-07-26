@@ -7,6 +7,6 @@ Property/attribute table plugin for docx-kit.
 ```ts
 import { propertyTablePlugin } from '@docxkit/plugin-property-table'
 
-builder.use(propertyTablePlugin)
+builder.use(propertyTablePlugin())
 builder.propertyTable({ items: [{ key: 'Author', value: 'Jane' }] })
 ```

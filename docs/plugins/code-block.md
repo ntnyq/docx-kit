@@ -21,10 +21,10 @@ import { codeBlockPlugin, type CodeBlockOptions } from 'docx-kit'
 ### Basic Code Block
 
 ```ts
-import { createDocx, codeBlockPlugin } from 'docx-kit'
+import { createDocx, codeBlockPlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(codeBlockPlugin)
+  .use(codeBlockPlugin())
   .h1('Code Example')
   .plugin('codeBlock', {
     code: `function hello(name: string): string {
@@ -41,7 +41,7 @@ console.log(hello('World'))`,
 
 ```ts
 const doc = createDocx()
-  .use(codeBlockPlugin)
+  .use(codeBlockPlugin())
   .h1('Algorithm')
   .plugin('codeBlock', {
     code: `def fibonacci(n):
@@ -61,7 +61,7 @@ for i in range(10):
 
 ```ts
 const doc = createDocx()
-  .use(codeBlockPlugin)
+  .use(codeBlockPlugin())
   .h1('Configuration')
   .plugin('codeBlock', {
     code: `# Server Configuration
@@ -77,7 +77,7 @@ timeout = 30s`,
 
 ```ts
 const doc = createDocx()
-  .use(codeBlockPlugin)
+  .use(codeBlockPlugin())
   .h1('API Examples')
 
   .h2('JavaScript')

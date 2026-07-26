@@ -251,7 +251,7 @@ import {
   reportTemplate,
   generateToolDefinitions,
 } from 'docx-kit/ai'
-import { createDocx } from 'docx-kit'
+import { createDocx } from 'docx-kit/node'
 
 const openai = new OpenAI()
 

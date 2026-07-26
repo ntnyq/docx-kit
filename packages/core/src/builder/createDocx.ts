@@ -36,16 +36,17 @@ export interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
    *
    * @example
    * ```ts
-   * await renderDocx({
+   * const doc = await renderDocx({
    *   styles: { p: { fontSize: 12 } },
    *   plugins: [
-   *     { type: 'inline', plugin: qrcodePlugin },
+   *     { type: 'inline', plugin: qrcodePlugin() },
    *   ],
    *   content: [
    *     { type: 'heading', level: 1, text: 'Report' },
    *     { type: 'plugin', name: 'qrcode', options: { text: 'hello' } },
    *   ],
-   * }).toBlob()
+   * })
+   * const blob = await doc.toBlob()
    * ```
    */
   plugins?: PluginSource[]
@@ -105,7 +106,7 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
  * @example
  * ```ts
  * // Without plugins
- * const blob = await renderDocx({
+ * const doc = await renderDocx({
  *   page: { size: 'A4', margin: '20mm' },
  *   styles: {
  *     h1: { fontSize: 24, fontWeight: 'bold' },
@@ -115,20 +116,20 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
  *     { type: 'heading',  level: 1, text: 'Report', className: 'h1' },
  *     { type: 'paragraph', text: 'This is a report generated via JSON DSL.', className: 'p' },
  *   ],
- * }).toBlob()
+ * })
+ * const blob = await doc.toBlob()
  *
  * // With plugins
- * const blob2 = await renderDocx({
+ * const pluginDoc = await renderDocx({
  *   page: { size: 'A4' },
  *   styles: { h1: { fontSize: 24 } },
- *   plugins: [
- *     { type: 'inline', plugin: qrcodePlugin },
- *   ],
+ *   plugins: [{ type: 'inline', plugin: qrcodePlugin() }],
  *   content: [
  *     { type: 'heading', level: 1, text: 'QR Demo', className: 'h1' },
  *     { type: 'plugin', name: 'qrcode', options: { text: 'https://example.com' } },
  *   ],
- * }).toBlob()
+ * })
+ * const blob2 = await pluginDoc.toBlob()
  * ```
  */
 export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(

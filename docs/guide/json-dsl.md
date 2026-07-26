@@ -7,7 +7,7 @@ The `renderDocx()` function accepts a JSON-serializable schema — ideal for AI/
 ```ts
 import { renderDocx } from 'docx-kit'
 
-const blob = await renderDocx({
+const doc = await renderDocx({
   page: { size: 'A4', margin: '20mm' },
   styles: {
     h1: { fontSize: 24, fontWeight: 'bold' },
@@ -20,7 +20,8 @@ const blob = await renderDocx({
     { type: 'heading',  level: 2, text: 'Section 2', className: 'h1' },
     { type: 'paragraph', text: 'More content...', className: 'p' },
   ],
-}).toBlob()
+})
+const blob = await doc.toBlob()
 ```
 
 ## Schema Structure
@@ -161,19 +162,22 @@ interface DocxSchema<TStyles> {
 > **Important:** Plugin nodes require the plugin to be registered via `.use()` first. In `renderDocx()`, you register plugins on the returned builder before exporting.
 
 ```ts
-// renderDocx returns a DocxBuilder — register plugins on it:
-const doc = renderDocx({ content: [...] })
-  .use(qrcodePlugin)
-  .use(echartsPlugin)
+import { echartsPlugin, qrcodePlugin, renderDocx } from 'docx-kit'
+
+// renderDocx resolves to a DocxBuilder — register plugins on it:
+const doc = await renderDocx({ content: [...] })
+doc
+  .use(qrcodePlugin())
+  .use(echartsPlugin())
 
 // now .plugin(...) nodes will be resolved
-await doc.save('output.docx')
+const blob = await doc.toBlob()
 ```
 
 ## Complete JSON Example
 
 ```ts
-import { renderDocx, qrcodePlugin, echartsPlugin } from 'docx-kit'
+import { echartsPlugin, qrcodePlugin, renderDocx } from 'docx-kit'
 
 const report = {
   page: { size: 'A4', margin: '20mm 25mm' },
@@ -239,11 +243,18 @@ const report = {
   ],
 }
 
-// Build + register plugins + export
-await renderDocx(report)
-  .use(echartsPlugin)
-  .use(qrcodePlugin)
-  .save('monthly-report.docx')
+// Build + register plugins + export in the browser
+const doc = await renderDocx(report)
+doc
+  .use(echartsPlugin())
+  .use(qrcodePlugin())
+
+const url = URL.createObjectURL(await doc.toBlob())
+const anchor = document.createElement('a')
+anchor.href = url
+anchor.download = 'monthly-report.docx'
+anchor.click()
+URL.revokeObjectURL(url)
 ```
 
 ## AI/LLM Integration
@@ -251,6 +262,8 @@ await renderDocx(report)
 The JSON DSL is designed for AI-driven document generation. Feed the schema structure to an LLM and it can generate complete `.docx` files:
 
 ```ts
+import { renderDocx } from 'docx-kit/node'
+
 // Example: AI generates this JSON from a natural language prompt
 const aiResponse = {
   page: { size: 'A4' },
@@ -272,6 +285,6 @@ const filled = fillTemplate(aiResponse, {
   CONTENT: 'Revenue grew 15% to $1.45M, exceeding analyst expectations.',
 })
 
-const doc = renderDocx(filled)
+const doc = await renderDocx(filled)
 await doc.save('ai-report.docx')
 ```

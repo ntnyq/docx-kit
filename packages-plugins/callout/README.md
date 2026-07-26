@@ -7,6 +7,6 @@ Callout/admonition plugin for docx-kit.
 ```ts
 import { calloutPlugin } from '@docxkit/plugin-callout'
 
-builder.use(calloutPlugin)
+builder.use(calloutPlugin())
 builder.callout({ type: 'info', text: 'Note: this is important.' })
 ```

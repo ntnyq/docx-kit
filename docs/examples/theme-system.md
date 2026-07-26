@@ -5,7 +5,7 @@ Showcase the built-in theme system with semantic design tokens, `$category.key` 
 ## Full Code
 
 ```ts
-import { createDocx, defineStyles, useTheme } from 'docx-kit'
+import { createDocx, defineStyles, useTheme } from 'docx-kit/node'
 
 // 1. Load a built-in theme
 const theme = useTheme('ocean')

@@ -34,10 +34,23 @@ pnpm add echarts
 ### Bar Chart
 
 ```ts
-import { createDocx, echartsPlugin } from 'docx-kit'
+import {
+  createDocx,
+  echartsPlugin,
+  type DocxBuilder,
+} from 'docx-kit'
+
+async function downloadDocx(doc: DocxBuilder, filename: string) {
+  const url = URL.createObjectURL(await doc.toBlob())
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
 
 const doc = createDocx()
-  .use(echartsPlugin)
+  .use(echartsPlugin())
   .h1('Monthly Revenue')
   .plugin('echarts', {
     option: {
@@ -59,14 +72,15 @@ const doc = createDocx()
     height: 360,
     caption: 'Figure 1: Monthly revenue by product line',
   })
-  .save('bar-chart.docx')
+
+await downloadDocx(doc, 'bar-chart.docx')
 ```
 
 ### Line Chart
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin)
+  .use(echartsPlugin())
   .h1('User Growth')
   .plugin('echarts', {
     option: {
@@ -94,14 +108,15 @@ const doc = createDocx()
     },
     caption: 'Figure 1: Monthly user growth and active users',
   })
-  .save('line-chart.docx')
+
+await downloadDocx(doc, 'line-chart.docx')
 ```
 
 ### Pie Chart
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin)
+  .use(echartsPlugin())
   .h1('Market Share Analysis')
   .plugin('echarts', {
     option: {
@@ -130,14 +145,15 @@ const doc = createDocx()
     },
     caption: 'Figure 2: Revenue distribution across product lines',
   })
-  .save('pie-chart.docx')
+
+await downloadDocx(doc, 'pie-chart.docx')
 ```
 
 ### Scatter Chart
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin)
+  .use(echartsPlugin())
   .h1('Correlation Analysis')
   .plugin('echarts', {
     option: {
@@ -156,14 +172,15 @@ const doc = createDocx()
     },
     caption: 'Figure 3: Height vs weight scatter plot (n = 12)',
   })
-  .save('scatter-chart.docx')
+
+await downloadDocx(doc, 'scatter-chart.docx')
 ```
 
 ### Multi-Chart Report
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin)
+  .use(echartsPlugin())
   .h1('Q2 Analytics Report')
 
   // Bar chart — revenue
@@ -223,14 +240,14 @@ const doc = createDocx()
     caption: 'Figure 3: Regional revenue distribution',
   })
 
-  .save('analytics-report.docx')
+await downloadDocx(doc, 'analytics-report.docx')
 ```
 
 ### Custom Dimensions
 
 ```ts
 const doc = createDocx()
-  .use(echartsPlugin)
+  .use(echartsPlugin())
   .h1('Wide Chart')
   .plugin('echarts', {
     option: {
@@ -249,5 +266,6 @@ const doc = createDocx()
     width: 800,
     height: 300,
   })
-  .save('wide-chart.docx')
+
+await downloadDocx(doc, 'wide-chart.docx')
 ```

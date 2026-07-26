@@ -28,7 +28,7 @@ docx-kit ships with **4 built-in templates**:
 Each template has a `generate()` function that produces a `DocxSchema` from parameters:
 
 ```ts
-import { reportTemplate, createDocx } from 'docx-kit'
+import { reportTemplate } from 'docx-kit/ai'
 import { renderDocx } from 'docx-kit/node'
 
 const schema = reportTemplate.generate({
@@ -41,8 +41,8 @@ const schema = reportTemplate.generate({
   conclusion: 'The outlook for next year is positive.',
 })
 
-const doc = createDocx(schema)
-const buffer = await renderDocx(doc)
+const doc = await renderDocx(schema)
+const buffer = await doc.toBuffer()
 ```
 
 ### Template Parameters

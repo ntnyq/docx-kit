@@ -5,7 +5,7 @@ A complete example generating a multi-page business report with headings, format
 ## Full Code
 
 ```ts
-import { createDocx, defineStyles, qrcodePlugin } from 'docx-kit'
+import { createDocx, defineStyles, qrcodePlugin } from 'docx-kit/node'
 
 // 1. Define styles
 const styles = defineStyles({
@@ -199,7 +199,7 @@ doc
   .p('• Competitive pressure in the APAC region', { className: 'body' })
 
   .h2('5. Contact Information', { className: 'h2' })
-  .use(qrcodePlugin)
+  .use(qrcodePlugin())
   .plugin('qrcode', {
     text: 'https://example.com/investor-relations',
     size: 150,

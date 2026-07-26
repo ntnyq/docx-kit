@@ -22,10 +22,10 @@ import { watermarkPlugin, type WatermarkOptions } from 'docx-kit'
 ### Basic Watermark
 
 ```ts
-import { createDocx, watermarkPlugin } from 'docx-kit'
+import { createDocx, watermarkPlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(watermarkPlugin)
+  .use(watermarkPlugin())
   .h1('Confidential Document')
   .p('This document contains proprietary information.')
   .plugin('watermark', { text: 'CONFIDENTIAL' })
@@ -36,7 +36,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(watermarkPlugin)
+  .use(watermarkPlugin())
   .h1('Work in Progress')
   .p('This document is still under review.')
   .plugin('watermark', {
@@ -53,7 +53,7 @@ const doc = createDocx()
 import { AlignmentType } from 'docx'
 
 const doc = createDocx()
-  .use(watermarkPlugin)
+  .use(watermarkPlugin())
   .h1('Internal Memo')
   .plugin('watermark', {
     text: 'INTERNAL USE ONLY',
@@ -69,7 +69,7 @@ For a true document-wide watermark, place it in a header or footer:
 
 ```ts
 const doc = createDocx()
-  .use(watermarkPlugin)
+  .use(watermarkPlugin())
 
 // Render watermark in a footer that applies to all pages
 const wm = doc.plugin('watermark', {
@@ -86,7 +86,7 @@ const wm = doc.plugin('watermark', {
 
 ```ts
 const doc = createDocx()
-  .use(watermarkPlugin)
+  .use(watermarkPlugin())
   .h1('Review Document')
   .plugin('watermark', { text: 'DRAFT', color: 'FF6600' })
   .p('Please review the following content carefully.')

@@ -5,7 +5,7 @@ A complete business report using the `modernPreset` for clean, professional styl
 ## Full Code
 
 ```ts
-import { createDocx, modernPreset, calloutPlugin, dataTablePlugin, pageNumberPlugin } from 'docx-kit'
+import { createDocx, modernPreset, calloutPlugin, dataTablePlugin, pageNumberPlugin } from 'docx-kit/node'
 
 const doc = createDocx({
   ...modernPreset.config,
@@ -26,7 +26,7 @@ doc
 
   // ── Executive summary with callout ──
   .h2('Executive Summary')
-  .use(calloutPlugin)
+  .use(calloutPlugin())
   .plugin('callout', {
     type: 'success',
     title: 'On Track',
@@ -42,7 +42,7 @@ doc
 
   // ── Key metrics table ──
   .h2('Key Metrics')
-  .use(dataTablePlugin)
+  .use(dataTablePlugin())
   .plugin('dataTable', {
     data: [
       { metric: 'Total Revenue',     value: '$1.45M', change: '+12%' },
@@ -90,7 +90,7 @@ doc
       },
     },
   })
-  .use(pageNumberPlugin)
+  .use(pageNumberPlugin())
 
 await doc.save('q1-2026-report.docx')
 ```

@@ -35,10 +35,10 @@ import { timelinePlugin, type TimelineOptions, type TimelineEvent } from 'docx-k
 ### Project Timeline
 
 ```ts
-import { createDocx, timelinePlugin } from 'docx-kit'
+import { createDocx, timelinePlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(timelinePlugin)
+  .use(timelinePlugin())
   .h1('Project Roadmap')
   .plugin('timeline', {
     events: [
@@ -55,7 +55,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(timelinePlugin)
+  .use(timelinePlugin())
   .h1('Development History')
   .plugin('timeline', {
     layout: 'left',
@@ -72,7 +72,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(timelinePlugin)
+  .use(timelinePlugin())
   .h1('Product Launch Timeline')
   .plugin('timeline', {
     accentColor: 'E74C3C',
@@ -90,7 +90,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(timelinePlugin)
+  .use(timelinePlugin())
   .h1('Milestones')
   .plugin('timeline', {
     events: [
@@ -108,7 +108,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(timelinePlugin)
+  .use(timelinePlugin())
   .h1('Key Date')
   .plugin('timeline', {
     events: [

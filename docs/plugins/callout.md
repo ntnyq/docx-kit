@@ -30,10 +30,10 @@ import { calloutPlugin, type CalloutOptions } from 'docx-kit'
 ### Information Callout
 
 ```ts
-import { createDocx, calloutPlugin } from 'docx-kit'
+import { createDocx, calloutPlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(calloutPlugin)
+  .use(calloutPlugin())
   .h1('System Maintenance')
   .plugin('callout', {
     type: 'info',
@@ -46,7 +46,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(calloutPlugin)
+  .use(calloutPlugin())
   .h1('Important Notice')
   .plugin('callout', {
     type: 'warning',
@@ -60,7 +60,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(calloutPlugin)
+  .use(calloutPlugin())
   .h1('Deployment Status')
   .plugin('callout', {
     type: 'success',
@@ -74,7 +74,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(calloutPlugin)
+  .use(calloutPlugin())
   .h1('Security Alert')
   .plugin('callout', {
     type: 'danger',
@@ -88,7 +88,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(calloutPlugin)
+  .use(calloutPlugin())
   .h1('Weekly Summary')
 
   .plugin('callout', {

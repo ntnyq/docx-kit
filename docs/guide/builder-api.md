@@ -5,7 +5,7 @@ The `DocxBuilder` class provides a fluent, chainable API for constructing Word d
 ## Creating a Builder
 
 ```ts
-import { createDocx, defineStyles } from 'docx-kit'
+import { createDocx, defineStyles } from 'docx-kit/node'
 
 const styles = defineStyles({
   title: { fontSize: 28, fontWeight: 'bold' },
@@ -56,7 +56,7 @@ doc
 Paragraphs can contain mixed inline content using `span()` and `inlineImg()` helpers:
 
 ```ts
-import { span, inlineImg } from 'docx-kit'
+import { inlineImg, span } from 'docx-kit/node'
 
 // Mixed text runs with per-span styles
 doc.p([
@@ -163,11 +163,10 @@ doc.add({ type: 'pageBreak' })
 Invoke registered plugins:
 
 ```ts
-import { createDocx, qrcodePlugin, echartsPlugin } from 'docx-kit'
+import { qrcodePlugin } from 'docx-kit/node'
 
 doc
-  .use(qrcodePlugin)     // Register QRCode
-  .use(echartsPlugin)    // Register ECharts
+  .use(qrcodePlugin())     // Register QRCode
   .plugin('qrcode', { text: 'https://example.com', size: 200 })
 ```
 
@@ -201,6 +200,9 @@ URL.revokeObjectURL(url)
 
 ```ts
 // In Node.js
+import { createDocx } from 'docx-kit/node'
+
+const doc = createDocx()
 await doc.save('output.docx')
 
 // Or manually
@@ -214,20 +216,12 @@ writeFileSync('output.docx', bytes)
 Register plugins before invoking them:
 
 ```ts
-import { createDocx, qrcodePlugin, echartsPlugin } from 'docx-kit'
+import { createDocx, qrcodePlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(qrcodePlugin)     // Register QRCode
-  .use(echartsPlugin)    // Register ECharts
+  .use(qrcodePlugin())     // Register QRCode
   .h1('Document with Plugins')
   .plugin('qrcode', { text: 'https://example.com' })
-  .plugin('echarts', {
-    option: {
-      xAxis: { data: ['A', 'B', 'C'] },
-      yAxis: {},
-      series: [{ type: 'bar', data: [1, 2, 3] }],
-    },
-  })
 ```
 
 ## Chaining & Immutability

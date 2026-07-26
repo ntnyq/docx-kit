@@ -10,7 +10,7 @@ import {
   academicPreset,
   pageNumberPlugin,
   codeBlockPlugin,
-} from 'docx-kit'
+} from 'docx-kit/node'
 
 const doc = createDocx({
   ...academicPreset.config,
@@ -82,7 +82,7 @@ doc
   .p('The core protocol is shown in Algorithm 1.')
 
   // Code block via plugin
-  .use(codeBlockPlugin)
+  .use(codeBlockPlugin())
   .plugin('codeBlock', {
     language: 'typescript',
     code: `// CVP: Coherence-Vector Protocol
@@ -147,7 +147,7 @@ async function handleRead(key: string): Promise<unknown> {
       },
     },
   })
-  .use(pageNumberPlugin)
+  .use(pageNumberPlugin())
 
 await doc.save('thesis.docx')
 ```

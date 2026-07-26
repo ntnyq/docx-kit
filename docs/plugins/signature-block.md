@@ -28,10 +28,10 @@ import { signatureBlockPlugin, type SignatureBlockOptions, type SignatureParty }
 ### Two-Party Contract
 
 ```ts
-import { createDocx, signatureBlockPlugin } from 'docx-kit'
+import { createDocx, signatureBlockPlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(signatureBlockPlugin)
+  .use(signatureBlockPlugin())
   .h1('Service Agreement')
   .p('The parties agree to the following terms and conditions...')
   .p('Signed:')
@@ -48,7 +48,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(signatureBlockPlugin)
+  .use(signatureBlockPlugin())
   .h1('Approval Sheet')
   .plugin('signatureBlock', {
     columns: 3,
@@ -65,7 +65,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(signatureBlockPlugin)
+  .use(signatureBlockPlugin())
   .h1('NDA Agreement')
   .plugin('signatureBlock', {
     parties: [
@@ -80,7 +80,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(signatureBlockPlugin)
+  .use(signatureBlockPlugin())
   .h1('Acknowledgment Form')
   .p('I acknowledge that I have received and read the employee handbook.')
   .plugin('signatureBlock', {
@@ -95,7 +95,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(signatureBlockPlugin)
+  .use(signatureBlockPlugin())
   .h1('Multi-Party Agreement')
   .plugin('signatureBlock', {
     columns: 2,

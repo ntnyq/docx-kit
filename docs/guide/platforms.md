@@ -161,7 +161,7 @@ The built-in ECharts plugin requires a browser DOM. For server-side chart render
 
 ```ts
 // Node.js with node-canvas (conceptual example)
-import { createDocx } from 'docx-kit'
+import { createDocx } from 'docx-kit/node'
 import * as echarts from 'echarts'
 import { createCanvas } from 'canvas'
 

@@ -7,6 +7,6 @@ Meeting minutes plugin for docx-kit.
 ```ts
 import { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
 
-builder.use(meetingMinutesPlugin)
+builder.use(meetingMinutesPlugin())
 builder.meetingMinutes({ title: 'Sprint Review', agenda: [...] })
 ```

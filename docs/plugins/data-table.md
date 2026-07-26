@@ -24,10 +24,10 @@ import { dataTablePlugin, type DataTableOptions } from 'docx-kit'
 ### Basic Data Table
 
 ```ts
-import { createDocx, dataTablePlugin } from 'docx-kit'
+import { createDocx, dataTablePlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(dataTablePlugin)
+  .use(dataTablePlugin())
   .h1('Employee Directory')
   .plugin('dataTable', {
     data: [
@@ -43,7 +43,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(dataTablePlugin)
+  .use(dataTablePlugin())
   .h1('Financial Summary')
   .plugin('dataTable', {
     data: [
@@ -71,7 +71,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(dataTablePlugin)
+  .use(dataTablePlugin())
   .h1('Project Metrics')
   .plugin('dataTable', {
     data: [
@@ -93,7 +93,7 @@ When `data` is an empty array, the plugin renders a centered placeholder text:
 
 ```ts
 const doc = createDocx()
-  .use(dataTablePlugin)
+  .use(dataTablePlugin())
   .h1('Search Results')
   .plugin('dataTable', { data: [] })
   .p('No results found matching your criteria.')
@@ -115,7 +115,7 @@ const monthlyData = monthNames.map((month, i) => ({
 monthlyData.forEach(d => { d.profit = d.revenue - d.expenses })
 
 const doc = createDocx()
-  .use(dataTablePlugin)
+  .use(dataTablePlugin())
   .h1('Monthly Financial Report')
   .plugin('dataTable', {
     data: monthlyData,

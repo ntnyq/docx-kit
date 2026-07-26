@@ -33,10 +33,10 @@ The agenda table renders four columns: 议题 | 讨论 | 决议 | 负责人.
 ### Full Meeting Minutes
 
 ```ts
-import { createDocx, meetingMinutesPlugin } from 'docx-kit'
+import { createDocx, meetingMinutesPlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(meetingMinutesPlugin)
+  .use(meetingMinutesPlugin())
   .plugin('meetingMinutes', {
     title: '项目周会纪要',
     date: '2026-06-11',
@@ -75,7 +75,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(meetingMinutesPlugin)
+  .use(meetingMinutesPlugin())
   .plugin('meetingMinutes', {
     title: 'Quick Sync',
     date: '2026-06-11',
@@ -93,7 +93,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(meetingMinutesPlugin)
+  .use(meetingMinutesPlugin())
   .plugin('meetingMinutes', {
     title: 'Q2 Planning Meeting',
     date: '2026-06-11',
@@ -134,7 +134,7 @@ When `agenda` is empty, only the title and metadata are rendered:
 
 ```ts
 const doc = createDocx()
-  .use(meetingMinutesPlugin)
+  .use(meetingMinutesPlugin())
   .plugin('meetingMinutes', {
     title: 'Standup Notes',
     date: '2026-06-11',
@@ -148,7 +148,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(meetingMinutesPlugin)
+  .use(meetingMinutesPlugin())
   .plugin('meetingMinutes', {
     title: '1:1 Meeting',
     date: '2026-06-11',

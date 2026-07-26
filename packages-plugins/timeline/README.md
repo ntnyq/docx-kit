@@ -7,6 +7,6 @@ Timeline visualization plugin for docx-kit.
 ```ts
 import { timelinePlugin } from '@docxkit/plugin-timeline'
 
-builder.use(timelinePlugin)
+builder.use(timelinePlugin())
 builder.timeline({ events: [{ date: '2026-01', description: 'Launch' }] })
 ```

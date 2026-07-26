@@ -174,7 +174,7 @@ doc.table({
 ## Full Table Example
 
 ```ts
-import { createDocx, defineStyles } from 'docx-kit'
+import { createDocx, defineStyles } from 'docx-kit/node'
 
 const styles = defineStyles({
   tableHeader: {

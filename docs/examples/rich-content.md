@@ -5,7 +5,7 @@ Showcase inline rich content in paragraphs: mixed text runs, inline images, and 
 ## Full Code
 
 ```ts
-import { createDocx, defineStyles, span, inlineImg } from 'docx-kit'
+import { createDocx, defineStyles, span, inlineImg } from 'docx-kit/node'
 
 // 1. Styles
 const styles = defineStyles({

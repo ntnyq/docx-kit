@@ -7,6 +7,6 @@ Page number plugin for docx-kit.
 ```ts
 import { pageNumberPlugin } from '@docxkit/plugin-page-number'
 
-builder.use(pageNumberPlugin)
+builder.use(pageNumberPlugin())
 builder.pageNumber({ alignment: 'center' })
 ```

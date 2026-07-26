@@ -25,7 +25,7 @@ pnpm add echarts
 Create your first .docx document in 3 lines:
 
 ```ts
-import { createDocx } from 'docx-kit'
+import { createDocx } from 'docx-kit/node'
 
 const doc = createDocx()
 

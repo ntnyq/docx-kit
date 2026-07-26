@@ -5,7 +5,7 @@ Generate a professional invoice with company branding, line items, totals, and p
 ## Full Code
 
 ```ts
-import { createDocx, defineStyles, qrcodePlugin } from 'docx-kit'
+import { createDocx, defineStyles, qrcodePlugin } from 'docx-kit/node'
 
 // 1. Styles
 const styles = defineStyles({
@@ -249,7 +249,7 @@ doc
   .p(' ', { style: { fontSize: 8 } })
 
   // QR Code for payment link
-  .use(qrcodePlugin)
+  .use(qrcodePlugin())
   .p('Scan to pay:', {
     style: { textAlign: 'center', fontSize: 10, marginBottom: 3 },
   })

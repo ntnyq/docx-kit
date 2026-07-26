@@ -7,6 +7,6 @@ ECharts chart embedding plugin for docx-kit (browser only).
 ```ts
 import { echartsPlugin } from '@docxkit/plugin-echarts'
 
-builder.use(echartsPlugin)
+builder.use(echartsPlugin())
 builder.echarts({ option: { ... } })
 ```

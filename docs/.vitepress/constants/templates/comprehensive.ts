@@ -53,7 +53,7 @@ export const COMPREHENSIVE_CODE = unindent(`
   })
 
   /** Register custom plugins */
-  doc.use(dividerPlugin).use(infoBoxPlugin)
+  doc.use(dividerPlugin()).use(infoBoxPlugin)
 
   // ═══════════════════════════════════════════════════════════════════════
   // SECTION 1 — Overview (A4 Portrait)

@@ -7,6 +7,6 @@ Syntax-highlighted code block plugin for docx-kit.
 ```ts
 import { codeBlockPlugin } from '@docxkit/plugin-code-block'
 
-builder.use(codeBlockPlugin)
+builder.use(codeBlockPlugin())
 builder.codeBlock({ code: 'const x = 1', language: 'typescript' })
 ```

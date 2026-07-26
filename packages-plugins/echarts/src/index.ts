@@ -8,6 +8,8 @@
  *
  * @example
  * ```ts
+ * import { createDocx, echartsPlugin } from 'docx-kit'
+ *
  * const doc = createDocx()
  *   .use(echartsPlugin())
  *   .h1('Sales Chart')
@@ -22,7 +24,8 @@
  *     height: 360,
  *     caption: 'Figure 1: Monthly sales data',
  *   })
- *   .save('chart.docx')
+ *
+ * const blob = await doc.toBlob()
  * ```
  */
 

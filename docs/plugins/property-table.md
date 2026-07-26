@@ -32,10 +32,10 @@ import {
 ### Basic Property Table
 
 ```ts
-import { createDocx, propertyTablePlugin } from 'docx-kit'
+import { createDocx, propertyTablePlugin } from 'docx-kit/node'
 
 const doc = createDocx()
-  .use(propertyTablePlugin)
+  .use(propertyTablePlugin())
   .h1('Project Overview')
   .plugin('propertyTable', {
     items: [
@@ -53,7 +53,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin)
+  .use(propertyTablePlugin())
   .h1('API Endpoint')
   .plugin('propertyTable', {
     items: [
@@ -72,7 +72,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin)
+  .use(propertyTablePlugin())
   .h1('System Info')
   .plugin('propertyTable', {
     items: [
@@ -91,7 +91,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin)
+  .use(propertyTablePlugin())
   .h1('Environment Variables')
 
   .h2('Database')
@@ -121,7 +121,7 @@ const doc = createDocx()
 
 ```ts
 const doc = createDocx()
-  .use(propertyTablePlugin)
+  .use(propertyTablePlugin())
   .h1('Deployment Specification')
   .plugin('propertyTable', {
     items: [
