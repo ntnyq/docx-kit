@@ -7,8 +7,12 @@
 import {
   Bookmark,
   CheckBox,
+  CommentRangeEnd,
+  CommentRangeStart,
+  CommentReference,
   DeletedTextRun,
   Math as DocxMath,
+  FootnoteReferenceRun,
   InsertedTextRun,
   MathFraction,
   MathFunction,
@@ -30,7 +34,9 @@ import { compileInlineNodes } from './compileInline'
 import type {
   BookmarkNode,
   CheckboxNode,
+  CommentNode,
   DocxKitConfig,
+  FootnoteNode,
   MathExpression,
   MathNode,
   RevisionNode,
@@ -41,6 +47,7 @@ import type {
   UnitValue,
 } from '@docxkit/types'
 import type { MathComponent, ParagraphChild } from 'docx'
+import type { CompilationSession } from '../numbers'
 
 type TextBoxShapeStyle = NonNullable<
   ConstructorParameters<typeof Textbox>[0]['style']
@@ -90,6 +97,45 @@ export function compileCheckbox<TStyles extends StyleSheet>(
   return children
 }
 
+/** Compile a comment range and register its document-level body. */
+export async function compileComment<TStyles extends StyleSheet>(
+  node: CommentNode<TStyles>,
+  config: DocxKitConfig<TStyles>,
+  session: CompilationSession,
+  baseStyle?: TextNode<TStyles>['style'],
+): Promise<ParagraphChild[]> {
+  const commentId = session.registerComment(node as CommentNode)
+  const style = resolveStyle({
+    base: baseStyle,
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+    theme: config.theme,
+  })
+  const children = await compileInlineNodes(
+    node.children,
+    config,
+    style,
+    session,
+  )
+
+  return [
+    new CommentRangeStart(commentId),
+    ...children,
+    new CommentRangeEnd(commentId),
+    new CommentReference(commentId),
+  ]
+}
+
+/** Compile a footnote reference and register its document-level body. */
+export function compileFootnote<TStyles extends StyleSheet>(
+  node: FootnoteNode<TStyles>,
+  session: CompilationSession,
+) {
+  const footnoteId = session.registerFootnote(node as FootnoteNode)
+  return new FootnoteReferenceRun(footnoteId)
+}
+
 /** Compile a structured Office Math expression. */
 export function compileMath(node: MathNode) {
   return new DocxMath({ children: compileMathExpressions(node.children) })
@@ -130,6 +176,7 @@ export function compileRevision<TStyles extends StyleSheet>(
 export async function compileTextBox<TStyles extends StyleSheet>(
   node: TextBoxNode<TStyles>,
   config: DocxKitConfig<TStyles>,
+  session: CompilationSession,
 ) {
   const style = resolveStyle({
     className: node.className,
@@ -139,7 +186,7 @@ export async function compileTextBox<TStyles extends StyleSheet>(
   })
   const children =
     node.children && node.children.length > 0
-      ? await compileInlineNodes(node.children, config, style)
+      ? await compileInlineNodes(node.children, config, style, session)
       : [
           new TextRun({
             text: node.text ?? '',

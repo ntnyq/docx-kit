@@ -30,9 +30,11 @@ import type {
   BulletItem,
   BulletListNode,
   CheckboxNode,
+  CommentNode,
   DocxKitConfig,
   DocxPlugin,
   DocxStyleRule,
+  FootnoteNode,
   HeadingNode,
   HyperlinkNode,
   ImageNode,
@@ -140,9 +142,22 @@ export class DocxBuilder<
     return this.add({ type: 'columnBreak' })
   }
 
+  /** Add an annotated comment range. */
+  comment(options: Omit<CommentNode<TStyles>, 'type'>): this {
+    return this.add({ type: 'comment', ...options })
+  }
+
   /** Add deleted text with tracked-revision metadata. */
   deletedText(options: Omit<RevisionNode<TStyles>, 'type'>): this {
     return this.add({ type: 'deletedText', ...options })
+  }
+
+  /** Add a footnote reference and its body content. */
+  footnote(
+    content: FootnoteNode<TStyles>['content'],
+    options: Omit<Partial<FootnoteNode<TStyles>>, 'content' | 'type'> = {},
+  ): this {
+    return this.add({ content, type: 'footnote', ...options })
   }
 
   /**

@@ -87,6 +87,8 @@ export type {
   CheckboxSymbol,
   ClassName,
   ColumnBreakNode,
+  CommentNode,
+  FootnoteNode,
   HeadingNode,
   HyperlinkNode,
   ImageNode,

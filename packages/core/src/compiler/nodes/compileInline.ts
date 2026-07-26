@@ -14,6 +14,8 @@ import { normalizeImageData } from './compileImage'
 import {
   compileBookmark,
   compileCheckbox,
+  compileComment,
+  compileFootnote,
   compileMath,
   compileRevision,
 } from './compileSemantic'
@@ -25,12 +27,14 @@ import type {
   StyleSheet,
 } from '@docxkit/types'
 import type { ParagraphChild } from 'docx'
+import type { CompilationSession } from '../numbers'
 
 /** Compile inline DSL nodes into children accepted by a `docx` Paragraph. */
 export async function compileInlineNodes<TStyles extends StyleSheet>(
   nodes: InlineNode<TStyles>[],
   config: DocxKitConfig<TStyles>,
   baseStyle?: DocxStyleRule,
+  session?: CompilationSession,
 ): Promise<ParagraphChild[]> {
   const compiled = await Promise.all(
     nodes.map(async node => {
@@ -39,9 +43,19 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
           return compileBookmark(node, config)
         case 'checkbox':
           return compileCheckbox(node, config)
+        case 'comment':
+          if (!session) {
+            throw new Error('Comment nodes require a compilation session')
+          }
+          return compileComment(node, config, session, baseStyle)
         case 'deletedText':
         case 'insertedText':
           return compileRevision(node, config)
+        case 'footnote':
+          if (!session) {
+            throw new Error('Footnote nodes require a compilation session')
+          }
+          return compileFootnote(node, session)
         case 'hyperlink':
           return compileInlineHyperlink(node, config, baseStyle)
         case 'image':

@@ -8,7 +8,20 @@
  * @module compiler/numbers
  */
 
+import type { CommentNode, FootnoteNode } from '@docxkit/types'
 import type { ILevelsOptions } from 'docx'
+
+/** Registered comment definition. */
+export interface CommentDefinition {
+  id: number
+  node: CommentNode
+}
+
+/** Registered footnote definition. */
+export interface FootnoteDefinition {
+  id: number
+  node: FootnoteNode
+}
 
 /** Numbering config entry shape — mirrors `INumberingOptions.config[number]`. */
 export type NumberingConfigEntry = {
@@ -27,10 +40,28 @@ export class CompilationSession {
   get size(): number {
     return this._map.size
   }
+  private _commentCounter = 0
+  /** Document comments registered while compiling inline content. */
+  private readonly _comments: CommentDefinition[] = []
   private _counter = 0
+
+  private _footnoteCounter = 0
+
+  /** Document footnotes registered while compiling inline content. */
+  private readonly _footnotes: FootnoteDefinition[] = []
 
   /** Accumulated numbering configs keyed by reference string. */
   private readonly _map = new Map<string, NumberingConfigEntry>()
+
+  /** Return registered comment definitions. */
+  getComments(): readonly CommentDefinition[] {
+    return this._comments
+  }
+
+  /** Return registered footnote definitions. */
+  getFootnotes(): readonly FootnoteDefinition[] {
+    return this._footnotes
+  }
 
   /** Register a new numbering entry and return its unique reference. */
   register(
@@ -40,6 +71,20 @@ export class CompilationSession {
     const ref = `${prefix}-${++this._counter}`
     this._map.set(ref, { ...entry, reference: ref })
     return ref
+  }
+
+  /** Register a document comment and return its range ID. */
+  registerComment(node: CommentNode): number {
+    const id = this._commentCounter++
+    this._comments.push({ id, node })
+    return id
+  }
+
+  /** Register a footnote and return its reference ID. */
+  registerFootnote(node: FootnoteNode): number {
+    const id = ++this._footnoteCounter
+    this._footnotes.push({ id, node })
+    return id
   }
 
   /** Get the accumulated numbering configs for `Document({ numbering })`. */

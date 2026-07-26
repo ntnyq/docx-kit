@@ -24,6 +24,43 @@ async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
 }
 
 describe('compiler OOXML contracts', () => {
+  it('emits footnote and comment document parts', async () => {
+    const pkg = await renderPackage([
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'Statement', type: 'text' },
+          {
+            content: ['Footnote body'],
+            type: 'footnote',
+          },
+          {
+            author: 'Ada Lovelace',
+            children: [{ text: ' reviewed text', type: 'text' }],
+            comment: ['Comment body'],
+            date: '2026-07-26T00:00:00Z',
+            initials: 'AL',
+            type: 'comment',
+          },
+        ],
+      },
+    ])
+
+    const commentsXml = await pkg.read('word/comments.xml')
+    const documentXml = await pkg.read('word/document.xml')
+    const footnotesXml = await pkg.read('word/footnotes.xml')
+
+    expect(documentXml).toContain('<w:footnoteReference w:id="1"/>')
+    expect(footnotesXml).toContain('<w:footnote w:id="1">')
+    expect(footnotesXml).toContain('Footnote body')
+    expect(documentXml).toContain('<w:commentRangeStart w:id="0"/>')
+    expect(documentXml).toContain('<w:commentRangeEnd w:id="0"/>')
+    expect(documentXml).toContain('<w:commentReference w:id="0"/>')
+    expect(commentsXml).toContain('w:author="Ada Lovelace"')
+    expect(commentsXml).toContain('w:initials="AL"')
+    expect(commentsXml).toContain('Comment body')
+  })
+
   it('emits semantic content nodes and tracked revisions', async () => {
     const pkg = await renderPackage([
       {

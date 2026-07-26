@@ -10,6 +10,8 @@ Union of all top-level content nodes.
 type BlockNode<TStyles> =
   | BookmarkNode<TStyles>
   | CheckboxNode<TStyles>
+  | CommentNode<TStyles>
+  | FootnoteNode<TStyles>
   | HeadingNode<TStyles>
   | ParagraphNode<TStyles>
   | ImageNode<TStyles>
@@ -101,6 +103,8 @@ Paragraph children support rich inline content:
 type InlineNode<TStyles> =
   | BookmarkNode<TStyles>
   | CheckboxNode<TStyles>
+  | CommentNode<TStyles>
+  | FootnoteNode<TStyles>
   | HyperlinkNode<TStyles>
   | ImageNode<TStyles>
   | MathNode
@@ -199,6 +203,23 @@ Checkboxes are Word content controls:
 
 ```ts
 doc.checkbox({ checked: true, label: 'Approved', alias: 'approval' })
+```
+
+Footnotes and comments register their bodies in the corresponding document
+parts while emitting references into the content flow:
+
+```ts
+doc
+  .footnote([
+    'This text is written to word/footnotes.xml.',
+  ])
+  .comment({
+    author: 'Ada Lovelace',
+    initials: 'AL',
+    date: '2026-07-26T00:00:00Z',
+    children: [{ type: 'text', text: 'Annotated text' }],
+    comment: ['Review this passage.'],
+  })
 ```
 
 Math nodes build native OMML. Expressions support text, fractions, functions,

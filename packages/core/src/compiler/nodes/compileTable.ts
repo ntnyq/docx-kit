@@ -15,11 +15,16 @@ import type {
   StyleSheet,
   TableNode,
 } from '@docxkit/types'
+import type { CompilationSession } from '../numbers'
 
 export async function compileTable<
   TData extends Record<string, unknown>,
   TStyles extends StyleSheet,
->(node: TableNode<TData, TStyles>, config: DocxKitConfig<TStyles>) {
+>(
+  node: TableNode<TData, TStyles>,
+  config: DocxKitConfig<TStyles>,
+  session?: CompilationSession,
+) {
   if (node.columns.length === 0) {
     throw new DocxKitError(
       'TABLE_INVALID_COLUMNS',
@@ -126,6 +131,7 @@ export async function compileTable<
                         inlineNodes,
                         config,
                         resolvedCellStyle,
+                        session,
                       ),
                     }),
                   ],

@@ -154,6 +154,12 @@ describe('DocxBuilder', () => {
       builder
         .bookmark('target', ['Target'])
         .checkbox({ checked: true, label: 'Done' })
+        .comment({
+          author: 'Ada',
+          children: [{ text: 'Annotated', type: 'text' }],
+          comment: ['Review this'],
+        })
+        .footnote(['Footnote body'])
         .math([{ text: 'x', type: 'text' }])
         .insertedText({
           author: 'Ada',
@@ -173,6 +179,8 @@ describe('DocxBuilder', () => {
       expect(builder.toJSON().content.map(node => node.type)).toEqual([
         'bookmark',
         'checkbox',
+        'comment',
+        'footnote',
         'math',
         'insertedText',
         'deletedText',

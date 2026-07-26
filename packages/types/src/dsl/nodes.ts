@@ -40,6 +40,8 @@ export type BlockNode<TStyles extends StyleSheet = StyleSheet> =
   | BulletListNode<TStyles>
   | CheckboxNode<TStyles>
   | ColumnBreakNode
+  | CommentNode<TStyles>
+  | FootnoteNode<TStyles>
   | HeadingNode<TStyles>
   | HyperlinkNode<TStyles>
   | ImageNode<TStyles>
@@ -150,6 +152,36 @@ export interface ColumnBreakNode {
   type: 'columnBreak'
 }
 
+/**
+ * An annotated content range backed by a Word comment.
+ */
+export interface CommentNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** Comment author. */
+  author: string
+  /** Annotated inline content. */
+  children: InlineNode<TStyles>[]
+  /** Comment body paragraphs or plain text. */
+  comment: (string | ParagraphNode<TStyles>)[]
+  type: 'comment'
+  /** ISO-8601 creation timestamp. */
+  date?: string
+  /** Author initials. */
+  initials?: string
+}
+
+/**
+ * A footnote reference and its document-level footnote content.
+ */
+export interface FootnoteNode<
+  TStyles extends StyleSheet = StyleSheet,
+> extends BaseNode<TStyles> {
+  /** Footnote body paragraphs or plain text. */
+  content: (string | ParagraphNode<TStyles>)[]
+  type: 'footnote'
+}
+
 // ---- Inline nodes ----
 
 /**
@@ -231,6 +263,8 @@ export interface ImageNode<
 export type InlineNode<TStyles extends StyleSheet = StyleSheet> =
   | BookmarkNode<TStyles>
   | CheckboxNode<TStyles>
+  | CommentNode<TStyles>
+  | FootnoteNode<TStyles>
   | HyperlinkNode<TStyles>
   | ImageNode<TStyles>
   | MathNode

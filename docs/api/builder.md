@@ -43,6 +43,8 @@ class DocxBuilder<
   bookmark(name: string, children: (string | TextNode)[], opts?: StyleOptions): this
   bulletList(items: BulletItem[], opts?: StyleOptions): this
   checkbox(options?: CheckboxOptions): this
+  comment(options: CommentOptions): this
+  footnote(content: (string | ParagraphNode)[], opts?: StyleOptions): this
   math(children: MathExpression[]): this
   numberedList(items: BulletItem[], opts?: StyleOptions): this
   hyperlink(url: string, text: string, opts?: StyleOptions): this
@@ -93,6 +95,8 @@ class DocxBuilder<
 | `.bookmark(name, children, opts?)` | Named bookmark target |
 | `.bulletList(items, opts?)` | Unordered list |
 | `.checkbox(options?)` | Word checkbox content control |
+| `.comment(options)` | Annotated range with a Word comment |
+| `.footnote(content, opts?)` | Footnote reference and body |
 | `.math(children)` | Structured Office Math expression |
 | `.numberedList(items, opts?)` | Ordered list |
 | `.hyperlink(url, text, opts?)` | Clickable hyperlink |

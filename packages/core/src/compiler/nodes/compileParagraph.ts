@@ -11,10 +11,12 @@ import { resolveStyle } from '../../style/normalizeStyle'
 import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
 import { compileInlineNodes } from './compileInline'
 import type { DocxKitConfig, ParagraphNode, StyleSheet } from '@docxkit/types'
+import type { CompilationSession } from '../numbers'
 
 export async function compileParagraph<TStyles extends StyleSheet>(
   node: ParagraphNode<TStyles>,
   config: DocxKitConfig<TStyles>,
+  session?: CompilationSession,
 ) {
   const style = resolveStyle({
     base: config.defaults?.paragraph,
@@ -26,7 +28,7 @@ export async function compileParagraph<TStyles extends StyleSheet>(
 
   const children =
     node.children && node.children.length > 0
-      ? await compileInlineNodes(node.children, config, style)
+      ? await compileInlineNodes(node.children, config, style, session)
       : [
           new TextRun({
             text: node.text ?? '',

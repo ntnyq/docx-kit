@@ -19,6 +19,8 @@ import { compilePlugin } from './nodes/compilePlugin'
 import {
   compileBookmark,
   compileCheckbox,
+  compileComment,
+  compileFootnote,
   compileMath,
   compileRevision,
   compileTextBox,
@@ -36,8 +38,10 @@ import type {
   BookmarkNode,
   BulletListNode,
   CheckboxNode,
+  CommentNode,
   DocxKitConfig,
   DocxPlugin,
+  FootnoteNode,
   HeadingNode,
   HyperlinkNode,
   ImageNode,
@@ -75,6 +79,15 @@ defaultRegistry
       compileCheckbox(node as CheckboxNode, ctx.config as DocxKitConfig),
     ),
   )
+  .register('comment', async (node, ctx) =>
+    wrapParagraph(
+      await compileComment(
+        node as CommentNode,
+        ctx.config as DocxKitConfig,
+        ctx.session,
+      ),
+    ),
+  )
   .register('deletedText', async (node, ctx) =>
     wrapParagraph(
       compileRevision(node as RevisionNode, ctx.config as DocxKitConfig),
@@ -83,8 +96,15 @@ defaultRegistry
   .register('heading', async (node, ctx) =>
     compileHeading(node as HeadingNode, ctx.config as DocxKitConfig),
   )
+  .register('footnote', async (node, ctx) =>
+    wrapParagraph(compileFootnote(node as FootnoteNode, ctx.session)),
+  )
   .register('paragraph', async (node, ctx) =>
-    compileParagraph(node as ParagraphNode, ctx.config as DocxKitConfig),
+    compileParagraph(
+      node as ParagraphNode,
+      ctx.config as DocxKitConfig,
+      ctx.session,
+    ),
   )
   .register('hyperlink', async (node, ctx) =>
     compileHyperlink(node as HyperlinkNode, ctx.config as DocxKitConfig),
@@ -116,10 +136,15 @@ defaultRegistry
     compileTable(
       node as TableNode<Record<string, unknown>, StyleSheet>,
       ctx.config as DocxKitConfig,
+      ctx.session,
     ),
   )
   .register('textBox', async (node, ctx) =>
-    compileTextBox(node as TextBoxNode, ctx.config as DocxKitConfig),
+    compileTextBox(
+      node as TextBoxNode,
+      ctx.config as DocxKitConfig,
+      ctx.session,
+    ),
   )
   .register('thematicBreak', async (node, ctx) =>
     compileThematicBreak(

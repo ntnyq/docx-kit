@@ -57,7 +57,7 @@ export async function compileBulletList<TStyles extends StyleSheet>(
 
       const children =
         typeof item === 'object' && item.children?.length
-          ? await compileInlineNodes(item.children, config, itemStyle)
+          ? await compileInlineNodes(item.children, config, itemStyle, session)
           : [
               new TextRun({
                 text: typeof item === 'string' ? item : (item.text ?? ''),
@@ -146,7 +146,7 @@ export async function compileNumberedList<TStyles extends StyleSheet>(
 
       const children =
         typeof item === 'object' && item.children?.length
-          ? await compileInlineNodes(item.children, config, itemStyle)
+          ? await compileInlineNodes(item.children, config, itemStyle, session)
           : [
               new TextRun({
                 text: typeof item === 'string' ? item : (item.text ?? ''),

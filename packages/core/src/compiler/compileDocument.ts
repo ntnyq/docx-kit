@@ -20,6 +20,7 @@ import {
 } from 'docx'
 import { compileNode } from './compileNode'
 import { compileBorderRule } from './compileStyle'
+import { compileParagraph } from './nodes/compileParagraph'
 import { CompilationSession } from './numbers'
 import { parseShorthandTwip, toTwip } from './units'
 import type {
@@ -30,6 +31,7 @@ import type {
   HeaderFooterContent,
   PageBorderConfig,
   PageConfig,
+  ParagraphNode,
   SectionBreakNode as SectionBreakNodeType,
   SectionColumnsConfig,
   SectionConfig,
@@ -162,10 +164,20 @@ export async function compileDocument<TStyles extends StyleSheet>(
 
   // Collect numbering configs generated during compilation
   const numberingConfig = session.toArray()
+  const comments = await compileComments(
+    session,
+    options.config as DocxKitConfig,
+  )
+  const footnotes = await compileFootnotes(
+    session,
+    options.config as DocxKitConfig,
+  )
 
   return new Document({
+    comments,
     creator: options.config.metadata?.creator,
     description: options.config.metadata?.description,
+    footnotes,
     keywords: options.config.metadata?.keywords?.join(', '),
     lastModifiedBy: options.config.metadata?.lastModifiedBy,
     subject: options.config.metadata?.subject,
@@ -203,7 +215,59 @@ function compileColumns(config?: SectionColumnsConfig) {
   }
 }
 
-// ---------- Page / Section properties ----------
+async function compileComments(
+  session: CompilationSession,
+  config: DocxKitConfig,
+) {
+  const definitions = session.getComments()
+  if (definitions.length === 0) {
+    return undefined
+  }
+
+  return {
+    children: await Promise.all(
+      definitions.map(async ({ id, node }) => ({
+        author: node.author,
+        date: node.date ? new Date(node.date) : undefined,
+        id,
+        initials: node.initials,
+        children: await compileReferenceParagraphs(
+          node.comment,
+          config,
+          session,
+        ),
+      })),
+    ),
+  }
+}
+
+async function compileFootnotes(
+  session: CompilationSession,
+  config: DocxKitConfig,
+) {
+  const definitions = session.getFootnotes()
+  if (definitions.length === 0) {
+    return undefined
+  }
+
+  const entries = await Promise.all(
+    definitions.map(
+      async ({ id, node }) =>
+        [
+          String(id),
+          {
+            children: await compileReferenceParagraphs(
+              node.content,
+              config,
+              session,
+            ),
+          },
+        ] as const,
+    ),
+  )
+
+  return Object.fromEntries(entries)
+}
 
 /**
  * Compile section headers or footers into `docx` `Header`/`Footer` objects.
@@ -241,7 +305,7 @@ async function compileHeaderFooter<TStyles extends StyleSheet>(
   return Object.keys(result).length > 0 ? result : undefined
 }
 
-// ---------- Header / Footer (deduplicated) ----------
+// ---------- Page / Section properties ----------
 
 /**
  * Compile a `HeaderFooterContent` into `docx` `Paragraph` children.
@@ -284,6 +348,8 @@ async function compileHeaderFooterChildren<TStyles extends StyleSheet>(
 
   return result
 }
+
+// ---------- Header / Footer (deduplicated) ----------
 
 function compileLineNumbers(config?: SectionLineNumberConfig) {
   if (!config) {
@@ -342,6 +408,20 @@ function compilePageMargin(config?: PageConfig) {
     right: parsed?.right,
     top: parsed?.top,
   }
+}
+
+async function compileReferenceParagraphs(
+  content: (string | ParagraphNode)[],
+  config: DocxKitConfig,
+  session: CompilationSession,
+): Promise<Paragraph[]> {
+  return Promise.all(
+    content.map(item =>
+      typeof item === 'string'
+        ? new Paragraph(item)
+        : compileParagraph(item, config, session),
+    ),
+  )
 }
 
 /**
