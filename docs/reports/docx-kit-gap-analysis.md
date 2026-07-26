@@ -1,310 +1,167 @@
 # docx-kit vs docxjs (dolanmiu/docx) — Feature Gap Analysis
 
-> Updated: 2026-06-23 | docx-kit v0.3.0 | docxjs v9.7.1
+> Updated: 2026-07-26 | Baseline: docx-kit `main` at `92de980` | docxjs v9.7.1
 
----
+## Executive Summary
 
-## 1. Executive Summary
+The feature gaps tracked in the original v0.3.0 audit are now closed. The
+current release candidate exposes the underlying Word capabilities through
+typed configuration, DSL nodes, builder methods, or focused built-in plugins.
 
-`docx-kit` wraps the `docx` (docxjs) library, adding a CSS-like style system, plugin architecture, and type-safe builder API. This analysis identifies gaps between docx-kit's exposed surface and what the underlying `docx` library actually supports, and recommends which gaps to close.
+| Original priority | Closed | Remaining |
+| --- | ---: | ---: |
+| P0 — Critical | 4 | 0 |
+| P1 — High | 8 | 0 |
+| P2 — Medium | 12 | 0 |
+| P3 — Low/Niche | 8 | 0 |
+| **Total** | **32** | **0** |
 
-### Summary by Priority
+This does not mean that every constructor option exported by `docx` has a
+dedicated CSS-like property. The `style.docx` escape hatch remains available
+for uncommon upstream options. It means every product gap explicitly recorded
+by this audit now has a supported public path.
 
-| Priority | Count | Impact |
-|----------|-------|--------|
-| **P0 — Critical** | 4 | ✅ All implemented |
-| **P1 — High** | 2 remaining | Cell merging and nested numbering remain common high-value gaps |
-| **P2 — Medium** | 10 remaining | Nice-to-have, possible with docx escape hatch or plugins |
-| **P3 — Low/Niche** | 8 | Advanced/rarely-used features |
+## Closed Capability Gaps
 
----
+### Document Structure
 
-## 2. Document Structure Features
+| Capability | Public surface | Status |
+| --- | --- | --- |
+| Multiple sections | `.section(config)` | ✅ |
+| Rich headers and footers | `HeaderFooterContent.children` accepts block nodes | ✅ |
+| First, even, and default variants | `HeaderFooterConfig` | ✅ |
+| Header/footer distance and gutter | `PageConfig` | ✅ |
+| Page borders | `PageConfig.borders` | ✅ |
+| Multi-column sections | `SectionConfig.columns` | ✅ |
+| Column breaks | `.columnBreak()` | ✅ |
+| Line numbering | `SectionConfig.lineNumbers` | ✅ |
+| Page-number restart and format | `PageConfig.pageNumber` | ✅ |
+| Section break types | `SectionConfig.type` | ✅ |
+| Page-break-before behavior | `style.pageBreakBefore` | ✅ |
 
-### 2.1 Headers & Footers
+### Content and Semantic Nodes
 
-| Feature | docxjs | docx-kit | Gap | Priority |
-|---------|--------|----------|-----|----------|
-| Basic headers/footers | ✅ | ✅ | `.section({ header/footer })` | **P0** ✅ |
-| Different first page | ✅ | ✅ | `HeaderFooterConfig.first` | P1 ✅ |
-| Odd/even page headers | ✅ | ✅ | `HeaderFooterConfig.even` | P2 ✅ |
-| Images in headers/footers | ✅ | ❌ | — | P1 |
-| Header/footer margins | ✅ | ❌ | — | P2 |
+| Capability | Public surface | Status |
+| --- | --- | --- |
+| Bulleted and numbered lists | `.bulletList()` / `.numberedList()` | ✅ |
+| Nested numbering | Per-list and per-item levels (0–8) | ✅ |
+| External hyperlinks | `.hyperlink()` | ✅ |
+| Internal links and bookmarks | `.internalLink()` / `.bookmark()` | ✅ |
+| Table of contents | `@docxkit/plugin-toc` | ✅ |
+| Horizontal rules | `.thematicBreak()` and divider plugin | ✅ |
+| Positioned text boxes | `.textBox()` | ✅ |
+| Tab stops | `style.tabStops` | ✅ |
+| Footnotes | `.footnote()` | ✅ |
+| Comments | `.comment()` | ✅ |
+| Checkboxes | `.checkbox()` | ✅ |
+| Office Math | `.math()` with typed expressions | ✅ |
+| Tracked insertions/deletions | `.insertedText()` / `.deletedText()` | ✅ |
 
-### 2.2 Page & Section
+### Tables
 
-| Feature | docxjs | docx-kit | Gap | Priority |
-|---------|--------|----------|-----|----------|
-| Page margins | ✅ | ✅ | — | — |
-| Page orientation (portrait/landscape) | ✅ | ✅ | — | — |
-| Page size presets (A3/A4/Legal/Letter) | ✅ | ✅ | — | — |
-| Custom page size | ✅ | ✅ | `{width, height}` in PageConfig | — |
-| Page borders | ✅ | ❌ | Not exposed in PageConfig | P2 |
-| **Multiple sections** | ✅ | ✅ | `.section(config?)` | **P0** ✅ |
-| Multiple columns | ✅ | ❌ | — | P2 |
-| Column breaks | ✅ | ❌ | — | P3 |
-| Line numbers | ✅ | ❌ | — | P3 |
-| Page numbers | ✅ | ✅ | `@docxkit/plugin-page-number` | P1 ✅ |
-| Restart page numbers | ✅ | ❌ | — | P2 |
-| Section types (continuous/next page) | ✅ | ❌ | — | P1 |
-| Page break before | ✅ | ❌ (only `pageBreak()` node) | — | P2 |
+| Capability | Public surface | Status |
+| --- | --- | --- |
+| Row and column spans | `rowSpan`, `colSpan`, and per-row span hints | ✅ |
+| Cell shading and vertical alignment | Cell style rules | ✅ |
+| Per-cell styles | Static styles and `TableCellStyleResolver` | ✅ |
+| Native table styles and look flags | `styleName` / `tableLook` | ✅ |
+| Explicit table layout | `layout: 'autofit' \| 'fixed'` | ✅ |
+| Outer and inner borders | `TableBordersConfig` | ✅ |
+| Floating and side-by-side tables | `TableFloatingOptions` | ✅ |
+| Right-to-left table grids | `visuallyRightToLeft` | ✅ |
 
-### 2.3 Content / DSL Nodes
+### Text and Paragraph Styling
 
-| Feature | docxjs | docx-kit | Gap | Priority |
-|---------|--------|----------|-----|----------|
-| Paragraph (`p`) | ✅ | ✅ | — | — |
-| Heading h1–h6 | ✅ | ✅ | — | — |
-| Image | ✅ | ✅ (basic + floating) | — | — |
-| Table | ✅ | ✅ (columns + data) | — | — |
-| Page break | ✅ | ✅ | — | — |
-| **Numbering / bullet lists** | ✅ | ✅ | `.bulletList()` / `.numberedList()` | **P0** ✅ |
-| **Numbered (ordered) lists** | ✅ | ✅ | `.numberedList({ numberingFormat })` | **P0** ✅ |
-| Nested numbering | ✅ | ❌ | — | P1 |
-| **Hyperlinks** | ✅ | ✅ | `HyperlinkNode` + `.hyperlink()` | P1 ✅ |
-| **Bookmarks** | ✅ | ❌ | — | P2 |
-| Table of Contents | ✅ | ✅ | `@docxkit/plugin-toc` field plugin | P2 ✅ |
-| Horizontal rule / line | ✅ | ❌ | — | P3 |
-| Text box / text frame | ✅ | ❌ | — | P3 |
-| Tab stops | ✅ | ❌ | — | P2 |
-| Footnotes | ✅ | ❌ | — | P2 |
-| Comments | ✅ | ❌ | — | P3 |
-| Checkboxes / form fields | ✅ | ❌ | — | P3 |
-| Math equations (OMML) | ✅ | ❌ | — | P3 |
+| Capability | Public surface | Status |
+| --- | --- | --- |
+| Highlight, superscript, and subscript | Text style rules | ✅ |
+| Small caps and double strike | Text style rules | ✅ |
+| RTL runs | `rightToLeft` | ✅ |
+| Character and CSS-unit letter spacing | `characterSpacing` / `letterSpacing` | ✅ |
+| Emboss and imprint effects | Text style rules | ✅ |
+| Keep-lines and keep-next | Paragraph style rules | ✅ |
+| Widow control and outline level | Paragraph style rules | ✅ |
+| Paragraph borders | Side-specific and shorthand border rules | ✅ |
 
-### 2.4 Table Features
+### Assets, Metadata, and Output
 
-| Feature | docxjs | docx-kit | Gap | Priority |
-|---------|--------|----------|-----|----------|
-| Basic table with header row | ✅ | ✅ | — | — |
-| Striped rows | ✅ | ✅ (`striped` option) | — | — |
-| Borders (`bordered` option) | ✅ | ✅ (on/off) | — | — |
-| Custom column renderers | ✅ | ✅ (`TableColumn.render`) | — | — |
-| Column width (percentage) | ✅ | ✅ | — | — |
-| Column alignment | ✅ | ✅ | — | — |
-| **Cell merging** | ✅ | ❌ | Common in reports | P1 |
-| Cell shading / background | ✅ | ✅ | `backgroundColor` → cell shading | P1 ✅ |
-| Table style presets ("table look") | ✅ | ❌ | — | P2 |
-| Side-by-side tables | ✅ | ❌ | — | P2 |
-| Floating tables | ✅ | ❌ | — | P3 |
-| Complex border styles per-cell | ✅ | ❌ (only global `bordered`) | — | P2 |
-| Cell vertical alignment | ✅ | ✅ (`verticalAlign` in style) | — | — |
+| Capability | Public surface | Status |
+| --- | --- | --- |
+| Core OOXML metadata | `DocxKitConfig.metadata` | ✅ |
+| Custom document properties | `metadata.customProperties` | ✅ |
+| Embedded TrueType/OpenType fonts | `DocxKitConfig.fonts` | ✅ |
+| Browser Blob output | `.toBlob()` | ✅ |
+| Cross-platform byte/base64 output | `.toUint8Array()`, `.toBuffer()`, `.toBase64()` | ✅ |
+| Node filesystem save | Node entry `save` method / `saveDocument()` | ✅ |
+| Node streaming | `.toStream()` / `streamDocument()` | ✅ |
 
----
+### Built-in Plugins
 
-## 3. Style System (DocxStyleRule)
+The workspace now ships 19 built-in plugins:
 
-### 3.1 Text Style — Present & Working
+`badge`, `barcode`, `callout`, `changelog`, `codeBlock`, `coverPage`,
+`dataTable`, `divider`, `echarts`, `invoice`, `letterhead`, `meetingMinutes`,
+`pageNumber`, `propertyTable`, `qrcode`, `signatureBlock`, `timeline`, `toc`,
+and `watermark`.
 
-| Property | docx-kit | Maps To | Status |
-|----------|----------|---------|--------|
-| `fontFamily` | ✅ | `TextRun.font` | Done |
-| `fontSize` | ✅ | `TextRun.size` (half-pts) | Done |
-| `fontWeight` | ✅ | `TextRun.bold` (≥600 → true) | Done |
-| `fontStyle` | ✅ | `TextRun.italics` | Done |
-| `color` | ✅ | `TextRun.color` | Done |
-| `underline` | ✅ | `TextRun.underline` | Done |
-| `strike` | ✅ | `TextRun.strike` | Done |
-| `allCaps` | ✅ | `TextRun.allCaps` | Done |
+The final plugin gap from the original audit, linear barcode generation, is
+implemented through `@docxkit/plugin-barcode`. It supports Node and browser PNG
+renderers through the optional `bwip-js` peer dependency.
 
-### 3.2 Text Style — Missing
+## Platform Boundaries
 
-| Property | docxjs Support | Priority | Recommendation |
-|----------|---------------|----------|----------------|
-| `highlight` | `TextRun.highlight` | **P1** ✅ | Implemented with Word highlight palette |
-| `superScript` / `subScript` | `TextRun.superScript` / `TextRun.subScript` | P1 ✅ | Boolean toggles implemented |
-| `smallCaps` | `TextRun.smallCaps` | P2 ✅ | Boolean implemented |
-| `doubleStrike` | `TextRun.doubleStrike` | P3 | Boolean |
-| `rightToLeft` | `TextRun.rightToLeft` | P2 | Boolean |
-| `characterSpacing` | `TextRun.characterSpacing` | P2 | Number (twips) |
-| `emboss` / `imprint` / `outline` / `shadow` | `TextRun` effects | P3 | Booleans |
+These are intentional platform contracts, not open feature gaps:
 
-### 3.3 Paragraph Style — Present & Working
+| Surface | Browser | Node.js |
+| --- | --- | --- |
+| Core document generation | ✅ | ✅ |
+| Barcode rendering | Canvas renderer | Buffer renderer |
+| ECharts rendering | Primary supported target | Requires a server-side canvas |
+| Filesystem save and streams | — | ✅ |
+| TOC and other Word fields | Generated as fields; the editor may need to refresh them |
 
-| Property | docx-kit | Maps To | Status |
-|----------|----------|---------|--------|
-| `textAlign` | ✅ | `Paragraph.alignment` | Done |
-| `textIndent` | ✅ | `Paragraph.indent.firstLine` | Done |
-| `lineHeight` | ✅ | `Paragraph.spacing.line` | Done |
-| `marginTop` | ✅ | `Paragraph.spacing.before` | Done |
-| `marginBottom` | ✅ | `Paragraph.spacing.after` | Done |
-| `marginLeft` | ✅ | `Paragraph.indent.left` | Done |
-| `marginRight` | ✅ | `Paragraph.indent.right` | Done |
-| `margin` (CSS shorthand) | ✅ | Parsed → 4-direction margins | Done |
+Media integrations keep their renderers as optional peer dependencies:
+`bwip-js`, `echarts`, `highlight.js`, and `qrcode`. Consumers install only the
+renderers they use.
 
-### 3.4 Paragraph Style — Missing
+## Verification Baseline
 
-| Property | docxjs Support | Priority | Recommendation |
-|----------|---------------|----------|----------------|
-| `keepLines` (keep together) | `Paragraph.keepLines` | P2 ✅ | Boolean implemented |
-| `keepNext` (keep with next) | `Paragraph.keepNext` | P2 ✅ | Boolean implemented |
-| `widowControl` | `Paragraph.widowControl` | P3 | Boolean (default true) |
-| `pageBreakBefore` | `Paragraph.pageBreakBefore` | P2 ✅ | Boolean implemented |
-| `outlineLevel` | `Paragraph.outlineLevel` | P3 | Number (0–9) |
-| `tabStops` | `Paragraph.tabStops` | P2 | Array of tab stop positions |
-| `bullet` / `numbering` | `Paragraph.numbering` | **P0** | Numbering reference |
-| Paragraph borders | `Paragraph.borders` | P1 ✅ | Paragraph-level border compiler implemented |
+The gap-closure branch is protected by the same commands used for release:
 
-### 3.5 Border System
+| Gate | Result |
+| --- | --- |
+| Workspace build | 35 non-docs workspaces passed |
+| TypeScript | All workspace packages passed `tsc --noEmit` |
+| Tests | 71 files, 728 tests passed |
+| Documentation examples | 143 Markdown files validated |
+| Documentation production build | VitePress build passed |
+| Generated Monaco declarations | Deterministic and complete for all 19 plugins |
+| Package artifact audit | Every published entry point resolved |
+| Packed consumer smoke test | Runtime imports and downstream TypeScript passed |
+| CI platforms | Ubuntu and Windows |
 
-| Feature | docx-kit | Status |
-|---------|----------|--------|
-| `border` (shorthand) | ✅ | Compiles to 4 sides |
-| `borderTop/Right/Bottom/Left` | ✅ | Override individual sides |
-| Border styles (dashed/dotted/double/none/single) | ✅ | Enum mapped |
-| Border color | ✅ | Hex → docx border color |
-| Border width | ✅ | pt → twips |
-| **Paragraph borders** | ✅ | `compileParagraphBorder` maps paragraph borders separately |
+## Next Work
 
----
+The next roadmap should focus on quality and scale rather than filling known
+docxjs parity holes:
 
-## 4. Plugin System
+1. Add visual-regression fixtures opened by Word and LibreOffice.
+2. Add large-document performance and memory benchmarks.
+3. Reduce the documentation playground bundle through code splitting.
+4. Expand integration fixtures for advanced OOXML interoperability.
 
-### 4.1 Current State
+These are follow-up investments; none are blockers for the current feature
+release.
 
-| Plugin | Status | Description |
-|--------|--------|-------------|
-| QRCode | ✅ | PNG QR code generation |
-| ECharts | ✅ | Browser-only chart rendering |
-
-### 4.2 Recommended Plugins
-
-| Plugin | Priority | Rationale |
-|--------|----------|-----------|
-| `table` (built-in) | **P0** | Expose docx's native table as a plugin for advanced options |
-| `numbering` (built-in) | **P0** | Bullet + ordered list support |
-| `header` / `footer` | P1 | Expose header/footer as config + plugin |
-| `toc` | P2 ✅ | Field-based table-of-contents plugin |
-| `watermark` | P2 ✅ | Text watermark plugin for header/footer placement |
-| `barcode` | P3 | Companion to QRCode |
-
----
-
-## 5. Unit System
-
-| Feature | docx-kit | Status |
-|---------|----------|--------|
-| `pt` unit | ✅ | All converters |
-| `px` unit | ✅ | All converters |
-| `mm` unit | ✅ | All converters |
-| `cm` unit | ✅ | All converters |
-| `in` unit | ✅ | All converters |
-| `%` unit | ✅ | Column width only |
-| Bare numbers (context-dependent) | ✅ | pt for dimensions, px for images |
-| `em` / `rem` | ❌ | Not applicable to docx |
-| `vh` / `vw` | ❌ | Not applicable |
-
----
-
-## 6. Export System
-
-| Feature | docxjs | docx-kit | Status |
-|---------|--------|----------|--------|
-| `toBlob()` | ✅ | ✅ | Browser |
-| `toBuffer()` | ✅ | ✅ | Node.js |
-| `toBase64()` | ✅ | ✅ | Cross-platform |
-| `toUint8Array()` | Not native | ✅ | Cross-platform |
-| `save()` (to disk) | Not native | ✅ | Node.js only |
-| `toDocument()` | Not native | ✅ | Raw docx Document |
-| `toJSON()` | ❌ | ✅ | Unique feature |
-| Streaming output | ✅ (Node.js) | ❌ | P3 |
-
----
-
-## 7. TypeScript Type System
-
-| Feature | docxjs | docx-kit |
-|---------|--------|----------|
-| Type-safe stylesheet keys | ❌ | ✅ (ClassName, StyleSheet generics) |
-| Type-safe plugin registry | ❌ | ✅ (accumulated generic) |
-| Type-safe node union | ❌ | ✅ (BlockNode, InlineNode) |
-| Identity helpers (`defineStyles`, etc.) | ❌ | ✅ (const inference) |
-| Error taxonomy | ❌ | ✅ (DocxKitError + error codes) |
-| UnitValue type | ❌ | ✅ (CSS unit union) |
-
----
-
-## 8. Metadata & Properties
-
-| Feature | docx-kit | Status |
-|---------|----------|--------|
-| OOXML core properties (title, creator, etc.) | ✅ | 6 fields |
-| Custom document properties | ❌ | P3 |
-
----
-
-## 9. Priority Roadmap
-
-### P0 — Must Have ✅ All Done
-
-| # | Feature | Effort | Approach | Status |
-|---|---------|--------|----------|--------|
-| 1 | Numbering / bullet lists | Medium | `BulletListNode` + `compileBulletList`; `.bulletList()` builder | ✅ Done |
-| 2 | Numbered / ordered lists | Medium | Same infrastructure as bullet lists, with numbering config | ✅ Done |
-| 3 | Multiple sections | Medium | `SectionConfig`; `SectionBreakNode`; `.section()` builder | ✅ Done |
-| 4 | Headers & footers | Medium | `HeaderFooterConfig`; `compileHeaders/Footers`; per-section | ✅ Done |
-
-### P1 — High Priority (commonly expected)
-
-| # | Feature | Effort | Approach |
-|---|---------|--------|----------|
-| 5 | Hyperlinks | Small | `HyperlinkNode` + `.hyperlink()` | ✅ Done |
-| 6 | Text highlighting | Small | `highlight` in `DocxStyleRule` + compile | ✅ Done |
-| 7 | SuperScript / subScript | Small | `DocxStyleRule` + compile | ✅ Done |
-| 8 | Cell merging (rowspan/colspan) | Medium | Add `rowSpan`/`colSpan` to data objects or column config |
-| 9 | Page numbers | Small | `@docxkit/plugin-page-number` for header/footer use | ✅ Done |
-| 10 | Nested numbering | Medium | Part of numbering system |
-| 11 | Paragraph borders (compile fix) | Small | Add `compileParagraphBorder` function | ✅ Done |
-| 12 | Cell shading (compile fix) | Small | Map `backgroundColor` → cell fill correctly | ✅ Done |
-
-### P2 — Medium Priority
-
-| # | Feature | Effort | Approach |
-|---|---------|--------|----------|
-| 13 | Bookmarks | Small | New `BookmarkNode` |
-| 14 | Table of Contents | Medium | Field-based `@docxkit/plugin-toc` | ✅ Done |
-| 15 | Table style presets | Small | Pass through to docx table properties |
-| 16 | Odd/even headers | Small | Config option |
-| 17 | Keep with next / keep together | Small | Add to `DocxStyleRule` | ✅ Done |
-| 18 | Page break before (style) | Small | Add to `DocxStyleRule` | ✅ Done |
-| 19 | Tab stops | Medium | New `TabStop` type |
-| 20 | Right-to-left text | Small | Add to `DocxStyleRule` |
-| 21 | Page borders | Medium | Add to `PageConfig` |
-| 22 | Character spacing | Small | Add to `DocxStyleRule` |
-| 23 | Section types | Small | Add to section config |
-| 24 | Side-by-side tables | Medium | Layout helper or section config |
-
-### P3 — Low Priority / Niche
-
-| # | Feature |
-|---|---------|
-| 25 | Footnotes |
-| 26 | Comments |
-| 27 | Track changes |
-| 28 | Math equations |
-| 29 | Checkboxes / form fields |
-| 30 | Text boxes / frames |
-| 31 | Custom fonts embedding |
-| 32 | Watermark | ✅ Plugin implemented |
-
----
-
-## 10. docx-kit Unique Advantages (over raw docxjs)
-
-These are features docx-kit has that docxjs does NOT:
+## docx-kit Advantages over Raw docxjs
 
 | Feature | Value |
-|---------|-------|
-| **CSS-like className system** | Write `docx-kit` styles, not raw docxjs options |
-| **Plugin architecture** | Extensible via `definePlugin()` + `use()` + `plugin()` |
-| **Style cascading** | `base → className(s) → inline` resolution with `resolveStyle()` |
-| **Unit system** | CSS units (pt/px/mm/cm/in/%) with auto-conversion to OOXML twips |
-| **Margin/padding shorthand** | `margin: '10pt 20pt'` parses into 4-direction values |
-| **Type-safe stylesheet** | `defineStyles({ accent: { color: '#f00' } })` → `className: 'accent'` only accepts valid keys |
-| **Type-safe plugins** | Plugin registry accumulates types; `doc.plugin('qrcode', ...)` is fully typed |
-| **Platform separation** | `docx-kit`, `docx-kit/node`, `docx-kit/browser` entry points |
-| **AI-friendly JSON entry** | `renderDocx({ content: [...], styles: {...} })` for declarative generation |
-| **Debug JSON** | `doc.toJSON()` exports full builder state |
-| **Error taxonomy** | 7 distinguishable error codes with structured `DocxKitError` |
-| **Escape hatch** | `style.docx` property for any docxjs option not yet mapped |
-| **ECharts + QRCode** plugins | Built-in chart + QR code generation |
+| --- | --- |
+| CSS-like styles | Familiar styling vocabulary with unit conversion |
+| Type-safe builder | Fluent document construction with typed nodes |
+| Plugin architecture | Extensible `definePlugin()` / `.use()` / `.plugin()` model |
+| Style inheritance and theme tokens | Reusable design systems for documents |
+| AI-friendly JSON DSL | Declarative generation through `renderDocx()` |
+| Platform entry points | Explicit browser and Node contracts |
+| Package validation | Generated declarations, artifact audits, and consumer smoke tests |
+| Escape hatch | Direct upstream options remain available through `style.docx` |
