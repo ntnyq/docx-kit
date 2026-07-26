@@ -1,4 +1,3 @@
-import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { PRESETS } from '../constants/templates'
@@ -9,7 +8,7 @@ const MAIN_FILE = '/main.ts'
 function createTypeService() {
   const files = new Map(
     DOCX_KIT_TYPE_LIBS.map(typeLib => [
-      fileURLToPath(typeLib.filePath),
+      toVirtualFileName(typeLib.filePath),
       typeLib.content,
     ]),
   )
@@ -78,7 +77,17 @@ function formatDiagnostics(diagnostics: readonly ts.Diagnostic[]) {
     .join('\n')
 }
 
+function toVirtualFileName(filePath: string) {
+  return decodeURIComponent(new URL(filePath).pathname)
+}
+
 describe('playground Monaco declarations', () => {
+  it('converts file URLs without requiring a Windows drive letter', () => {
+    expect(toVirtualFileName('file:///node_modules/docx-kit/index.d.ts')).toBe(
+      '/node_modules/docx-kit/index.d.ts',
+    )
+  })
+
   it('type-checks every playground preset against the real package API', () => {
     const typeService = createTypeService()
 
