@@ -45,12 +45,13 @@ import { saveDocument, dataUrlToUint8Array } from 'docx-kit/node'
 
 ### Available in Node.js
 
-#### `saveDocument(doc, filename)`
+#### Streaming output
 
-Save a compiled document to disk:
+`save()` streams a compiled document directly to disk. Use `toStream()` or
+`streamDocument()` when another Node.js destination owns the writable side:
 
 ```ts
-import { saveDocument } from 'docx-kit/node'
+import { createDocx, saveDocument, streamDocument } from 'docx-kit/node'
 
 const doc = createDocx()
   .h1('Hello')
@@ -59,9 +60,14 @@ const doc = createDocx()
 // Method 1: save() shortcut (uses saveDocument internally)
 await doc.save('output.docx')
 
-// Method 2: manual
+// Method 2: pipe the builder output elsewhere
+const stream = await doc.toStream()
+stream.pipe(uploadDestination)
+
+// Method 3: work with a compiled Document
 const compiled = await doc.toDocument()
 await saveDocument(compiled, 'output.docx')
+streamDocument(compiled).pipe(uploadDestination)
 ```
 
 #### `dataUrlToUint8Array(dataUrl)`

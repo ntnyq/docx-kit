@@ -8,6 +8,24 @@ import type { BlockNode } from './dsl/nodes'
 import type { BorderRule, DocxStyleRule, StyleSheet } from './style'
 import type { UnitValue } from './utility'
 
+/** OOXML document properties shown in Word's File → Info panel. */
+export interface DocumentMetadata {
+  /** Document author. */
+  creator?: string
+  /** Application-specific string properties. */
+  customProperties?: Record<string, string>
+  /** Document description / summary. */
+  description?: string
+  /** Keywords / tags. */
+  keywords?: string[]
+  /** Last editor. */
+  lastModifiedBy?: string
+  /** Document subject. */
+  subject?: string
+  /** Document title. */
+  title?: string
+}
+
 /**
  * Top-level configuration passed to `createDocx()`.
  *
@@ -17,6 +35,10 @@ import type { UnitValue } from './utility'
  * @template TStyles — The user's stylesheet type (inferred from `styles`).
  */
 export interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
+  /** Font files embedded into the generated DOCX package. */
+  fonts?: EmbeddedFont[]
+  /** OOXML core properties (appear in File → Info). */
+  metadata?: DocumentMetadata
   /** Page dimensions and margins. */
   page?: PageConfig
   /** Named style classes (class → style rule map). */
@@ -42,21 +64,6 @@ export interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
     trackRevisions?: boolean
     /** Ask Word to update fields when the document opens. */
     updateFields?: boolean
-  }
-  /** OOXML core properties (appear in File → Info). */
-  metadata?: {
-    /** Document author. */
-    creator?: string
-    /** Document description / summary. */
-    description?: string
-    /** Keywords / tags. */
-    keywords?: string[]
-    /** Last editor. */
-    lastModifiedBy?: string
-    /** Document subject. */
-    subject?: string
-    /** Document title. */
-    title?: string
   }
 }
 
@@ -94,6 +101,14 @@ export interface DocxTheme {
   fontSize?: Record<string, UnitValue>
   /** Spacing tokens (name → value). */
   spacing?: ThemeSpacing
+}
+
+/** A TrueType/OpenType font embedded into the DOCX package. */
+export interface EmbeddedFont {
+  /** Raw font-file bytes. */
+  data: Uint8Array
+  /** Font family name written to the OOXML font table. */
+  name: string
 }
 
 /**

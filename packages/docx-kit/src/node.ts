@@ -20,9 +20,10 @@ import { modernPreset } from '@docxkit/preset-modern'
 import { minimalTheme } from '@docxkit/theme-minimal'
 import { oceanTheme } from '@docxkit/theme-ocean'
 import { warmTheme } from '@docxkit/theme-warm'
-import { saveDocument } from './node/index'
+import { saveDocument, streamDocument } from './node/index'
 // Plugin type map augmentation (must be imported before any code that uses DocxBuilder)
 import './types/plugin-map'
+import type { Readable } from 'node:stream'
 import type {
   BuiltinPluginMap,
   DocxBuilder,
@@ -46,6 +47,8 @@ export interface NodeDocxBuilder<
 > extends DocxBuilder<TStyles, TPlugins> {
   /** Save the generated document to the local filesystem. */
   save: (filename: string) => Promise<void>
+  /** Pack the generated document as a Node.js stream. */
+  toStream: () => Promise<Readable>
   use: <TName extends string, TOptions, TRender>(
     plugin: DocxPlugin<TName, TOptions, TRender>,
   ) => NodeDocxBuilder<TStyles, Record<TName, TOptions> & TPlugins>
@@ -77,6 +80,8 @@ function attachNodeSave<
   nodeBuilder.save = async filename => {
     await saveDocument(await nodeBuilder.toDocument(), filename)
   }
+  nodeBuilder.toStream = async () =>
+    streamDocument(await nodeBuilder.toDocument())
   return nodeBuilder
 }
 
@@ -97,7 +102,7 @@ export { coverPagePlugin } from '@docxkit/plugin-cover-page'
 export { dataTablePlugin } from '@docxkit/plugin-data-table'
 export { letterheadPlugin } from '@docxkit/plugin-letterhead'
 export { pageNumberPlugin } from '@docxkit/plugin-page-number'
-export { saveDocument }
+export { saveDocument, streamDocument }
 export { propertyTablePlugin } from '@docxkit/plugin-property-table'
 export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
 

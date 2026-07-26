@@ -176,7 +176,8 @@ See the [Plugins guide](/guide/plugins) for more details.
 
 | Method | Returns | Platform | Use Case |
 |---|---|---|---|
-| `.save(filename)` | `Promise<void>` | Node.js | Write .docx to disk |
+| `.save(filename)` | `Promise<void>` | Node.js | Stream a .docx package to disk |
+| `.toStream()` | `Promise<Readable>` | Node.js | Stream a .docx package to another destination |
 | `.toBlob()` | `Promise<Blob>` | Browser | Download via `URL.createObjectURL()` |
 | `.toBuffer()` | `Promise<Uint8Array>` | Both | Raw bytes for any use case |
 | `.toBase64()` | `Promise<string>` | Both | HTTP transfer, DB storage |
@@ -205,10 +206,9 @@ import { createDocx } from 'docx-kit/node'
 const doc = createDocx()
 await doc.save('output.docx')
 
-// Or manually
-const bytes = await doc.toBuffer()
-import { writeFileSync } from 'node:fs'
-writeFileSync('output.docx', bytes)
+// Or pipe to another Node.js destination
+const stream = await doc.toStream()
+stream.pipe(uploadDestination)
 ```
 
 ## Plugin Registration (use)

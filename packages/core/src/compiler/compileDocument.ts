@@ -182,12 +182,21 @@ export async function compileDocument<TStyles extends StyleSheet>(
     lastModifiedBy: options.config.metadata?.lastModifiedBy,
     subject: options.config.metadata?.subject,
     title: options.config.metadata?.title,
+    customProperties: Object.entries(
+      options.config.metadata?.customProperties ?? {},
+    ).map(([name, value]) => ({ name, value })),
     features: {
       updateFields: options.config.features?.updateFields,
       trackRevisions:
         options.config.features?.trackRevisions
         ?? hasTrackedRevisions(options.nodes),
     },
+    fonts: options.config.fonts?.map(font => ({
+      // `docx` types this cross-platform byte input as Node's Buffer, but its
+      // packer consumes the shared Uint8Array methods supported in browsers.
+      data: font.data as never,
+      name: font.name,
+    })),
     ...(numberingConfig ? { numbering: { config: numberingConfig } } : {}),
     sections,
   })

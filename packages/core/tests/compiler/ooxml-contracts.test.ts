@@ -20,10 +20,56 @@ async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
     return file.async('string')
   }
 
-  return { read }
+  async function readBytes(path: string) {
+    const file = archive.file(path)
+    if (!file) {
+      throw new Error(`Missing OOXML part: ${path}`)
+    }
+    return file.async('uint8array')
+  }
+
+  return { read, readBytes }
 }
 
 describe('compiler OOXML contracts', () => {
+  it('emits custom document properties and embedded fonts', async () => {
+    const fontData = Uint8Array.from({ length: 64 }, (_, index) => index)
+    const pkg = await renderPackage(
+      [
+        {
+          children: [{ text: 'Embedded font', type: 'text' }],
+          type: 'paragraph',
+        },
+      ],
+      {
+        fonts: [{ data: fontData, name: 'Docx Kit Test' }],
+        metadata: {
+          title: 'Property contract',
+          customProperties: {
+            Department: 'Engineering',
+            Release: '2026.07',
+          },
+        },
+      },
+    )
+
+    const customPropertiesXml = await pkg.read('docProps/custom.xml')
+    const embeddedFont = await pkg.readBytes('word/fonts/font1.odttf')
+    const fontTableXml = await pkg.read('word/fontTable.xml')
+    const fontTableRelationships = await pkg.read(
+      'word/_rels/fontTable.xml.rels',
+    )
+
+    expect(customPropertiesXml).toContain('name="Department"')
+    expect(customPropertiesXml).toContain('<vt:lpwstr>Engineering</vt:lpwstr>')
+    expect(customPropertiesXml).toContain('name="Release"')
+    expect(fontTableXml).toContain('<w:font w:name="Docx Kit Test">')
+    expect(fontTableXml).toContain('<w:embedRegular')
+    expect(fontTableRelationships).toContain('Target="fonts/font1.odttf"')
+    expect(embeddedFont).toHaveLength(fontData.length)
+    expect(embeddedFont).not.toEqual(fontData)
+  })
+
   it('emits advanced table layout, positioning, and cell styles', async () => {
     const table: TableNode<Record<string, unknown>> = {
       alignment: 'center',

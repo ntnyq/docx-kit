@@ -44,13 +44,14 @@ describe('shared.ts — shared exports', () => {
 })
 
 describe('node.ts — platform exports', () => {
-  it('exports saveDocument and dataUrlToUint8Array', async () => {
+  it('exports Node output and data URL helpers', async () => {
     const mod = await import('../src/node')
     expect(mod.saveDocument).toBeDefined()
+    expect(mod.streamDocument).toBeDefined()
     expect(mod.dataUrlToUint8Array).toBeDefined()
   })
 
-  it('installs save on fluent and JSON builders', async () => {
+  it('installs save and stream output on fluent and JSON builders', async () => {
     const mod = await import('../src/node')
     const fluentBuilder = mod.createDocx().use({
       name: 'test',
@@ -59,7 +60,9 @@ describe('node.ts — platform exports', () => {
     const jsonBuilder = await mod.renderDocx({ content: [] })
 
     expect(typeof fluentBuilder.save).toBe('function')
+    expect(typeof fluentBuilder.toStream).toBe('function')
     expect(typeof jsonBuilder.save).toBe('function')
+    expect(typeof jsonBuilder.toStream).toBe('function')
   })
 })
 
@@ -82,8 +85,10 @@ describe('dist exports — published package smoke tests', () => {
   it('loads node dist entrypoint', async () => {
     const mod = await import('../dist/node.js')
     expect(mod.saveDocument).toBeDefined()
+    expect(mod.streamDocument).toBeDefined()
     expect(mod.letterheadPlugin).toBeDefined()
     expect(typeof mod.createDocx().save).toBe('function')
+    expect(typeof mod.createDocx().toStream).toBe('function')
   })
 
   it.each([

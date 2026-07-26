@@ -19,6 +19,29 @@ const doc = createDocx({
   metadata: {
     title: 'Annual Report',
     creator: 'Alice',
+    customProperties: {
+      Department: 'Finance',
+    },
+  },
+})
+```
+
+Binary font data can be embedded once and referenced by its family name in
+document styles:
+
+```ts
+import { readFile } from 'node:fs/promises'
+import { createDocx } from 'docx-kit/node'
+
+const doc = createDocx({
+  fonts: [
+    {
+      name: 'Inter',
+      data: await readFile('./Inter-Regular.ttf'),
+    },
+  ],
+  defaults: {
+    text: { fontFamily: 'Inter' },
   },
 })
 ```
@@ -198,6 +221,7 @@ await doc.toBlob()         // → Blob (browser & Node.js)
 await doc.toUint8Array()   // → Uint8Array
 await doc.toBuffer()       // → Uint8Array (alias)
 await doc.toBase64()       // → base64 string
+await doc.toStream()       // → Node.js stream (Node.js only)
 await doc.save('f.docx')   // → writes to disk (Node.js only)
 await doc.toDocument()     // → raw docx Document
 doc.toJSON()               // → plain object (debug / serialization)

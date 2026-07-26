@@ -56,9 +56,11 @@ export type {
 
 // ---------- Document types ----------
 export type {
+  DocumentMetadata,
   DocxKitConfig,
   DocxPreset,
   DocxTheme,
+  EmbeddedFont,
   HeaderFooterConfig,
   HeaderFooterContent,
   Orientation,

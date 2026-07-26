@@ -4,8 +4,8 @@
  * @module node
  */
 
-// File system save
-export { saveDocument } from './fs'
+// Streaming and file-system output
+export { saveDocument, streamDocument } from './fs'
 
 // Base64 decoding (via Buffer)
 export { dataUrlToUint8Array } from '@docxkit/core'
