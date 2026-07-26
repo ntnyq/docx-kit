@@ -24,6 +24,71 @@ async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
 }
 
 describe('compiler OOXML contracts', () => {
+  it('emits advanced table layout, positioning, and cell styles', async () => {
+    const table: TableNode<Record<string, unknown>> = {
+      alignment: 'center',
+      data: [{ amount: 42 }],
+      layout: 'fixed',
+      styleName: 'TableGrid',
+      type: 'table',
+      width: '60%',
+      borders: {
+        insideHorizontal: {
+          color: '#94a3b8',
+          style: 'dotted',
+          width: '0.5pt',
+        },
+      },
+      columns: [
+        {
+          align: 'right',
+          key: 'amount',
+          title: 'Amount',
+          width: '40pt',
+          cellStyle: {
+            borderBottom: {
+              color: '#123456',
+              style: 'double',
+              width: '1pt',
+            },
+          },
+        },
+      ],
+      floating: {
+        horizontalAnchor: 'page',
+        overlap: false,
+        verticalAnchor: 'margin',
+        x: '1in',
+        y: '2in',
+      },
+      tableLook: {
+        firstRow: true,
+        noHBand: false,
+      },
+      cellStyle: value => ({
+        backgroundColor: Number(value) > 0 ? '#dcfce7' : '#fee2e2',
+      }),
+    }
+    const pkg = await renderPackage([table])
+    const documentXml = await pkg.read('word/document.xml')
+
+    expect(documentXml).toContain('<w:tblStyle w:val="TableGrid"/>')
+    expect(documentXml).toContain('<w:tblLayout w:type="fixed"/>')
+    expect(documentXml).toContain('<w:jc w:val="center"/>')
+    expect(documentXml).toContain('<w:tblW w:type="pct" w:w="60%"/>')
+    expect(documentXml).toContain(
+      '<w:tblpPr w:tblpX="1440" w:tblpY="2880" w:horzAnchor="page" w:vertAnchor="margin"><w:tblOverlap w:val="never"/></w:tblpPr>',
+    )
+    expect(documentXml).toContain(
+      '<w:insideH w:val="dotted" w:color="94a3b8" w:sz="10"/>',
+    )
+    expect(documentXml).toContain(
+      '<w:bottom w:val="double" w:color="123456" w:sz="20"/>',
+    )
+    expect(documentXml).toContain('<w:shd w:fill="dcfce7" w:val="clear"/>')
+    expect(documentXml).toContain('<w:tcW w:type="dxa" w:w="800"/>')
+  })
+
   it('emits footnote and comment document parts', async () => {
     const pkg = await renderPackage([
       {

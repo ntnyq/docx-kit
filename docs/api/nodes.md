@@ -148,11 +148,19 @@ interface TableNode<TData, TStyles> extends BaseNode<TStyles> {
   type: 'table'
   columns: TableColumn<TData>[]
   data: TData[]
+  alignment?: 'left' | 'center' | 'right'
   bordered?: boolean
+  borders?: TableBordersConfig
+  floating?: TableFloatingOptions
   striped?: boolean
   header?: boolean
+  layout?: 'autofit' | 'fixed'
+  styleName?: string
+  tableLook?: TableLookOptions
+  visuallyRightToLeft?: boolean
+  width?: UnitValue
   headerCellStyle?: DocxStyleRule
-  cellStyle?: DocxStyleRule
+  cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
 }
 ```
 
@@ -166,6 +174,8 @@ interface TableColumn<TData> {
   colSpan?: number
   rowSpan?: number
   width?: UnitValue
+  cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
+  headerCellStyle?: DocxStyleRule
   render?: (
     value: unknown,
     row: TData,
@@ -177,6 +187,12 @@ interface TableColumn<TData> {
 Data rows can override spans with `_${key}_colSpan` and
 `_${key}_rowSpan` fields. A row-level `_rowSpan` applies to every cell in
 that row.
+
+`styleName` and `tableLook` pass native Word table style information through
+to OOXML. `layout`, `width`, `alignment`, `borders`, and `floating` expose
+fixed/autofit layout, outer/inner borders, and floating placement. Cell styles
+can be static or computed from `(value, row, rowIndex, column)`, and a data row
+may provide a final `_${key}_style` override.
 
 ## `HyperlinkNode<TStyles>`
 

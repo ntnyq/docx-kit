@@ -105,6 +105,7 @@ export function compileCellStyle(style: CellStyleRule) {
     bottom != null || left != null || right != null || top != null
 
   return {
+    borders: compileBorder(style),
     verticalAlign: compileVerticalAlign(style.verticalAlign),
     margins: hasAnyMargin
       ? {
@@ -151,6 +152,12 @@ export function compileColumnWidth(width: unknown) {
     return {
       size: Number.parseFloat(width),
       type: WidthType.PERCENTAGE,
+    }
+  }
+  if (typeof width === 'number' || typeof width === 'string') {
+    return {
+      size: toTwip(width) ?? 0,
+      type: WidthType.DXA,
     }
   }
   return undefined

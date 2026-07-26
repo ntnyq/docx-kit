@@ -145,15 +145,46 @@ interface TableOptions<TData> {
     title: string
     align?: 'left' | 'center' | 'right'
     width?: UnitValue
+    cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
+    headerCellStyle?: DocxStyleRule
     render?: (value: unknown, row: TData, index: number) => string | InlineNode[]
   }[]
   data: TData[]
+  alignment?: 'left' | 'center' | 'right'
   bordered?: boolean
+  borders?: TableBordersConfig
+  floating?: TableFloatingOptions
   striped?: boolean
   header?: boolean
+  layout?: 'autofit' | 'fixed'
+  styleName?: string
+  tableLook?: TableLookOptions
+  visuallyRightToLeft?: boolean
+  width?: UnitValue
   headerCellStyle?: DocxStyleRule
-  cellStyle?: DocxStyleRule
+  cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
 }
+```
+
+Floating positioning supports side-by-side tables by anchoring two fixed-width
+tables at different horizontal offsets:
+
+```ts
+doc
+  .table({
+    columns,
+    data: leftData,
+    layout: 'fixed',
+    width: '45%',
+    floating: { horizontalAnchor: 'page', x: '0.5in', y: '2in' },
+  })
+  .table({
+    columns,
+    data: rightData,
+    layout: 'fixed',
+    width: '45%',
+    floating: { horizontalAnchor: 'page', x: '4.25in', y: '2in' },
+  })
 ```
 
 ### Export Methods

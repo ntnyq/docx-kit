@@ -173,9 +173,18 @@ describe('compileColumnWidth', () => {
     expect(result).toEqual({ size: 25, type: 'pct' })
   })
 
-  it('returns undefined for non-percentage values', () => {
-    expect(compileColumnWidth('100px')).toBeUndefined()
-    expect(compileColumnWidth(100)).toBeUndefined()
+  it('converts fixed widths to twips', () => {
+    expect(compileColumnWidth('100px')).toEqual({
+      size: 1500,
+      type: 'dxa',
+    })
+    expect(compileColumnWidth(100)).toEqual({
+      size: 2000,
+      type: 'dxa',
+    })
+  })
+
+  it('returns undefined for missing values', () => {
     expect(compileColumnWidth(undefined)).toBeUndefined()
   })
 })

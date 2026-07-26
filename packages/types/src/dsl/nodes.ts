@@ -9,7 +9,7 @@
  */
 
 import type { SectionConfig } from '../document'
-import type { DocxStyleRule, StyleSheet } from '../style'
+import type { BorderRule, DocxStyleRule, StyleSheet } from '../style'
 import type { UnitValue } from '../utility'
 
 /**
@@ -444,6 +444,26 @@ export interface SectionBreakNode {
   config?: SectionConfig
 }
 
+/** Table-level border configuration. */
+export interface TableBordersConfig {
+  bottom?: BorderRule
+  insideHorizontal?: BorderRule
+  insideVertical?: BorderRule
+  left?: BorderRule
+  right?: BorderRule
+  top?: BorderRule
+}
+
+/** Per-cell style resolver. */
+export type TableCellStyleResolver<
+  TData extends Record<string, unknown> = Record<string, unknown>,
+> = (
+  value: TData[keyof TData],
+  row: TData,
+  rowIndex: number,
+  column: TableColumn<TData>,
+) => DocxStyleRule
+
 /**
  * A column definition for a table.
  *
@@ -458,12 +478,16 @@ export interface TableColumn<
   title: string
   /** Cell text alignment. */
   align?: 'center' | 'left' | 'right'
+  /** Per-column data cell style or resolver. */
+  cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
   /**
    * Span multiple columns horizontally.
    *
    * Applied to all cells in this column.
    */
   colSpan?: number
+  /** Per-column header cell style. */
+  headerCellStyle?: DocxStyleRule
   /**
    * Span multiple rows vertically (per-cell via data hints).
    *
@@ -487,6 +511,44 @@ export interface TableColumn<
   ) => string | InlineNode[]
 }
 
+/** Floating table positioning. */
+export interface TableFloatingOptions {
+  /** Bottom distance from surrounding text. */
+  bottomFromText?: UnitValue
+  /** Horizontal anchor. */
+  horizontalAnchor?: 'margin' | 'page' | 'text'
+  /** Left distance from surrounding text. */
+  leftFromText?: UnitValue
+  /** Whether the table may overlap other floating objects. */
+  overlap?: boolean
+  /** Right distance from surrounding text. */
+  rightFromText?: UnitValue
+  /** Top distance from surrounding text. */
+  topFromText?: UnitValue
+  /** Vertical anchor. */
+  verticalAnchor?: 'margin' | 'page' | 'text'
+  /** Absolute horizontal offset. */
+  x?: UnitValue
+  /** Absolute vertical offset. */
+  y?: UnitValue
+  /** Relative horizontal placement. */
+  relativeHorizontalPosition?:
+    'center' | 'inside' | 'left' | 'outside' | 'right'
+  /** Relative vertical placement. */
+  relativeVerticalPosition?:
+    'bottom' | 'center' | 'inline' | 'inside' | 'outside' | 'top'
+}
+
+/** Native Word table-look flags. */
+export interface TableLookOptions {
+  firstColumn?: boolean
+  firstRow?: boolean
+  lastColumn?: boolean
+  lastRow?: boolean
+  noHBand?: boolean
+  noVBand?: boolean
+}
+
 /**
  * A table node with column definitions and data rows.
  *
@@ -502,16 +564,32 @@ export interface TableNode<
   /** Row data objects. */
   data: TData[]
   type: 'table'
+  /** Horizontal table alignment. */
+  alignment?: 'center' | 'left' | 'right'
   /** Show table borders. */
   bordered?: boolean
-  /** Default cell style for data rows. */
-  cellStyle?: DocxStyleRule
+  /** Explicit outer and inner table borders. */
+  borders?: TableBordersConfig
+  /** Default data cell style or per-cell resolver. */
+  cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
+  /** Floating table positioning. Enables side-by-side layouts. */
+  floating?: TableFloatingOptions
   /** Show header row (default: `true`). */
   header?: boolean
   /** Style for header cells. */
   headerCellStyle?: DocxStyleRule
+  /** Word table layout algorithm. */
+  layout?: 'autofit' | 'fixed'
   /** Alternate row shading. */
   striped?: boolean
+  /** Native Word table style ID. */
+  styleName?: string
+  /** Native Word table-look flags. */
+  tableLook?: TableLookOptions
+  /** Render the table grid from right to left. */
+  visuallyRightToLeft?: boolean
+  /** Overall table width. */
+  width?: UnitValue
 }
 
 /**

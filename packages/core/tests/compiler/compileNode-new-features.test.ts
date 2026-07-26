@@ -132,6 +132,21 @@ describe('compileParagraphStyle - new properties', () => {
 })
 
 describe('compileCellStyle - shading', () => {
+  it('maps per-cell borders', () => {
+    const result = compileCellStyle({
+      borderBottom: {
+        color: '#123456',
+        style: 'double',
+        width: '1pt',
+      },
+    })
+    expect(result.borders?.bottom).toEqual({
+      color: '123456',
+      size: 20,
+      style: 'double',
+    })
+  })
+
   it('compiles backgroundColor into shading', () => {
     const result = compileCellStyle({ backgroundColor: '#f0f0f0' })
     expect(result.shading).toBeDefined()

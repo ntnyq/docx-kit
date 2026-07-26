@@ -5,17 +5,47 @@
  */
 
 import { DocxKitError } from '@docxkit/types'
-import { Paragraph, Table, TableCell, TableRow, WidthType } from 'docx'
+import {
+  Paragraph,
+  ShadingType,
+  Table,
+  TableBorders,
+  TableCell,
+  TableRow,
+  WidthType,
+} from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
-import { compileCellStyle, compileColumnWidth } from '../compileStyle'
+import {
+  compileBorderRule,
+  compileCellStyle,
+  compileColumnWidth,
+} from '../compileStyle'
+import { toTwip } from '../units'
 import { compileInlineNodes } from './compileInline'
 import type {
   DocxKitConfig,
+  DocxStyleRule,
   InlineNode,
   StyleSheet,
+  TableBordersConfig,
+  TableColumn,
+  TableFloatingOptions,
   TableNode,
 } from '@docxkit/types'
 import type { CompilationSession } from '../numbers'
+
+interface ResolveTableCellStyleOptions<
+  TData extends Record<string, unknown>,
+  TStyles extends StyleSheet,
+> {
+  column: TableColumn<TData>
+  config: DocxKitConfig<TStyles>
+  node: TableNode<TData, TStyles>
+  raw: TData[keyof TData]
+  row: TData
+  rowIndex: number
+  tableStyle?: DocxStyleRule
+}
 
 export async function compileTable<
   TData extends Record<string, unknown>,
@@ -58,17 +88,28 @@ export async function compileTable<
     rows.push(
       new TableRow({
         tableHeader: true,
-        children: node.columns.map(
-          col =>
-            new TableCell({
-              ...compileCellStyle(headerStyle ?? {}),
-              children: [new Paragraph(String(col.title))],
-              ...(col.colSpan && col.colSpan > 1
-                ? { columnSpan: col.colSpan }
-                : {}),
-              width: compileColumnWidth(col.width),
-            }),
-        ),
+        children: node.columns.map(col => {
+          const columnHeaderStyle = resolveStyle({
+            base: headerStyle,
+            inline: col.headerCellStyle,
+            styles: config.styles,
+            theme: config.theme,
+          })
+
+          return new TableCell({
+            ...compileCellStyle(columnHeaderStyle),
+            children: [
+              new Paragraph({
+                alignment: col.align,
+                text: String(col.title),
+              }),
+            ],
+            ...(col.colSpan && col.colSpan > 1
+              ? { columnSpan: col.colSpan }
+              : {}),
+            width: compileColumnWidth(col.width),
+          })
+        }),
       }),
     )
   }
@@ -96,15 +137,15 @@ export async function compileTable<
 
                 const isEvenRow = rowIndex % 2 === 1
 
-                // Resolve cell style: base from table-level style, then inline cellStyle
-                const resolvedCellStyle = tableStyle
-                  ? resolveStyle({
-                      base: tableStyle,
-                      inline: node.cellStyle,
-                      styles: config.styles,
-                      theme: config.theme,
-                    })
-                  : node.cellStyle
+                const resolvedCellStyle = resolveTableCellStyle({
+                  column: col,
+                  config,
+                  node,
+                  raw,
+                  row,
+                  rowIndex,
+                  tableStyle,
+                })
 
                 const baseCellStyle: Record<string, unknown> = resolvedCellStyle
                   ? { ...compileCellStyle(resolvedCellStyle) }
@@ -117,16 +158,19 @@ export async function compileTable<
 
                 return new TableCell({
                   ...baseCellStyle,
-                  ...(node.striped && isEvenRow && baseCellStyle.shading
+                  ...(node.striped && isEvenRow
                     ? {
                         shading: {
-                          ...(baseCellStyle.shading as Record<string, unknown>),
+                          ...((baseCellStyle.shading as Record<string, unknown>)
+                            ?? {}),
                           fill: 'F2F2F2',
+                          type: ShadingType.CLEAR,
                         },
                       }
                     : {}),
                   children: [
                     new Paragraph({
+                      alignment: col.align,
                       children: await compileInlineNodes(
                         inlineNodes,
                         config,
@@ -151,7 +195,96 @@ export async function compileTable<
   )
 
   return new Table({
+    alignment: node.alignment,
+    float: compileTableFloat(node.floating),
+    layout: node.layout,
     rows,
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    style: node.styleName,
+    tableLook: node.tableLook,
+    visuallyRightToLeft: node.visuallyRightToLeft,
+    borders:
+      compileTableBorders(node.borders)
+      ?? (node.bordered === false ? TableBorders.NONE : undefined),
+    width: compileColumnWidth(node.width) ?? {
+      size: 100,
+      type: WidthType.PERCENTAGE,
+    },
+  })
+}
+
+function compileTableBorders(config?: TableBordersConfig) {
+  if (!config) {
+    return undefined
+  }
+
+  return {
+    bottom: config.bottom ? compileBorderRule(config.bottom) : undefined,
+    left: config.left ? compileBorderRule(config.left) : undefined,
+    right: config.right ? compileBorderRule(config.right) : undefined,
+    top: config.top ? compileBorderRule(config.top) : undefined,
+    insideHorizontal: config.insideHorizontal
+      ? compileBorderRule(config.insideHorizontal)
+      : undefined,
+    insideVertical: config.insideVertical
+      ? compileBorderRule(config.insideVertical)
+      : undefined,
+  }
+}
+
+function compileTableFloat(config?: TableFloatingOptions) {
+  if (!config) {
+    return undefined
+  }
+
+  return {
+    absoluteHorizontalPosition: toTwip(config.x),
+    absoluteVerticalPosition: toTwip(config.y),
+    bottomFromText: toTwip(config.bottomFromText),
+    horizontalAnchor: config.horizontalAnchor,
+    leftFromText: toTwip(config.leftFromText),
+    relativeHorizontalPosition: config.relativeHorizontalPosition,
+    relativeVerticalPosition: config.relativeVerticalPosition,
+    rightFromText: toTwip(config.rightFromText),
+    topFromText: toTwip(config.topFromText),
+    verticalAnchor: config.verticalAnchor,
+    overlap:
+      config.overlap == null ? undefined : config.overlap ? 'overlap' : 'never',
+  } as const
+}
+
+function resolveTableCellStyle<
+  TData extends Record<string, unknown>,
+  TStyles extends StyleSheet,
+>(options: ResolveTableCellStyleOptions<TData, TStyles>) {
+  const { column, config, node, raw, row, rowIndex, tableStyle } = options
+  const tableCellStyle =
+    typeof node.cellStyle === 'function'
+      ? node.cellStyle(raw, row, rowIndex, column)
+      : node.cellStyle
+  const columnCellStyle =
+    typeof column.cellStyle === 'function'
+      ? column.cellStyle(raw, row, rowIndex, column)
+      : column.cellStyle
+  const hintedStyle = row[`_${column.key}_style` as string] as
+    DocxStyleRule | undefined
+
+  const withTableCellStyle = resolveStyle({
+    base: tableStyle,
+    inline: tableCellStyle,
+    styles: config.styles,
+    theme: config.theme,
+  })
+  const withColumnCellStyle = resolveStyle({
+    base: withTableCellStyle,
+    inline: columnCellStyle,
+    styles: config.styles,
+    theme: config.theme,
+  })
+
+  return resolveStyle({
+    base: withColumnCellStyle,
+    inline: hintedStyle,
+    styles: config.styles,
+    theme: config.theme,
   })
 }
