@@ -2,12 +2,14 @@
  * DocxBuilder — the primary fluent API for building Word documents.
  *
  * Chain method calls to add content, then export to Blob, Buffer,
- * or base64 string. Use the `docx-kit` umbrella package for filesystem save.
+ * or base64 string. Use the `docx-kit/node` entry for filesystem save.
  *
  * @module builder/DocxBuilder
  *
  * @example
  * ```ts
+ * import { createDocx } from 'docx-kit/node'
+ *
  * const doc = createDocx()
  * await doc
  *   .h1('Annual Report')
@@ -46,8 +48,9 @@ import type {
  * Fluent document builder.
  *
  * Use `createDocx()` to instantiate, then chain `.h1()`, `.p()`, `.table()`,
- * etc. to build content. Call `.save()`, `.toBlob()`, `.toBuffer()`, or
- * `.toBase64()` to export the document.
+ * etc. to build content. Cross-platform builders support `.toBlob()`,
+ * `.toBuffer()`, and `.toBase64()`. The `docx-kit/node` entry installs
+ * `.save()` for filesystem output.
  *
  * @template TStyles — Inferred stylesheet type from `config.styles`
  * @template TPlugins — Accumulated plugin registry (built via `.use()`)
@@ -59,11 +62,9 @@ export class DocxBuilder<
   /**
    * Save the document to a file (Node.js only).
    *
-   * **Not available in `@docxkit/core`.** Use `docx-kit` or
-   * `docx-kit/node` umbrella package, which injects this method
+   * **Not available in `@docxkit/core` or `docx-kit/browser`.**
+   * Import `createDocx` from `docx-kit/node`, which installs this method
    * with the Node.js filesystem implementation.
-   *
-   * @deprecated Use `saveDocument(doc.toDocument(), filename)` from `docx-kit/node`.
    */
   declare save?: (filename: string) => Promise<void>
   private readonly config: DocxKitConfig<TStyles>

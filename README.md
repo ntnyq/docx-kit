@@ -48,7 +48,7 @@ pnpm add docx-kit
 ## Quick Start
 
 ```ts
-import { createDocx, defineStyles } from 'docx-kit'
+import { createDocx, defineStyles } from 'docx-kit/node'
 
 const doc = createDocx({
   styles: defineStyles({
@@ -68,8 +68,8 @@ doc
     data: [{ name: 'Revenue', value: '$1.2M' }],
   })
 
-await doc.save('output.docx') // Node.js
-// const blob = await doc.toBlob()  // Browser
+await doc.save('output.docx') // Node.js entry
+// Browser: import from 'docx-kit' and use await doc.toBlob()
 ```
 
 ## Plugins

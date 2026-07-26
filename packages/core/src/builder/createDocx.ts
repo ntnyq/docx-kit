@@ -57,14 +57,17 @@ export interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
  * Create a new DocxBuilder with optional configuration.
  *
  * This is the primary entry point for the fluent builder API.
- * Chain `.h1()`, `.p()`, `.table()`, etc. and call `.save()`
- * or `.toBlob()` to export.
+ * Chain `.h1()`, `.p()`, `.table()`, etc. and use a cross-platform
+ * export method such as `.toBlob()`. The `docx-kit/node` entry installs
+ * `.save()` for filesystem output.
  *
  * @param config - — Document configuration (page, styles, metadata, theme, defaults)
  * @returns A new `DocxBuilder` instance
  *
  * @example
  * ```ts
+ * import { createDocx } from 'docx-kit/node'
+ *
  * const styles = defineStyles({
  *   title: { fontSize: 28, fontWeight: 'bold' },
  *   body:  { fontSize: 12, lineHeight: 1.5 },

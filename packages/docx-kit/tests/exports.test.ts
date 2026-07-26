@@ -49,6 +49,18 @@ describe('node.ts — platform exports', () => {
     expect(mod.saveDocument).toBeDefined()
     expect(mod.dataUrlToUint8Array).toBeDefined()
   })
+
+  it('installs save on fluent and JSON builders', async () => {
+    const mod = await import('../src/node')
+    const fluentBuilder = mod.createDocx().use({
+      name: 'test',
+      render: () => [],
+    })
+    const jsonBuilder = await mod.renderDocx({ content: [] })
+
+    expect(typeof fluentBuilder.save).toBe('function')
+    expect(typeof jsonBuilder.save).toBe('function')
+  })
 })
 
 describe('browser.ts — platform exports', () => {
@@ -71,6 +83,7 @@ describe('dist exports — published package smoke tests', () => {
     const mod = await import('../dist/node.js')
     expect(mod.saveDocument).toBeDefined()
     expect(mod.letterheadPlugin).toBeDefined()
+    expect(typeof mod.createDocx().save).toBe('function')
   })
 
   it.each([

@@ -114,7 +114,10 @@ try {
   )
   writeFileSync(
     join(temporaryRoot, 'smoke.mjs'),
-    `const expectedExports = [
+    `import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+
+const expectedExports = [
   ['docx-kit', 'createDocx'],
   ['docx-kit/ai', 'buildPrompt'],
   ['docx-kit/browser', 'createDocx'],
@@ -133,6 +136,19 @@ for (const [specifier, exportName] of expectedExports) {
     throw new Error(\`Missing export \${exportName} from \${specifier}\`)
   }
 }
+
+const nodeModule = await import('docx-kit/node')
+const outputPath = join(import.meta.dirname, 'consumer-smoke.docx')
+await nodeModule
+  .createDocx()
+  .h1('Packed consumer smoke test')
+  .p('Node.js save adapter is available.')
+  .save(outputPath)
+
+const output = await readFile(outputPath)
+if (output.length < 4 || output[0] !== 0x50 || output[1] !== 0x4b) {
+  throw new Error('Node.js save adapter did not produce a DOCX ZIP archive')
+}
 `,
   )
   writeFileSync(
@@ -142,7 +158,10 @@ import { createDocx } from 'docx-kit'
 import { loadUrlPlugin } from 'docx-kit/loader/browser'
 import { loadNpmPlugin } from 'docx-kit/loader/node'
 import { TOOL_DEFINITIONS } from 'docx-kit/mcp'
-import { saveDocument } from 'docx-kit/node'
+import {
+  createDocx as createNodeDocx,
+  saveDocument,
+} from 'docx-kit/node'
 import { createPluginTestContext } from 'docx-kit/pdk'
 import { createPluginRegistry } from 'docx-kit/registry'
 
@@ -156,6 +175,8 @@ void [
   saveDocument,
   TOOL_DEFINITIONS,
 ]
+
+void createNodeDocx().save('consumer-smoke.docx')
 `,
   )
 

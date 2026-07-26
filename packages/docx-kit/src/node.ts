@@ -8,6 +8,10 @@
  */
 
 // ---------- Core ----------
+import {
+  createDocx as createCoreDocx,
+  renderDocx as renderCoreDocx,
+} from '@docxkit/core'
 // ---------- Style Presets ----------
 import { academicPreset } from '@docxkit/preset-academic'
 import { classicPreset } from '@docxkit/preset-classic'
@@ -16,13 +20,69 @@ import { modernPreset } from '@docxkit/preset-modern'
 import { minimalTheme } from '@docxkit/theme-minimal'
 import { oceanTheme } from '@docxkit/theme-ocean'
 import { warmTheme } from '@docxkit/theme-warm'
+import { saveDocument } from './node/index'
 // Plugin type map augmentation (must be imported before any code that uses DocxBuilder)
 import './types/plugin-map'
-import type { DocxPreset, DocxTheme } from '@docxkit/core'
+import type {
+  BuiltinPluginMap,
+  DocxBuilder,
+  DocxKitConfig,
+  DocxPlugin,
+  DocxPreset,
+  DocxSchema,
+  DocxTheme,
+  PluginRegistry,
+  StyleSheet,
+} from '@docxkit/core'
 
 export * from '@docxkit/core'
 
+/**
+ * A {@link DocxBuilder} with the Node.js filesystem save adapter installed.
+ */
+export interface NodeDocxBuilder<
+  TStyles extends StyleSheet = StyleSheet,
+  TPlugins extends PluginRegistry = BuiltinPluginMap & PluginRegistry,
+> extends DocxBuilder<TStyles, TPlugins> {
+  /** Save the generated document to the local filesystem. */
+  save: (filename: string) => Promise<void>
+  use: <TName extends string, TOptions, TRender>(
+    plugin: DocxPlugin<TName, TOptions, TRender>,
+  ) => NodeDocxBuilder<TStyles, Record<TName, TOptions> & TPlugins>
+}
+
+/**
+ * Create a fluent document builder with Node.js filesystem saving enabled.
+ */
+export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
+  config: DocxKitConfig<TStyles> = {},
+): NodeDocxBuilder<TStyles> {
+  return attachNodeSave(createCoreDocx(config)) as NodeDocxBuilder<TStyles>
+}
+
+/**
+ * Render a JSON document schema with Node.js filesystem saving enabled.
+ */
+export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
+  schema: DocxSchema<TStyles>,
+): Promise<NodeDocxBuilder<TStyles>> {
+  return attachNodeSave(await renderCoreDocx(schema))
+}
+
+function attachNodeSave<
+  TStyles extends StyleSheet,
+  TPlugins extends PluginRegistry,
+>(builder: DocxBuilder<TStyles, TPlugins>): NodeDocxBuilder<TStyles, TPlugins> {
+  const nodeBuilder = builder as NodeDocxBuilder<TStyles, TPlugins>
+  nodeBuilder.save = async filename => {
+    await saveDocument(await nodeBuilder.toDocument(), filename)
+  }
+  return nodeBuilder
+}
+
 export { tocPlugin } from '@docxkit/plugin-toc'
+// ---------- Node.js–specific APIs ----------
+export { dataUrlToUint8Array } from './node/index'
 // ---------- Built-in plugins (except echarts — browser only) ----------
 export { badgePlugin } from '@docxkit/plugin-badge'
 export { qrcodePlugin } from '@docxkit/plugin-qrcode'
@@ -37,8 +97,7 @@ export { coverPagePlugin } from '@docxkit/plugin-cover-page'
 export { dataTablePlugin } from '@docxkit/plugin-data-table'
 export { letterheadPlugin } from '@docxkit/plugin-letterhead'
 export { pageNumberPlugin } from '@docxkit/plugin-page-number'
-// ---------- Node.js–specific APIs ----------
-export { dataUrlToUint8Array, saveDocument } from './node/index'
+export { saveDocument }
 export { propertyTablePlugin } from '@docxkit/plugin-property-table'
 export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
 
