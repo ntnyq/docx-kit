@@ -5,7 +5,7 @@ export const COMPREHENSIVE_CODE = unindent(`
   import { Paragraph, TextRun, BorderStyle, AlignmentType } from 'docx'
 
   // ─── Custom Plugin: Section Divider ───────────────────────────────────
-  const dividerPlugin = definePlugin<'divider', { label?: string; color?: string }>({
+  const sectionDividerPlugin = definePlugin<'divider', { label?: string; color?: string }>({
     name: 'divider',
     async render(opts) {
       const color = opts.color || '888888'
@@ -28,15 +28,23 @@ export const COMPREHENSIVE_CODE = unindent(`
     async render(opts) {
       return [
         new Paragraph({
-          text: \`ℹ \${opts.title}\`,
-          bold: true,
+          children: [
+            new TextRun({
+              text: \`ℹ \${opts.title}\`,
+              bold: true,
+            }),
+          ],
           spacing: { before: 200, after: 80 },
         }),
         new Paragraph({
-          text: opts.body,
+          children: [
+            new TextRun({
+              text: opts.body,
+              italics: true,
+            }),
+          ],
           spacing: { before: 0, after: 200 },
           indent: { left: 360 },
-          italics: true,
         }),
       ]
     },
@@ -53,7 +61,7 @@ export const COMPREHENSIVE_CODE = unindent(`
   })
 
   /** Register custom plugins */
-  doc.use(dividerPlugin()).use(infoBoxPlugin)
+  doc.use(sectionDividerPlugin).use(infoBoxPlugin)
 
   // ═══════════════════════════════════════════════════════════════════════
   // SECTION 1 — Overview (A4 Portrait)

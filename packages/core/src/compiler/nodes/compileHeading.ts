@@ -23,7 +23,10 @@ export function compileHeading<TStyles extends StyleSheet>(
   node: HeadingNode<TStyles>,
   config: DocxKitConfig<TStyles>,
 ) {
-  const className = node.className ?? `h${node.level}`
+  const defaultClassName = `h${node.level}`
+  const className =
+    node.className
+    ?? (config.styles?.[defaultClassName] ? defaultClassName : undefined)
   const style = resolveStyle({
     className,
     inline: node.style,

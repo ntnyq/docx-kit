@@ -42,6 +42,16 @@ describe('compileNode — heading', () => {
     expect(result).toBeDefined()
   })
 
+  it('allows an omitted semantic heading class in a partial stylesheet', async () => {
+    const result = await compileNode(
+      makeCtx({
+        config: { styles: { accent: { color: '#ff0000' } } },
+        node: { level: 1, text: 'Title', type: 'heading' },
+      }),
+    )
+    expect(result).toBeDefined()
+  })
+
   it('compiles heading with custom className', async () => {
     const result = await compileNode(
       makeCtx({
@@ -97,6 +107,16 @@ describe('compileNode — paragraph', () => {
           text: 'Styled',
           type: 'paragraph',
         },
+      }),
+    )
+    expect(result).toBeDefined()
+  })
+
+  it('allows an omitted semantic paragraph class in a partial stylesheet', async () => {
+    const result = await compileNode(
+      makeCtx({
+        config: { styles: { caption: { color: '#888888' } } },
+        node: { text: 'Body', type: 'paragraph' },
       }),
     )
     expect(result).toBeDefined()

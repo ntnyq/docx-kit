@@ -18,9 +18,10 @@ export async function compileParagraph<TStyles extends StyleSheet>(
   config: DocxKitConfig<TStyles>,
   session?: CompilationSession,
 ) {
+  const className = node.className ?? (config.styles?.p ? 'p' : undefined)
   const style = resolveStyle({
     base: config.defaults?.paragraph,
-    className: node.className ?? 'p',
+    className,
     inline: node.style,
     styles: config.styles,
     theme: config.theme,

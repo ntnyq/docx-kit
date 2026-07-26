@@ -1,34 +1,4 @@
-import * as docx from 'docx'
-import {
-  badgePlugin as _badgePlugin,
-  barcodePlugin as _barcodePlugin,
-  calloutPlugin as _calloutPlugin,
-  changelogPlugin as _changelogPlugin,
-  codeBlockPlugin as _codeBlockPlugin,
-  coverPagePlugin as _coverPagePlugin,
-  createDocx as _createDocx,
-  dataTablePlugin as _dataTablePlugin,
-  dividerPlugin as _dividerPlugin,
-  echartsPlugin as _echartsPlugin,
-  inlineImg as _inlineImg,
-  invoicePlugin as _invoicePlugin,
-  letterheadPlugin as _letterheadPlugin,
-  meetingMinutesPlugin as _meetingMinutesPlugin,
-  pageNumberPlugin as _pageNumberPlugin,
-  propertyTablePlugin as _propertyTablePlugin,
-  qrcodePlugin as _qrcodePlugin,
-  signatureBlockPlugin as _signatureBlockPlugin,
-  span as _span,
-  timelinePlugin as _timelinePlugin,
-  tocPlugin as _tocPlugin,
-  useTheme as _useTheme,
-  watermarkPlugin as _watermarkPlugin,
-  definePlugin,
-  defineStyles,
-  DocxBuilder,
-  PRESET_LIST,
-  renderDocx,
-} from 'docx-kit'
+import { createDocx as _createDocx, PRESET_LIST } from 'docx-kit'
 import { saveAs } from 'tinysaver'
 import { useData } from 'vitepress'
 import {
@@ -40,7 +10,7 @@ import {
   watch,
 } from 'vue'
 import { DEFAULT_CODE, PRESETS } from '../constants/templates'
-import { DOCX_KIT_TYPES, prepareCode } from '../utils'
+import { DOCX_KIT_TYPE_LIBS, executePlaygroundCode } from '../utils'
 import type { DocxKitConfig, DocxPreset } from 'docx-kit'
 import type * as Monaco from 'monaco-editor'
 import type { Preset } from '../constants/templates'
@@ -108,10 +78,12 @@ export function useDocxPlayground() {
 
       // Feed Monaco the docx-kit type declarations so `import { … } from 'docx-kit'`
       // resolves without errors.
-      monaco.typescript.typescriptDefaults.addExtraLib(
-        DOCX_KIT_TYPES,
-        'file:///node_modules/docx-kit/index.d.ts',
-      )
+      for (const typeLib of DOCX_KIT_TYPE_LIBS) {
+        monaco.typescript.typescriptDefaults.addExtraLib(
+          typeLib.content,
+          typeLib.filePath,
+        )
+      }
 
       // Relax compiler options for a smoother playground experience.
       monaco.typescript.typescriptDefaults.setCompilerOptions({
@@ -119,6 +91,7 @@ export function useDocxPlayground() {
         moduleResolution: monaco.typescript.ModuleResolutionKind.NodeJs,
         noUnusedLocals: false,
         noUnusedParameters: false,
+        skipLibCheck: true,
         strict: false,
         target: monaco.typescript.ScriptTarget.ESNext,
       })
@@ -229,71 +202,9 @@ export function useDocxPlayground() {
         code.value = editorInstance.getValue()
       }
 
-      const source = prepareCode(code.value)
-
-      // eslint-disable-next-line no-new-func -- sandboxed evaluation is the point of a code playground
-      const fn = new Function(
-        'DocxBuilder',
-        'defineStyles',
-        'definePlugin',
-        'createDocx',
-        'renderDocx',
-        'useTheme',
-        'span',
-        'inlineImg',
-        'badgePlugin',
-        'barcodePlugin',
-        'calloutPlugin',
-        'changelogPlugin',
-        'codeBlockPlugin',
-        'coverPagePlugin',
-        'dataTablePlugin',
-        'dividerPlugin',
-        'echartsPlugin',
-        'invoicePlugin',
-        'letterheadPlugin',
-        'meetingMinutesPlugin',
-        'pageNumberPlugin',
-        'propertyTablePlugin',
-        'qrcodePlugin',
-        'signatureBlockPlugin',
-        'timelinePlugin',
-        'tocPlugin',
-        'watermarkPlugin',
-        'docx',
-        source,
-      )
-
-      const result = await fn(
-        DocxBuilder,
-        defineStyles,
-        definePlugin,
-        createDocxWrapped,
-        renderDocx,
-        _useTheme,
-        _span,
-        _inlineImg,
-        _badgePlugin,
-        _barcodePlugin,
-        _calloutPlugin,
-        _changelogPlugin,
-        _codeBlockPlugin,
-        _coverPagePlugin,
-        _dataTablePlugin,
-        _dividerPlugin,
-        _echartsPlugin,
-        _invoicePlugin,
-        _letterheadPlugin,
-        _meetingMinutesPlugin,
-        _pageNumberPlugin,
-        _propertyTablePlugin,
-        _qrcodePlugin,
-        _signatureBlockPlugin,
-        _timelinePlugin,
-        _tocPlugin,
-        _watermarkPlugin,
-        docx,
-      )
+      const result = await executePlaygroundCode(code.value, {
+        createDocx: createDocxWrapped,
+      })
 
       if (result instanceof Blob) {
         resultBlob.value = result

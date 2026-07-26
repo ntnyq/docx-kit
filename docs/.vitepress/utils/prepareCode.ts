@@ -4,34 +4,25 @@ import { transform } from 'sucrase'
  * Transform user-written TypeScript code into executable JavaScript.
  *
  * Pipeline:
- * 1. `import { X } from 'docx'` → `const { X } = docx` (injected namespace)
- * 2. `import { X } from 'docx-kit'` → stripped (injected as individual args)
+ * 1. Named `docx` imports → destructuring from the injected `docx` namespace
+ * 2. Named `docx-kit` imports → destructuring from the injected `docxKit` namespace
  * 3. Remaining `import` lines → stripped
  * 4. TypeScript→JavaScript via sucrase (strips generics, type annotations, etc.)
  * 5. Last expression auto-wrapped with `return` if needed
  * 6. Wrapped in `"use strict"; return (async () => { … })()`
  */
 export function prepareCode(raw: string): string {
-  // Step 1: Transform docx imports → destructuring from injected 'docx' namespace.
-  //    import { Paragraph, BorderStyle } from 'docx'
-  //    →  const { Paragraph, BorderStyle } = docx
-  let body = raw.replace(
-    /^import\s+\{([^}]+)\}\s+from\s+['"]docx['"]\s*;?/gm,
-    (_match, names: string) =>
-      `const { ${names
-        .split(',')
-        .map(s => s.trim())
-        .join(', ')} } = docx`,
-  )
+  let body = replaceNamedImports(raw, 'docx', 'docx')
 
-  // Step 2: Strip docx-kit imports (they're injected as individual args).
+  body = replaceNamedImports(body, 'docx-kit', 'docxKit')
+
+  // Step 3: Strip unsupported imports after the two runtime namespaces have
+  // been mapped. The first pattern handles multiline named/type imports.
   body = body.replace(
-    /^import\s+\{[^}]+\}\s+from\s+['"]docx-kit['"]\s*;?/gm,
+    /^[\t ]*import\s+(?:type\s+)?\{[^}]*\}\s+from\s+['"][^'"]+['"][\t ]*;?/gm,
     '',
   )
-
-  // Step 3: Strip any remaining import / import type statements.
-  body = body.replace(/^import\s+(?:\S.*)?$/gm, '')
+  body = body.replace(/^[\t ]*import[^\n]*$/gm, '')
 
   // Step 4: Transpile TypeScript → JavaScript via sucrase.
   //    Strips generics, type annotations, enum declarations, etc.
@@ -71,4 +62,36 @@ export function prepareCode(raw: string): string {
 return (async () => {
 ${source}
 })()`
+}
+
+/**
+ * Replace named ESM imports with destructuring from an injected namespace.
+ *
+ * Type-only specifiers are omitted, and aliases are translated from
+ * `source as local` to object-destructuring syntax (`source: local`).
+ */
+function replaceNamedImports(
+  source: string,
+  moduleName: string,
+  namespaceName: string,
+): string {
+  const escapedModuleName = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const importPattern = new RegExp(
+    `^[\\t ]*import\\s+\\{([^}]+)\\}\\s+from\\s+['"]${escapedModuleName}['"][\\t ]*;?`,
+    'gm',
+  )
+
+  return source.replace(importPattern, (_match, names: string) => {
+    const runtimeNames = names
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name.length > 0 && !name.startsWith('type '))
+      .map(name => name.replace(/\s+as\s+/, ': '))
+
+    if (runtimeNames.length === 0) {
+      return ''
+    }
+
+    return `const { ${runtimeNames.join(', ')} } = ${namespaceName};`
+  })
 }
