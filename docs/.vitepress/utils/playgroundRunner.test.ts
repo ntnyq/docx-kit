@@ -1,5 +1,5 @@
 import * as docxKit from 'docx-kit'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { COMPREHENSIVE_CODE, RICH_CONTENT_CODE } from '../constants/templates'
 import { executePlaygroundCode } from './playgroundRunner'
 import { prepareCode } from './prepareCode'
@@ -59,6 +59,26 @@ describe('playground runtime', () => {
     expect(source).toContain('const { Paragraph: DocxParagraph } = docx;')
     expect(source).not.toContain('DocxKitConfig')
     expect(source).not.toContain('external-package')
+  })
+
+  it('transforms createDocx configuration through runtime overrides', async () => {
+    const transformConfig = vi.fn(config => config)
+
+    await expect(
+      executePlaygroundCode(
+        `
+          import { createDocx } from 'docx-kit'
+
+          const doc = createDocx({ metadata: { title: 'Lazy runtime' } })
+          doc.toBlob()
+        `,
+        { transformConfig },
+      ),
+    ).resolves.toBeInstanceOf(Blob)
+
+    expect(transformConfig).toHaveBeenCalledWith({
+      metadata: { title: 'Lazy runtime' },
+    })
   })
 
   it('runs the custom-plugin comprehensive preset', async () => {

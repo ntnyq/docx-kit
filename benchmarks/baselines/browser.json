@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-07-26T17:20:34.500Z",
+  "runsPerScenario": 3,
+  "scenarios": [
+    {
+      "durationMedianMs": 9.100000023841858,
+      "durationSamplesMs": [
+        38.60000002384186, 9.100000023841858, 7.699999988079071
+      ],
+      "outputMedianBytes": 9144,
+      "scenario": "paragraphs-100",
+      "heapDeltaMaxBytes": 8794160
+    },
+    {
+      "durationMedianMs": 27.69999998807907,
+      "durationSamplesMs": [
+        30.80000001192093, 26.900000035762787, 27.69999998807907
+      ],
+      "outputMedianBytes": 12447,
+      "scenario": "paragraphs-1000",
+      "heapDeltaMaxBytes": 16319106
+    },
+    {
+      "durationMedianMs": 224.39999997615814,
+      "durationSamplesMs": [
+        228.39999997615814, 212.10000002384186, 224.39999997615814
+      ],
+      "outputMedianBytes": 43939,
+      "scenario": "paragraphs-10000",
+      "heapDeltaMaxBytes": 80867727
+    },
+    {
+      "durationMedianMs": 176.19999998807907,
+      "durationSamplesMs": [179.10000002384186, 176.19999998807907, 175],
+      "outputMedianBytes": 35310,
+      "scenario": "table-1000-rows",
+      "heapDeltaMaxBytes": 54025400
+    },
+    {
+      "durationMedianMs": 13.899999976158142,
+      "durationSamplesMs": [
+        15.900000035762787, 13.899999976158142, 12.699999988079071
+      ],
+      "outputMedianBytes": 11011,
+      "scenario": "images-100",
+      "heapDeltaMaxBytes": 0
+    },
+    {
+      "durationMedianMs": 19.399999976158142,
+      "durationSamplesMs": [20.700000047683716, 19.399999976158142, 17.5],
+      "outputMedianBytes": 12518,
+      "scenario": "plugins-500",
+      "heapDeltaMaxBytes": 22884659
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36"
+}

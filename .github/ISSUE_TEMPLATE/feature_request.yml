@@ -1,0 +1,52 @@
+name: Feature request
+description: Propose a focused capability or API improvement.
+title: 'feat: '
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What workflow or user need is currently difficult?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Show the desired API or document behavior when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe current workarounds or related upstream docx APIs.
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Likely scope
+      options:
+        - Core builder/compiler
+        - New or existing plugin
+        - Loader/registry
+        - Browser renderer
+        - Documentation/playground
+        - Packaging/tooling
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility requirements
+      description: Note required Node/browser and Microsoft Word/LibreOffice behavior.
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to help implement or test this feature.

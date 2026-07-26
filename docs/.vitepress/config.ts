@@ -118,8 +118,16 @@ export default defineConfig({
   },
 
   vite: {
+    build: {
+      // Large Monaco/runtime chunks are lazy and have targeted budgets in
+      // scripts/check-doc-bundle.mjs.
+      chunkSizeWarningLimit: 7 * 1024,
+    },
     optimizeDeps: {
-      include: ['monaco-editor'],
+      include: [
+        'monaco-editor/editor/editor.api',
+        'monaco-editor/languages/features/typescript/register',
+      ],
     },
     worker: {
       format: 'es',

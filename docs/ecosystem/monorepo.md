@@ -50,27 +50,27 @@ docx-kit/
 
 ## Workspace Package Map
 
-| Scope | Count | Notes |
-| --- | --- | --- |
-| `packages/` | 10 | Runtime, tooling, AI, renderer, and shared types |
-| `packages-plugins/` | 19 | Every built-in plugin has its own package, tests, and README |
-| `packages-presets/` | 3 | Style presets for common document families |
-| `packages-themes/` | 3 | Token-based themes for color systems |
+| Scope               | Count | Notes                                                        |
+| ------------------- | ----- | ------------------------------------------------------------ |
+| `packages/`         | 10    | Runtime, tooling, AI, renderer, and shared types             |
+| `packages-plugins/` | 19    | Every built-in plugin has its own package, tests, and README |
+| `packages-presets/` | 3     | Style presets for common document families                   |
+| `packages-themes/`  | 3     | Token-based themes for color systems                         |
 
 ## What Lives In `packages/`
 
-| Package | Role |
-| --- | --- |
-| `docx-kit` | Umbrella package that re-exports the public surface |
-| `@docxkit/core` | Builder, compiler, style system, plugin contracts |
-| `@docxkit/loader` | Dynamic plugin loading from multiple sources |
-| `@docxkit/pdk` | Plugin development and test helpers |
-| `@docxkit/registry` | Plugin discovery over npm |
-| `@docxkit/ai` | Templates, schema guidance, and prompt building |
-| `@docxkit/mcp` | MCP server for AI-agent integration |
-| `@docxkit/create-plugin` | Plugin scaffolding CLI |
-| `@docxkit/renderer` | Browser-side `.docx` preview |
-| `@docxkit/types` | Shared document, style, plugin, and utility types |
+| Package                  | Role                                                |
+| ------------------------ | --------------------------------------------------- |
+| `docx-kit`               | Umbrella package that re-exports the public surface |
+| `@docxkit/core`          | Builder, compiler, style system, plugin contracts   |
+| `@docxkit/loader`        | Dynamic plugin loading from multiple sources        |
+| `@docxkit/pdk`           | Plugin development and test helpers                 |
+| `@docxkit/registry`      | Plugin discovery over npm                           |
+| `@docxkit/ai`            | Templates, schema guidance, and prompt building     |
+| `@docxkit/mcp`           | MCP server for AI-agent integration                 |
+| `@docxkit/create-plugin` | Plugin scaffolding CLI                              |
+| `@docxkit/renderer`      | Browser-side `.docx` preview                        |
+| `@docxkit/types`         | Shared document, style, plugin, and utility types   |
 
 The [Package Catalog](/ecosystem/packages) page expands each package with usage guidance.
 
@@ -94,23 +94,34 @@ That separation is important because plugins can have different peer dependencie
 
 ## Contributor Workflow
 
+Use the current Node.js LTS resolved by `.node-version` and the pnpm version
+pinned in the root `packageManager` field. Enable Corepack before the first
+install. The complete review and compatibility policy lives in the [repository
+contribution
+guide](https://github.com/ntnyq/docx-kit/blob/main/CONTRIBUTING.md).
+
 Run these commands from the repository root:
 
 ```sh
+corepack enable
+corepack install
 pnpm install --frozen-lockfile
-pnpm run lint
-pnpm run typecheck
-pnpm run test
-pnpm run build
+pnpm run release:verify
 ```
 
-Useful package-local commands:
+Useful focused commands:
 
 ```sh
-cd packages/core && pnpm run build
-cd packages-plugins/echarts && pnpm exec tsc --noEmit
-cd packages/core && pnpm run test
+pnpm exec vitest run packages/core/tests/compiler/ooxml-contracts.test.ts
+pnpm exec vitest run tests/e2e/plugin-lifecycle.test.ts
+pnpm run visual:check
+pnpm run bench:node
+pnpm run bench:browser
 ```
+
+Visual and performance working output is written under ignored `tmp/` and
+`output/` directories. Commit visual or benchmark baselines only after
+reviewing an intentional change.
 
 ## Documentation Expectations
 

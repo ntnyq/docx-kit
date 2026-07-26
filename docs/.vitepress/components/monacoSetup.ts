@@ -4,14 +4,11 @@
  * avoid SSR issues — Monaco references `window` and imports CSS.
  */
 
-// ─── Vite ?worker type declarations ────────────────────────────────────
 // ─── Imports ────────────────────────────────────────────────────────────
-import * as monaco from 'monaco-editor'
+import * as monaco from 'monaco-editor/editor/editor.api'
 import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
-import CSSWorker from 'monaco-editor/language/css/css.worker?worker'
-import HTMLWorker from 'monaco-editor/language/html/html.worker?worker'
-import JSONWorker from 'monaco-editor/language/json/json.worker?worker'
 import TSWorker from 'monaco-editor/language/typescript/ts.worker?worker'
+import * as typescript from 'monaco-editor/languages/features/typescript/register'
 
 const globalSelf = globalThis as {
   MonacoEnvironment?: {
@@ -23,23 +20,13 @@ const globalSelf = globalThis as {
 globalSelf.MonacoEnvironment = {
   getWorker(_workerId: string, label: string): Worker {
     switch (label) {
-      case 'css':
-      case 'less':
-      case 'scss':
-        return new CSSWorker()
-      case 'handlebars':
-      case 'html':
-      case 'razor':
-        return new HTMLWorker()
       case 'javascript':
       case 'typescript':
         return new TSWorker()
-      case 'json':
-        return new JSONWorker()
       default:
         return new EditorWorker()
     }
   },
 }
 
-export { monaco }
+export { monaco, typescript }

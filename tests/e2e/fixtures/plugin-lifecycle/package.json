@@ -1,0 +1,11 @@
+{
+  "name": "docx-kit-plugin-lifecycle-fixture",
+  "type": "module",
+  "version": "1.0.0",
+  "keywords": [
+    "docx-kit-plugin",
+    "typescript",
+    "vitest"
+  ],
+  "private": true
+}

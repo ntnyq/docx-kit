@@ -1,0 +1,12 @@
+{
+  "docxKit": "^0.4.0",
+  "main": "./dist/index.js",
+  "name": "docx-kit-plugin-lifecycle-fixture",
+  "plugin": {
+    "description": "Build-to-render lifecycle fixture",
+    "license": "MIT",
+    "name": "lifecycle-banner"
+  },
+  "types": "./dist/index.d.ts",
+  "version": "1.0.0"
+}

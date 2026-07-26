@@ -45,8 +45,13 @@ export async function loadLocalPlugin(
   try {
     // Dynamic import works for both Node.js (file:// URLs)
     // and browser (same-origin paths). The caller is responsible
-    // for providing a valid absolute path or URL.
-    mod = (await import(path)) as DocxPlugin | { default?: unknown }
+    // for providing a valid absolute path or URL. Bundlers must preserve
+    // this runtime-resolved specifier instead of trying to analyze it.
+    mod = (await import(/* @vite-ignore */ path)) as
+      | DocxPlugin
+      | {
+          default?: unknown
+        }
   } catch (error) {
     throw new DocxKitError(
       'PLUGIN_LOAD_FAILED',

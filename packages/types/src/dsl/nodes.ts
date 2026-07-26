@@ -593,7 +593,7 @@ export interface TableNode<
 }
 
 /**
- * A legacy Word text box positioned as a block-level shape.
+ * A Word text box positioned as a block-level DrawingML shape.
  */
 export interface TextBoxNode<
   TStyles extends StyleSheet = StyleSheet,

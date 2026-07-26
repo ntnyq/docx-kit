@@ -1,0 +1,86 @@
+name: Bug report
+description: Report a reproducible defect in docx-kit.
+title: 'fix: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Remove private document content and secrets before attaching files.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Core builder/compiler
+        - Plugin
+        - Loader/registry
+        - Browser renderer
+        - Documentation/playground
+        - Packaging/tooling
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: docx-kit version
+      placeholder: 0.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Node.js or browser version, operating system, package manager, and Word/LibreOffice version when relevant.
+      placeholder: |
+        Node.js:
+        Browser:
+        OS:
+        pnpm/npm/yarn:
+        Microsoft Word or LibreOffice:
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link a repository or provide the smallest code/schema that reproduces the issue.
+      render: ts
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include errors, logs, screenshots, or sanitized DOCX/PDF output.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I reproduced this with the latest docx-kit release.
+          required: true
+        - label: I removed secrets and personal document content.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

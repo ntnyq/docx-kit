@@ -78,6 +78,12 @@ await doc.save('output.docx') // Node.js entry
 
 → [Plugin Documentation](https://docx-kit.ntnyq.dev/plugins/)
 
+## Contributing and Security
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the toolchain, test matrix, visual
+regression, and performance workflow. Report suspected vulnerabilities
+privately by following [SECURITY.md](./SECURITY.md).
+
 ## License
 
 [MIT](./LICENSE) © 2025-PRESENT [ntnyq](https://github.com/ntnyq)

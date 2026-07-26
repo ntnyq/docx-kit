@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-07-26T17:19:20.120Z",
+  "runsPerScenario": 3,
+  "scenarios": [
+    {
+      "durationMedianMs": 27.84750000000001,
+      "durationSamplesMs": [28.658958, 27.84750000000001, 27.150542],
+      "outputMedianBytes": 9148,
+      "peakRssMaxBytes": 82280448,
+      "scenario": "paragraphs-100",
+      "peakRssDeltaMaxBytes": 12976128
+    },
+    {
+      "durationMedianMs": 63.144791,
+      "durationSamplesMs": [63.144791, 63.70975, 62.900417000000004],
+      "outputMedianBytes": 12450,
+      "peakRssMaxBytes": 113410048,
+      "scenario": "paragraphs-1000",
+      "peakRssDeltaMaxBytes": 42565632
+    },
+    {
+      "durationMedianMs": 323.030666,
+      "durationSamplesMs": [360.02079200000003, 314.199417, 323.030666],
+      "outputMedianBytes": 43942,
+      "peakRssMaxBytes": 330924032,
+      "scenario": "paragraphs-10000",
+      "peakRssDeltaMaxBytes": 261275648
+    },
+    {
+      "durationMedianMs": 278.08975,
+      "durationSamplesMs": [282.09387499999997, 278.08975, 271.702041],
+      "outputMedianBytes": 35313,
+      "peakRssMaxBytes": 295501824,
+      "scenario": "table-1000-rows",
+      "peakRssDeltaMaxBytes": 225443840
+    },
+    {
+      "durationMedianMs": 46.178042000000005,
+      "durationSamplesMs": [
+        46.26958400000001, 46.178042000000005, 45.44250000000001
+      ],
+      "outputMedianBytes": 11014,
+      "peakRssMaxBytes": 87621632,
+      "scenario": "images-100",
+      "peakRssDeltaMaxBytes": 16908288
+    },
+    {
+      "durationMedianMs": 53.04025,
+      "durationSamplesMs": [54.22316599999999, 53.04025, 52.317125000000004],
+      "outputMedianBytes": 12521,
+      "peakRssMaxBytes": 99008512,
+      "scenario": "plugins-500",
+      "peakRssDeltaMaxBytes": 28442624
+    }
+  ],
+  "machine": {
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "node": "v24.16.0",
+    "platform": "darwin",
+    "release": "24.6.0"
+  }
+}

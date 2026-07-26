@@ -272,9 +272,9 @@ describe('compiler OOXML contracts', () => {
         text: 'Text box',
         type: 'textBox',
         box: {
-          height: '40pt',
+          height: 40,
           position: 'absolute',
-          width: '120pt',
+          width: 120,
         },
       },
       { type: 'thematicBreak' },
@@ -290,8 +290,11 @@ describe('compiler OOXML contracts', () => {
     expect(documentXml).toContain('<m:f>')
     expect(documentXml).toContain('<w:ins w:id="7"')
     expect(documentXml).toContain('<w:del w:id="8"')
-    expect(documentXml).toContain('<w:txbxContent>')
+    expect(documentXml).toContain('<wps:txbx>')
+    expect(documentXml).toContain('<w:txbxContent><w:p>')
+    expect(documentXml).toContain('cx="1524000" cy="508000"')
     expect(documentXml).toContain('Text box')
+    expect(documentXml).not.toContain('undefined')
     expect(documentXml).toContain('<w:pBdr>')
     expect(settingsXml).toContain('<w:trackRevisions/>')
   })

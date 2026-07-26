@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { createDocxPreview } from 'docx-kit'
-import { nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import {
+  nextTick,
+  onBeforeUnmount,
+  shallowRef,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import { useDocxPlayground } from '../composables/useDocxPlayground'
-import type { DocxPreview } from 'docx-kit'
+import type { DocxPreview } from '@docxkit/renderer'
 
 const {
   activePreset,
@@ -24,20 +29,27 @@ const {
 // ---------- Preview renderer ----------
 const previewContainer = useTemplateRef<HTMLElement>('previewContainer')
 let previewInstance: DocxPreview | null = null
-const previewLoading = ref(false)
-const previewError = ref('')
+const previewLoading = shallowRef(false)
+const previewError = shallowRef('')
 
 // Re-render preview when resultBlob changes.
 // Use flush: 'post' so the watcher runs AFTER Vue has updated the DOM,
 // ensuring previewContainer.value is set when the v-else-if branch activates.
 watch(
   resultBlob,
-  async blob => {
-    // Clean up previous instance.
-    if (previewInstance) {
-      previewInstance.destroy()
-      previewInstance = null
-    }
+  async (blob, _previousBlob, onCleanup) => {
+    let instance: DocxPreview | null = null
+    let stale = false
+
+    onCleanup(() => {
+      stale = true
+      instance?.destroy()
+      if (previewInstance === instance) {
+        previewInstance = null
+      }
+    })
+
+    previewLoading.value = false
     previewError.value = ''
 
     if (!blob) {
@@ -54,17 +66,27 @@ watch(
 
     previewLoading.value = true
     try {
-      previewInstance = createDocxPreview(previewContainer.value, {
+      const { createDocxPreview } = await import('@docxkit/renderer')
+      if (stale || !previewContainer.value) {
+        return
+      }
+
+      instance = createDocxPreview(previewContainer.value, {
         // Custom className avoids colliding with global `.docx` styles.
         // The rendered DOM will use `.docxkit-preview-wrapper` and
         // `section.docxkit-preview`.
         className: 'docxkit-preview',
       })
-      await previewInstance.render(blob)
+      previewInstance = instance
+      await instance.render(blob)
     } catch (error_) {
-      previewError.value = String(error_)
+      if (!stale) {
+        previewError.value = String(error_)
+      }
     } finally {
-      previewLoading.value = false
+      if (!stale) {
+        previewLoading.value = false
+      }
     }
   },
   { flush: 'post' },

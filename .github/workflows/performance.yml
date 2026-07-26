@@ -1,0 +1,30 @@
+name: Performance
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run bench:node
+      - run: pnpm run bench:browser
+      - uses: actions/upload-artifact@v7
+        with:
+          name: performance-${{ github.run_id }}
+          path: output/performance/
+          retention-days: 30

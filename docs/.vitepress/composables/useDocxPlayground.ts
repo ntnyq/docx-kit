@@ -1,19 +1,20 @@
-import { createDocx as _createDocx, PRESET_LIST } from 'docx-kit'
+import { academicPreset } from '@docxkit/preset-academic'
+import { classicPreset } from '@docxkit/preset-classic'
+import { modernPreset } from '@docxkit/preset-modern'
 import { saveAs } from 'tinysaver'
 import { useData } from 'vitepress'
-import {
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  shallowRef,
-  watch,
-} from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
 import { DEFAULT_CODE, PRESETS } from '../constants/templates'
-import { DOCX_KIT_TYPE_LIBS, executePlaygroundCode } from '../utils'
+import { executePlaygroundCode } from '../utils'
 import type { DocxKitConfig, DocxPreset } from 'docx-kit'
-import type * as Monaco from 'monaco-editor'
+import type * as Monaco from 'monaco-editor/editor/editor.api'
 import type { Preset } from '../constants/templates'
+
+const STYLE_PRESETS: readonly DocxPreset[] = [
+  classicPreset,
+  modernPreset,
+  academicPreset,
+]
 
 /**
  * Core reactive state and logic for the DocxPlayground.
@@ -33,33 +34,21 @@ export function useDocxPlayground() {
   // -------------------------------------------------------------------------
   // Reactive state
   // -------------------------------------------------------------------------
-  const code = ref(DEFAULT_CODE)
-  const activePreset = ref(PRESETS[0].label)
-  const loading = ref(false)
-  const error = ref('')
+  const code = shallowRef(DEFAULT_CODE)
+  const activePreset = shallowRef(PRESETS[0].label)
+  const loading = shallowRef(false)
+  const error = shallowRef('')
   const resultBlob = shallowRef<Blob | null>(null)
-  const editorContainer = ref<HTMLElement | null>(null)
-  const editorError = ref('')
+  const editorContainer = shallowRef<HTMLElement | null>(null)
+  const editorError = shallowRef('')
 
   // Style preset state: null = no preset (raw defaults)
-  const activeStylePreset = ref<DocxPreset | null>(null)
+  const activeStylePreset = shallowRef<DocxPreset | null>(null)
 
   let editorInstance: Monaco.editor.IStandaloneCodeEditor | null = null
   let modelInstance: Monaco.editor.ITextModel | null = null
   let monacoRef: typeof Monaco | null = null
   let isInternalChange = false
-
-  // -------------------------------------------------------------------------
-  // Wrapped createDocx — merges selected style preset automatically
-  // -------------------------------------------------------------------------
-  function createDocxWrapped(config: DocxKitConfig = {}) {
-    if (activeStylePreset.value) {
-      return _createDocx(
-        mergeWithPreset(activeStylePreset.value.config, config),
-      )
-    }
-    return _createDocx(config)
-  }
 
   // -------------------------------------------------------------------------
   // Monaco editor initialisation
@@ -73,27 +62,31 @@ export function useDocxPlayground() {
     }
 
     try {
-      const { monaco } = await import('../components/monacoSetup')
+      const [{ monaco, typescript }, { DOCX_KIT_TYPE_LIBS }] =
+        await Promise.all([
+          import('../components/monacoSetup'),
+          import('../utils/monacoTypes'),
+        ])
       monacoRef = monaco
 
       // Feed Monaco the docx-kit type declarations so `import { … } from 'docx-kit'`
       // resolves without errors.
       for (const typeLib of DOCX_KIT_TYPE_LIBS) {
-        monaco.typescript.typescriptDefaults.addExtraLib(
+        typescript.typescriptDefaults.addExtraLib(
           typeLib.content,
           typeLib.filePath,
         )
       }
 
       // Relax compiler options for a smoother playground experience.
-      monaco.typescript.typescriptDefaults.setCompilerOptions({
-        module: monaco.typescript.ModuleKind.ESNext,
-        moduleResolution: monaco.typescript.ModuleResolutionKind.NodeJs,
+      typescript.typescriptDefaults.setCompilerOptions({
+        module: typescript.ModuleKind.ESNext,
+        moduleResolution: typescript.ModuleResolutionKind.NodeJs,
         noUnusedLocals: false,
         noUnusedParameters: false,
         skipLibCheck: true,
         strict: false,
-        target: monaco.typescript.ScriptTarget.ESNext,
+        target: typescript.ScriptTarget.ESNext,
       })
 
       // Reuse existing model if present (e.g. after page re-visit in VitePress
@@ -202,9 +195,16 @@ export function useDocxPlayground() {
         code.value = editorInstance.getValue()
       }
 
-      const result = await executePlaygroundCode(code.value, {
-        createDocx: createDocxWrapped,
-      })
+      const selectedPreset = activeStylePreset.value
+      const result = await executePlaygroundCode(
+        code.value,
+        selectedPreset
+          ? {
+              transformConfig: config =>
+                mergeWithPreset(selectedPreset.config, config),
+            }
+          : undefined,
+      )
 
       if (result instanceof Blob) {
         resultBlob.value = result
@@ -261,7 +261,7 @@ export function useDocxPlayground() {
     resultBlob,
     run,
     selectStylePreset,
-    stylePresets: PRESET_LIST,
+    stylePresets: STYLE_PRESETS,
   }
 }
 

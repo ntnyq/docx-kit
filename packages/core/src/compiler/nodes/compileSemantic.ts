@@ -24,12 +24,14 @@ import {
   MathSum,
   MathSuperScript,
   Paragraph,
-  Textbox,
   TextRun,
+  TextWrappingSide,
+  TextWrappingType,
+  WpsShapeRun,
 } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
-import { toTwip } from '../units'
+import { toPx } from '../units'
 import { compileInlineNodes } from './compileInline'
 import type {
   BookmarkNode,
@@ -46,13 +48,8 @@ import type {
   ThematicBreakNode,
   UnitValue,
 } from '@docxkit/types'
-import type { MathComponent, ParagraphChild } from 'docx'
+import type { IFloating, MathComponent, ParagraphChild } from 'docx'
 import type { CompilationSession } from '../numbers'
-
-type TextBoxShapeStyle = NonNullable<
-  ConstructorParameters<typeof Textbox>[0]['style']
->
-type VmlLength = TextBoxShapeStyle['width']
 
 /** Compile a bookmark as an inline paragraph child. */
 export function compileBookmark<TStyles extends StyleSheet>(
@@ -172,7 +169,7 @@ export function compileRevision<TStyles extends StyleSheet>(
   })
 }
 
-/** Compile a block-level legacy Word text box. */
+/** Compile a block-level DrawingML Word text box. */
 export async function compileTextBox<TStyles extends StyleSheet>(
   node: TextBoxNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -194,19 +191,26 @@ export async function compileTextBox<TStyles extends StyleSheet>(
           }),
         ]
 
-  const textBoxStyle: TextBoxShapeStyle = {
-    height: toVmlLength(node.box.height),
-    left: toVmlLength(node.box.left),
-    position: node.box.position,
-    top: toVmlLength(node.box.top),
-    width: toVmlLength(node.box.width)!,
-    wrapStyle: node.box.wrap,
-  }
-
-  return new Textbox({
+  const content = new Paragraph({
     ...compileParagraphStyle(style),
     children,
-    style: textBoxStyle,
+  })
+  const shape = new WpsShapeRun({
+    bodyProperties: {},
+    children: [content],
+    floating: compileTextBoxFloating(node.box),
+    type: 'wps',
+    transformation: {
+      // DrawingML shapes require an explicit height. Preserve the optional
+      // public API with a one-line default when no height is supplied.
+      height: toTextBoxPx(node.box.height) ?? 48,
+      width: toTextBoxPx(node.box.width) ?? 0,
+    },
+  })
+
+  return new Paragraph({
+    ...compileParagraphStyle(style),
+    children: [shape],
   })
 }
 
@@ -331,31 +335,41 @@ function compileStyledText<TStyles extends StyleSheet>(
   })
 }
 
-function toVmlLength(value?: UnitValue): VmlLength | undefined {
-  if (value == null) {
+function compileTextBoxFloating(
+  box: TextBoxNode['box'],
+): IFloating | undefined {
+  const isFloating =
+    box.position === 'absolute'
+    || box.position === 'relative'
+    || box.left != null
+    || box.top != null
+
+  if (!isFloating) {
     return undefined
   }
-  if (typeof value === 'number') {
-    return `${value}pt`
+
+  return {
+    horizontalPosition: { offset: toEmu(box.left) ?? 0 },
+    verticalPosition: { offset: toEmu(box.top) ?? 0 },
+    wrap: box.wrap
+      ? {
+          side: TextWrappingSide.BOTH_SIDES,
+          type:
+            box.wrap === 'square'
+              ? TextWrappingType.SQUARE
+              : TextWrappingType.NONE,
+        }
+      : undefined,
   }
-  const numericValue = Number(value.replace(/(?:%|cm|in|mm|pt|px)$/, ''))
-  if (value.endsWith('%')) {
-    return `${numericValue}%`
-  }
-  if (value.endsWith('cm')) {
-    return `${numericValue}cm`
-  }
-  if (value.endsWith('in')) {
-    return `${numericValue}in`
-  }
-  if (value.endsWith('mm')) {
-    return `${numericValue}mm`
-  }
-  if (value.endsWith('pt')) {
-    return `${numericValue}pt`
-  }
-  if (value.endsWith('px')) {
-    return `${(toTwip(value) ?? 0) / 20}pt`
-  }
-  return undefined
+}
+
+function toEmu(value: UnitValue | undefined): number | undefined {
+  const pixels = toTextBoxPx(value)
+  return pixels === undefined ? undefined : Math.round(pixels * 9525)
+}
+
+function toTextBoxPx(value: UnitValue | undefined): number | undefined {
+  // Text-box lengths historically interpret bare numbers as points, while
+  // the shared image conversion interprets them as pixels.
+  return typeof value === 'number' ? (value * 96) / 72 : toPx(value)
 }
