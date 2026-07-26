@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/theme-ocean",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Ocean-inspired color theme — docx-kit theme",
   "keywords": [
     "docx",

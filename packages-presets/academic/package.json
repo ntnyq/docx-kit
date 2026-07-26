@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/preset-academic",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Formal thesis/paper style (Times New Roman) — docx-kit style preset",
   "keywords": [
     "docx",

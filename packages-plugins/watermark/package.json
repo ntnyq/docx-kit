@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/plugin-watermark",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Text watermark — docx-kit plugin",
   "keywords": [
     "docx",
