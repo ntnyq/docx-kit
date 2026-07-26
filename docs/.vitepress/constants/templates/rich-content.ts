@@ -13,7 +13,8 @@ export const RICH_CONTENT_CODE = unindent(`
 
   // 1. Styles
   const styles = defineStyles({
-    body: { fontSize: 12, lineHeight: 1.6 },
+    h1: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
+    p: { fontSize: 12, lineHeight: 1.6 },
     caption: {
       fontSize: 10,
       color: '#888',
