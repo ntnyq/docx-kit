@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import { createDocxPreview } from 'docx-kit'
-import {
-  nextTick,
-  onBeforeUnmount,
-  ref,
-  shallowRef,
-  useTemplateRef,
-  watch,
-} from 'vue'
+import { nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import { useDocxPlayground } from '../composables/useDocxPlayground'
-import ThemeStudio from './theme-studio/ThemeStudio.vue'
 import type { DocxPreview } from 'docx-kit'
-
-const activeMode = shallowRef<'code' | 'theme'>('code')
 
 const {
   activePreset,
@@ -90,31 +80,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="playground-shell">
-    <div class="mode-switch">
-      <button
-        @click="activeMode = 'code'"
-        :class="{ active: activeMode === 'code' }"
-        class="mode-switch-btn"
-        type="button"
-      >
-        Code Lab
-      </button>
-      <button
-        @click="activeMode = 'theme'"
-        :class="{ active: activeMode === 'theme' }"
-        class="mode-switch-btn"
-        type="button"
-      >
-        Theme Studio
-      </button>
-    </div>
-
-    <ThemeStudio v-if="activeMode === 'theme'" />
-
-    <div
-      v-else
-      class="playground-container"
-    >
+    <div class="playground-container">
       <div class="editor-panel">
         <div class="panel-header">
           <span class="panel-title">Code Editor</span>
@@ -263,47 +229,15 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .playground-shell {
-  display: grid;
-  gap: 14px;
-}
-
-.mode-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  padding: 6px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 999px;
-  background: var(--vp-c-bg-soft);
-}
-
-.mode-switch-btn {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--vp-c-text-2);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-}
-
-.mode-switch-btn.active {
-  background: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
+  min-height: calc(100vh - var(--vp-nav-height));
 }
 
 .playground-container {
   display: flex;
   gap: 0;
-  height: calc(100vh - 120px);
+  height: calc(100vh - var(--vp-nav-height));
   min-height: 500px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 8px;
+  border-top: 1px solid var(--vp-c-divider);
   overflow: hidden;
 }
 

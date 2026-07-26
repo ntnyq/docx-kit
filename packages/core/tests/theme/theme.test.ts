@@ -78,10 +78,35 @@ describe('resolveThemeTokens', () => {
     })
   })
 
+  it('resolves tokens inside nested border rules', () => {
+    const rule: DocxStyleRule = {
+      border: {
+        color: '$colors.primary',
+        style: 'single',
+        width: '$spacing.sm',
+      },
+      borderBottom: {
+        color: '$colors.muted',
+      },
+    }
+    const resolved = resolveThemeTokens(rule, theme)
+
+    expect(resolved.border).toEqual({
+      color: '#1a56db',
+      style: 'single',
+      width: 8,
+    })
+    expect(resolved.borderBottom).toEqual({ color: '#6b7280' })
+  })
+
   it('does not mutate the input rule', () => {
-    const rule: DocxStyleRule = { color: '$colors.primary' }
+    const rule: DocxStyleRule = {
+      border: { color: '$colors.primary' },
+      color: '$colors.primary',
+    }
     resolveThemeTokens(rule, theme)
     expect(rule.color).toBe('$colors.primary')
+    expect(rule.border?.color).toBe('$colors.primary')
   })
 })
 

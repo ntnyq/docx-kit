@@ -36,6 +36,7 @@ export const englishNav: LinkItem[] = [
   { link: '/plugins/', text: 'Plugins' },
   { link: '/examples/basic-report', text: 'Examples' },
   { link: '/playground', text: 'Playground' },
+  { link: '/theme-studio', text: 'Theme Studio' },
 ]
 
 export const simplifiedNav: LinkItem[] = [
@@ -44,6 +45,7 @@ export const simplifiedNav: LinkItem[] = [
   { link: '/ecosystem/packages', text: '包总览' },
   { link: '/plugins/', text: '插件' },
   { link: '/playground', text: 'Playground' },
+  { link: '/theme-studio', text: 'Theme Studio' },
 ]
 
 export const traditionalNav: LinkItem[] = [
@@ -52,6 +54,7 @@ export const traditionalNav: LinkItem[] = [
   { link: '/ecosystem/packages', text: '套件總覽' },
   { link: '/plugins/', text: '外掛' },
   { link: '/playground', text: 'Playground' },
+  { link: '/theme-studio', text: 'Theme Studio' },
 ]
 
 export const apiLinks: LinkItem[] = [
@@ -68,6 +71,7 @@ export const ecosystemLinks: LinkItem[] = [
   { link: '/ecosystem/packages', text: 'Package Catalog' },
   { link: '/ecosystem/creating-plugins', text: 'Creating Plugins' },
   { link: '/playground', text: 'Online Playground' },
+  { link: '/theme-studio', text: 'Theme Studio' },
 ]
 
 export const exampleLinks: LinkItem[] = [

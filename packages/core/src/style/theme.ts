@@ -30,19 +30,16 @@ export function resolveThemeTokens(
     return rule
   }
 
-  const resolved: Record<string, unknown> = { ...rule }
+  return resolveTokenValue(rule, theme) as DocxStyleRule
+}
 
-  for (const key of Object.keys(rule)) {
-    const value = (rule as Record<string, unknown>)[key]
-    if (typeof value === 'string' && value.startsWith('$')) {
-      const resolvedValue = resolveSingleToken(value, theme)
-      if (resolvedValue !== undefined) {
-        resolved[key] = resolvedValue
-      }
-    }
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== 'object') {
+    return false
   }
 
-  return resolved as DocxStyleRule
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === null || prototype === Object.prototype
 }
 
 /** Parse `$category.key` and look up the value in the theme. */
@@ -59,4 +56,30 @@ function resolveSingleToken(token: string, theme: DocxTheme): unknown {
     return (map as Record<string, unknown>)[key]
   }
   return undefined
+}
+
+/**
+ * Recursively resolve tokens in nested style values such as borders and tab
+ * stops. Style rules are plain data, but the prototype check keeps opaque
+ * class instances in the `docx` escape hatch untouched.
+ */
+function resolveTokenValue(value: unknown, theme: DocxTheme): unknown {
+  if (typeof value === 'string' && value.startsWith('$')) {
+    return resolveSingleToken(value, theme) ?? value
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(item => resolveTokenValue(item, theme))
+  }
+
+  if (isPlainObject(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        resolveTokenValue(item, theme),
+      ]),
+    )
+  }
+
+  return value
 }

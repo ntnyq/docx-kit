@@ -34,30 +34,51 @@ function emitTokenUpdate(key: string, value: string) {
     value,
   })
 }
+
+function toColorInputValue(value: number | string) {
+  const color = String(value)
+  return /^#[\da-f]{6}$/i.test(color) ? color : '#000000'
+}
 </script>
 
 <template>
   <section class="token-group">
     <header class="token-header">
-      <div>
-        <p class="token-eyebrow">{{ category }}</p>
-        <h3 class="token-title">{{ title }}</h3>
-      </div>
+      <h3 class="token-title">{{ title }}</h3>
       <p class="token-description">{{ description }}</p>
     </header>
 
     <div class="token-list">
-      <label
+      <div
         v-for="[key, value] in orderedTokens"
         :key
         class="token-row"
       >
-        <span class="token-key">{{ key }}</span>
-        <span
+        <label
+          :for="`${category}-${key}`"
+          class="token-key"
+        >
+          {{ key }}
+        </label>
+        <input
+          @input="
+            emitTokenUpdate(key, ($event.target as HTMLInputElement).value)
+          "
           v-if="category === 'colors'"
-          :style="{ backgroundColor: String(value) }"
-          class="token-swatch"
+          :aria-label="`Choose ${key} color`"
+          :value="toColorInputValue(value)"
+          class="token-color"
+          type="color"
         />
+        <span
+          v-else
+          aria-hidden="true"
+          class="token-unit"
+        >
+          {{
+            category === 'fontSize' ? 'pt' : category === 'spacing' ? 'u' : 'Aa'
+          }}
+        </span>
         <input
           @input="
             emitTokenUpdate(key, ($event.target as HTMLInputElement).value)
@@ -67,102 +88,106 @@ function emitTokenUpdate(key: string, value: string) {
               ? 'decimal'
               : 'text'
           "
-          :type="category === 'colors' ? 'text' : 'text'"
           :value="String(value)"
+          :id="`${category}-${key}`"
+          autocomplete="off"
           class="token-input"
+          spellcheck="false"
+          type="text"
         />
-      </label>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
 .token-group {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  gap: 14px;
 }
 
 .token-header {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.token-eyebrow {
-  margin: 0;
-  color: var(--vp-c-text-3);
-  font-family: var(--vp-font-family-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  display: grid;
+  gap: 3px;
 }
 
 .token-title {
   margin: 0;
   color: var(--vp-c-text-1);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 650;
 }
 
 .token-description {
   margin: 0;
-  color: var(--vp-c-text-2);
-  font-size: 13px;
-  line-height: 1.5;
+  color: var(--vp-c-text-3);
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .token-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .token-row {
   display: grid;
-  grid-template-columns: minmax(88px, 116px) 16px minmax(0, 1fr);
+  grid-template-columns: minmax(72px, 92px) 26px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .token-key {
+  overflow: hidden;
   color: var(--vp-c-text-2);
   font-family: var(--vp-font-family-mono);
-  font-size: 12px;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.token-swatch {
-  width: 16px;
-  height: 16px;
-  border: 1px solid color-mix(in srgb, var(--vp-c-text-1) 16%, transparent);
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+.token-color {
+  width: 26px;
+  height: 26px;
+  padding: 2px;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 5px;
+  background: var(--vp-c-bg);
+  cursor: pointer;
+}
+
+.token-color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.token-color::-webkit-color-swatch {
+  border: 0;
+  border-radius: 2px;
+}
+
+.token-unit {
+  color: var(--vp-c-text-3);
+  font-family: var(--vp-font-family-mono);
+  font-size: 9px;
+  text-align: center;
 }
 
 .token-input {
   width: 100%;
   min-width: 0;
-  padding: 9px 11px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--vp-c-bg) 92%, white);
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 5px;
+  background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
   font-family: var(--vp-font-family-mono);
-  font-size: 12px;
+  font-size: 10px;
 }
 
-.token-input:focus {
-  outline: none;
-  border-color: var(--vp-c-brand-1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vp-c-brand-1) 18%, transparent);
-}
-
-@media (max-width: 640px) {
-  .token-row {
-    grid-template-columns: 1fr;
-  }
-
-  .token-swatch {
-    display: none;
-  }
+.token-color:focus-visible,
+.token-input:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
 }
 </style>

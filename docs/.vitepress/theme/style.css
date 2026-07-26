@@ -6,3 +6,13 @@
     grid-template-columns: repeat(3, 1fr) !important;
   }
 }
+
+.page-playground .VPContent,
+.page-theme-studio .VPContent {
+  padding: 0;
+}
+
+.page-playground .VPContent .VPPage,
+.page-theme-studio .VPContent .VPPage {
+  min-height: calc(100vh - var(--vp-nav-height));
+}
