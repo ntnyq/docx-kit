@@ -50,6 +50,18 @@ const dataUrl = 'data:image/png;base64,iVBORw0K...'
 doc.image({ data: dataUrl, width: 200, height: 200 })
 ```
 
+## Local Image Paths
+
+Local paths and `file:` URLs are also accepted by the Node entry point:
+
+```ts
+import { createDocx } from 'docx-kit/node'
+
+const doc = createDocx().image({ data: './logo.png', width: 200 })
+```
+
+Paths resolve when exporting, relative to the process working directory. The core/browser entry does not read local files or fetch image URLs automatically. Supply bytes/data URLs, or configure `resolveImage(source)` to return bytes or a Blob from an application-controlled source.
+
 ## Sizing
 
 Images can be sized with absolute values. Omit one dimension to preserve the

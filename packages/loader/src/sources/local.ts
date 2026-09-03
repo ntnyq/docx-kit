@@ -12,7 +12,7 @@
  */
 
 import { DocxKitError } from '@docxkit/core'
-import { isDocxPlugin } from '../utils'
+import { resolvePluginExport } from '../utils'
 import { resolveManifest } from './options'
 
 import type { DocxPlugin } from '@docxkit/core'
@@ -60,19 +60,10 @@ export async function loadLocalPlugin(
     )
   }
 
-  // Extract the plugin
-  const exported = mod as { default?: unknown }
-  const plugin = exported.default ?? mod
-
-  if (!isDocxPlugin(plugin)) {
-    throw new DocxKitError(
-      'PLUGIN_LOAD_FAILED',
-      `Module loaded from "${path}" does not export a valid DocxPlugin`,
-    )
-  }
+  const plugin = await resolvePluginExport(mod, path, manifest?.plugin.name)
 
   return {
     manifest,
-    plugin: plugin as DocxPlugin,
+    plugin,
   }
 }

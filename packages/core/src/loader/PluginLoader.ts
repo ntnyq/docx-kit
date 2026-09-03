@@ -9,7 +9,7 @@
  */
 
 import { DocxKitError } from '@docxkit/types'
-import { satisfies, valid, validRange } from 'semver'
+import { isValid, isValidRange, satisfies } from 'verkit'
 import { validateManifest } from './manifest'
 import type { DocxPlugin, MaybePromise } from '@docxkit/types'
 import type { PluginManifest } from './manifest'
@@ -21,13 +21,19 @@ export type { PluginManifest } from './manifest'
  * Options for creating a {@link PluginLoader} instance.
  */
 export interface PluginLoaderOptions {
-  /** Current docx-kit version for compatibility checking. */
+  /**
+   * Current docx-kit version for compatibility checking.
+   */
   kitVersion?: string
 
-  /** Custom security policy hooks. */
+  /**
+   * Custom security policy hooks.
+   */
   security?: PluginSecurityPolicy
 
-  /** Validate manifests before loading (default: `true`). */
+  /**
+   * Validate manifests before loading (default: `true`).
+   */
   validateManifest?: boolean
 }
 
@@ -45,13 +51,19 @@ export interface PluginLoadResult<
   TOptions = unknown,
   TRender = unknown,
 > {
-  /** Resolved manifest (`null` for inline sources). */
+  /**
+   * Resolved manifest (`null` for inline sources).
+   */
   manifest: PluginManifest | null
 
-  /** The loaded plugin instance. */
+  /**
+   * The loaded plugin instance.
+   */
   plugin: DocxPlugin<TName, TOptions, TRender>
 
-  /** The source used to load this plugin. */
+  /**
+   * The source used to load this plugin.
+   */
   source: PluginSource
 }
 
@@ -270,8 +282,8 @@ export class PluginLoader {
     const kitVersion = this.options.kitVersion
 
     if (
-      !valid(kitVersion)
-      || !validRange(range)
+      !isValid(kitVersion)
+      || !isValidRange(range)
       || !satisfies(kitVersion, range)
     ) {
       throw new DocxKitError(

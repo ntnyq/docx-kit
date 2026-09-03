@@ -10,13 +10,19 @@
 import { createPreviewError, PREVIEW_ERROR_CODES } from './errors'
 import type { DocxInput } from './types'
 
-/** Standard DOCX MIME type. */
+/**
+ * Standard DOCX MIME type.
+ */
 export const DOCX_MIME =
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 
-/** Result of normalizing a {@link DocxInput} to a Blob. */
+/**
+ * Result of normalizing a {@link DocxInput} to a Blob.
+ */
 export interface NormalizedDocx {
-  /** The DOCX data as a Blob. */
+  /**
+   * The DOCX data as a Blob.
+   */
   blob: Blob
 }
 

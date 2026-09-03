@@ -16,15 +16,23 @@ import type { HexColor, LiteralUnion, StyleToken, UnitValue } from './utility'
  * Follows the CSS `border` shorthand convention (style, width, color).
  */
 export interface BorderRule {
-  /** Border color (e.g. `"#333"`, named color, or theme token like `"$colors.primary"`). */
+  /**
+   * Border color (e.g. `"#333"`, named color, or theme token like `"$colors.primary"`).
+   */
   color?: HexColor | StyleToken<string>
-  /** Line style. */
+  /**
+   * Line style.
+   */
   style?: BorderStyle
-  /** Line width (bare number treated as pt). */
+  /**
+   * Line width (bare number treated as pt).
+   */
   width?: UnitValue
 }
 
-/** Available border line styles. */
+/**
+ * Available border line styles.
+ */
 export type BorderStyle = 'dashed' | 'dotted' | 'double' | 'none' | 'single'
 
 /**
@@ -33,31 +41,57 @@ export type BorderStyle = 'dashed' | 'dotted' | 'double' | 'none' | 'single'
  * Used by {@link compileCellStyle} for `TableCell` construction.
  */
 export interface CellStyleRule {
-  /** Background / shading color (hex, named, or theme token like `"$colors.info"`). */
+  /**
+   * Background / shading color (hex, named, or theme token like `"$colors.info"`).
+   */
   backgroundColor?: HexColor | StyleToken<string>
-  /** Shorthand border for all four sides. */
+  /**
+   * Shorthand border for all four sides.
+   */
   border?: BorderRule
-  /** Bottom border override. */
+  /**
+   * Bottom border override.
+   */
   borderBottom?: BorderRule
-  /** Left border override. */
+  /**
+   * Left border override.
+   */
   borderLeft?: BorderRule
-  /** Right border override. */
+  /**
+   * Right border override.
+   */
   borderRight?: BorderRule
-  /** Top border override. */
+  /**
+   * Top border override.
+   */
   borderTop?: BorderRule
-  /** Element height. */
+  /**
+   * Element height.
+   */
   height?: UnitValue
-  /** Bottom margin (cell padding). */
+  /**
+   * Bottom margin (cell padding).
+   */
   marginBottom?: UnitValue
-  /** Left margin (cell padding). */
+  /**
+   * Left margin (cell padding).
+   */
   marginLeft?: UnitValue
-  /** Right margin (cell padding). */
+  /**
+   * Right margin (cell padding).
+   */
   marginRight?: UnitValue
-  /** Top margin (cell padding). */
+  /**
+   * Top margin (cell padding).
+   */
   marginTop?: UnitValue
-  /** Vertical alignment (mostly for table cells). */
+  /**
+   * Vertical alignment (mostly for table cells).
+   */
   verticalAlign?: VerticalAlign
-  /** Element width. */
+  /**
+   * Element width.
+   */
   width?: UnitValue
   /**
    * CSS-like margin shorthand (used as cell padding).
@@ -88,7 +122,9 @@ export interface DocxStyleRule
 export type FontWeight =
   'bold' | 'normal' | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
 
-/** Text highlight / marker colors (matches Word highlight palette). */
+/**
+ * Text highlight / marker colors (matches Word highlight palette).
+ */
 export type HighlightColor =
   | 'black'
   | 'blue'
@@ -115,43 +151,79 @@ export type HighlightColor =
  */
 export interface ParagraphStyleRule {
   // ---- border ----
-  /** Shorthand border for all four sides. */
+  /**
+   * Shorthand border for all four sides.
+   */
   border?: BorderRule
-  /** Bottom border override. */
+  /**
+   * Bottom border override.
+   */
   borderBottom?: BorderRule
-  /** Left border override. */
+  /**
+   * Left border override.
+   */
   borderLeft?: BorderRule
-  /** Right border override. */
+  /**
+   * Right border override.
+   */
   borderRight?: BorderRule
-  /** Top border override. */
+  /**
+   * Top border override.
+   */
   borderTop?: BorderRule
 
   // ---- paragraph flow ----
-  /** Keep lines together on same page. */
+  /**
+   * Keep lines together on same page.
+   */
   keepLines?: boolean
-  /** Keep this paragraph with the next one. */
+  /**
+   * Keep this paragraph with the next one.
+   */
   keepNext?: boolean
-  /** Line height multiplier or explicit unit value. */
+  /**
+   * Line height multiplier or explicit unit value.
+   */
   lineHeight?: number | UnitValue
-  /** Bottom margin. */
+  /**
+   * Bottom margin.
+   */
   marginBottom?: UnitValue
-  /** Left margin. */
+  /**
+   * Left margin.
+   */
   marginLeft?: UnitValue
-  /** Right margin. */
+  /**
+   * Right margin.
+   */
   marginRight?: UnitValue
-  /** Top margin. */
+  /**
+   * Top margin.
+   */
   marginTop?: UnitValue
-  /** Outline level used by Word navigation and table-of-contents fields (0–9). */
+  /**
+   * Outline level used by Word navigation and table-of-contents fields (0–9).
+   */
   outlineLevel?: number
-  /** Force page break before this paragraph. */
+  /**
+   * Force page break before this paragraph.
+   */
   pageBreakBefore?: boolean
-  /** Custom tab stops for this paragraph. */
+  /**
+   * Custom tab stops for this paragraph.
+   */
   tabStops?: TabStopRule[]
-  /** Horizontal text alignment. */
+  /**
+   * Horizontal text alignment.
+   */
   textAlign?: TextAlign
-  /** First-line indent. */
+  /**
+   * First-line indent.
+   */
   textIndent?: UnitValue
-  /** Prevent isolated first or last lines across page boundaries. */
+  /**
+   * Prevent isolated first or last lines across page boundaries.
+   */
   widowControl?: boolean
   /**
    * CSS-like margin shorthand.
@@ -196,17 +268,27 @@ export type StyleSheet = Record<string, StyleSheetEntry>
  * ```
  */
 export interface StyleSheetEntry extends DocxStyleRule {
-  /** Inherit style properties from one or more other style classes. */
+  /**
+   * Inherit style properties from one or more other style classes.
+   */
   extends?: string | string[]
 }
 
-/** A paragraph tab stop. */
+/**
+ * A paragraph tab stop.
+ */
 export interface TabStopRule {
-  /** Position from the paragraph's left edge. */
+  /**
+   * Position from the paragraph's left edge.
+   */
   position: UnitValue
-  /** Optional leader characters before the tab stop. */
+  /**
+   * Optional leader characters before the tab stop.
+   */
   leader?: 'dot' | 'hyphen' | 'middleDot' | 'none' | 'underscore'
-  /** Tab alignment. */
+  /**
+   * Tab alignment.
+   */
   type:
     | 'bar'
     | 'center'
@@ -219,7 +301,9 @@ export interface TabStopRule {
     | 'start'
 }
 
-/** Horizontal text alignment. */
+/**
+ * Horizontal text alignment.
+ */
 export type TextAlign = 'center' | 'justify' | 'left' | 'right'
 
 /**
@@ -234,64 +318,102 @@ export type TextAlign = 'center' | 'justify' | 'left' | 'right'
  * When `italic: true` is set, it is equivalent to `fontStyle: 'italic'`.
  */
 export interface TextStyleRule {
-  /** Force text to uppercase (small caps-like). */
+  /**
+   * Force text to uppercase (small caps-like).
+   */
   allCaps?: boolean
-  /** Background / shading color (hex, named, or theme token like `"$colors.info"`). */
+  /**
+   * Background / shading color (hex, named, or theme token like `"$colors.info"`).
+   */
   backgroundColor?: HexColor | StyleToken<string>
   /**
    * Convenience boolean: `true` maps to `fontWeight: 'bold'`.
    * Takes precedence over `fontWeight` when both are set.
    */
   bold?: boolean
-  /** Raw OOXML character spacing in twips. Prefer `letterSpacing` for CSS units. */
+  /**
+   * Raw OOXML character spacing in twips. Prefer `letterSpacing` for CSS units.
+   */
   characterSpacing?: number
-  /** Text / foreground color (hex, named, or theme token like `"$colors.primary"`). */
+  /**
+   * Text / foreground color (hex, named, or theme token like `"$colors.primary"`).
+   */
   color?: HexColor | StyleToken<string>
   /**
    * Direct passthrough to the underlying `docx` library constructor options.
    * Use for properties not yet covered by the CSS-like mapping.
    */
   docx?: Record<string, unknown>
-  /** Double strikethrough toggle. */
+  /**
+   * Double strikethrough toggle.
+   */
   doubleStrike?: boolean
-  /** Embossed text effect. */
+  /**
+   * Embossed text effect.
+   */
   emboss?: boolean
   /**
    * Font family name (e.g. `"Arial"`, or theme token like `"$fonts.heading"`).
    */
   fontFamily?: StyleToken<LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>>
-  /** Font size (bare number = pt). */
+  /**
+   * Font size (bare number = pt).
+   */
   fontSize?: UnitValue
-  /** Italic toggle (canonical form). Use `italic?: boolean` for convenience. */
+  /**
+   * Italic toggle (canonical form). Use `italic?: boolean` for convenience.
+   */
   fontStyle?: 'italic' | 'normal'
-  /** Font weight: keyword `"bold"` / `"normal"` or numeric 100–900. */
+  /**
+   * Font weight: keyword `"bold"` / `"normal"` or numeric 100–900.
+   */
   fontWeight?: FontWeight
-  /** Text highlight color (background marker). */
+  /**
+   * Text highlight color (background marker).
+   */
   highlight?: HighlightColor
-  /** Imprinted (engraved) text effect. */
+  /**
+   * Imprinted (engraved) text effect.
+   */
   imprint?: boolean
   /**
    * Convenience boolean: `true` maps to `fontStyle: 'italic'`.
    * Takes precedence over `fontStyle` when both are set.
    */
   italic?: boolean
-  /** CSS-like character spacing with unit conversion. */
+  /**
+   * CSS-like character spacing with unit conversion.
+   */
   letterSpacing?: UnitValue
-  /** Right-to-left run direction. */
+  /**
+   * Right-to-left run direction.
+   */
   rightToLeft?: boolean
-  /** Small caps text variant. */
+  /**
+   * Small caps text variant.
+   */
   smallCaps?: boolean
-  /** Strikethrough toggle. */
+  /**
+   * Strikethrough toggle.
+   */
   strike?: boolean
-  /** Sub-script text. */
+  /**
+   * Sub-script text.
+   */
   subScript?: boolean
-  /** Super-script text. */
+  /**
+   * Super-script text.
+   */
   superScript?: boolean
-  /** Underline style. */
+  /**
+   * Underline style.
+   */
   underline?: 'double' | 'single' | boolean
 }
 
-/** Vertical alignment (for table cells). */
+/**
+ * Vertical alignment (for table cells).
+ */
 export type VerticalAlign = 'bottom' | 'middle' | 'top'
 
 /**

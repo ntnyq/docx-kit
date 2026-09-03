@@ -15,31 +15,57 @@ import type {
 } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
 
-/** Invoice template parameters. */
+/**
+ * Invoice template parameters.
+ */
 export interface InvoiceParams {
-  /** Client name. */
+  /**
+   * Client name.
+   */
   clientName: string
-  /** Invoice number. */
+  /**
+   * Invoice number.
+   */
   invoiceNumber: string
-  /** Issuer company name. */
+  /**
+   * Issuer company name.
+   */
   issuerName: string
-  /** Client address. */
+  /**
+   * Client address.
+   */
   clientAddress?: string
-  /** Invoice due date. */
+  /**
+   * Invoice due date.
+   */
   dueDate?: string
-  /** Invoice issue date. */
+  /**
+   * Invoice issue date.
+   */
   issueDate?: string
-  /** Issuer company address. */
+  /**
+   * Issuer company address.
+   */
   issuerAddress?: string
-  /** Tax rate percentage (e.g. 0.08 for 8%). */
+  /**
+   * Tax rate percentage (e.g. 0.08 for 8%).
+   */
   taxRate?: number
-  /** Invoice items (line charges). */
+  /**
+   * Invoice items (line charges).
+   */
   items: {
-    /** Item description. */
+    /**
+     * Item description.
+     */
     description: string
-    /** Quantity. */
+    /**
+     * Quantity.
+     */
     quantity: number
-    /** Unit price. */
+    /**
+     * Unit price.
+     */
     unitPrice: number
   }[]
 }

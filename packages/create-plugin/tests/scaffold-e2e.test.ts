@@ -3,6 +3,8 @@ import fs from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
+import { createDocx } from '@docxkit/core'
+import { createPluginLoader } from '@docxkit/loader/node'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createPlugin } from '../src/commands/create-plugin'
 
@@ -98,5 +100,15 @@ describe('generated plugin project', () => {
     await expect(
       fs.access(path.join(projectDirectory, 'dist/index.d.ts')),
     ).resolves.toBeUndefined()
+
+    const { plugin } = await createPluginLoader().load({
+      path: projectDirectory,
+      type: 'local',
+    })
+    const bytes = await createDocx()
+      .use(plugin)
+      .plugin('smoke', { text: 'Scaffold integration' })
+      .toBuffer()
+    expect(bytes.byteLength).toBeGreaterThan(0)
   }, 120_000)
 })

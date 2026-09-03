@@ -30,5 +30,8 @@ export function ${identifier}Plugin() {
     },
   })
 }
+
+// The loader uses the default factory; consumers can also import it by name.
+export default ${identifier}Plugin
 `
 }

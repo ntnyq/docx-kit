@@ -1,3 +1,4 @@
+import { parse } from 'acorn'
 import { transform } from 'sucrase'
 
 /**
@@ -30,37 +31,21 @@ export function prepareCode(raw: string): string {
     transforms: ['typescript'],
   }).code.trim()
 
-  // Step 5: Find the last non-empty line and prepend 'return ' if it's an expression.
-  const lines = body.split('\n')
-  let lastIdx = lines.length - 1
-  while (lastIdx >= 0 && lines[lastIdx].trim() === '') {
-    lastIdx--
+  // Return the complete final expression, regardless of line breaks or comments.
+  const program = parse(body, {
+    allowAwaitOutsideFunction: true,
+    allowReturnOutsideFunction: true,
+    ecmaVersion: 'latest',
+  })
+  const last = program.body.at(-1)
+  if (last?.type === 'ExpressionStatement') {
+    body = `${body.slice(0, last.start)}return (${body.slice(last.expression.start, last.expression.end)});${body.slice(last.end)}`
   }
-
-  if (lastIdx >= 0) {
-    const trimmed = lines[lastIdx].trim()
-    const isDeclaration =
-      /^(?:const|let|var|if|for|while|function|class|import|export|return|throw)\b/
-    const isBlockEnd = /^[})]/
-    const isComment = /^\/\//
-
-    if (
-      !isDeclaration.test(trimmed)
-      && !isBlockEnd.test(trimmed)
-      && !isComment.test(trimmed)
-      && trimmed !== ''
-    ) {
-      const indent = lines[lastIdx].match(/^(\s*)/)?.[1] ?? ''
-      lines[lastIdx] = `${indent}return ${trimmed}`
-    }
-  }
-
-  const source = lines.join('\n')
 
   // Step 6: Wrap in async IIFE so user `await` works.
   return `"use strict";
 return (async () => {
-${source}
+${body}
 })()`
 }
 

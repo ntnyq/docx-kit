@@ -1,2 +1,4 @@
-/** Cross-platform plugin loading APIs. */
+/**
+ * Cross-platform plugin loading APIs.
+ */
 export * from '@docxkit/loader'

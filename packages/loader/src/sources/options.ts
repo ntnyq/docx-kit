@@ -8,7 +8,9 @@ export interface ExternalPluginLoadOptions {
    * When present, the source loader must invoke it before importing code.
    */
   authorizeManifest?: PluginManifestAuthorizer
-  /** Manifest resolved independently from the executable module. */
+  /**
+   * Manifest resolved independently from the executable module.
+   */
   manifest?: unknown
 }
 

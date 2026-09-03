@@ -4,16 +4,31 @@
  * @module mcp-server/tools/validateSchema
  */
 
-import { BLOCK_NODE_DEFINITIONS } from '../schema/blockNodes'
-import type { BlockNodeType, SchemaFieldRule } from '../schema/blockNodes'
+import {
+  BLOCK_NODE_DEFINITIONS,
+  INLINE_NODE_TYPES,
+  LIST_ITEM_DEFINITION,
+  MATH_NODE_DEFINITIONS,
+  TEXT_NODE_DEFINITION,
+} from '../schema/blockNodes'
+import type {
+  BlockNodeDefinition,
+  BlockNodeType,
+  NodeCollectionKind,
+  SchemaFieldRule,
+} from '../schema/blockNodes'
 
 /**
  * Output from the validate_schema MCP tool.
  */
 export interface ValidateSchemaOutput {
-  /** List of validation errors (empty if valid). */
+  /**
+   * List of validation errors (empty if valid).
+   */
   errors: ValidationError[]
-  /** Whether the schema is valid. */
+  /**
+   * Whether the schema is valid.
+   */
   valid: boolean
 }
 
@@ -21,9 +36,13 @@ export interface ValidateSchemaOutput {
  * Validation error detail.
  */
 export interface ValidationError {
-  /** Error description. */
+  /**
+   * Error description.
+   */
   message: string
-  /** JSON path to the invalid field. */
+  /**
+   * JSON path to the invalid field.
+   */
   path: string
 }
 
@@ -90,7 +109,7 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
         continue
       }
 
-      if (!(nodeType in BLOCK_NODE_DEFINITIONS)) {
+      if (!Object.hasOwn(BLOCK_NODE_DEFINITIONS, nodeType)) {
         errors.push({
           message: `Invalid node type "${nodeType}" at index ${i}`,
           path: `/content/${i}/type`,
@@ -121,6 +140,10 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 function matchesKind(value: unknown, kind: SchemaFieldRule['kind']): boolean {
   switch (kind) {
     case 'array':
@@ -140,12 +163,106 @@ function matchesKind(value: unknown, kind: SchemaFieldRule['kind']): boolean {
   }
 }
 
+function validateCollection(
+  nodes: unknown[],
+  kind: NodeCollectionKind,
+  path: string,
+  errors: ValidationError[],
+  depth: number,
+): void {
+  if (depth > 64) {
+    errors.push({ message: 'Content nesting exceeds 64 levels', path })
+    return
+  }
+  for (const [index, node] of nodes.entries()) {
+    const nodePath = `${path}/${index}`
+    if (
+      typeof node === 'string'
+      && ['listItem', 'paragraph', 'text'].includes(kind)
+    ) {
+      continue
+    }
+    if (!isRecord(node)) {
+      errors.push({ message: `Expected a ${kind} node`, path: nodePath })
+      continue
+    }
+    if (kind === 'listItem') {
+      validateDefinition(node, LIST_ITEM_DEFINITION, nodePath, errors, depth)
+      continue
+    }
+    const type = node.type
+    if (typeof type === 'string') {
+      if (kind === 'math' && Object.hasOwn(MATH_NODE_DEFINITIONS, type)) {
+        validateDefinition(
+          node,
+          MATH_NODE_DEFINITIONS[type],
+          nodePath,
+          errors,
+          depth,
+        )
+        continue
+      }
+      if (type === 'text' && (kind === 'text' || kind === 'inline')) {
+        validateDefinition(node, TEXT_NODE_DEFINITION, nodePath, errors, depth)
+        continue
+      }
+      const isAllowed =
+        kind === 'block'
+        || (kind === 'paragraph' && type === 'paragraph')
+        || (kind === 'inline'
+          && (INLINE_NODE_TYPES as readonly string[]).includes(type))
+      if (isAllowed && Object.hasOwn(BLOCK_NODE_DEFINITIONS, type)) {
+        validateNode(node, type as BlockNodeType, nodePath, errors, depth)
+        continue
+      }
+    }
+    errors.push({
+      message: `Invalid ${kind} node type: ${String(type)}`,
+      path: `${nodePath}/type`,
+    })
+  }
+}
+
+function validateDefinition(
+  node: Record<string, unknown>,
+  definition: BlockNodeDefinition,
+  path: string,
+  errors: ValidationError[],
+  depth: number,
+): void {
+  for (const [field, rule] of Object.entries(definition.fields)) {
+    const hasField = Object.hasOwn(node, field)
+    if (rule.required && !hasField) {
+      errors.push({
+        message: `${String(node.type ?? 'List item')} node missing required "${field}" field`,
+        path: `${path}/${field}`,
+      })
+      continue
+    }
+    if (hasField) {
+      validateField(node[field], field, rule, path, errors, depth)
+    }
+  }
+
+  if (
+    'requireOneOf' in definition
+    && definition.requireOneOf
+    && !definition.requireOneOf.some(field => isNonEmptyString(node[field]))
+  ) {
+    errors.push({
+      message: `${String(node.type)} node requires one of: ${definition.requireOneOf.join(', ')}`,
+      path,
+    })
+  }
+}
+
 function validateField(
   value: unknown,
   field: string,
   rule: SchemaFieldRule,
   path: string,
   errors: ValidationError[],
+  depth = 0,
 ): void {
   if (rule.kind !== 'unknown' && !matchesKind(value, rule.kind)) {
     errors.push({
@@ -195,6 +312,59 @@ function validateField(
       path: `${path}/${field}`,
     })
   }
+  if (rule.items && Array.isArray(value)) {
+    validateCollection(value, rule.items, `${path}/${field}`, errors, depth + 1)
+  }
+}
+
+function validateHeaderFooters(
+  config: unknown,
+  path: string,
+  errors: ValidationError[],
+  depth: number,
+): void {
+  if (!isRecord(config)) {
+    return
+  }
+  for (const field of ['header', 'footer']) {
+    const variants = config[field]
+    if (variants === undefined) {
+      continue
+    }
+    if (!isRecord(variants)) {
+      errors.push({
+        message: `${field} must be an object`,
+        path: `${path}/${field}`,
+      })
+      continue
+    }
+    for (const key of ['default', 'first', 'even']) {
+      const content = variants[key]
+      if (content === undefined) {
+        continue
+      }
+      const contentPath = `${path}/${field}/${key}/children`
+      if (!isRecord(content) || !Array.isArray(content.children)) {
+        errors.push({
+          message: 'Header/footer children must be an array',
+          path: contentPath,
+        })
+        continue
+      }
+      // Header/footer strings are shorthand paragraphs, unlike ordinary blocks.
+      validateCollection(
+        content.children.map(child =>
+          typeof child === 'string'
+            ? { text: child, type: 'paragraph' }
+            : child,
+        ),
+        'block',
+        contentPath,
+        errors,
+        depth,
+      )
+    }
+  }
 }
 
 function validateNode(
@@ -202,34 +372,15 @@ function validateNode(
   nodeType: BlockNodeType,
   path: string,
   errors: ValidationError[],
+  depth = 0,
 ): void {
   const definition = BLOCK_NODE_DEFINITIONS[nodeType]
 
-  for (const [field, rule] of Object.entries(definition.fields)) {
-    const hasField = Object.hasOwn(node, field)
-    if (rule.required && !hasField) {
-      errors.push({
-        message: `${nodeType} node missing required "${field}" field`,
-        path: `${path}/${field}`,
-      })
-      continue
-    }
-    if (hasField) {
-      validateField(node[field], field, rule, path, errors)
-    }
-  }
+  validateDefinition(node, definition, path, errors, depth)
 
-  if (
-    'requireOneOf' in definition
-    && definition.requireOneOf
-    && !definition.requireOneOf.some(field => isNonEmptyString(node[field]))
-  ) {
-    errors.push({
-      message: `${nodeType} node requires one of: ${definition.requireOneOf.join(', ')}`,
-      path,
-    })
+  if (nodeType === 'sectionBreak') {
+    validateHeaderFooters(node.config, `${path}/config`, errors, depth + 1)
   }
-
   if (nodeType === 'table') {
     validateTableColumns(node.columns, path, errors)
   }

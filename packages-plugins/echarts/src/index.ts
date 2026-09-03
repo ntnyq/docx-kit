@@ -45,9 +45,13 @@ import type { EChartsOption } from 'echarts'
  * Options for the ECharts plugin.
  */
 export interface EChartsPluginOptions {
-  /** Full ECharts option object (series, axes, title, etc.). */
+  /**
+   * Full ECharts option object (series, axes, title, etc.).
+   */
   option: EChartsOption
-  /** Optional caption text displayed below the chart. */
+  /**
+   * Optional caption text displayed below the chart.
+   */
   caption?: string
   /**
    * Chart height in pixels.
@@ -71,7 +75,9 @@ export interface EChartsPluginOptions {
   width?: number
 }
 
-/** Internal render configuration (resolved defaults). */
+/**
+ * Internal render configuration (resolved defaults).
+ */
 interface RenderConfig {
   height: number
   imageType: 'png' | 'svg'
@@ -79,13 +85,21 @@ interface RenderConfig {
   width: number
 }
 
-/** Result of rendering a chart to an image. */
+/**
+ * Result of rendering a chart to an image.
+ */
 interface RenderImageResult {
-  /** Raw image bytes. */
+  /**
+   * Raw image bytes.
+   */
   data: Uint8Array
-  /** Image format (`"png"` or `"svg"`). */
+  /**
+   * Image format (`"png"` or `"svg"`).
+   */
   type: 'png' | 'svg'
-  /** Raster fallback for SVG output. */
+  /**
+   * Raster fallback for SVG output.
+   */
   fallback?: {
     data: Uint8Array
     type: 'png'

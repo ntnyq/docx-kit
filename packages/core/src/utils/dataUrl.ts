@@ -1,5 +1,5 @@
 /**
- * Cross-platform base64 data-URL decoder.
+ * Cross-platform base64 and percent-encoded data-URL decoder.
  *
  * Auto-detects the runtime environment and uses the appropriate
  * implementation:
@@ -18,12 +18,11 @@ interface BufferConstructorLike {
 }
 
 /**
- * Decode a base64 data-URL to raw bytes (works in both browser & Node.js).
+ * Decode a data URL to raw bytes (works in both browser & Node.js).
  *
- * Strips the `"data:*;base64,"` prefix and decodes using the appropriate
- * runtime API.
+ * Supports base64 payloads and percent-encoded bytes, including SVG data URLs.
  *
- * @param dataUrl - — A base64 data-URI string (e.g. `"data:image/png;base64,iVBO..."`)
+ * @param dataUrl - — A data-URI string (e.g. `"data:image/png;base64,iVBO..."`)
  * @returns Raw bytes as `Uint8Array`
  *
  * @example
@@ -37,11 +36,22 @@ export async function dataUrlToUint8Array(
   dataUrl: string,
 ): Promise<Uint8Array> {
   const payloadStart = dataUrl.indexOf(',')
-  if (payloadStart === -1) {
-    throw new Error('Expected a base64 data URL payload')
+  if (!dataUrl.startsWith('data:') || payloadStart === -1) {
+    throw new Error('Expected a data URL payload')
   }
 
-  const base64 = dataUrl.slice(payloadStart + 1)
+  const payload = dataUrl.slice(payloadStart + 1)
+  if (!/;base64$/i.test(dataUrl.slice(0, payloadStart))) {
+    // Decode bytes directly: percent escapes can contain non-UTF-8 image data.
+    const chunks = payload.split(/(%[\da-f]{2})/i)
+    const bytes = chunks.flatMap(chunk =>
+      /^%[\da-f]{2}$/i.test(chunk)
+        ? [Number.parseInt(chunk.slice(1), 16)]
+        : [...new TextEncoder().encode(chunk)],
+    )
+    return Uint8Array.from(bytes)
+  }
+  const base64 = decodeURIComponent(payload)
 
   // Browser path: use atob
   if (typeof atob === 'function') {

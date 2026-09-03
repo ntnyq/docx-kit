@@ -11,13 +11,22 @@ import type { DocxPlugin } from '@docxkit/core'
  * Plugin info returned by the list_plugins tool.
  */
 export interface PluginInfo {
-  /** Plugin description (derived from name and render signature). */
+  /**
+   * Plugin description (derived from name and render signature).
+   */
   description: string
-  /** Plugin name. */
+  /**
+   * Plugin name.
+   */
   name: string
 }
 
-/** Build plugin info for every built-in plugin in the canonical catalog. */
+/**
+ * Build plugin info for every built-in plugin in the canonical catalog.
+ *
+ * @param filter - Optional case-insensitive substring used to match plugin names
+ * @returns Matching built-in plugin names and descriptions in catalog order
+ */
 export function buildBuiltinPluginInfoList(filter?: string): PluginInfo[] {
   const normalizedFilter = filter?.toLowerCase()
   return BUILTIN_PLUGIN_CATALOG.filter(

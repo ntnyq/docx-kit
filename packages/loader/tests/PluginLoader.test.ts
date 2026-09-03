@@ -350,7 +350,13 @@ describe('PluginLoader', () => {
 
     it.each([
       ['0.3.0', '0.3.0'],
+      ['v0.3.0', '0.3.0'],
+      ['0.3.0+build.123', '0.3.0'],
       ['0.3.4', '>=0.3.0 <0.4.0'],
+      ['1.2.3', '^0.3.0 || ^1.0.0'],
+      ['0.3.5', '0.3.0 - 0.4.0'],
+      ['0.3.5', '0.3.x'],
+      ['0.3.5', '  ~0.3.0  '],
       ['0.4.0-beta.1', '^0.4.0-beta.1'],
     ])('accepts version %s for range %s', (kitVersion, docxKit) => {
       const loader = createPluginLoader({ kitVersion })
@@ -364,8 +370,15 @@ describe('PluginLoader', () => {
     it.each([
       ['0.3.1', '0.3.0'],
       ['0.4.0-beta.1', '^0.3.0'],
+      ['0.4.0-beta.1', '*'],
+      ['0.5.0-beta.1', '^0.4.0-beta.1'],
+      ['0.4.0', '0.3.x'],
+      ['0.5.0', '^0.3.0 || ^1.0.0'],
       ['not-a-version', '*'],
+      ['0.3', '*'],
+      ['00.3.0', '*'],
       ['0.3.0', 'not-a-range'],
+      ['0.3.0', '^0.3.0 || invalid'],
     ])('rejects version %s for range %s', (kitVersion, docxKit) => {
       const loader = createPluginLoader({ kitVersion })
       const manifest: PluginManifest = { ...TEST_MANIFEST, docxKit }
@@ -374,7 +387,11 @@ describe('PluginLoader', () => {
       }
 
       expect(() => testLoader._checkCompatibility(manifest)).toThrowError(
-        DocxKitError,
+        expect.objectContaining({
+          code: ERROR_CODES.PLUGIN_VERSION_MISMATCH,
+          message: `Plugin "test" requires docx-kit range "${docxKit}" but ${kitVersion} is installed`,
+          name: 'DocxKitError',
+        }),
       )
     })
   })

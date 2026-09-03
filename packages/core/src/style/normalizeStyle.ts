@@ -20,15 +20,25 @@ import type {
  * Options for resolving a style cascade.
  */
 export interface ResolveStyleOptions {
-  /** Base style (typically element defaults). */
+  /**
+   * Base style (typically element defaults).
+   */
   base?: DocxStyleRule
-  /** Class name(s) to resolve from the stylesheet. */
+  /**
+   * Class name(s) to resolve from the stylesheet.
+   */
   className?: string | string[]
-  /** Inline style overrides (highest priority). */
+  /**
+   * Inline style overrides (highest priority).
+   */
   inline?: DocxStyleRule
-  /** The stylesheet to resolve class names against. */
+  /**
+   * The stylesheet to resolve class names against.
+   */
   styles?: StyleSheet
-  /** Theme for token resolution (color, font, spacing tokens). */
+  /**
+   * Theme for token resolution (color, font, spacing tokens).
+   */
   theme?: DocxTheme
 }
 

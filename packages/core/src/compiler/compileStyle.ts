@@ -10,13 +10,13 @@
 import {
   AlignmentType,
   BorderStyle,
-  HighlightColor,
+  LineRuleType,
   ShadingType,
   UnderlineType,
   VerticalAlign,
   WidthType,
 } from 'docx'
-import { parseShorthandTwip, toPtHalf, toTwip } from './units'
+import { parseShorthandTwip, toPtEighth, toPtHalf, toTwip } from './units'
 import type {
   CellStyleRule,
   DocxStyleRule,
@@ -67,7 +67,7 @@ export function compileBorder(style: CellStyleRule | ParagraphStyleRule) {
 export function compileBorderRule(rule: NonNullable<DocxStyleRule['border']>) {
   return {
     color: normalizeColor(rule.color),
-    size: rule.width == null ? 1 : toTwip(rule.width),
+    size: rule.width == null ? 1 : toPtEighth(rule.width),
     style: compileBorderStyle(rule.style),
   }
 }
@@ -163,7 +163,12 @@ export function compileColumnWidth(width: unknown) {
   return undefined
 }
 
-/** Compile paragraph-level borders (separate from cell borders). */
+/**
+ * Compile paragraph-level borders (separate from cell borders).
+ *
+ * @param style - Paragraph style containing border declarations
+ * @returns Paragraph border options, or an empty object if no borders are configured
+ */
 export function compileParagraphBorder(style: ParagraphStyleRule) {
   const borders = compileBorder(style)
   if (!borders) {
@@ -311,13 +316,16 @@ function compileBorderStyle(style?: import('@docxkit/types').BorderStyle) {
  * Map a highlight color name to `docx` `HighlightColor`.
  */
 function compileHighlight(color?: import('@docxkit/types').HighlightColor) {
-  if (!color || color === 'none') {
-    return undefined
-  }
-  return (HighlightColor as Record<string, unknown>)[color.toUpperCase()]
+  // The public colors already match docx's enum values, not its enum keys.
+  return color
 }
 
-/** Convert line-height multiplier to twips. 1 → 240 (single-spacing). */
+/**
+ * Convert line-height multiplier to twips. 1 → 240 (single-spacing).
+ *
+ * @param value - Line-height multiplier or explicit unit value
+ * @returns Line spacing in twips, or `undefined` when the value is absent
+ */
 function compileLineHeight(value: DocxStyleRule['lineHeight']) {
   if (typeof value === 'number') {
     return Math.round(value * 240)
@@ -338,7 +346,12 @@ function compileVerticalAlign(value: DocxStyleRule['verticalAlign']) {
   return VerticalAlign.TOP
 }
 
-/** Strip leading `#` from a color string (docx expects raw hex). */
+/**
+ * Strip leading `#` from a color string (docx expects raw hex).
+ *
+ * @param color - Optional hexadecimal color with or without a leading `#`
+ * @returns The color without its leading `#`, or `undefined` when omitted
+ */
 function normalizeColor(color?: string) {
   return color?.replace(/^#/, '')
 }
@@ -378,5 +391,15 @@ function resolveSpacing(style: DocxStyleRule) {
   if (before == null && after == null && line == null) {
     return undefined
   }
-  return { after, before, line }
+  return {
+    after,
+    before,
+    line,
+    lineRule:
+      line == null
+        ? undefined
+        : typeof style.lineHeight === 'number'
+          ? LineRuleType.AUTO
+          : LineRuleType.EXACT,
+  }
 }

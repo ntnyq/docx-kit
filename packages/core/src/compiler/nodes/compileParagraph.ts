@@ -20,7 +20,7 @@ export async function compileParagraph<TStyles extends StyleSheet>(
 ) {
   const className = node.className ?? (config.styles?.p ? 'p' : undefined)
   const style = resolveStyle({
-    base: config.defaults?.paragraph,
+    base: { ...config.defaults?.text, ...config.defaults?.paragraph },
     className,
     inline: node.style,
     styles: config.styles,

@@ -44,15 +44,21 @@ const VALUE_SHADING: IShadingAttributesProperties = {
   type: ShadingType.CLEAR,
 }
 
-/** A single key-value pair. */
+/**
+ * A single key-value pair.
+ */
 export interface PropertyItem {
   key: string
   value: string
 }
 
-/** Options for the PropertyTable plugin. */
+/**
+ * Options for the PropertyTable plugin.
+ */
 export interface PropertyTableOptions {
-  /** Key-value items to display. */
+  /**
+   * Key-value items to display.
+   */
   items: PropertyItem[]
   /**
    * Whether the key column text is bold.

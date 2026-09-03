@@ -24,9 +24,13 @@ export interface BaseNode<TStyles extends StyleSheet = StyleSheet> {
    * Can be a single string, an array, or a space-separated string.
    */
   className?: string | ClassName<TStyles> | ClassName<TStyles>[]
-  /** Optional unique identifier (for templating / references). */
+  /**
+   * Optional unique identifier (for templating / references).
+   */
   id?: string
-  /** Inline style override for this specific node. */
+  /**
+   * Inline style override for this specific node.
+   */
   style?: DocxStyleRule
 }
 
@@ -64,9 +68,13 @@ export type BlockNode<TStyles extends StyleSheet = StyleSheet> =
 export interface BookmarkNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Text or styled text runs contained by the bookmark. */
+  /**
+   * Text or styled text runs contained by the bookmark.
+   */
   children: (string | TextNode<TStyles>)[]
-  /** Stable bookmark name. */
+  /**
+   * Stable bookmark name.
+   */
   name: string
   type: 'bookmark'
 }
@@ -81,11 +89,17 @@ export interface BookmarkNode<
 export interface BulletItem<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Optional inline children override (instead of text). */
+  /**
+   * Optional inline children override (instead of text).
+   */
   children?: InlineNode<TStyles>[]
-  /** Per-item nested list level (0–8). Overrides the list-level default. */
+  /**
+   * Per-item nested list level (0–8). Overrides the list-level default.
+   */
   level?: number
-  /** Item text content, used when `children` is absent. */
+  /**
+   * Item text content, used when `children` is absent.
+   */
   text?: string
 }
 
@@ -99,12 +113,18 @@ export interface BulletItem<
 export interface BulletListNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** List items — strings or structured items. */
+  /**
+   * List items — strings or structured items.
+   */
   items: (string | BulletItem<TStyles>)[]
   type: 'bulletList'
-  /** Bullet character / style. Default: `'•'`. */
+  /**
+   * Bullet character / style. Default: `'•'`.
+   */
   bullet?: string
-  /** Nested list level (0 = top-level). */
+  /**
+   * Nested list level (0 = top-level).
+   */
   level?: number
 }
 
@@ -115,23 +135,39 @@ export interface CheckboxNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
   type: 'checkbox'
-  /** Accessible alias for the checkbox control. */
+  /**
+   * Accessible alias for the checkbox control.
+   */
   alias?: string
-  /** Whether the checkbox is checked. */
+  /**
+   * Whether the checkbox is checked.
+   */
   checked?: boolean
-  /** Checked-state glyph and font. */
+  /**
+   * Checked-state glyph and font.
+   */
   checkedState?: CheckboxSymbol
-  /** Optional label rendered after the checkbox. */
+  /**
+   * Optional label rendered after the checkbox.
+   */
   label?: string
-  /** Unchecked-state glyph and font. */
+  /**
+   * Unchecked-state glyph and font.
+   */
   uncheckedState?: CheckboxSymbol
 }
 
-/** Checkbox glyph customization. */
+/**
+ * Checkbox glyph customization.
+ */
 export interface CheckboxSymbol {
-  /** Font containing the glyph. */
+  /**
+   * Font containing the glyph.
+   */
   font?: string
-  /** Unicode code point expressed as a hexadecimal string. */
+  /**
+   * Unicode code point expressed as a hexadecimal string.
+   */
   value?: string
 }
 
@@ -158,16 +194,26 @@ export interface ColumnBreakNode {
 export interface CommentNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Comment author. */
+  /**
+   * Comment author.
+   */
   author: string
-  /** Annotated inline content. */
+  /**
+   * Annotated inline content.
+   */
   children: InlineNode<TStyles>[]
-  /** Comment body paragraphs or plain text. */
+  /**
+   * Comment body paragraphs or plain text.
+   */
   comment: (string | ParagraphNode<TStyles>)[]
   type: 'comment'
-  /** ISO-8601 creation timestamp. */
+  /**
+   * ISO-8601 creation timestamp.
+   */
   date?: string
-  /** Author initials. */
+  /**
+   * Author initials.
+   */
   initials?: string
 }
 
@@ -177,7 +223,9 @@ export interface CommentNode<
 export interface FootnoteNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Footnote body paragraphs or plain text. */
+  /**
+   * Footnote body paragraphs or plain text.
+   */
   content: (string | ParagraphNode<TStyles>)[]
   type: 'footnote'
 }
@@ -192,9 +240,13 @@ export interface FootnoteNode<
 export interface HeadingNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Heading level (1 = largest, 6 = smallest). */
+  /**
+   * Heading level (1 = largest, 6 = smallest).
+   */
   level: 1 | 2 | 3 | 4 | 5 | 6
-  /** Heading text content. */
+  /**
+   * Heading text content.
+   */
   text: string
   type: 'heading'
 }
@@ -207,35 +259,52 @@ export interface HeadingNode<
 export interface HyperlinkNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Display text or inline children. */
+  /**
+   * Display text or inline children.
+   */
   children: (string | TextNode<TStyles>)[]
   type: 'hyperlink'
-  /** Internal bookmark target (used instead of `url`). */
+  /**
+   * Internal bookmark target (used instead of `url`).
+   */
   anchor?: string
-  /** External link target URL. */
+  /**
+   * External link target URL.
+   */
   url?: string
 }
 
 /**
  * An image node.
  *
- * Supports raw bytes (`Uint8Array`, `ArrayBuffer`, `Blob`) or a file path string.
+ * Supports raw bytes, Blob, data URLs, and file paths via docx-kit/node or
+ * the document's resolveImage adapter. Core/browser do not read files implicitly.
  *
  * @template TStyles — The user's stylesheet type
  */
 export interface ImageNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Image data as bytes, blob, or file path. */
+  /**
+   * Image bytes, blob, data URL, or an explicitly resolved file path.
+   */
   data: string | ArrayBuffer | Blob | Uint8Array
   type: 'image'
-  /** Alt text for accessibility. */
+  /**
+   * Alt text for accessibility.
+   */
   alt?: string
-  /** Display height. */
+  /**
+   * Display height.
+   */
   height?: UnitValue
-  /** Image format hint. Auto-detected if omitted. */
+  /**
+   * Image format hint. Auto-detected if omitted.
+   */
   imageType?: 'bmp' | 'gif' | 'jpeg' | 'jpg' | 'png'
-  /** Display width. */
+  /**
+   * Display width.
+   */
   width?: UnitValue
   /**
    * Floating layout configuration.
@@ -246,11 +315,17 @@ export interface ImageNode<
   floating?:
     | boolean
     | {
-        /** Text wrap mode. */
+        /**
+         * Text wrap mode.
+         */
         wrap?: 'square' | 'tight' | 'topAndBottom'
-        /** Horizontal offset. */
+        /**
+         * Horizontal offset.
+         */
         x?: UnitValue
-        /** Vertical offset. */
+        /**
+         * Vertical offset.
+         */
         y?: UnitValue
       }
 }
@@ -283,21 +358,27 @@ export type MathExpression =
   | MathSumExpression
   | MathTextExpression
 
-/** A mathematical fraction. */
+/**
+ * A mathematical fraction.
+ */
 export interface MathFractionExpression {
   denominator: MathExpression[]
   numerator: MathExpression[]
   type: 'fraction'
 }
 
-/** A named mathematical function. */
+/**
+ * A named mathematical function.
+ */
 export interface MathFunctionExpression {
   arguments: MathExpression[]
   name: MathExpression[]
   type: 'function'
 }
 
-/** A mathematical integral. */
+/**
+ * A mathematical integral.
+ */
 export interface MathIntegralExpression {
   children: MathExpression[]
   type: 'integral'
@@ -309,19 +390,25 @@ export interface MathIntegralExpression {
  * An Office Math (OMML) expression.
  */
 export interface MathNode {
-  /** Structured mathematical expression tree. */
+  /**
+   * Structured mathematical expression tree.
+   */
   children: MathExpression[]
   type: 'math'
 }
 
-/** A mathematical radical with an optional degree. */
+/**
+ * A mathematical radical with an optional degree.
+ */
 export interface MathRadicalExpression {
   children: MathExpression[]
   type: 'radical'
   degree?: MathExpression[]
 }
 
-/** Subscript, superscript, or combined script. */
+/**
+ * Subscript, superscript, or combined script.
+ */
 export interface MathScriptExpression {
   children: MathExpression[]
   type: 'script'
@@ -329,7 +416,9 @@ export interface MathScriptExpression {
   superScript?: MathExpression[]
 }
 
-/** A mathematical sum. */
+/**
+ * A mathematical sum.
+ */
 export interface MathSumExpression {
   children: MathExpression[]
   type: 'sum'
@@ -337,7 +426,9 @@ export interface MathSumExpression {
   superScript?: MathExpression[]
 }
 
-/** Plain text inside a mathematical expression. */
+/**
+ * Plain text inside a mathematical expression.
+ */
 export interface MathTextExpression {
   text: string
   type: 'text'
@@ -351,12 +442,18 @@ export interface MathTextExpression {
 export interface NumberedListNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** List items. */
+  /**
+   * List items.
+   */
   items: (string | BulletItem<TStyles>)[]
   type: 'numberedList'
-  /** Nested list level (0 = top-level). */
+  /**
+   * Nested list level (0 = top-level).
+   */
   level?: number
-  /** Starting number (default: 1). */
+  /**
+   * Starting number (default: 1).
+   */
   start?: number
   /**
    * Numbering format.
@@ -384,9 +481,13 @@ export interface ParagraphNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
   type: 'paragraph'
-  /** Inline children (text runs, inline images, etc.). */
+  /**
+   * Inline children (text runs, inline images, etc.).
+   */
   children?: InlineNode<TStyles>[]
-  /** Plain-text content (used when `children` is not provided). */
+  /**
+   * Plain-text content (used when `children` is not provided).
+   */
   text?: string
 }
 
@@ -404,9 +505,13 @@ export interface PluginNode<
   TOptions = unknown,
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Registered plugin name. */
+  /**
+   * Registered plugin name.
+   */
   name: TName
-  /** Plugin-specific options. */
+  /**
+   * Plugin-specific options.
+   */
   options: TOptions
   type: 'plugin'
 }
@@ -417,15 +522,25 @@ export interface PluginNode<
 export interface RevisionNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Revision author. */
+  /**
+   * Revision author.
+   */
   author: string
-  /** Text or styled text runs in the revision. */
+  /**
+   * Text or styled text runs in the revision.
+   */
   children: (string | TextNode<TStyles>)[]
-  /** ISO-8601 revision timestamp. */
+  /**
+   * ISO-8601 revision timestamp.
+   */
   date: string
-  /** Document-unique revision identifier. */
+  /**
+   * Document-unique revision identifier.
+   */
   revisionId: number
-  /** Revision kind. */
+  /**
+   * Revision kind.
+   */
   type: 'deletedText' | 'insertedText'
 }
 
@@ -440,11 +555,15 @@ export interface RevisionNode<
  */
 export interface SectionBreakNode {
   type: 'sectionBreak'
-  /** Optional per-section page/header/footer overrides. */
+  /**
+   * Optional per-section page/header/footer overrides.
+   */
   config?: SectionConfig
 }
 
-/** Table-level border configuration. */
+/**
+ * Table-level border configuration.
+ */
 export interface TableBordersConfig {
   bottom?: BorderRule
   insideHorizontal?: BorderRule
@@ -454,7 +573,16 @@ export interface TableBordersConfig {
   top?: BorderRule
 }
 
-/** Per-cell style resolver. */
+/**
+ * Per-cell style resolver.
+ *
+ * @template TData - The shape of each table data row
+ * @param value - Current cell value
+ * @param row - Complete data row containing the cell
+ * @param rowIndex - Zero-based index of the data row
+ * @param column - Column definition for the current cell
+ * @returns Style overrides for the current data cell
+ */
 export type TableCellStyleResolver<
   TData extends Record<string, unknown> = Record<string, unknown>,
 > = (
@@ -472,13 +600,21 @@ export type TableCellStyleResolver<
 export interface TableColumn<
   TData extends Record<string, unknown> = Record<string, unknown>,
 > {
-  /** Key in the data object this column maps to. */
+  /**
+   * Key in the data object this column maps to.
+   */
   key: Extract<keyof TData, string>
-  /** Column header text. */
+  /**
+   * Column header text.
+   */
   title: string
-  /** Cell text alignment. */
+  /**
+   * Cell text alignment.
+   */
   align?: 'center' | 'left' | 'right'
-  /** Per-column data cell style or resolver. */
+  /**
+   * Per-column data cell style or resolver.
+   */
   cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
   /**
    * Span multiple columns horizontally.
@@ -486,7 +622,9 @@ export interface TableColumn<
    * Applied to all cells in this column.
    */
   colSpan?: number
-  /** Per-column header cell style. */
+  /**
+   * Per-column header cell style.
+   */
   headerCellStyle?: DocxStyleRule
   /**
    * Span multiple rows vertically (per-cell via data hints).
@@ -496,7 +634,9 @@ export interface TableColumn<
    * column default.
    */
   rowSpan?: number
-  /** Column width. Supports percentage strings (e.g. `"30%"`). */
+  /**
+   * Column width. Supports percentage strings (e.g. `"30%"`).
+   */
   width?: UnitValue
   /**
    * Custom cell renderer.
@@ -511,35 +651,61 @@ export interface TableColumn<
   ) => string | InlineNode[]
 }
 
-/** Floating table positioning. */
+/**
+ * Floating table positioning.
+ */
 export interface TableFloatingOptions {
-  /** Bottom distance from surrounding text. */
+  /**
+   * Bottom distance from surrounding text.
+   */
   bottomFromText?: UnitValue
-  /** Horizontal anchor. */
+  /**
+   * Horizontal anchor.
+   */
   horizontalAnchor?: 'margin' | 'page' | 'text'
-  /** Left distance from surrounding text. */
+  /**
+   * Left distance from surrounding text.
+   */
   leftFromText?: UnitValue
-  /** Whether the table may overlap other floating objects. */
+  /**
+   * Whether the table may overlap other floating objects.
+   */
   overlap?: boolean
-  /** Right distance from surrounding text. */
+  /**
+   * Right distance from surrounding text.
+   */
   rightFromText?: UnitValue
-  /** Top distance from surrounding text. */
+  /**
+   * Top distance from surrounding text.
+   */
   topFromText?: UnitValue
-  /** Vertical anchor. */
+  /**
+   * Vertical anchor.
+   */
   verticalAnchor?: 'margin' | 'page' | 'text'
-  /** Absolute horizontal offset. */
+  /**
+   * Absolute horizontal offset.
+   */
   x?: UnitValue
-  /** Absolute vertical offset. */
+  /**
+   * Absolute vertical offset.
+   */
   y?: UnitValue
-  /** Relative horizontal placement. */
+  /**
+   * Relative horizontal placement.
+   */
   relativeHorizontalPosition?:
     'center' | 'inside' | 'left' | 'outside' | 'right'
-  /** Relative vertical placement. */
+  /**
+   * Relative vertical placement.
+   */
   relativeVerticalPosition?:
     'bottom' | 'center' | 'inline' | 'inside' | 'outside' | 'top'
 }
 
-/** Native Word table-look flags. */
+/**
+ * Native Word table-look flags.
+ */
 export interface TableLookOptions {
   firstColumn?: boolean
   firstRow?: boolean
@@ -559,36 +725,66 @@ export interface TableNode<
   TData extends Record<string, unknown> = Record<string, unknown>,
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Column definitions. */
+  /**
+   * Column definitions.
+   */
   columns: TableColumn<TData>[]
-  /** Row data objects. */
+  /**
+   * Row data objects.
+   */
   data: TData[]
   type: 'table'
-  /** Horizontal table alignment. */
+  /**
+   * Horizontal table alignment.
+   */
   alignment?: 'center' | 'left' | 'right'
-  /** Show table borders. */
+  /**
+   * Show table borders.
+   */
   bordered?: boolean
-  /** Explicit outer and inner table borders. */
+  /**
+   * Explicit outer and inner table borders.
+   */
   borders?: TableBordersConfig
-  /** Default data cell style or per-cell resolver. */
+  /**
+   * Default data cell style or per-cell resolver.
+   */
   cellStyle?: DocxStyleRule | TableCellStyleResolver<TData>
-  /** Floating table positioning. Enables side-by-side layouts. */
+  /**
+   * Floating table positioning. Enables side-by-side layouts.
+   */
   floating?: TableFloatingOptions
-  /** Show header row (default: `true`). */
+  /**
+   * Show header row (default: `true`).
+   */
   header?: boolean
-  /** Style for header cells. */
+  /**
+   * Style for header cells.
+   */
   headerCellStyle?: DocxStyleRule
-  /** Word table layout algorithm. */
+  /**
+   * Word table layout algorithm.
+   */
   layout?: 'autofit' | 'fixed'
-  /** Alternate row shading. */
+  /**
+   * Alternate row shading.
+   */
   striped?: boolean
-  /** Native Word table style ID. */
+  /**
+   * Native Word table style ID.
+   */
   styleName?: string
-  /** Native Word table-look flags. */
+  /**
+   * Native Word table-look flags.
+   */
   tableLook?: TableLookOptions
-  /** Render the table grid from right to left. */
+  /**
+   * Render the table grid from right to left.
+   */
   visuallyRightToLeft?: boolean
-  /** Overall table width. */
+  /**
+   * Overall table width.
+   */
   width?: UnitValue
 }
 
@@ -598,28 +794,48 @@ export interface TableNode<
 export interface TextBoxNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Text box dimensions and positioning. */
+  /**
+   * Text box dimensions and positioning.
+   */
   box: TextBoxOptions
   type: 'textBox'
-  /** Inline children (used instead of `text`). */
+  /**
+   * Inline children (used instead of `text`).
+   */
   children?: InlineNode<TStyles>[]
-  /** Plain text content. */
+  /**
+   * Plain text content.
+   */
   text?: string
 }
 
-/** Text box dimensions and positioning. */
+/**
+ * Text box dimensions and positioning.
+ */
 export interface TextBoxOptions {
-  /** Text box width. */
+  /**
+   * Text box width.
+   */
   width: UnitValue
-  /** Text box height. */
+  /**
+   * Text box height.
+   */
   height?: UnitValue
-  /** Horizontal offset. */
+  /**
+   * Horizontal offset.
+   */
   left?: UnitValue
-  /** Shape positioning mode. */
+  /**
+   * Shape positioning mode.
+   */
   position?: 'absolute' | 'relative' | 'static'
-  /** Vertical offset. */
+  /**
+   * Vertical offset.
+   */
   top?: UnitValue
-  /** Text wrapping behavior. */
+  /**
+   * Text wrapping behavior.
+   */
   wrap?: 'none' | 'square'
 }
 
@@ -631,7 +847,9 @@ export interface TextBoxOptions {
 export interface TextNode<
   TStyles extends StyleSheet = StyleSheet,
 > extends BaseNode<TStyles> {
-  /** Text content. */
+  /**
+   * Text content.
+   */
   text: string
   type: 'text'
 }

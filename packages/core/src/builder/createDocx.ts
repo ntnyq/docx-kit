@@ -23,9 +23,13 @@ import type { PluginLoader, PluginSource } from '../loader/PluginLoader'
  * @template TStyles — The user's stylesheet type
  */
 export interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
-  /** Ordered array of block nodes. */
+  /**
+   * Ordered array of block nodes.
+   */
   content: BlockNode<TStyles>[]
-  /** Optional page configuration. */
+  /**
+   * Optional page configuration.
+   */
   page?: DocxKitConfig<TStyles>['page']
   /**
    * Plugin sources to load before rendering.
@@ -50,14 +54,28 @@ export interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
    * ```
    */
   plugins?: PluginSource[]
-  /** Named stylesheet entries. */
+  /**
+   * Named stylesheet entries.
+   */
   styles?: TStyles
 }
 
-/** Runtime adapters used while rendering a declarative schema. */
+/**
+ * Runtime adapters used while rendering a declarative schema.
+ */
 export interface RenderDocxOptions {
-  /** Platform-aware loader for npm, URL, or local plugin sources. */
+  /**
+   * Platform-aware loader for npm, URL, or local plugin sources.
+   */
   pluginLoader?: PluginLoader
+  /**
+   * Resolve image paths without putting executable adapters in JSON schemas.
+   *
+   * @param source - Image path to resolve using the current platform adapter
+   * @returns Image bytes or a Blob, optionally wrapped in a promise
+   * @throws If the adapter cannot read or resolve the image source
+   */
+  resolveImage?: DocxKitConfig['resolveImage']
 }
 
 /**
@@ -143,7 +161,10 @@ export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   options: RenderDocxOptions = {},
 ): Promise<DocxBuilder<TStyles>> {
   const { content, plugins, ...config } = schema
-  const builder = new DocxBuilder<TStyles>(config as DocxKitConfig<TStyles>)
+  const builder = new DocxBuilder<TStyles>({
+    ...config,
+    resolveImage: options.resolveImage,
+  })
 
   // Load and register plugins before compiling content
   if (plugins && plugins.length > 0) {

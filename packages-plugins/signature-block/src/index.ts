@@ -32,9 +32,13 @@ import {
   WidthType,
 } from 'docx'
 
-/** Options for the SignatureBlock plugin. */
+/**
+ * Options for the SignatureBlock plugin.
+ */
 export interface SignatureBlockOptions {
-  /** The signing parties. */
+  /**
+   * The signing parties.
+   */
   parties: SignatureParty[]
   /**
    * Number of columns in the signature grid.
@@ -43,13 +47,21 @@ export interface SignatureBlockOptions {
   columns?: number
 }
 
-/** A single party in a signature block. */
+/**
+ * A single party in a signature block.
+ */
 export interface SignatureParty {
-  /** Party label (e.g. "甲方（盖章）"). */
+  /**
+   * Party label (e.g. "甲方（盖章）").
+   */
   label: string
-  /** Pre-filled date (e.g. "2026年  月  日"). */
+  /**
+   * Pre-filled date (e.g. "2026年  月  日").
+   */
   date?: string
-  /** Pre-filled name (shown underlined when provided). */
+  /**
+   * Pre-filled name (shown underlined when provided).
+   */
   name?: string
 }
 

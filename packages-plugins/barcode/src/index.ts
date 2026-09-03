@@ -15,7 +15,9 @@ import {
 import { AlignmentType, Paragraph } from 'docx'
 import type { LiteralUnion } from '@docxkit/core'
 
-/** Common linear barcode formats, while retaining the full bwip-js catalog. */
+/**
+ * Common linear barcode formats, while retaining the full bwip-js catalog.
+ */
 export type BarcodeFormat = LiteralUnion<
   | 'code128'
   | 'code39'
@@ -29,9 +31,13 @@ export type BarcodeFormat = LiteralUnion<
   | 'upce'
 >
 
-/** Options for the barcode plugin. */
+/**
+ * Options for the barcode plugin.
+ */
 export interface BarcodeOptions {
-  /** Value encoded by the barcode. */
+  /**
+   * Value encoded by the barcode.
+   */
   text: string
   /**
    * Paragraph alignment.
@@ -53,7 +59,9 @@ export interface BarcodeOptions {
    * @default 12
    */
   barHeight?: number
-  /** Optional caption below the barcode. */
+  /**
+   * Optional caption below the barcode.
+   */
   caption?: string
   /**
    * Barcode symbology.
@@ -75,9 +83,13 @@ export interface BarcodeOptions {
    * @default 3
    */
   scale?: number
-  /** Human-readable text color as a hex string. */
+  /**
+   * Human-readable text color as a hex string.
+   */
   textColor?: string
-  /** Display width in pixels. Defaults to the natural width, capped at 320. */
+  /**
+   * Display width in pixels. Defaults to the natural width, capped at 320.
+   */
   width?: number
 }
 

@@ -21,17 +21,20 @@ export type DocxInput = string | ArrayBuffer | Blob | File | Uint8Array
  * read-only.
  */
 export interface DocxPreview {
-  /** The root DOM container element. Read-only. */
+  /**
+   * The root DOM container element. Read-only.
+   */
   readonly container: HTMLElement
 
-  /** The most recently rendered input, or `null` if nothing rendered yet. Read-only. */
+  /**
+   * The most recently rendered input, or `null` if nothing rendered yet. Read-only.
+   */
   readonly currentInput: DocxInput | null
 
   /**
    * Clear the container (removes all child nodes and resets `currentInput`).
    *
-   * Does not release any tracked object URLs. Use {@link DocxPreview.destroy}
-   * for full cleanup.
+   * Releases media URLs owned by the removed content. The instance can be reused.
    */
   clear(): void
 
@@ -72,7 +75,6 @@ export interface DocxPreviewOptions extends Partial<DocxPreviewOptionsBase> {
    * @default 'docx-kit-preview'
    */
   className?: string
-
   /**
    * Microsoft Office Online viewer URL template.
    * The URL to the .docx file is appended (URL-encoded) as the `src` query param.
@@ -93,6 +95,12 @@ export interface DocxPreviewOptions extends Partial<DocxPreviewOptionsBase> {
   pageMode?: 'continuous' | 'paged'
 
   /**
+   * Render embedded HTML chunks in inert, sandboxed iframes. Disabled by default.
+   * Scripts, forms, same-origin access, and top-level navigation stay blocked.
+   */
+  renderAltChunks?: boolean
+
+  /**
    * Which rendering backend to use.
    * - `'dom'` (default) — `docx-preview` renders to DOM elements
    * - `'microsoft'` — Embeds Microsoft Office Online via iframe (URL input only)
@@ -100,5 +108,7 @@ export interface DocxPreviewOptions extends Partial<DocxPreviewOptionsBase> {
   renderer?: RendererKind
 }
 
-/** Which rendering backend to use. */
+/**
+ * Which rendering backend to use.
+ */
 export type RendererKind = 'dom' | 'microsoft'

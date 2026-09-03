@@ -9,13 +9,18 @@
 
 import {
   defaultOptions as docxPreviewDefaults,
-  renderAsync,
+  parseAsync,
+  renderDocument,
 } from 'docx-preview'
 import { createPreviewError, PREVIEW_ERROR_CODES } from './errors'
 import { normalizeDocxInput } from './normalize'
+import { trackDocumentResources } from './resources'
+import { sanitizePreviewNode } from './sanitize'
 import type { DocxInput, DocxPreviewOptions } from './types'
 
-/** Default options for the DOM renderer. */
+/**
+ * Default options for the DOM renderer.
+ */
 const DEFAULT_OPTIONS = {
   className: 'docx-kit-preview',
   pageMode: 'paged' as const,
@@ -27,7 +32,7 @@ const DEFAULT_OPTIONS = {
  * Behavior is determined by `options.renderer`:
  * - `'microsoft'` — Embeds an iframe pointing to the Microsoft Office Online
  *   viewer. Only accepts URL string inputs.
- * - `'dom'` (default) — Uses `docx-preview`'s `renderAsync` to render the
+ * - `'dom'` (default) — Uses `docx-preview` to render the
  *   DOCX as styled HTML inside the container.
  *
  * @param container - The target DOM element (will be cleared before rendering)
@@ -41,7 +46,7 @@ export async function renderDocxPreview(
   input: DocxInput,
   options: DocxPreviewOptions = {},
   signal?: AbortSignal,
-): Promise<void> {
+): Promise<(() => void) | void> {
   // Microsoft renderer — only accepts URL strings
   if (options.renderer === 'microsoft') {
     if (typeof input !== 'string') {
@@ -70,14 +75,24 @@ export async function renderDocxPreview(
     breakPages,
     className: options.className ?? DEFAULT_OPTIONS.className,
     ...stripUnknownOptions(options),
+    renderAltChunks: options.renderAltChunks ?? false,
+    h(element: Parameters<typeof docxPreviewDefaults.h>[0]) {
+      return sanitizePreviewNode((options.h ?? docxPreviewDefaults.h)(element))
+    },
   }
 
+  let dispose: (() => void) | undefined
   try {
-    await renderAsync(blob, container, undefined, renderOptions)
+    const document: unknown = await parseAsync(blob, renderOptions)
+    dispose = trackDocumentResources(document)
+    const nodes = await renderDocument(document, renderOptions)
+    container.replaceChildren(...nodes)
+    return dispose
   } catch (error) {
+    dispose?.()
     throw createPreviewError(
       PREVIEW_ERROR_CODES.PREVIEW_RENDER_FAILED,
-      `docx-preview renderAsync failed: ${(error as Error).message ?? String(error)}`,
+      `docx-preview rendering failed: ${(error as Error).message ?? String(error)}`,
       error,
     )
   }

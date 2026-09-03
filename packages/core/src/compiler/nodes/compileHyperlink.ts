@@ -23,14 +23,23 @@ export function compileHyperlink<TStyles extends StyleSheet>(
   })
 }
 
-/** Compile a hyperlink for use inside another paragraph-like container. */
+/**
+ * Compile a hyperlink for use inside another paragraph-like container.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - External or internal hyperlink node
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param baseStyle - Optional inherited text style
+ * @returns An internal or external hyperlink containing styled text runs
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ */
 export function compileInlineHyperlink<TStyles extends StyleSheet>(
   node: HyperlinkNode<TStyles>,
   config: DocxKitConfig<TStyles>,
   baseStyle?: DocxStyleRule,
 ) {
   const style = resolveStyle({
-    base: baseStyle,
+    base: { ...config.defaults?.text, ...baseStyle },
     className: node.className,
     inline: node.style,
     styles: config.styles,

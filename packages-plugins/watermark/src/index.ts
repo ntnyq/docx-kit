@@ -18,9 +18,13 @@
 import { definePlugin } from '@docxkit/core'
 import { AlignmentType, Paragraph, TextRun } from 'docx'
 
-/** Options for the Watermark plugin. */
+/**
+ * Options for the Watermark plugin.
+ */
 export interface WatermarkOptions {
-  /** Watermark text. */
+  /**
+   * Watermark text.
+   */
   text: string
   /**
    * Horizontal alignment.

@@ -28,29 +28,43 @@ import {
   TextRun,
 } from 'docx'
 
-/** Options for the Cover Page plugin. */
+/**
+ * Options for the Cover Page plugin.
+ */
 export interface CoverPageOptions {
-  /** Main title text (required). */
+  /**
+   * Main title text (required).
+   */
   title: string
   /**
    * Horizontal text alignment.
    * @default CENTER
    */
   alignment?: (typeof AlignmentType)[keyof typeof AlignmentType]
-  /** Author or department name. */
+  /**
+   * Author or department name.
+   */
   author?: string
-  /** Background color of the cover page in hex RRGGBB. */
+  /**
+   * Background color of the cover page in hex RRGGBB.
+   */
   backgroundColor?: string
-  /** Date string (e.g. "2026-06-11"). */
+  /**
+   * Date string (e.g. "2026-06-11").
+   */
   date?: string
-  /** Organization / company name. */
+  /**
+   * Organization / company name.
+   */
   organization?: string
   /**
    * Show a decorative horizontal rule between title and author.
    * @default true
    */
   showRule?: boolean
-  /** Sub-title text displayed below the title. */
+  /**
+   * Sub-title text displayed below the title.
+   */
   subtitle?: string
 }
 

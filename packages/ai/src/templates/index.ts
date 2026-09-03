@@ -28,7 +28,9 @@ export type BuiltinAiTemplate =
   | typeof reportTemplate
   | typeof resumeTemplate
 
-/** All built-in templates. */
+/**
+ * All built-in templates.
+ */
 export const BUILTIN_TEMPLATES = [
   invoiceTemplate,
   letterTemplate,
@@ -38,7 +40,9 @@ export const BUILTIN_TEMPLATES = [
 
 export type BuiltinTemplateName = (typeof BUILTIN_TEMPLATES)[number]['name']
 
-/** Names of all built-in templates. */
+/**
+ * Names of all built-in templates.
+ */
 export const TEMPLATE_LIST: BuiltinTemplateName[] = BUILTIN_TEMPLATES.map(
   template => template.name,
 )

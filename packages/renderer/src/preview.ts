@@ -11,11 +11,14 @@
 import { renderDocxPreview } from './render'
 import type { DocxInput, DocxPreview, DocxPreviewOptions } from './types'
 
-/** Internal state of a preview instance. */
+/**
+ * Internal state of a preview instance.
+ */
 interface PreviewState {
   activeController: AbortController | null
   currentInput: DocxInput | null
   destroyed: boolean
+  dispose: (() => void) | null
   renderId: number
 }
 
@@ -62,6 +65,7 @@ export function createDocxPreview(
     activeController: null,
     currentInput: null,
     destroyed: false,
+    dispose: null,
     renderId: 0,
   }
 
@@ -71,6 +75,8 @@ export function createDocxPreview(
       state.activeController = null
       state.renderId += 1
       container.replaceChildren()
+      state.dispose?.()
+      state.dispose = null
       state.currentInput = null
     },
 
@@ -91,6 +97,8 @@ export function createDocxPreview(
       state.activeController = null
       state.renderId += 1
       container.replaceChildren()
+      state.dispose?.()
+      state.dispose = null
       state.currentInput = null
       state.destroyed = true
     },
@@ -113,7 +121,7 @@ export function createDocxPreview(
       state.renderId = renderId
 
       try {
-        await renderDocxPreview(
+        const dispose = await renderDocxPreview(
           stagingContainer,
           input,
           options,
@@ -121,10 +129,13 @@ export function createDocxPreview(
         )
 
         if (state.destroyed || state.renderId !== renderId) {
+          dispose?.()
           return
         }
 
         container.replaceChildren(...stagingContainer.childNodes)
+        state.dispose?.()
+        state.dispose = dispose ?? null
         state.currentInput = input
       } catch (error) {
         if (

@@ -30,7 +30,15 @@ import type {
 
 export * from '@docxkit/core'
 
-/** Render a schema with browser URL and same-origin plugin loading support. */
+/**
+ * Render a schema with browser URL and same-origin plugin loading support.
+ *
+ * @template TStyles - The stylesheet type inferred from the schema
+ * @param schema - Document content, configuration, and optional plugin sources
+ * @returns A promise that resolves to a builder ready for document export
+ * @throws {DocxKitError} If a plugin cannot be loaded, validated, or authorized
+ * @throws Propagates synchronous plugin setup errors during registration
+ */
 export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   schema: DocxSchema<TStyles>,
 ): Promise<DocxBuilder<TStyles>> {
@@ -115,42 +123,60 @@ export type {
 
 export { academicPreset, classicPreset, modernPreset }
 
-/** All built-in presets, keyed by ID. */
+/**
+ * All built-in presets, keyed by ID.
+ */
 export const BUILTIN_PRESETS: ReadonlyMap<string, DocxPreset> = new Map([
   [academicPreset.id, academicPreset],
   [classicPreset.id, classicPreset],
   [modernPreset.id, modernPreset],
 ])
 
-/** Ordered list of built-in presets (for UI selectors). */
+/**
+ * Ordered list of built-in presets (for UI selectors).
+ */
 export const PRESET_LIST: readonly DocxPreset[] = [
   classicPreset,
   modernPreset,
   academicPreset,
 ]
 
-/** Look up a built-in preset by ID. */
+/**
+ * Look up a built-in preset by ID.
+ *
+ * @param id - Identifier of the built-in preset
+ * @returns The matching preset, or `undefined` if the ID is unknown
+ */
 export function usePreset(id: string): DocxPreset | undefined {
   return BUILTIN_PRESETS.get(id)
 }
 
 export { minimalTheme, oceanTheme, warmTheme }
 
-/** All built-in themes, keyed by ID. */
+/**
+ * All built-in themes, keyed by ID.
+ */
 export const BUILTIN_THEMES: ReadonlyMap<string, DocxTheme> = new Map([
   [minimalTheme.id, minimalTheme],
   [oceanTheme.id, oceanTheme],
   [warmTheme.id, warmTheme],
 ])
 
-/** Ordered list of built-in themes (for UI selectors). */
+/**
+ * Ordered list of built-in themes (for UI selectors).
+ */
 export const THEME_LIST: readonly DocxTheme[] = [
   minimalTheme,
   oceanTheme,
   warmTheme,
 ]
 
-/** Look up a built-in theme by ID. */
+/**
+ * Look up a built-in theme by ID.
+ *
+ * @param id - Identifier of the built-in theme
+ * @returns The matching theme, or `undefined` if the ID is unknown
+ */
 export function useTheme(id: string): DocxTheme | undefined {
   return BUILTIN_THEMES.get(id)
 }

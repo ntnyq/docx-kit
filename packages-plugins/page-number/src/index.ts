@@ -17,7 +17,9 @@
 import { definePlugin } from '@docxkit/core'
 import { AlignmentType, PageNumber, Paragraph, TextRun } from 'docx'
 
-/** Options for the Page Number plugin. */
+/**
+ * Options for the Page Number plugin.
+ */
 export interface PageNumberOptions {
   /**
    * Horizontal alignment of the page number.

@@ -57,14 +57,18 @@ import type {
 } from '@docxkit/types'
 import type { FileChild, ParagraphChild } from 'docx'
 
-/** Re-export for backward compatibility. */
+/**
+ * Re-export for backward compatibility.
+ */
 export { CompilationSession, numberingConfigMap, resetNumberingState }
 
 // -----------------------------------------------------------------
 // Node Compiler Registry
 // -----------------------------------------------------------------
 
-/** The default node compiler registry, pre-populated with all built-in types. */
+/**
+ * The default node compiler registry, pre-populated with all built-in types.
+ */
 export const defaultRegistry = new NodeCompilerRegistry()
 
 // Register all built-in node type compilers.
@@ -185,13 +189,21 @@ defaultRegistry
  * @template TStyles — The user's stylesheet type
  */
 export interface CompileNodeContext<TStyles extends StyleSheet = StyleSheet> {
-  /** The document configuration. */
+  /**
+   * The document configuration.
+   */
   config: DocxKitConfig<TStyles>
-  /** The node being compiled. */
+  /**
+   * The node being compiled.
+   */
   node: BlockNode<TStyles>
-  /** Map of registered plugin name → plugin instance. */
+  /**
+   * Map of registered plugin name → plugin instance.
+   */
   plugins: Map<string, DocxPlugin>
-  /** Optional compilation session (recommended for new code). */
+  /**
+   * Optional compilation session (recommended for new code).
+   */
   session?: CompilationSession
 }
 

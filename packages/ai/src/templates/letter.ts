@@ -10,23 +10,41 @@
 import type { BlockNode, DocxSchema } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
 
-/** Letter template parameters. */
+/**
+ * Letter template parameters.
+ */
 export interface LetterParams {
-  /** Letter body paragraphs. */
+  /**
+   * Letter body paragraphs.
+   */
   body: string[]
-  /** Recipient name. */
+  /**
+   * Recipient name.
+   */
   recipientName: string
-  /** Sender name. */
+  /**
+   * Sender name.
+   */
   senderName: string
-  /** Closing phrase (e.g. "Sincerely", "Best regards"). */
+  /**
+   * Closing phrase (e.g. "Sincerely", "Best regards").
+   */
   closing?: string
-  /** Letter date. */
+  /**
+   * Letter date.
+   */
   date?: string
-  /** Recipient address. */
+  /**
+   * Recipient address.
+   */
   recipientAddress?: string
-  /** Sender address. */
+  /**
+   * Sender address.
+   */
   senderAddress?: string
-  /** Letter subject line. */
+  /**
+   * Letter subject line.
+   */
   subject?: string
 }
 

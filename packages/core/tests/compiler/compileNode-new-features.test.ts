@@ -15,9 +15,9 @@ describe('compileTextStyle - new properties', () => {
     expect(result.highlight).toBeDefined()
   })
 
-  it('compiles highlight "none" as undefined', () => {
+  it('preserves explicit highlight removal', () => {
     const result = compileTextStyle({ highlight: 'none' })
-    expect(result.highlight).toBeUndefined()
+    expect(result.highlight).toBe('none')
   })
 
   it('compiles superScript property', () => {
@@ -142,7 +142,7 @@ describe('compileCellStyle - shading', () => {
     })
     expect(result.borders?.bottom).toEqual({
       color: '123456',
-      size: 20,
+      size: 8,
       style: 'double',
     })
   })

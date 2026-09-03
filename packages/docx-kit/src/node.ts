@@ -7,6 +7,7 @@
  * @packageDocumentation
  */
 
+import { readFile } from 'node:fs/promises'
 // ---------- Core ----------
 import {
   createDocx as createCoreDocx,
@@ -45,9 +46,20 @@ export interface NodeDocxBuilder<
   TStyles extends StyleSheet = StyleSheet,
   TPlugins extends PluginRegistry = Record<never, never>,
 > extends DocxBuilder<TStyles, TPlugins> {
-  /** Save the generated document to the local filesystem. */
+  /**
+   * Save the generated document to the local filesystem.
+   *
+   * @param filename - Destination path for the generated DOCX file
+   * @returns A promise that resolves after the document is written
+   * @throws If plugin setup, document compilation, packing, or filesystem writing fails
+   */
   save: (filename: string) => Promise<void>
-  /** Pack the generated document as a Node.js stream. */
+  /**
+   * Pack the generated document as a Node.js stream.
+   *
+   * @returns A promise that resolves to a readable DOCX stream
+   * @throws If plugin setup, document compilation, or stream creation fails
+   */
   toStream: () => Promise<Readable>
   use: <TName extends string, TOptions, TRender>(
     plugin: DocxPlugin<TName, TOptions, TRender>,
@@ -60,7 +72,12 @@ export interface NodeDocxBuilder<
 export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
   config: DocxKitConfig<TStyles> = {},
 ): NodeDocxBuilder<TStyles> {
-  return attachNodeSave(createCoreDocx(config)) as NodeDocxBuilder<TStyles>
+  return attachNodeSave(
+    createCoreDocx({
+      ...config,
+      resolveImage: config.resolveImage ?? resolveNodeImage,
+    }),
+  ) as NodeDocxBuilder<TStyles>
 }
 
 /**
@@ -72,6 +89,7 @@ export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   return attachNodeSave(
     await renderCoreDocx(schema, {
       pluginLoader: createPluginLoader(),
+      resolveImage: resolveNodeImage,
     }),
   )
 }
@@ -87,6 +105,13 @@ function attachNodeSave<
   nodeBuilder.toStream = async () =>
     streamDocument(await nodeBuilder.toDocument())
   return nodeBuilder
+}
+
+/**
+ * Read local image paths only; URL fetching requires an explicit caller adapter.
+ */
+async function resolveNodeImage(source: string): Promise<Uint8Array> {
+  return readFile(source.startsWith('file:') ? new URL(source) : source)
 }
 
 export { tocPlugin } from '@docxkit/plugin-toc'

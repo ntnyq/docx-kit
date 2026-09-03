@@ -137,10 +137,10 @@ describe('compiler OOXML contracts', () => {
       '<w:tblpPr w:tblpX="1440" w:tblpY="2880" w:horzAnchor="page" w:vertAnchor="margin"><w:tblOverlap w:val="never"/></w:tblpPr>',
     )
     expect(documentXml).toContain(
-      '<w:insideH w:val="dotted" w:color="94a3b8" w:sz="10"/>',
+      '<w:insideH w:val="dotted" w:color="94a3b8" w:sz="4"/>',
     )
     expect(documentXml).toContain(
-      '<w:bottom w:val="double" w:color="123456" w:sz="20"/>',
+      '<w:bottom w:val="double" w:color="123456" w:sz="8"/>',
     )
     expect(documentXml).toContain('<w:shd w:fill="dcfce7" w:val="clear"/>')
     expect(documentXml).toContain('<w:tcW w:type="dxa" w:w="800"/>')
@@ -409,7 +409,7 @@ describe('compiler OOXML contracts', () => {
       '<w:pgBorders w:display="allPages" w:offsetFrom="page" w:zOrder="front">',
     )
     expect(documentXml).toContain(
-      '<w:top w:val="double" w:color="336699" w:sz="20"/>',
+      '<w:top w:val="double" w:color="336699" w:sz="8"/>',
     )
     expect(documentXml).toContain(
       '<w:lnNumType w:countBy="5" w:start="3" w:restart="newSection" w:distance="120"/>',

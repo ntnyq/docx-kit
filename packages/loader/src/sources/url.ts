@@ -16,7 +16,7 @@
  */
 
 import { DocxKitError } from '@docxkit/core'
-import { isDocxPlugin } from '../utils'
+import { resolvePluginExport } from '../utils'
 import { resolveManifest } from './options'
 
 import type { DocxPlugin } from '@docxkit/core'
@@ -52,16 +52,7 @@ export async function loadUrlPlugin(
     )
   }
 
-  // Extract the plugin — check for default export first, then named
-  const exported = mod as { default?: unknown }
-  const plugin = exported.default ?? mod
-
-  if (!isDocxPlugin(plugin)) {
-    throw new DocxKitError(
-      'PLUGIN_LOAD_FAILED',
-      `Module loaded from "${url}" does not export a valid DocxPlugin`,
-    )
-  }
+  const plugin = await resolvePluginExport(mod, url, manifest?.plugin.name)
 
   // If a manifest was provided, verify plugin name matches
   if (manifest && plugin.name !== manifest.plugin.name) {
@@ -73,6 +64,6 @@ export async function loadUrlPlugin(
 
   return {
     manifest,
-    plugin: plugin as DocxPlugin,
+    plugin,
   }
 }

@@ -9,7 +9,9 @@ import { resolveStyle } from '../../style/normalizeStyle'
 import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
 import type { DocxKitConfig, HeadingNode, StyleSheet } from '@docxkit/types'
 
-/** Map heading level numbers to `docx` `HeadingLevel` enum values. */
+/**
+ * Map heading level numbers to `docx` `HeadingLevel` enum values.
+ */
 export const HEADING_MAP = {
   1: HeadingLevel.HEADING_1,
   2: HeadingLevel.HEADING_2,
@@ -28,6 +30,7 @@ export function compileHeading<TStyles extends StyleSheet>(
     node.className
     ?? (config.styles?.[defaultClassName] ? defaultClassName : undefined)
   const style = resolveStyle({
+    base: config.defaults?.text,
     className,
     inline: node.style,
     styles: config.styles,

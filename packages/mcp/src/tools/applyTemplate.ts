@@ -11,9 +11,13 @@ import type { DocxSchema } from '@docxkit/core'
  * Input for the apply_template MCP tool.
  */
 export interface ApplyTemplateInput {
-  /** Template parameter values (match template schema). */
+  /**
+   * Template parameter values (match template schema).
+   */
   data: Record<string, unknown>
-  /** Name of the template to apply. */
+  /**
+   * Name of the template to apply.
+   */
   template: string
 }
 
@@ -21,9 +25,13 @@ export interface ApplyTemplateInput {
  * Output from the apply_template MCP tool.
  */
 export interface ApplyTemplateOutput {
-  /** The generated DocxSchema. */
+  /**
+   * The generated DocxSchema.
+   */
   schema: DocxSchema
-  /** Name of the template used. */
+  /**
+   * Name of the template used.
+   */
   templateName: string
 }
 

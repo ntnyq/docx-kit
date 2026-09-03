@@ -42,7 +42,13 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return prototype === null || prototype === Object.prototype
 }
 
-/** Parse `$category.key` and look up the value in the theme. */
+/**
+ * Parse `$category.key` and look up the value in the theme.
+ *
+ * @param token - Theme token in `$category.key` form
+ * @param theme - Theme containing the token category maps
+ * @returns The token value, or `undefined` if the token or key is not recognized
+ */
 function resolveSingleToken(token: string, theme: DocxTheme): unknown {
   const re = /^\$(colors|fonts|fontSize|spacing)\.(.+)$/
   const match = token.match(re)

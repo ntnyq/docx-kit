@@ -16,12 +16,14 @@ describe('createDocxPreview render ordering', () => {
 
   it('keeps the latest render when an older render finishes last', async () => {
     const completions = new Map<string, () => void>()
+    const firstDispose = vi.fn()
+    const secondDispose = vi.fn()
     mockRenderDocxPreview.mockImplementation(
       async (container, input) =>
-        new Promise<void>(resolve => {
+        new Promise<() => void>(resolve => {
           completions.set(String(input), () => {
             container.textContent = String(input)
-            resolve()
+            resolve(input === 'first.docx' ? firstDispose : secondDispose)
           })
         }),
     )
@@ -40,29 +42,58 @@ describe('createDocxPreview render ordering', () => {
     await firstRender
     expect(container.textContent).toBe('second.docx')
     expect(preview.currentInput).toBe('second.docx')
+    expect(firstDispose).toHaveBeenCalledOnce()
+    expect(secondDispose).not.toHaveBeenCalled()
+    preview.destroy()
+    expect(secondDispose).toHaveBeenCalledOnce()
   })
 
-  it('does not commit a render that finishes after clear', async () => {
-    let complete: (() => void) | undefined
-    mockRenderDocxPreview.mockImplementation(
-      async container =>
-        new Promise<void>(resolve => {
-          complete = () => {
-            container.textContent = 'late result'
-            resolve()
-          }
-        }),
-    )
+  it.each(['clear', 'destroy'] as const)(
+    'disposes a render that finishes after %s',
+    async action => {
+      let complete: (() => void) | undefined
+      const dispose = vi.fn()
+      mockRenderDocxPreview.mockImplementation(
+        async container =>
+          new Promise<() => void>(resolve => {
+            complete = () => {
+              container.textContent = 'late result'
+              resolve(dispose)
+            }
+          }),
+      )
 
+      const container = document.createElement('div')
+      const preview = createDocxPreview(container)
+      const render = preview.render('document.docx')
+
+      preview[action]()
+      complete?.()
+      await render
+
+      expect(container.textContent).toBe('')
+      expect(preview.currentInput).toBeNull()
+      expect(dispose).toHaveBeenCalledOnce()
+    },
+  )
+
+  it('keeps the current preview and media when a replacement fails', async () => {
+    const dispose = vi.fn()
+    const failure = new Error('Bad replacement')
+    mockRenderDocxPreview
+      .mockImplementationOnce(async container => {
+        container.textContent = 'First'
+        return dispose
+      })
+      .mockRejectedValueOnce(failure)
     const container = document.createElement('div')
     const preview = createDocxPreview(container)
-    const render = preview.render('document.docx')
-
-    preview.clear()
-    complete?.()
-    await render
-
-    expect(container.textContent).toBe('')
-    expect(preview.currentInput).toBeNull()
+    await preview.render('first.docx')
+    await expect(preview.render('bad.docx')).rejects.toBe(failure)
+    expect(container.textContent).toBe('First')
+    expect(preview.currentInput).toBe('first.docx')
+    expect(dispose).not.toHaveBeenCalled()
+    preview.destroy()
+    expect(dispose).toHaveBeenCalledOnce()
   })
 })

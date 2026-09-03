@@ -33,19 +33,31 @@ import {
   WidthType,
 } from 'docx'
 
-/** A single timeline event. */
+/**
+ * A single timeline event.
+ */
 export interface TimelineEvent {
-  /** Date / time label (e.g. "2026-06" or "Q3"). */
+  /**
+   * Date / time label (e.g. "2026-06" or "Q3").
+   */
   date: string
-  /** Short event title. */
+  /**
+   * Short event title.
+   */
   title: string
-  /** Optional longer description. */
+  /**
+   * Optional longer description.
+   */
   description?: string
 }
 
-/** Options for the Timeline plugin. */
+/**
+ * Options for the Timeline plugin.
+ */
 export interface TimelineOptions {
-  /** Array of timeline events in chronological order. */
+  /**
+   * Array of timeline events in chronological order.
+   */
   events: TimelineEvent[]
   /**
    * Accent color for the connector line and date highlight.
@@ -64,7 +76,9 @@ export interface TimelineOptions {
   layout?: 'alternating' | 'left' | 'right'
 }
 
-/** Default table column widths (in DXA, twips). */
+/**
+ * Default table column widths (in DXA, twips).
+ */
 const COL_WIDTHS = {
   connector: 600,
   content: 6400,

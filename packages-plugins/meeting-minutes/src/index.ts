@@ -53,27 +53,47 @@ const BORDER = {
 
 const AGENDA_COLUMNS = ['议题', '讨论', '决议', '负责人']
 
-/** A single agenda item. */
+/**
+ * A single agenda item.
+ */
 export interface AgendaItem {
-  /** Discussion notes. */
+  /**
+   * Discussion notes.
+   */
   discussion: string
-  /** Meeting topic. */
+  /**
+   * Meeting topic.
+   */
   topic: string
-  /** Decision made. */
+  /**
+   * Decision made.
+   */
   decision?: string
-  /** Responsible person. */
+  /**
+   * Responsible person.
+   */
   owner?: string
 }
 
-/** Options for the MeetingMinutes plugin. */
+/**
+ * Options for the MeetingMinutes plugin.
+ */
 export interface MeetingMinutesOptions {
-  /** Agenda items to render in the table. */
+  /**
+   * Agenda items to render in the table.
+   */
   agenda: AgendaItem[]
-  /** Attendee names. */
+  /**
+   * Attendee names.
+   */
   attendees: string[]
-  /** Meeting date (e.g. "2026-06-11"). */
+  /**
+   * Meeting date (e.g. "2026-06-11").
+   */
   date: string
-  /** Meeting title (rendered as Heading 1). */
+  /**
+   * Meeting title (rendered as Heading 1).
+   */
   title: string
 }
 

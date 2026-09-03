@@ -26,8 +26,13 @@ export function renderManifest(
       docxKit: docxKitRange,
       main: './dist/index.js',
       name: pluginName,
-      plugin: { name: pluginName.replace(/^docx-kit-plugin-/, '') },
       version,
+      plugin: {
+        name: pluginName
+          .split('/')
+          .at(-1)!
+          .replace(/^docx-kit-plugin-/, ''),
+      },
     },
     null,
     2,

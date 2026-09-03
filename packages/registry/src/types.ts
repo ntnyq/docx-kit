@@ -10,10 +10,14 @@ import type { PluginManifest } from '@docxkit/core'
  * Search result from the npm registry API.
  */
 export interface NpmSearchResult {
-  /** Download count (if available). */
+  /**
+   * Download count (if available).
+   */
   downloads?: number
 
-  /** Package name. */
+  /**
+   * Package name.
+   */
   package: {
     description: string
     name: string
@@ -22,7 +26,9 @@ export interface NpmSearchResult {
     links?: { repository?: string }
   }
 
-  /** Score object from npm search. */
+  /**
+   * Score object from npm search.
+   */
   score?: {
     detail: { popularity: number; quality: number }
     final: number
@@ -36,16 +42,24 @@ export interface NpmSearchResult {
  * its repository (if linked).
  */
 export interface QualityScore {
-  /** Whether the package includes a docx-kit plugin manifest. */
+  /**
+   * Whether the package includes a docx-kit plugin manifest.
+   */
   hasManifest: boolean
 
-  /** Whether the package has test files detected. */
+  /**
+   * Whether the package has test files detected.
+   */
   hasTests: boolean
 
-  /** Whether the package includes TypeScript source/types. */
+  /**
+   * Whether the package includes TypeScript source/types.
+   */
   hasTypescript: boolean
 
-  /** GitHub star count (0 if no repo linked). */
+  /**
+   * GitHub star count (0 if no repo linked).
+   */
   stars: number
 }
 
@@ -56,21 +70,33 @@ export interface QualityScore {
  * including its npm package details, manifest, and quality score.
  */
 export interface RegistryPluginEntry {
-  /** Package description from npm. */
+  /**
+   * Package description from npm.
+   */
   description: string
 
-  /** Weekly download count from npm. */
+  /**
+   * Weekly download count from npm.
+   */
   downloads: number
 
-  /** Parsed plugin manifest, or null when it has not been verified. */
+  /**
+   * Parsed plugin manifest, or null when it has not been verified.
+   */
   manifest: PluginManifest | null
 
-  /** npm package name. */
+  /**
+   * npm package name.
+   */
   name: string
 
-  /** Quality assessment based on available signals. */
+  /**
+   * Quality assessment based on available signals.
+   */
   quality: QualityScore
 
-  /** Latest published version. */
+  /**
+   * Latest published version.
+   */
   version: string
 }

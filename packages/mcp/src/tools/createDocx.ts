@@ -15,13 +15,19 @@ import type { DocxSchema, PluginLoader } from '@docxkit/core'
  * Input schema for the create_document MCP tool.
  */
 export interface CreateDocumentInput {
-  /** File path for the output .docx file. */
+  /**
+   * File path for the output .docx file.
+   */
   outputPath: string
-  /** The docx-kit DocxSchema defining the document. */
+  /**
+   * The docx-kit DocxSchema defining the document.
+   */
   schema: DocxSchema
 }
 
-/** Filesystem boundary for the create_document tool. */
+/**
+ * Filesystem boundary for the create_document tool.
+ */
 export interface CreateDocumentOptions {
   /**
    * Directory that contains every path the tool may write.
@@ -40,9 +46,13 @@ export interface CreateDocumentOptions {
  * Output from the create_document MCP tool.
  */
 export interface CreateDocumentOutput {
-  /** Path of the created file. */
+  /**
+   * Path of the created file.
+   */
   filePath: string
-  /** File size in bytes. */
+  /**
+   * File size in bytes.
+   */
   size: number
 }
 
@@ -75,7 +85,15 @@ export const createDocxToolDefinition = {
   },
 }
 
-/** Render and save a DOCX inside the configured output directory. */
+/**
+ * Render and save a DOCX inside the configured output directory.
+ *
+ * @param input - Document schema and output path relative to the configured directory
+ * @param options - Optional output directory and plugin loader
+ * @returns A promise that resolves to the absolute output path and byte size
+ * @throws {Error} If the output escapes the configured directory or lacks a `.docx` extension
+ * @throws If plugin loading, document export, or filesystem operations fail
+ */
 export async function createDocument(
   input: CreateDocumentInput,
   options: CreateDocumentOptions = {},

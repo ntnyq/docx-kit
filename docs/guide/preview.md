@@ -69,6 +69,8 @@ await preview.render('https://example.com/report.docx')
 
 Uses `docx-preview` to render the DOCX as styled HTML elements inside the container.
 
+Embedded HTML (`altChunk`) is disabled by default. Set `renderAltChunks: true` to display it in sandboxed iframes without script or same-origin permissions. Executable hyperlink schemes such as `javascript:` are removed. Embedded HTML may still request external resources, so leave it disabled for untrusted documents that must not contact external servers.
+
 - **Text is selectable and searchable** (DOM-based)
 - Supports headers/footers, page breaks, tables, images
 - Fidelity: high (pixel-faithful to Word layout)
@@ -151,7 +153,7 @@ Creates a preview instance bound to a DOM container.
 | Method | Description |
 |---|---|
 | `render(input)` | Render a DOCX input (Blob/File/ArrayBuffer/Uint8Array/URL) |
-| `clear()` | Remove rendered content, keep instance alive |
+| `clear()` | Remove rendered content and release its media URLs, keep instance alive |
 | `destroy()` | Full cleanup (revokes URLs, clears DOM, marks destroyed) |
 
 | Property | Type | Description |
@@ -195,6 +197,7 @@ All options from `docx-preview` can be passed through:
 | `renderEndnotes` | `boolean` | `false` | Render endnotes |
 | `ignoreFonts` | `boolean` | `false` | Don't load web fonts |
 | `useBase64URL` | `boolean` | `false` | Use base64 images (vs ObjectURL) |
+| `renderAltChunks` | `boolean` | `false` | Render embedded HTML in inert sandboxed iframes |
 | `microsoftViewerUrl` | `string` | Office Online URL | Custom OOS server |
 
 ---
@@ -233,7 +236,7 @@ try {
 |---|---|
 | `PREVIEW_INPUT_INVALID` | Input is `null`, `undefined`, or unrecognized type |
 | `PREVIEW_FETCH_FAILED` | `fetch()` to URL failed (network or HTTP error) |
-| `PREVIEW_RENDER_FAILED` | `docx-preview` `renderAsync()` threw |
+| `PREVIEW_RENDER_FAILED` | DOCX parsing or DOM rendering failed |
 | `MICROSOFT_URL_REQUIRED` | Microsoft renderer called with non-URL input |
 
 ---

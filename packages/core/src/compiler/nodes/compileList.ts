@@ -18,7 +18,17 @@ import type { CompilationSession } from '../numbers'
 
 const MAX_LIST_LEVEL = 8
 
-/** Map bullet list node to Paragraphs. */
+/**
+ * Map bullet list node to Paragraphs.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Bullet list items, marker, nesting level, and styling
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param session - Compilation session tracking numbering, comments, and footnotes
+ * @returns A promise that resolves to one bullet-numbered paragraph per list item
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ * @throws If nested inline content or image data cannot be compiled
+ */
 export async function compileBulletList<TStyles extends StyleSheet>(
   node: BulletListNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -36,6 +46,7 @@ export async function compileBulletList<TStyles extends StyleSheet>(
   })
 
   const style = resolveStyle({
+    base: config.defaults?.text,
     className: node.className,
     inline: node.style,
     styles: config.styles,
@@ -105,7 +116,17 @@ const FORMAT_MAP: Record<
   upperRoman: LevelFormat.UPPER_ROMAN,
 }
 
-/** Map numbered list node to Paragraphs. */
+/**
+ * Map numbered list node to Paragraphs.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Numbered list items, format, start value, nesting level, and styling
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param session - Compilation session tracking numbering, comments, and footnotes
+ * @returns A promise that resolves to one numbered paragraph per list item
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ * @throws If nested inline content or image data cannot be compiled
+ */
 export async function compileNumberedList<TStyles extends StyleSheet>(
   node: NumberedListNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -125,6 +146,7 @@ export async function compileNumberedList<TStyles extends StyleSheet>(
   })
 
   const style = resolveStyle({
+    base: config.defaults?.text,
     className: node.className,
     inline: node.style,
     styles: config.styles,

@@ -27,9 +27,13 @@ import { Paragraph } from 'docx'
  * Options for the QRCode plugin.
  */
 export interface QRCodePluginOptions {
-  /** The text / URL to encode. */
+  /**
+   * The text / URL to encode.
+   */
   text: string
-  /** Optional caption text displayed below the QR code. */
+  /**
+   * Optional caption text displayed below the QR code.
+   */
   caption?: string
   /**
    * QR error correction level.

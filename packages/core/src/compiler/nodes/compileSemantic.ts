@@ -51,7 +51,15 @@ import type {
 import type { IFloating, MathComponent, ParagraphChild } from 'docx'
 import type { CompilationSession } from '../numbers'
 
-/** Compile a bookmark as an inline paragraph child. */
+/**
+ * Compile a bookmark as an inline paragraph child.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Bookmark identifier and enclosed text
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @returns A bookmark containing the compiled text runs
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ */
 export function compileBookmark<TStyles extends StyleSheet>(
   node: BookmarkNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -62,7 +70,15 @@ export function compileBookmark<TStyles extends StyleSheet>(
   })
 }
 
-/** Compile a checkbox and its optional label. */
+/**
+ * Compile a checkbox and its optional label.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Checkbox state, optional label, and styling
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @returns The checkbox control followed by its optional styled label
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ */
 export function compileCheckbox<TStyles extends StyleSheet>(
   node: CheckboxNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -78,6 +94,7 @@ export function compileCheckbox<TStyles extends StyleSheet>(
 
   if (node.label) {
     const style = resolveStyle({
+      base: config.defaults?.text,
       className: node.className,
       inline: node.style,
       styles: config.styles,
@@ -94,7 +111,18 @@ export function compileCheckbox<TStyles extends StyleSheet>(
   return children
 }
 
-/** Compile a comment range and register its document-level body. */
+/**
+ * Compile a comment range and register its document-level body.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Annotated inline content and comment body
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param session - Compilation session tracking numbering, comments, and footnotes
+ * @param baseStyle - Optional inherited text style
+ * @returns A promise that resolves to the annotated content with comment range markers and a reference
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ * @throws If nested inline content or image data cannot be compiled
+ */
 export async function compileComment<TStyles extends StyleSheet>(
   node: CommentNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -103,7 +131,7 @@ export async function compileComment<TStyles extends StyleSheet>(
 ): Promise<ParagraphChild[]> {
   const commentId = session.registerComment(node as CommentNode)
   const style = resolveStyle({
-    base: baseStyle,
+    base: { ...config.defaults?.text, ...baseStyle },
     className: node.className,
     inline: node.style,
     styles: config.styles,
@@ -124,7 +152,14 @@ export async function compileComment<TStyles extends StyleSheet>(
   ]
 }
 
-/** Compile a footnote reference and register its document-level body. */
+/**
+ * Compile a footnote reference and register its document-level body.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Footnote body to register
+ * @param session - Compilation session tracking numbering, comments, and footnotes
+ * @returns A footnote reference run linked to the registered body
+ */
 export function compileFootnote<TStyles extends StyleSheet>(
   node: FootnoteNode<TStyles>,
   session: CompilationSession,
@@ -133,12 +168,25 @@ export function compileFootnote<TStyles extends StyleSheet>(
   return new FootnoteReferenceRun(footnoteId)
 }
 
-/** Compile a structured Office Math expression. */
+/**
+ * Compile a structured Office Math expression.
+ *
+ * @param node - Structured math expression node
+ * @returns An Office Math object containing the compiled expressions
+ */
 export function compileMath(node: MathNode) {
   return new DocxMath({ children: compileMathExpressions(node.children) })
 }
 
-/** Compile inserted/deleted revision runs. */
+/**
+ * Compile inserted/deleted revision runs.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Inserted or deleted text with revision metadata
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @returns Tracked-revision text runs in the original child order
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ */
 export function compileRevision<TStyles extends StyleSheet>(
   node: RevisionNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -150,6 +198,7 @@ export function compileRevision<TStyles extends StyleSheet>(
     const textNode: TextNode<TStyles> =
       typeof child === 'string' ? { text: child, type: 'text' } : child
     const style = resolveStyle({
+      base: config.defaults?.text,
       className: textNode.className ?? node.className,
       styles: config.styles,
       theme: config.theme,
@@ -169,13 +218,24 @@ export function compileRevision<TStyles extends StyleSheet>(
   })
 }
 
-/** Compile a block-level DrawingML Word text box. */
+/**
+ * Compile a block-level DrawingML Word text box.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Text box content, dimensions, position, and styling
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param session - Compilation session tracking numbering, comments, and footnotes
+ * @returns A promise that resolves to a paragraph containing the DrawingML text box
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ * @throws If nested inline content or image data cannot be compiled
+ */
 export async function compileTextBox<TStyles extends StyleSheet>(
   node: TextBoxNode<TStyles>,
   config: DocxKitConfig<TStyles>,
   session: CompilationSession,
 ) {
   const style = resolveStyle({
+    base: config.defaults?.text,
     className: node.className,
     inline: node.style,
     styles: config.styles,
@@ -214,7 +274,15 @@ export async function compileTextBox<TStyles extends StyleSheet>(
   })
 }
 
-/** Compile a horizontal thematic break. */
+/**
+ * Compile a horizontal thematic break.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param node - Thematic break node with optional border styling
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @returns An empty paragraph with the resolved horizontal rule border
+ * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
+ */
 export function compileThematicBreak<TStyles extends StyleSheet>(
   node: ThematicBreakNode<TStyles>,
   config: DocxKitConfig<TStyles>,
@@ -322,7 +390,7 @@ function compileStyledText<TStyles extends StyleSheet>(
     const node: TextNode<TStyles> =
       typeof child === 'string' ? { text: child, type: 'text' } : child
     const style = resolveStyle({
-      base: baseStyle,
+      base: { ...config.defaults?.text, ...baseStyle },
       className: node.className,
       inline: node.style,
       styles: config.styles,

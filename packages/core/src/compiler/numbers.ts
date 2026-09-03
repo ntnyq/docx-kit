@@ -11,19 +11,25 @@
 import type { CommentNode, FootnoteNode } from '@docxkit/types'
 import type { ILevelsOptions } from 'docx'
 
-/** Registered comment definition. */
+/**
+ * Registered comment definition.
+ */
 export interface CommentDefinition {
   id: number
   node: CommentNode
 }
 
-/** Registered footnote definition. */
+/**
+ * Registered footnote definition.
+ */
 export interface FootnoteDefinition {
   id: number
   node: FootnoteNode
 }
 
-/** Numbering config entry shape — mirrors `INumberingOptions.config[number]`. */
+/**
+ * Numbering config entry shape — mirrors `INumberingOptions.config[number]`.
+ */
 export type NumberingConfigEntry = {
   levels: readonly ILevelsOptions[]
   reference: string
@@ -36,34 +42,58 @@ export type NumberingConfigEntry = {
  * the compilation context.
  */
 export class CompilationSession {
-  /** Check if any numbering configs have been registered. */
+  /**
+   * Get the number of registered numbering configurations.
+   *
+   * @returns The number of registered numbering configurations
+   */
   get size(): number {
     return this._map.size
   }
   private _commentCounter = 0
-  /** Document comments registered while compiling inline content. */
+  /**
+   * Document comments registered while compiling inline content.
+   */
   private readonly _comments: CommentDefinition[] = []
   private _counter = 0
 
   private _footnoteCounter = 0
 
-  /** Document footnotes registered while compiling inline content. */
+  /**
+   * Document footnotes registered while compiling inline content.
+   */
   private readonly _footnotes: FootnoteDefinition[] = []
 
-  /** Accumulated numbering configs keyed by reference string. */
+  /**
+   * Accumulated numbering configs keyed by reference string.
+   */
   private readonly _map = new Map<string, NumberingConfigEntry>()
 
-  /** Return registered comment definitions. */
+  /**
+   * Return registered comment definitions.
+   *
+   * @returns The registered comment definitions in registration order
+   */
   getComments(): readonly CommentDefinition[] {
     return this._comments
   }
 
-  /** Return registered footnote definitions. */
+  /**
+   * Return registered footnote definitions.
+   *
+   * @returns The registered footnote definitions in registration order
+   */
   getFootnotes(): readonly FootnoteDefinition[] {
     return this._footnotes
   }
 
-  /** Register a new numbering entry and return its unique reference. */
+  /**
+   * Register a new numbering entry and return its unique reference.
+   *
+   * @param prefix - Prefix for the generated numbering reference
+   * @param entry - Numbering levels and options without a reference
+   * @returns A unique numbering reference for this compilation session
+   */
   register(
     prefix: string,
     entry: Omit<NumberingConfigEntry, 'reference'>,
@@ -73,21 +103,35 @@ export class CompilationSession {
     return ref
   }
 
-  /** Register a document comment and return its range ID. */
+  /**
+   * Register a document comment and return its range ID.
+   *
+   * @param node - Comment range and document-level body to register
+   * @returns The zero-based ID assigned to the comment range
+   */
   registerComment(node: CommentNode): number {
     const id = this._commentCounter++
     this._comments.push({ id, node })
     return id
   }
 
-  /** Register a footnote and return its reference ID. */
+  /**
+   * Register a footnote and return its reference ID.
+   *
+   * @param node - Footnote content to register
+   * @returns The one-based ID assigned to the footnote reference
+   */
   registerFootnote(node: FootnoteNode): number {
     const id = ++this._footnoteCounter
     this._footnotes.push({ id, node })
     return id
   }
 
-  /** Get the accumulated numbering configs for `Document({ numbering })`. */
+  /**
+   * Get the accumulated numbering configs for `Document({ numbering })`.
+   *
+   * @returns Registered numbering configurations, or `undefined` if none exist
+   */
   toArray(): NumberingConfigEntry[] | undefined {
     return this._map.size > 0 ? Array.from(this._map.values()) : undefined
   }
@@ -101,10 +145,16 @@ export class CompilationSession {
 // `CompilationSession` instead.
 // -----------------------------------------------------------------
 
-/** @deprecated Use `CompilationSession` instead. Retained for test compatibility. */
+/**
+ * @deprecated Use `CompilationSession` instead. Retained for test compatibility.
+ */
 export const numberingConfigMap = new Map<string, NumberingConfigEntry>()
 
-/** @deprecated Use `CompilationSession` instead. Retained for test compatibility. */
+/**
+ * Clear the legacy numbering configuration map.
+ *
+ * @deprecated Use `CompilationSession` instead. Retained for test compatibility.
+ */
 export function resetNumberingState() {
   numberingConfigMap.clear()
 }

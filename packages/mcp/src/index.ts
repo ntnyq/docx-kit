@@ -54,9 +54,13 @@ export const TOOL_DEFINITIONS = [
 export const RESOURCE_DEFINITIONS = [docxSchemaResource] as const
 
 export interface CreateDocxKitServerOptions {
-  /** Directory that contains every path create_document may write. */
+  /**
+   * Directory that contains every path create_document may write.
+   */
   outputDirectory?: string
-  /** Explicitly authorized plugin loader for create_document schemas. */
+  /**
+   * Explicitly authorized plugin loader for create_document schemas.
+   */
   pluginLoader?: PluginLoader
 }
 

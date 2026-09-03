@@ -27,7 +27,9 @@ export const PREVIEW_ERROR_CODES = {
   PREVIEW_RENDER_FAILED: 'PREVIEW_RENDER_FAILED',
 } as const
 
-/** Union of all renderer error codes. */
+/**
+ * Union of all renderer error codes.
+ */
 export type PreviewErrorCode =
   (typeof PREVIEW_ERROR_CODES)[keyof typeof PREVIEW_ERROR_CODES]
 

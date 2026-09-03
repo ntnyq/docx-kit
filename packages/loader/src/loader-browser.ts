@@ -53,7 +53,12 @@ class BrowserPluginLoader extends PluginLoader {
   }
 }
 
-/** Create a browser plugin loader with URL and same-origin support. */
+/**
+ * Create a browser plugin loader with URL and same-origin support.
+ *
+ * @param options - Optional compatibility, manifest validation, and security settings
+ * @returns A browser plugin loader using the supplied settings
+ */
 export function createPluginLoader(
   options: PluginLoaderOptions = {},
 ): PluginLoader {

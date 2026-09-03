@@ -6,23 +6,39 @@
 
 import type { BlockNode } from './dsl/nodes'
 import type { BorderRule, DocxStyleRule, StyleSheet } from './style'
-import type { UnitValue } from './utility'
+import type { MaybePromise, UnitValue } from './utility'
 
-/** OOXML document properties shown in Word's File → Info panel. */
+/**
+ * OOXML document properties shown in Word's File → Info panel.
+ */
 export interface DocumentMetadata {
-  /** Document author. */
+  /**
+   * Document author.
+   */
   creator?: string
-  /** Application-specific string properties. */
+  /**
+   * Application-specific string properties.
+   */
   customProperties?: Record<string, string>
-  /** Document description / summary. */
+  /**
+   * Document description / summary.
+   */
   description?: string
-  /** Keywords / tags. */
+  /**
+   * Keywords / tags.
+   */
   keywords?: string[]
-  /** Last editor. */
+  /**
+   * Last editor.
+   */
   lastModifiedBy?: string
-  /** Document subject. */
+  /**
+   * Document subject.
+   */
   subject?: string
-  /** Document title. */
+  /**
+   * Document title.
+   */
   title?: string
 }
 
@@ -35,36 +51,71 @@ export interface DocumentMetadata {
  * @template TStyles — The user's stylesheet type (inferred from `styles`).
  */
 export interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
-  /** Font files embedded into the generated DOCX package. */
+  /**
+   * Font files embedded into the generated DOCX package.
+   */
   fonts?: EmbeddedFont[]
-  /** OOXML core properties (appear in File → Info). */
+  /**
+   * OOXML core properties (appear in File → Info).
+   */
   metadata?: DocumentMetadata
-  /** Page dimensions and margins. */
+  /**
+   * Page dimensions and margins.
+   */
   page?: PageConfig
-  /** Named style classes (class → style rule map). */
+  /**
+   * Named style classes (class → style rule map).
+   */
   styles?: TStyles
-  /** Semantic design tokens for theming. */
+  /**
+   * Semantic design tokens for theming.
+   */
   theme?: DocxTheme
-  /** Default styles applied as base for each element type. */
+  /**
+   * Default styles applied as base for each element type.
+   */
   defaults?: {
-    /** Default table cell style. */
+    /**
+     * Default table cell style.
+     */
     cell?: DocxStyleRule
-    /** Default image style (applied to the paragraph wrapping the image). */
+    /**
+     * Default image style (applied to the paragraph wrapping the image).
+     */
     image?: DocxStyleRule
-    /** Default paragraph style. */
+    /**
+     * Default paragraph style.
+     */
     paragraph?: DocxStyleRule
-    /** Default table style. */
+    /**
+     * Default table style.
+     */
     table?: DocxStyleRule
-    /** Default text run style. */
+    /**
+     * Default text run style.
+     */
     text?: DocxStyleRule
   }
-  /** Document-level Word feature switches. */
+  /**
+   * Document-level Word feature switches.
+   */
   features?: {
-    /** Enable tracked revision display and behavior. */
+    /**
+     * Enable tracked revision display and behavior.
+     */
     trackRevisions?: boolean
-    /** Ask Word to update fields when the document opens. */
+    /**
+     * Ask Word to update fields when the document opens.
+     */
     updateFields?: boolean
   }
+  /**
+   * Resolve image file paths to bytes. Installed automatically by docx-kit/node;
+   * browser/core callers must opt into a resolver or supply bytes/data URLs.
+   */
+  resolveImage?: (
+    source: string,
+  ) => MaybePromise<ArrayBuffer | Blob | Uint8Array>
 }
 
 /**
@@ -75,13 +126,21 @@ export interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
  * `usePreset()` helper for lookup by ID.
  */
 export interface DocxPreset {
-  /** The config fragment to merge into `createDocx()`. */
+  /**
+   * The config fragment to merge into `createDocx()`.
+   */
   readonly config: DocxKitConfig
-  /** Short description. */
+  /**
+   * Short description.
+   */
   readonly description: string
-  /** Machine-readable identifier (e.g. `"classic"`). */
+  /**
+   * Machine-readable identifier (e.g. `"classic"`).
+   */
   readonly id: string
-  /** Human-readable display name (e.g. `"Classic"`). */
+  /**
+   * Human-readable display name (e.g. `"Classic"`).
+   */
   readonly name: string
 }
 
@@ -93,21 +152,35 @@ export interface DocxPreset {
  * at compile time by {@link resolveThemeTokens}.
  */
 export interface DocxTheme {
-  /** Color palette tokens (name → hex). */
+  /**
+   * Color palette tokens (name → hex).
+   */
   colors?: ThemeColors
-  /** Font family tokens (name → font family string). */
+  /**
+   * Font family tokens (name → font family string).
+   */
   fonts?: ThemeFonts
-  /** Font size tokens (name → value). */
+  /**
+   * Font size tokens (name → value).
+   */
   fontSize?: Record<string, UnitValue>
-  /** Spacing tokens (name → value). */
+  /**
+   * Spacing tokens (name → value).
+   */
   spacing?: ThemeSpacing
 }
 
-/** A TrueType/OpenType font embedded into the DOCX package. */
+/**
+ * A TrueType/OpenType font embedded into the DOCX package.
+ */
 export interface EmbeddedFont {
-  /** Raw font-file bytes. */
+  /**
+   * Raw font-file bytes.
+   */
   data: Uint8Array
-  /** Font family name written to the OOXML font table. */
+  /**
+   * Font family name written to the OOXML font table.
+   */
   name: string
 }
 
@@ -117,11 +190,17 @@ export interface EmbeddedFont {
  * Supports standard, first-page, and even-page variants.
  */
 export interface HeaderFooterConfig {
-  /** Default header/footer (appears on all pages). */
+  /**
+   * Default header/footer (appears on all pages).
+   */
   default?: HeaderFooterContent
-  /** Even-page header/footer (overrides default on even pages). */
+  /**
+   * Even-page header/footer (overrides default on even pages).
+   */
   even?: HeaderFooterContent
-  /** First-page-only header/footer (overrides default on page 1). */
+  /**
+   * First-page-only header/footer (overrides default on page 1).
+   */
   first?: HeaderFooterContent
 }
 
@@ -132,28 +211,48 @@ export interface HeaderFooterConfig {
  * and full {@link BlockNode} elements (paragraphs, images, tables, etc.).
  */
 export interface HeaderFooterContent {
-  /** Content items — strings (simple) or BlockNode objects (rich). */
+  /**
+   * Content items — strings (simple) or BlockNode objects (rich).
+   */
   children: (string | BlockNode)[]
 }
 
-/** Page orientation. */
+/**
+ * Page orientation.
+ */
 export type Orientation = 'landscape' | 'portrait'
 
-/** Page border configuration. */
+/**
+ * Page border configuration.
+ */
 export interface PageBorderConfig {
-  /** Bottom page border. */
+  /**
+   * Bottom page border.
+   */
   bottom?: BorderRule
-  /** Pages that display the border. */
+  /**
+   * Pages that display the border.
+   */
   display?: 'allPages' | 'firstPage' | 'notFirstPage'
-  /** Left page border. */
+  /**
+   * Left page border.
+   */
   left?: BorderRule
-  /** Measure border offsets from the page edge or text area. */
+  /**
+   * Measure border offsets from the page edge or text area.
+   */
   offsetFrom?: 'page' | 'text'
-  /** Right page border. */
+  /**
+   * Right page border.
+   */
   right?: BorderRule
-  /** Top page border. */
+  /**
+   * Top page border.
+   */
   top?: BorderRule
-  /** Render the border behind or in front of document content. */
+  /**
+   * Render the border behind or in front of document content.
+   */
   zOrder?: 'back' | 'front'
 }
 
@@ -161,19 +260,33 @@ export interface PageBorderConfig {
  * Page configuration (size, orientation, margin).
  */
 export interface PageConfig {
-  /** Page border configuration. */
+  /**
+   * Page border configuration.
+   */
   borders?: PageBorderConfig
-  /** Distance between the footer and the page edge. */
+  /**
+   * Distance between the footer and the page edge.
+   */
   footerDistance?: UnitValue
-  /** Extra gutter width for binding. */
+  /**
+   * Extra gutter width for binding.
+   */
   gutter?: UnitValue
-  /** Distance between the header and the page edge. */
+  /**
+   * Distance between the header and the page edge.
+   */
   headerDistance?: UnitValue
-  /** Page orientation (`"portrait"` default). */
+  /**
+   * Page orientation (`"portrait"` default).
+   */
   orientation?: Orientation
-  /** Page-number sequence configuration for this section. */
+  /**
+   * Page-number sequence configuration for this section.
+   */
   pageNumber?: PageNumberConfig
-  /** Page size: preset name or explicit dimensions. */
+  /**
+   * Page size: preset name or explicit dimensions.
+   */
   size?: PageSize | { height: UnitValue; width: UnitValue }
   /**
    * Page margin.
@@ -187,37 +300,63 @@ export interface PageConfig {
     | UnitValue
 }
 
-/** Per-section page-number sequence configuration. */
+/**
+ * Per-section page-number sequence configuration.
+ */
 export interface PageNumberConfig {
-  /** First page number in the section. */
+  /**
+   * First page number in the section.
+   */
   start?: number
-  /** Page number format. */
+  /**
+   * Page number format.
+   */
   format?:
     'decimal' | 'lowerLetter' | 'lowerRoman' | 'upperLetter' | 'upperRoman'
 }
 
-/** Available page size presets. */
+/**
+ * Available page size presets.
+ */
 export type PageSize = 'A3' | 'A4' | 'Legal' | 'Letter'
 
-/** An explicitly sized section column. */
+/**
+ * An explicitly sized section column.
+ */
 export interface SectionColumn {
-  /** Column width. */
+  /**
+   * Column width.
+   */
   width: UnitValue
-  /** Space after this column. */
+  /**
+   * Space after this column.
+   */
   spacing?: UnitValue
 }
 
-/** Multi-column layout for a section. */
+/**
+ * Multi-column layout for a section.
+ */
 export interface SectionColumnsConfig {
-  /** Explicit column widths for unequal-width layouts. */
+  /**
+   * Explicit column widths for unequal-width layouts.
+   */
   columns?: SectionColumn[]
-  /** Number of equal-width columns. */
+  /**
+   * Number of equal-width columns.
+   */
   count?: number
-  /** Whether Word should keep columns equally sized. */
+  /**
+   * Whether Word should keep columns equally sized.
+   */
   equalWidth?: boolean
-  /** Draw a separator line between columns. */
+  /**
+   * Draw a separator line between columns.
+   */
   separator?: boolean
-  /** Default spacing between columns. */
+  /**
+   * Default spacing between columns.
+   */
   spacing?: UnitValue
 }
 
@@ -229,33 +368,57 @@ export interface SectionColumnsConfig {
  * sections.
  */
 export interface SectionConfig {
-  /** Multi-column layout. */
+  /**
+   * Multi-column layout.
+   */
   columns?: SectionColumnsConfig
-  /** Section footer(s). */
+  /**
+   * Section footer(s).
+   */
   footer?: HeaderFooterConfig
-  /** Section header(s). */
+  /**
+   * Section header(s).
+   */
   header?: HeaderFooterConfig
-  /** Line numbering. */
+  /**
+   * Line numbering.
+   */
   lineNumbers?: SectionLineNumberConfig
-  /** Section-specific page dimensions (overrides document-level `page`). */
+  /**
+   * Section-specific page dimensions (overrides document-level `page`).
+   */
   page?: PageConfig
-  /** Section break behavior. */
+  /**
+   * Section break behavior.
+   */
   type?: SectionType
 }
 
-/** Line-numbering configuration for a section. */
+/**
+ * Line-numbering configuration for a section.
+ */
 export interface SectionLineNumberConfig {
-  /** Number every Nth line. */
+  /**
+   * Number every Nth line.
+   */
   countBy?: number
-  /** Distance between line numbers and text. */
+  /**
+   * Distance between line numbers and text.
+   */
   distance?: UnitValue
-  /** When line numbering restarts. */
+  /**
+   * When line numbering restarts.
+   */
   restart?: 'continuous' | 'newPage' | 'newSection'
-  /** Starting line number. */
+  /**
+   * Starting line number.
+   */
   start?: number
 }
 
-/** Section break behavior. */
+/**
+ * Section break behavior.
+ */
 export type SectionType =
   'continuous' | 'evenPage' | 'nextColumn' | 'nextPage' | 'oddPage'
 

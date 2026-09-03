@@ -14,13 +14,19 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { DocxKitError } from '@docxkit/core'
-import { isDocxPlugin } from '../utils'
+import { resolvePluginExport } from '../utils'
 import { resolveManifest } from './options'
 
 import type { DocxPlugin, PluginManifestAuthorizer } from '@docxkit/core'
 
 export interface LoadNpmPluginOptions {
-  /** Authorize the parsed manifest before importing the package entry. */
+  /**
+   * Authorize the parsed manifest before importing the package entry.
+   *
+   * @param manifest - Parsed manifest to validate and authorize before importing plugin code
+   * @returns The authorized manifest, or a promise that resolves to it
+   * @throws If manifest validation, compatibility checks, or execution policy reject the plugin
+   */
   authorizeManifest?: PluginManifestAuthorizer
 }
 
@@ -118,16 +124,11 @@ export async function loadNpmPlugin(
     )
   }
 
-  // Extract the plugin — check for default export first, then named
-  const exported = mod as { default?: unknown }
-  const plugin = exported.default ?? mod
-
-  if (!isDocxPlugin(plugin)) {
-    throw new DocxKitError(
-      'PLUGIN_LOAD_FAILED',
-      `Module "${manifest.main}" from "${packageName}" does not export a valid DocxPlugin`,
-    )
-  }
+  const plugin = await resolvePluginExport(
+    mod,
+    packageName,
+    manifest.plugin.name,
+  )
 
   // If the manifest declares a different plugin name, verify it matches
   if (plugin.name !== manifest.plugin.name) {
@@ -137,7 +138,7 @@ export async function loadNpmPlugin(
     )
   }
 
-  return { manifest, plugin: plugin as DocxPlugin }
+  return { manifest, plugin }
 }
 
 // ---------- Helpers ----------

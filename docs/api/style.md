@@ -143,7 +143,9 @@ An entry in the stylesheet that may extend other styles.
 
 ```ts
 interface StyleSheetEntry extends DocxStyleRule {
-  /** Single parent or ordered list of parents (later wins on conflict). */
+  /**
+   * Single parent or ordered list of parents (later wins on conflict).
+   */
   extends?: string | string[]
 }
 ```

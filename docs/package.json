@@ -36,6 +36,7 @@
     "@docxkit/theme-ocean": "workspace:*",
     "@docxkit/theme-warm": "workspace:*",
     "@ntnyq/utils": "^0.22.0",
+    "acorn": "^8.18.0",
     "docx": "^9.7.1",
     "docx-kit": "workspace:*",
     "monaco-editor": "^0.56.0",

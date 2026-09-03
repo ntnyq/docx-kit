@@ -46,9 +46,16 @@ export interface DocxPlugin<
   TOptions = unknown,
   TRender = unknown,
 > {
-  /** Unique plugin name, used as the node discriminator. */
+  /**
+   * Unique plugin name, used as the node discriminator.
+   */
   name: TName
-  /** One-time setup called when the plugin is registered. */
+  /**
+   * One-time setup called when the plugin is registered.
+   *
+   * @returns Nothing, or a promise that resolves when setup completes
+   * @throws If plugin initialization fails; asynchronous failures reject the returned promise
+   */
   setup?: () => MaybePromise<void>
   /**
    * Render plugin content into one or more `docx` objects
@@ -77,11 +84,21 @@ export type PluginRegistry = Record<string, unknown>
  * and the ability to compile child nodes.
  */
 export interface PluginRenderContext {
-  /** The full document config. */
+  /**
+   * The full document config.
+   */
   config: DocxKitConfig
-  /** Compile a child node (useful for nesting). */
+  /**
+   * Compile a child node (useful for nesting).
+   *
+   * @param node - Child block node to compile with the current document context
+   * @returns A promise that resolves to the compiled child output
+   * @throws If the child node, its styles, images, or nested plugins cannot be compiled
+   */
   compileNode: (node: BlockNode) => Promise<unknown>
-  /** Utility helpers. */
+  /**
+   * Utility helpers.
+   */
   utils: {
     image: {
       /**

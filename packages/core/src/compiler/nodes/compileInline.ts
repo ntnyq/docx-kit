@@ -34,7 +34,19 @@ import type {
 import type { ParagraphChild } from 'docx'
 import type { CompilationSession } from '../numbers'
 
-/** Compile inline DSL nodes into children accepted by a `docx` Paragraph. */
+/**
+ * Compile inline DSL nodes into children accepted by a `docx` Paragraph.
+ *
+ * @template TStyles - The document's stylesheet type
+ * @param nodes - Inline nodes to compile in document order
+ * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param baseStyle - Optional inherited text style
+ * @param session - Optional session, required for comments and footnotes
+ * @returns A promise that resolves to the flattened paragraph children in input order
+ * @throws {Error} If a comment or footnote is compiled without a session
+ * @throws {DocxKitError} If a node type, style reference, or image is invalid
+ * @throws Propagates errors from nested inline compilers
+ */
 export async function compileInlineNodes<TStyles extends StyleSheet>(
   nodes: InlineNode<TStyles>[],
   config: DocxKitConfig<TStyles>,
@@ -69,7 +81,7 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
           return compileMath(node)
         case 'text': {
           const style = resolveStyle({
-            base: baseStyle,
+            base: { ...config.defaults?.text, ...baseStyle },
             className: node.className,
             inline: node.style,
             styles: config.styles,
@@ -81,6 +93,11 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
             ...compileTextStyle(style),
           })
         }
+        default:
+          throw new DocxKitError(
+            'UNKNOWN_NODE_TYPE',
+            `Unknown inline node type: ${String((node as { type: unknown }).type)}`,
+          )
       }
     }),
   )
@@ -92,7 +109,7 @@ async function compileInlineImage<TStyles extends StyleSheet>(
   node: ImageNode<TStyles>,
   config: DocxKitConfig<TStyles>,
 ) {
-  const data = await normalizeImageData(node.data)
+  const data = await normalizeImageData(node.data, config.resolveImage)
   const metadata = readImageMetadata(data, node.imageType)
   if (!metadata) {
     throw new DocxKitError(

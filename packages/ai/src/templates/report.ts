@@ -10,23 +10,41 @@
 import type { BlockNode, DocxSchema } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
 
-/** Report template parameters. */
+/**
+ * Report template parameters.
+ */
 export interface ReportParams {
-  /** Report title. */
+  /**
+   * Report title.
+   */
   title: string
-  /** Author name(s). */
+  /**
+   * Author name(s).
+   */
   author?: string
-  /** Conclusion text. */
+  /**
+   * Conclusion text.
+   */
   conclusion?: string
-  /** Report date (e.g. "2026-06-12"). */
+  /**
+   * Report date (e.g. "2026-06-12").
+   */
   date?: string
-  /** Executive summary paragraphs. */
+  /**
+   * Executive summary paragraphs.
+   */
   executiveSummary?: string[]
-  /** Full body sections. */
+  /**
+   * Full body sections.
+   */
   sections?: {
-    /** Section body paragraphs. */
+    /**
+     * Section body paragraphs.
+     */
     content?: string[]
-    /** Section heading. */
+    /**
+     * Section heading.
+     */
     heading?: string
   }[]
 }

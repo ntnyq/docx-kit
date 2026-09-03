@@ -24,9 +24,13 @@
 import { definePlugin } from '@docxkit/core'
 import { Paragraph, ShadingType, TextRun } from 'docx'
 
-/** Options for the CodeBlock plugin. */
+/**
+ * Options for the CodeBlock plugin.
+ */
 export interface CodeBlockOptions {
-  /** Source code string. */
+  /**
+   * Source code string.
+   */
   code: string
   /**
    * Language identifier for syntax highlighting (optional).
@@ -42,7 +46,9 @@ export interface CodeBlockOptions {
   showLineNumbers?: boolean
 }
 
-/** Highlight.js token → `TextRun` color mapping for common token types. */
+/**
+ * Highlight.js token → `TextRun` color mapping for common token types.
+ */
 const TOKEN_COLORS: Record<string, string> = {
   attr: 'D4D4D4',
   built_in: '4EC9B0',
@@ -66,7 +72,9 @@ const LINE_NO_COLOR = '999999'
 const MONO_FONT = 'Courier New'
 const FONT_SIZE = 16 // half-points → 8pt
 
-/** Minimal interface for the highlight.js default export (optional peer dep). */
+/**
+ * Minimal interface for the highlight.js default export (optional peer dep).
+ */
 interface HighlightJs {
   highlight(code: string, options: { language: string }): { value: string }
 }

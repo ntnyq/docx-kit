@@ -15,7 +15,9 @@ import type {
   RegistryPluginEntry,
 } from './types'
 
-/** npm registry search API endpoint. */
+/**
+ * npm registry search API endpoint.
+ */
 const NPM_SEARCH_URL = 'https://registry.npmjs.org/-/v1/search'
 
 /**

@@ -10,36 +10,62 @@
  * Consumers can match against these codes for structured error handling.
  */
 export const ERROR_CODES = {
-  /** Document export failed. */
+  /**
+   * Document export failed.
+   */
   EXPORT_FAILED: 'EXPORT_FAILED',
-  /** Image data is empty, corrupt, or unsupported. */
+  /**
+   * Image data is empty, corrupt, or unsupported.
+   */
   IMAGE_INVALID_DATA: 'IMAGE_INVALID_DATA',
-  /** Plugin manifest JSON is missing required fields or has invalid structure. */
+  /**
+   * Plugin manifest JSON is missing required fields or has invalid structure.
+   */
   MANIFEST_INVALID: 'MANIFEST_INVALID',
-  /** Plugin manifest file was not found at the expected path. */
+  /**
+   * Plugin manifest file was not found at the expected path.
+   */
   MANIFEST_MISSING: 'MANIFEST_MISSING',
-  /** A required plugin dependency was not found or version is incompatible. */
+  /**
+   * A required plugin dependency was not found or version is incompatible.
+   */
   PLUGIN_DEPENDENCY_MISSING: 'PLUGIN_DEPENDENCY_MISSING',
-  /** Plugin failed to load (import error, network error, etc.). */
+  /**
+   * Plugin failed to load (import error, network error, etc.).
+   */
   PLUGIN_LOAD_FAILED: 'PLUGIN_LOAD_FAILED',
-  /** A plugin node referenced an unregistered plugin. */
+  /**
+   * A plugin node referenced an unregistered plugin.
+   */
   PLUGIN_NOT_REGISTERED: 'PLUGIN_NOT_REGISTERED',
 
   // ---- Plugin ecosystem errors ----
 
-  /** A plugin's `render()` method threw an error. */
+  /**
+   * A plugin's `render()` method threw an error.
+   */
   PLUGIN_RENDER_FAILED: 'PLUGIN_RENDER_FAILED',
-  /** Plugin's `docxKit` semver range is incompatible with the running version. */
+  /**
+   * Plugin's `docxKit` semver range is incompatible with the running version.
+   */
   PLUGIN_VERSION_MISMATCH: 'PLUGIN_VERSION_MISMATCH',
-  /** A `className` referenced a stylesheet key that doesn't exist. */
+  /**
+   * A `className` referenced a stylesheet key that doesn't exist.
+   */
   STYLE_UNKNOWN_CLASS: 'STYLE_UNKNOWN_CLASS',
-  /** Table was created with no columns. */
+  /**
+   * Table was created with no columns.
+   */
   TABLE_INVALID_COLUMNS: 'TABLE_INVALID_COLUMNS',
-  /** Encountered a node type that has no registered compiler. */
+  /**
+   * Encountered a node type that has no registered compiler.
+   */
   UNKNOWN_NODE_TYPE: 'UNKNOWN_NODE_TYPE',
 } as const
 
-/** Union type of all known error codes. */
+/**
+ * Union type of all known error codes.
+ */
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]
 
 /**
@@ -49,9 +75,13 @@ export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]
  * and optionally the underlying `cause`.
  */
 export class DocxKitError extends Error {
-  /** The underlying error that caused this failure (if any). */
+  /**
+   * The underlying error that caused this failure (if any).
+   */
   readonly cause: unknown
-  /** Machine-readable error code. */
+  /**
+   * Machine-readable error code.
+   */
   readonly code: string | ErrorCode
 
   /**

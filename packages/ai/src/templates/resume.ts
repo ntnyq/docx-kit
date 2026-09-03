@@ -10,38 +10,70 @@
 import type { BlockNode, DocxSchema, TableNode } from '@docxkit/core'
 import type { AiTemplate, AiTemplateSchema } from '../types'
 
-/** Resume template parameters. */
+/**
+ * Resume template parameters.
+ */
 export interface ResumeParams {
-  /** Full name. */
+  /**
+   * Full name.
+   */
   name: string
-  /** Email address. */
+  /**
+   * Email address.
+   */
   email?: string
-  /** Phone number. */
+  /**
+   * Phone number.
+   */
   phone?: string
-  /** Skills list. */
+  /**
+   * Skills list.
+   */
   skills?: string[]
-  /** Professional summary / objective. */
+  /**
+   * Professional summary / objective.
+   */
   summary?: string
-  /** Education entries. */
+  /**
+   * Education entries.
+   */
   education?: {
-    /** Degree/major. */
+    /**
+     * Degree/major.
+     */
     degree?: string
-    /** Institution name. */
+    /**
+     * Institution name.
+     */
     institution?: string
-    /** Graduation year. */
+    /**
+     * Graduation year.
+     */
     year?: string
   }[]
-  /** Work experience entries. */
+  /**
+   * Work experience entries.
+   */
   experience?: {
-    /** Company name. */
+    /**
+     * Company name.
+     */
     company?: string
-    /** End date or "Present". */
+    /**
+     * End date or "Present".
+     */
     endDate?: string
-    /** Role description bullets. */
+    /**
+     * Role description bullets.
+     */
     highlights?: string[]
-    /** Role/title. */
+    /**
+     * Role/title.
+     */
     role?: string
-    /** Start date. */
+    /**
+     * Start date.
+     */
     startDate?: string
   }[]
 }

@@ -4,7 +4,9 @@ export interface BuiltinPluginMetadata {
   usageExample: string
 }
 
-/** Canonical MCP-facing catalog for all built-in docx-kit plugins. */
+/**
+ * Canonical MCP-facing catalog for all built-in docx-kit plugins.
+ */
 export const BUILTIN_PLUGIN_CATALOG = [
   entry(
     'badge',

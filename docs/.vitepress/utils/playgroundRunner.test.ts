@@ -27,6 +27,17 @@ const BUILTIN_PLUGIN_FACTORIES = {
 } as const
 
 describe('playground runtime', () => {
+  it.each([
+    `createDocx()\n  .p('Hello')\n  .toBlob()`,
+    `createDocx({\n  page: { margin: 0 }\n}).toBlob() // final comment`,
+    `await createDocx()\n  .p('Hello')\n  .toBlob()\n/* trailing comment */`,
+  ])('returns multiline expressions', async expression => {
+    await expect(
+      executePlaygroundCode(
+        `import { createDocx } from 'docx-kit'\n${expression}`,
+      ),
+    ).resolves.toBeInstanceOf(Blob)
+  })
   it('exposes all built-in plugins as factories with matching plugin names', () => {
     for (const [name, createPlugin] of Object.entries(
       BUILTIN_PLUGIN_FACTORIES,

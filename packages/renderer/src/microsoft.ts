@@ -9,7 +9,9 @@
 
 import type { DocxPreviewOptions } from './types'
 
-/** Default Microsoft Office Online viewer base URL. */
+/**
+ * Default Microsoft Office Online viewer base URL.
+ */
 export const DEFAULT_MICROSOFT_VIEWER_URL =
   'https://view.officeapps.live.com/op/embed.aspx?src='
 

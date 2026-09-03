@@ -7,7 +7,10 @@
  * @module mcp-server/resources/schema
  */
 
-import { buildBlockNodeJsonSchemas } from '../schema/blockNodes'
+import {
+  buildBlockNodeJsonSchemas,
+  buildNestedNodeJsonSchemas,
+} from '../schema/blockNodes'
 
 /**
  * DocxSchema JSON Schema for MCP resource exposure.
@@ -28,6 +31,7 @@ export const docxSchemaResource = {
     title: 'DocxSchema',
     type: 'object',
     definitions: {
+      ...buildNestedNodeJsonSchemas(),
       blockNode: {
         oneOf: buildBlockNodeJsonSchemas(),
       },

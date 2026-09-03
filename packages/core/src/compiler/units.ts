@@ -123,6 +123,31 @@ export function parseShorthandTwip(
 }
 
 /**
+ * Convert a border length to eighth-points, retaining fractional-point precision.
+ */
+export function toPtEighth(
+  value: number | string | undefined,
+): number | undefined {
+  if (value == null) {
+    return undefined
+  }
+  if (typeof value === 'number') {
+    return Math.round(value * 8)
+  }
+  const amount = Number(value.replace(/[%a-z]+$/i, ''))
+  const pointsPerUnit = value.endsWith('px')
+    ? POINTS_PER_PX
+    : value.endsWith('mm')
+      ? POINTS_PER_MM
+      : value.endsWith('cm')
+        ? POINTS_PER_CM
+        : value.endsWith('in')
+          ? POINTS_PER_INCH
+          : 1
+  return Math.round(amount * pointsPerUnit * 8)
+}
+
+/**
  * Convert a font-size value to Word **half-points** (used by the `docx`
  * library's `size` field on text runs).
  *

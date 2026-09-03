@@ -15,25 +15,35 @@ import type { IFloating, IImageOptions } from 'docx'
  * Options for {@link createImageRun}.
  */
 export interface CreateImageRunOptions {
-  /** Raw image bytes (Uint8Array, ArrayBuffer, etc.). */
+  /**
+   * Raw image bytes (Uint8Array, ArrayBuffer, etc.).
+   */
   data: string | ArrayBuffer | Buffer | Uint8Array
-  /** Accessible alternative text. */
+  /**
+   * Accessible alternative text.
+   */
   alt?: string
-  /** Floating layout configuration. */
+  /**
+   * Floating layout configuration.
+   */
   floating?: IFloating
   /**
    * Display height in pixels.
    * @default 180
    */
   height?: number
-  /** Image format. SVG images require `fallback`. */
+  /**
+   * Image format. SVG images require `fallback`.
+   */
   type?: ImageRunType
   /**
    * Display width in pixels.
    * @default 300
    */
   width?: number
-  /** Raster fallback required by DOCX readers that do not support SVG. */
+  /**
+   * Raster fallback required by DOCX readers that do not support SVG.
+   */
   fallback?: {
     data: string | ArrayBuffer | Buffer | Uint8Array
     type: ImageType
@@ -83,7 +93,13 @@ export function createImageRun(options: CreateImageRunOptions) {
   } as IImageOptions)
 }
 
-/** Detect image format and intrinsic dimensions from bytes or a string hint. */
+/**
+ * Detect image format and intrinsic dimensions from bytes or a string hint.
+ *
+ * @param data - Raw image bytes or a string containing an image MIME type or extension
+ * @param typeHint - Optional image format hint that takes precedence over detection
+ * @returns Detected image metadata, or `null` if the format is unknown
+ */
 export function readImageMetadata(
   data: string | ArrayBuffer | Buffer | Uint8Array,
   typeHint?: 'bmp' | 'gif' | 'jpeg' | 'jpg' | 'png',
@@ -100,7 +116,17 @@ export function readImageMetadata(
   }
 }
 
-/** Preserve intrinsic aspect ratio when one image dimension is omitted. */
+/**
+ * Preserve intrinsic aspect ratio when one image dimension is omitted.
+ *
+ * @param width - Requested display width in pixels, if specified
+ * @param height - Requested display height in pixels, if specified
+ * @param metadata - Detected image format and optional intrinsic pixel dimensions
+ * @param defaults - Fallback pixel dimensions and aspect ratio
+ * @param defaults.height - Fallback display height in pixels
+ * @param defaults.width - Fallback display width in pixels
+ * @returns Display width and height in pixels with missing dimensions resolved
+ */
 export function resolveImageDimensions(
   width: number | undefined,
   height: number | undefined,

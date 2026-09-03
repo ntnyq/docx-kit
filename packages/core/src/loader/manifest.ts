@@ -9,6 +9,7 @@
  */
 
 import { DocxKitError } from '@docxkit/types'
+import { isValidRange } from 'verkit'
 
 /**
  * Plugin manifest as defined in `docx-kit.plugin.json`.
@@ -36,10 +37,14 @@ export interface PluginManifest {
    */
   main: string
 
-  /** npm package name (e.g. `"@my-org/docx-kit-chart"`). */
+  /**
+   * npm package name (e.g. `"@my-org/docx-kit-chart"`).
+   */
   name: string
 
-  /** Semver version of the plugin package. */
+  /**
+   * Semver version of the plugin package.
+   */
   version: string
 
   /**
@@ -50,7 +55,9 @@ export interface PluginManifest {
    */
   dependencies?: Record<string, string>
 
-  /** Optional subpath exports for the plugin package. */
+  /**
+   * Optional subpath exports for the plugin package.
+   */
   exports?: Record<string, string>
 
   /**
@@ -69,7 +76,9 @@ export interface PluginManifest {
    */
   types?: string
 
-  /** Plugin metadata. */
+  /**
+   * Plugin metadata.
+   */
   plugin: {
     /**
      * Unique plugin name — the discriminator used in
@@ -77,13 +86,19 @@ export interface PluginManifest {
      */
     name: string
 
-    /** Plugin author information. */
+    /**
+     * Plugin author information.
+     */
     author?: string | { name: string; email?: string; url?: string }
 
-    /** Human-readable description of the plugin. */
+    /**
+     * Human-readable description of the plugin.
+     */
     description?: string
 
-    /** SPDX license identifier (e.g. `"MIT"`, `"Apache-2.0"`). */
+    /**
+     * SPDX license identifier (e.g. `"MIT"`, `"Apache-2.0"`).
+     */
     license?: string
   }
 }
@@ -97,18 +112,6 @@ export interface PluginManifest {
  * in plugin manifests.
  */
 const SEMVER_RE = /^\d+\.\d+\.\d+(?:-[a-z\d.-]+)?(?:\+[a-z\d.-]+)?$/i
-
-/**
- * Very lenient semver range validation.
- *
- * Accepts: `"*"`, ranges like `"^1.0.0"`, `">=0.5.0 <1.0.0"`,
- * and bare versions that look like `"1.2.3"`.
- *
- * This is intentionally lenient; full semver-range parsing
- * is out of scope. The runtime check should use a real semver
- * library or delegate to the consumer.
- */
-const RANGE_RE = /^[*^~>=<!x\d][\d.*^~>=<!\s\-]*$/i
 
 /**
  * Validate and type-narrow an unknown value into a {@link PluginManifest}.
@@ -174,7 +177,7 @@ export function validateManifest(json: unknown): PluginManifest {
 // ---------- Internal validation helpers ----------
 
 function assertRange(range: string, field: string): void {
-  if (!RANGE_RE.test(range)) {
+  if (!isValidRange(range)) {
     throw new DocxKitError(
       'MANIFEST_INVALID',
       `Plugin manifest field "${field}" is not a valid semver range: "${range}"`,

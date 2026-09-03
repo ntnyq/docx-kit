@@ -35,10 +35,9 @@
   "dependencies": {
     "@docxkit/types": "workspace:*",
     "docx": "^9.7.1",
-    "semver": "^7.8.5"
+    "verkit": "^0.4.0"
   },
   "devDependencies": {
-    "@types/semver": "^7.8.0",
     "jszip": "^3.10.1"
   }
 }

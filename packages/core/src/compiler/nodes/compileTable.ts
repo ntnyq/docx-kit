@@ -12,6 +12,7 @@ import {
   TableBorders,
   TableCell,
   TableRow,
+  TextRun,
   WidthType,
 } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
@@ -19,6 +20,8 @@ import {
   compileBorderRule,
   compileCellStyle,
   compileColumnWidth,
+  compileParagraphStyle,
+  compileTextStyle,
 } from '../compileStyle'
 import { toTwip } from '../units'
 import { compileInlineNodes } from './compileInline'
@@ -63,27 +66,28 @@ export async function compileTable<
   }
 
   // Resolve table-level style from stylesheet
-  const tableStyle = node.className
-    ? resolveStyle({
-        className: node.className,
-        inline: node.style,
-        styles: config.styles,
-        theme: config.theme,
-      })
-    : undefined
+  const tableStyle = resolveStyle({
+    base: config.defaults?.table,
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+    theme: config.theme,
+  })
 
   const rows: TableRow[] = []
 
   // Header row
   if (node.header !== false) {
-    const headerStyle = tableStyle
-      ? resolveStyle({
-          base: tableStyle,
-          inline: node.headerCellStyle,
-          styles: config.styles,
-          theme: config.theme,
-        })
-      : node.headerCellStyle
+    const headerStyle = resolveStyle({
+      inline: node.headerCellStyle,
+      styles: config.styles,
+      theme: config.theme,
+      base: {
+        ...config.defaults?.text,
+        ...config.defaults?.cell,
+        ...tableStyle,
+      },
+    })
 
     rows.push(
       new TableRow({
@@ -95,13 +99,20 @@ export async function compileTable<
             styles: config.styles,
             theme: config.theme,
           })
+          const paragraphStyle = compileParagraphStyle(columnHeaderStyle)
 
           return new TableCell({
             ...compileCellStyle(columnHeaderStyle),
             children: [
               new Paragraph({
-                alignment: col.align,
-                text: String(col.title),
+                ...paragraphStyle,
+                alignment: col.align ?? paragraphStyle.alignment,
+                children: [
+                  new TextRun({
+                    text: String(col.title),
+                    ...compileTextStyle(columnHeaderStyle),
+                  }),
+                ],
               }),
             ],
             ...(col.colSpan && col.colSpan > 1
@@ -269,7 +280,7 @@ function resolveTableCellStyle<
     DocxStyleRule | undefined
 
   const withTableCellStyle = resolveStyle({
-    base: tableStyle,
+    base: { ...config.defaults?.cell, ...tableStyle },
     inline: tableCellStyle,
     styles: config.styles,
     theme: config.theme,

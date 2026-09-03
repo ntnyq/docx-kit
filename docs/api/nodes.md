@@ -35,11 +35,17 @@ All styled nodes share these common fields.
 
 ```ts
 interface BaseNode<TStyles> {
-  /** One or more stylesheet class names. */
+  /**
+   * One or more stylesheet class names.
+   */
   className?: string | ClassName<TStyles> | ClassName<TStyles>[]
-  /** Unique identifier for the node. */
+  /**
+   * Unique identifier for the node.
+   */
   id?: string
-  /** Inline style overrides (highest priority). */
+  /**
+   * Inline style overrides (highest priority).
+   */
   style?: DocxStyleRule
 }
 ```
@@ -64,9 +70,13 @@ Usage:
 ```ts
 interface ParagraphNode<TStyles> extends BaseNode<TStyles> {
   type: 'paragraph'
-  /** Simple text (automatically wrapped in a TextNode). */
+  /**
+   * Simple text (automatically wrapped in a TextNode).
+   */
   text?: string
-  /** Mixed inline content: text runs + inline images. */
+  /**
+   * Mixed inline content: text runs + inline images.
+   */
   children?: InlineNode<TStyles>[]
 }
 ```

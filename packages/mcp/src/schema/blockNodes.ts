@@ -3,6 +3,9 @@ export interface BlockNodeDefinition {
   requireOneOf?: readonly string[]
 }
 
+export type NodeCollectionKind =
+  'block' | 'inline' | 'listItem' | 'math' | 'paragraph' | 'text'
+
 export type SchemaFieldKind =
   'array' | 'boolean' | 'number' | 'object' | 'string' | 'unknown'
 
@@ -10,13 +13,18 @@ export interface SchemaFieldRule {
   kind: SchemaFieldKind
   enum?: readonly (number | string)[]
   integer?: boolean
+  items?: NodeCollectionKind
   maximum?: number
   minimum?: number
   nonEmpty?: boolean
   required?: boolean
 }
 
-const array = (required = false): SchemaFieldRule => ({
+const array = (
+  required = false,
+  items?: NodeCollectionKind,
+): SchemaFieldRule => ({
+  items,
   kind: 'array',
   required,
 })
@@ -47,12 +55,12 @@ export const BLOCK_NODE_DEFINITIONS = {
   pageBreak: { fields: {} },
   thematicBreak: { fields: {} },
   bookmark: {
-    fields: { children: array(true), name: string(true) },
+    fields: { children: array(true, 'text'), name: string(true) },
   },
   bulletList: {
     fields: {
       bullet: string(),
-      items: array(true),
+      items: array(true, 'listItem'),
       level: number({ integer: true, maximum: 8, minimum: 0 }),
     },
   },
@@ -68,8 +76,8 @@ export const BLOCK_NODE_DEFINITIONS = {
   comment: {
     fields: {
       author: string(true),
-      children: array(true),
-      comment: array(true),
+      children: array(true, 'inline'),
+      comment: array(true, 'paragraph'),
       date: string(),
       initials: string(),
     },
@@ -77,13 +85,13 @@ export const BLOCK_NODE_DEFINITIONS = {
   deletedText: {
     fields: {
       author: string(true),
-      children: array(true),
+      children: array(true, 'text'),
       date: string(true),
       revisionId: number({ integer: true, minimum: 0, required: true }),
     },
   },
   footnote: {
-    fields: { content: array(true) },
+    fields: { content: array(true, 'paragraph') },
   },
   heading: {
     fields: {
@@ -99,7 +107,7 @@ export const BLOCK_NODE_DEFINITIONS = {
     requireOneOf: ['anchor', 'url'],
     fields: {
       anchor: string(),
-      children: array(true),
+      children: array(true, 'text'),
       url: string(),
     },
   },
@@ -119,17 +127,17 @@ export const BLOCK_NODE_DEFINITIONS = {
   insertedText: {
     fields: {
       author: string(true),
-      children: array(true),
+      children: array(true, 'text'),
       date: string(true),
       revisionId: number({ integer: true, minimum: 0, required: true }),
     },
   },
   math: {
-    fields: { children: array(true) },
+    fields: { children: array(true, 'math') },
   },
   numberedList: {
     fields: {
-      items: array(true),
+      items: array(true, 'listItem'),
       level: number({ integer: true, maximum: 8, minimum: 0 }),
       start: number({ integer: true, minimum: 1 }),
       numberingFormat: {
@@ -145,7 +153,7 @@ export const BLOCK_NODE_DEFINITIONS = {
     },
   },
   paragraph: {
-    fields: { children: array(), text: string() },
+    fields: { children: array(false, 'inline'), text: string() },
   },
   plugin: {
     fields: { name: string(true), options: unknown(true) },
@@ -164,7 +172,7 @@ export const BLOCK_NODE_DEFINITIONS = {
   textBox: {
     fields: {
       box: object(true),
-      children: array(),
+      children: array(false, 'inline'),
       text: string(),
     },
   },
@@ -172,40 +180,136 @@ export const BLOCK_NODE_DEFINITIONS = {
 
 export type BlockNodeType = keyof typeof BLOCK_NODE_DEFINITIONS
 
+/**
+ * Nested content contracts shared by validation and the exposed JSON Schema.
+ */
+export const TEXT_NODE_DEFINITION: BlockNodeDefinition = {
+  fields: { text: { kind: 'string', required: true } },
+}
+export const LIST_ITEM_DEFINITION: BlockNodeDefinition = {
+  fields: {
+    children: array(false, 'inline'),
+    level: number({ integer: true, maximum: 8, minimum: 0 }),
+    text: string(),
+  },
+}
+export const INLINE_NODE_TYPES = [
+  'bookmark',
+  'checkbox',
+  'comment',
+  'deletedText',
+  'footnote',
+  'hyperlink',
+  'image',
+  'insertedText',
+  'math',
+] as const satisfies readonly BlockNodeType[]
+export const MATH_NODE_DEFINITIONS: Record<string, BlockNodeDefinition> = {
+  text: TEXT_NODE_DEFINITION,
+  fraction: {
+    fields: {
+      denominator: array(true, 'math'),
+      numerator: array(true, 'math'),
+    },
+  },
+  function: {
+    fields: { arguments: array(true, 'math'), name: array(true, 'math') },
+  },
+  integral: {
+    fields: {
+      children: array(true, 'math'),
+      subScript: array(false, 'math'),
+      superScript: array(false, 'math'),
+    },
+  },
+  radical: {
+    fields: { children: array(true, 'math'), degree: array(false, 'math') },
+  },
+  script: {
+    fields: {
+      children: array(true, 'math'),
+      subScript: array(false, 'math'),
+      superScript: array(false, 'math'),
+    },
+  },
+  sum: {
+    fields: {
+      children: array(true, 'math'),
+      subScript: array(false, 'math'),
+      superScript: array(false, 'math'),
+    },
+  },
+}
+
 export const BLOCK_NODE_TYPES = Object.freeze(
   Object.keys(BLOCK_NODE_DEFINITIONS) as BlockNodeType[],
 )
 
 export function buildBlockNodeJsonSchemas(): Record<string, unknown>[] {
-  return BLOCK_NODE_TYPES.map(type => {
-    const definition = BLOCK_NODE_DEFINITIONS[type]
-    const required = ['type']
-    const properties: Record<string, unknown> = {
-      type: { const: type },
-    }
+  return BLOCK_NODE_TYPES.map(type =>
+    buildNodeJsonSchema(BLOCK_NODE_DEFINITIONS[type], type),
+  )
+}
 
-    for (const [field, rule] of Object.entries(definition.fields)) {
-      properties[field] = fieldRuleToJsonSchema(rule)
-      if (rule.required) {
-        required.push(field)
-      }
-    }
+export function buildNestedNodeJsonSchemas(): Record<string, unknown> {
+  const text = buildNodeJsonSchema(TEXT_NODE_DEFINITION, 'text')
+  return {
+    textNode: { anyOf: [{ type: 'string' }, text] },
+    inlineNode: {
+      oneOf: [
+        text,
+        ...INLINE_NODE_TYPES.map(type =>
+          buildNodeJsonSchema(BLOCK_NODE_DEFINITIONS[type], type),
+        ),
+      ],
+    },
+    listItemNode: {
+      anyOf: [{ type: 'string' }, buildNodeJsonSchema(LIST_ITEM_DEFINITION)],
+    },
+    mathNode: {
+      oneOf: Object.entries(MATH_NODE_DEFINITIONS).map(([type, definition]) =>
+        buildNodeJsonSchema(definition, type),
+      ),
+    },
+    paragraphNode: {
+      anyOf: [
+        { type: 'string' },
+        buildNodeJsonSchema(BLOCK_NODE_DEFINITIONS.paragraph, 'paragraph'),
+      ],
+    },
+  }
+}
 
-    const schema: Record<string, unknown> = {
-      additionalProperties: true,
-      properties,
-      required,
-      type: 'object',
-    }
+function buildNodeJsonSchema(
+  definition: BlockNodeDefinition,
+  type?: string,
+): Record<string, unknown> {
+  const required = type ? ['type'] : []
+  const properties: Record<string, unknown> = type
+    ? { type: { const: type } }
+    : {}
 
-    if ('requireOneOf' in definition && definition.requireOneOf) {
-      schema.anyOf = definition.requireOneOf.map(field => ({
-        required: [field],
-      }))
+  for (const [field, rule] of Object.entries(definition.fields)) {
+    properties[field] = fieldRuleToJsonSchema(rule)
+    if (rule.required) {
+      required.push(field)
     }
+  }
 
-    return schema
-  })
+  const schema: Record<string, unknown> = {
+    additionalProperties: true,
+    properties,
+    required,
+    type: 'object',
+  }
+
+  if ('requireOneOf' in definition && definition.requireOneOf) {
+    schema.anyOf = definition.requireOneOf.map(field => ({
+      required: [field],
+    }))
+  }
+
+  return schema
 }
 
 function fieldRuleToJsonSchema(rule: SchemaFieldRule): Record<string, unknown> {
@@ -231,6 +335,9 @@ function fieldRuleToJsonSchema(rule: SchemaFieldRule): Record<string, unknown> {
   }
   if (rule.nonEmpty && rule.kind === 'string') {
     schema.minLength = 1
+  }
+  if (rule.items) {
+    schema.items = { $ref: `#/definitions/${rule.items}Node` }
   }
   return schema
 }

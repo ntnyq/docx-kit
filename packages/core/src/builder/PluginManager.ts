@@ -27,15 +27,33 @@ export class PluginManager<
   TPlugins extends PluginRegistry = Record<never, never>,
 > {
   private readonly _map = new Map<string, DocxPlugin>()
-  private readonly _pendingSetups: Promise<void>[] = []
+  private readonly _pendingSetups: Promise<PromiseSettledResult<void>>[] = []
 
-  /** Await all pending plugin setup hooks. */
+  /**
+   * Await all pending plugin setup hooks.
+   *
+   * @returns A promise that resolves after all pending setup hooks succeed
+   * @throws Propagates the original rejection reason if a plugin setup hook fails
+   */
   async awaitSetups(): Promise<void> {
-    await Promise.all(this._pendingSetups)
+    const results = await Promise.all(this._pendingSetups)
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        throw result.reason
+      }
+    }
     this._pendingSetups.length = 0
   }
 
-  /** Create a plugin invocation node for the builder DSL. */
+  /**
+   * Create a plugin invocation node for the builder DSL.
+   *
+   * @template TName - The name of a plugin in the accumulated registry
+   * @param name - Name of a registered plugin
+   * @param options - Options accepted by the selected plugin
+   * @param style - Optional inline style overrides for this invocation
+   * @returns A plugin invocation node without executing the plugin
+   */
   createNode<TName extends string & keyof TPlugins>(
     name: TName,
     options: TPlugins[TName],
@@ -69,12 +87,21 @@ export class PluginManager<
     }
     this._map.set(plugin.name, plugin as DocxPlugin)
     if (plugin.setup) {
-      this._pendingSetups.push(Promise.resolve(plugin.setup()))
+      // Observe failures now, even if this builder is exported much later.
+      this._pendingSetups.push(
+        Promise.resolve(plugin.setup())
+          .then(() => ({ status: 'fulfilled', value: undefined }) as const)
+          .catch(error => ({ reason: error, status: 'rejected' }) as const),
+      )
     }
     return this as unknown as PluginManager<Record<TName, TOptions> & TPlugins>
   }
 
-  /** Get the raw plugin map for the compiler. */
+  /**
+   * Get the raw plugin map for the compiler.
+   *
+   * @returns The live map of registered plugin names to plugin instances
+   */
   toMap(): Map<string, DocxPlugin> {
     return this._map
   }

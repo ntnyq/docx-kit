@@ -11,12 +11,14 @@
  * @module compiler/compileDocument
  */
 
+import { DocxKitError } from '@docxkit/types'
 import {
   Column,
   Document,
   Footer as DocxFooter,
   Header as DocxHeader,
   Paragraph,
+  Table,
 } from 'docx'
 import { compileNode } from './compileNode'
 import { compileBorderRule } from './compileStyle'
@@ -48,18 +50,28 @@ import type { FileChild, ISectionOptions } from 'docx'
 export interface CompileDocumentOptions<
   TStyles extends StyleSheet = StyleSheet,
 > {
-  /** User configuration (page, styles, metadata, etc.). */
+  /**
+   * User configuration (page, styles, metadata, etc.).
+   */
   config: DocxKitConfig<TStyles>
-  /** Ordered array of block nodes to render. */
+  /**
+   * Ordered array of block nodes to render.
+   */
   nodes: BlockNode<TStyles>[]
-  /** Map of registered plugin name → plugin instance. */
+  /**
+   * Map of registered plugin name → plugin instance.
+   */
   plugins: Map<string, DocxPlugin>
 }
 
-/** Alias for `PageConfig['margin']`. */
+/**
+ * Alias for `PageConfig['margin']`.
+ */
 type PageMarginValue = PageConfig['margin']
 
-/** Alias for `PageConfig['size']`. */
+/**
+ * Alias for `PageConfig['size']`.
+ */
 type PageSizeValue = PageConfig['size']
 
 /**
@@ -185,6 +197,9 @@ export async function compileDocument<TStyles extends StyleSheet>(
     customProperties: Object.entries(
       options.config.metadata?.customProperties ?? {},
     ).map(([name, value]) => ({ name, value })),
+    evenAndOddHeaderAndFooters: sectionGroups.some(({ config }) =>
+      Boolean(config?.header?.even || config?.footer?.even),
+    ),
     features: {
       updateFields: options.config.features?.updateFields,
       trackRevisions:
@@ -317,7 +332,7 @@ async function compileHeaderFooter<TStyles extends StyleSheet>(
 // ---------- Page / Section properties ----------
 
 /**
- * Compile a `HeaderFooterContent` into `docx` `Paragraph` children.
+ * Compile header/footer content into supported block children.
  *
  * Supports both simple strings (backward compatible — each becomes a `Paragraph`)
  * and full {@link BlockNode} objects (compiled via the node registry with style support).
@@ -326,13 +341,19 @@ async function compileHeaderFooterChildren<TStyles extends StyleSheet>(
   content: HeaderFooterContent,
   options: CompileDocumentOptions<TStyles>,
   session: CompilationSession,
-): Promise<Paragraph[]> {
-  const result: Paragraph[] = []
+): Promise<(Paragraph | Table)[]> {
+  const result: (Paragraph | Table)[] = []
 
   for (const item of content.children) {
     if (typeof item === 'string') {
       // Simple text — create a plain paragraph (backward compatible)
-      result.push(new Paragraph(item))
+      result.push(
+        await compileParagraph(
+          { text: item, type: 'paragraph' },
+          options.config,
+          session,
+        ),
+      )
     } else {
       // Rich content BlockNode — compile via the node registry
       const compiled = await compileNode({
@@ -342,14 +363,16 @@ async function compileHeaderFooterChildren<TStyles extends StyleSheet>(
         session,
       })
 
-      // Flatten the result — collect only Paragraph children
+      // Tables are block children; nesting them inside paragraphs is invalid.
       const items = Array.isArray(compiled) ? compiled : [compiled]
       for (const child of items) {
-        if (child instanceof Paragraph) {
+        if (child instanceof Paragraph || child instanceof Table) {
           result.push(child)
         } else {
-          // Wrap non-Paragraph FileChild in a Paragraph
-          result.push(new Paragraph({ children: [child] }))
+          throw new DocxKitError(
+            'HEADER_FOOTER_INVALID_CONTENT',
+            'Header and footer plugins must render paragraphs or tables',
+          )
         }
       }
     }
@@ -397,9 +420,10 @@ function compilePageBorders(config?: PageBorderConfig) {
  * Compile a single page margin value (shorthand or explicit) into twips.
  */
 function compilePageMargin(config?: PageConfig) {
-  const parsed = config?.margin
-    ? parseShorthandTwip(config.margin as PageMarginValue)
-    : undefined
+  const parsed =
+    config?.margin == null
+      ? undefined
+      : parseShorthandTwip(config.margin as PageMarginValue)
   const footer = toTwip(config?.footerDistance)
   const gutter = toTwip(config?.gutter)
   const header = toTwip(config?.headerDistance)
@@ -427,7 +451,7 @@ async function compileReferenceParagraphs(
   return Promise.all(
     content.map(item =>
       typeof item === 'string'
-        ? new Paragraph(item)
+        ? compileParagraph({ text: item, type: 'paragraph' }, config, session)
         : compileParagraph(item, config, session),
     ),
   )
@@ -456,6 +480,9 @@ function compileSectionProperties(
             }
           : undefined,
       },
+      titlePage: Boolean(
+        sectionConfig?.header?.first || sectionConfig?.footer?.first,
+      ),
     },
   }
 }
@@ -502,7 +529,9 @@ function mergePageConfig<TStyles extends StyleSheet>(
 
 // ---------- Page size ----------
 
-/** Page size presets in twips (width × height). */
+/**
+ * Page size presets in twips (width × height).
+ */
 const PAGE_SIZE_PRESETS = {
   A3: { height: 23811, width: 16838 },
   A4: { height: 16838, width: 11906 },
@@ -518,7 +547,7 @@ function compilePageSize(
   orientation?: 'landscape' | 'portrait',
 ) {
   if (!size) {
-    return undefined
+    return orientation ? { orientation } : undefined
   }
 
   let width: number | undefined
@@ -543,8 +572,6 @@ function compilePageSize(
     return undefined
   }
 
-  if (orientation === 'landscape') {
-    return { height: width, width: height }
-  }
-  return { height, width }
+  // docx performs the width/height swap when serializing landscape pages.
+  return { height, orientation, width }
 }

@@ -59,7 +59,12 @@ class NodePluginLoader extends PluginLoader {
   }
 }
 
-/** Create a Node.js plugin loader with npm and local-file support. */
+/**
+ * Create a Node.js plugin loader with npm and local-file support.
+ *
+ * @param options - Optional compatibility, manifest validation, and security settings
+ * @returns A Node.js plugin loader using the supplied settings
+ */
 export function createPluginLoader(
   options: PluginLoaderOptions = {},
 ): PluginLoader {

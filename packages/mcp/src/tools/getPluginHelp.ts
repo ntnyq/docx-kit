@@ -11,11 +11,17 @@ import type { DocxPlugin } from '@docxkit/core'
  * Plugin help info returned by get_plugin_help.
  */
 export interface PluginHelpInfo {
-  /** Detailed description of the plugin. */
+  /**
+   * Detailed description of the plugin.
+   */
   description: string
-  /** Plugin name. */
+  /**
+   * Plugin name.
+   */
   name: string
-  /** Example usage in JSON DSL. */
+  /**
+   * Example usage in JSON DSL.
+   */
   usageExample: string
 }
 

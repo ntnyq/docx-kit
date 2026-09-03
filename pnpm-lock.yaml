@@ -161,6 +161,9 @@ importers:
       '@ntnyq/utils':
         specifier: ^0.22.0
         version: 0.22.0
+      acorn:
+        specifier: ^8.18.0
+        version: 8.18.0
       docx:
         specifier: ^9.7.1
         version: 9.7.1
@@ -505,13 +508,10 @@ importers:
       docx:
         specifier: ^9.7.1
         version: 9.7.1
-      semver:
-        specifier: ^7.8.5
-        version: 7.8.5
+      verkit:
+        specifier: ^0.4.0
+        version: 0.4.0
     devDependencies:
-      '@types/semver':
-        specifier: ^7.8.0
-        version: 7.8.0
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
@@ -522,6 +522,12 @@ importers:
         specifier: ^2.4.2
         version: 2.4.2
     devDependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../core
+      '@docxkit/loader':
+        specifier: workspace:*
+        version: link:../loader
       '@types/prompts':
         specifier: ^2.4.9
         version: 2.4.9
@@ -1423,9 +1429,6 @@ packages:
 
   '@types/qrcode@1.5.6':
     resolution: {integrity: sha512-te7NQcV2BOvdj2b1hCAHzAoMNuj65kNBMz0KBaxM6c3VGBOhU0dURQKOtH8CFNI/dsKkwlv32p26qYQTWoB5bw==}
-
-  '@types/semver@7.8.0':
-    resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -4783,8 +4786,6 @@ snapshots:
   '@types/qrcode@1.5.6':
     dependencies:
       '@types/node': 26.4.1
-
-  '@types/semver@7.8.0': {}
 
   '@types/trusted-types@2.0.7':
     optional: true

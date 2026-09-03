@@ -2,6 +2,20 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { dataUrlToUint8Array } from '../../src/utils/dataUrl'
 
 describe('dataUrlToUint8Array (cross-platform)', () => {
+  it('decodes percent-encoded SVG from ECharts without treating it as base64', async () => {
+    const svg =
+      '<svg xmlns="http://www.w3.org/2000/svg"><text>图表 + chart</text></svg>'
+    const bytes = await dataUrlToUint8Array(
+      `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    )
+    expect(new TextDecoder().decode(bytes)).toBe(svg)
+  })
+
+  it('preserves percent-encoded binary bytes', async () => {
+    expect(
+      await dataUrlToUint8Array('data:application/octet-stream,%00%FF%80'),
+    ).toEqual(Uint8Array.of(0, 255, 128))
+  })
   afterEach(() => {
     vi.unstubAllGlobals()
   })
@@ -38,9 +52,9 @@ describe('dataUrlToUint8Array (cross-platform)', () => {
     expect(result.length).toBeGreaterThan(0)
   })
 
-  it('rejects data URLs without a base64 payload', async () => {
+  it('rejects data URLs without a payload separator', async () => {
     await expect(dataUrlToUint8Array('data:text/plain;base64')).rejects.toThrow(
-      'Expected a base64 data URL payload',
+      'Expected a data URL payload',
     )
   })
 })

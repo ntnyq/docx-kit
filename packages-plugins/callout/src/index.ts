@@ -45,13 +45,21 @@ const CALLOUT_PRESETS = {
   },
 } as const
 
-/** Options for the Callout plugin. */
+/**
+ * Options for the Callout plugin.
+ */
 export interface CalloutOptions {
-  /** Body text of the callout. */
+  /**
+   * Body text of the callout.
+   */
   content: string
-  /** Callout style — controls icon, color, and tone. */
+  /**
+   * Callout style — controls icon, color, and tone.
+   */
   type: 'danger' | 'info' | 'success' | 'warning'
-  /** Optional bold title line placed before the content. */
+  /**
+   * Optional bold title line placed before the content.
+   */
   title?: string
 }
 

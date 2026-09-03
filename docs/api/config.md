@@ -8,18 +8,28 @@ Top-level configuration passed to `createDocx()`.
 
 ```ts
 interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
-  /** Document-level Word feature switches. */
+  /**
+   * Document-level Word feature switches.
+   */
   features?: {
     trackRevisions?: boolean
     updateFields?: boolean
   }
-  /** Page dimensions and margins. */
+  /**
+   * Page dimensions and margins.
+   */
   page?: PageConfig
-  /** Named style classes (class → style rule map). */
+  /**
+   * Named style classes (class → style rule map).
+   */
   styles?: TStyles
-  /** Semantic design tokens for theming. */
+  /**
+   * Semantic design tokens for theming.
+   */
   theme?: DocxTheme
-  /** Default styles applied as base for each element type. */
+  /**
+   * Default styles applied as base for each element type.
+   */
   defaults?: {
     cell?: DocxStyleRule
     image?: DocxStyleRule
@@ -27,7 +37,9 @@ interface DocxKitConfig<TStyles extends StyleSheet = StyleSheet> {
     table?: DocxStyleRule
     text?: DocxStyleRule
   }
-  /** OOXML core properties (File → Info). */
+  /**
+   * OOXML core properties (File → Info).
+   */
   metadata?: {
     creator?: string
     description?: string

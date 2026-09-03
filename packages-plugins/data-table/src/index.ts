@@ -38,10 +38,14 @@ import {
 } from 'docx'
 import type { IShadingAttributesProperties } from 'docx'
 
-/** Per-column alignment hint. */
+/**
+ * Per-column alignment hint.
+ */
 export type ColAlign = 'center' | 'left' | 'right'
 
-/** Value formatter identifier. */
+/**
+ * Value formatter identifier.
+ */
 export type ColFormat = 'currency' | 'date' | 'number' | 'percent'
 
 const HEADER_SHADING: IShadingAttributesProperties = {
@@ -54,7 +58,9 @@ const STRIPE_SHADING: IShadingAttributesProperties = {
   type: ShadingType.CLEAR,
 }
 
-/** Options for the DataTable plugin. */
+/**
+ * Options for the DataTable plugin.
+ */
 export interface DataTableOptions {
   /**
    * The data to render — each object is one row.
@@ -62,16 +68,22 @@ export interface DataTableOptions {
    * Column keys are taken from the first object in the array.
    */
   data: Record<string, unknown>[]
-  /** Per-column alignment. Auto-detected from value types when omitted. */
+  /**
+   * Per-column alignment. Auto-detected from value types when omitted.
+   */
   align?: Record<string, ColAlign>
   /**
    * Render visible table borders.
    * @default true
    */
   bordered?: boolean
-  /** Per-column value formatter. */
+  /**
+   * Per-column value formatter.
+   */
   format?: Record<string, ColFormat>
-  /** Human-readable column labels (e.g. `{ salary: '薪资' }`). */
+  /**
+   * Human-readable column labels (e.g. `{ salary: '薪资' }`).
+   */
   labels?: Record<string, string>
   /**
    * Alternate row background shading.

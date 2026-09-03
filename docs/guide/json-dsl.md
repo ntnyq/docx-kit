@@ -99,7 +99,7 @@ interface DocxSchema<TStyles> {
 }
 ```
 
-> **Note:** `data` must be in the format expected by the runtime (Uint8Array, Blob, etc. — not a base64 string with the prefix). For base64 data URLs inside Node.js, use `dataUrlToUint8Array()` from `docx-kit/node` to pre-process.
+`data` accepts bytes, a Blob, or a data URL directly. When using `renderDocx()` from `docx-kit/node`, it also accepts local file paths and `file:` URLs. Core/browser callers must supply bytes/data URLs or provide an explicit `resolveImage` adapter in the runtime options; paths are not fetched automatically.
 
 ### Table Nodes
 

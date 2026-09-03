@@ -4,10 +4,14 @@
  * @module utility
  */
 
-/** Generic dictionary with string keys. */
+/**
+ * Generic dictionary with string keys.
+ */
 export type Dict<T = unknown> = Record<string, T>
 
-/** Hexadecimal CSS color string, e.g. `"#ff0000"`. */
+/**
+ * Hexadecimal CSS color string, e.g. `"#ff0000"`.
+ */
 export type HexColor = `#${string}`
 
 /**
@@ -35,7 +39,9 @@ export type MaybePromise<T> = Promise<T> | T
  */
 export type StyleToken<T extends number | string> = T | ThemeToken
 
-/** Supported theme token categories (must match {@link resolveSingleToken}). */
+/**
+ * Supported theme token categories (must match {@link resolveSingleToken}).
+ */
 export type StyleTokenCategory = '$colors' | '$fonts' | '$fontSize' | '$spacing'
 
 /**
