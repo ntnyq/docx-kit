@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/core",
   "type": "module",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Core engine for docx-kit — CSS-like DOCX generation library",
   "license": "MIT",
   "author": {

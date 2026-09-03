@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/loader",
   "type": "module",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Plugin loader for docx-kit with platform-specific sources",
   "license": "MIT",
   "author": {

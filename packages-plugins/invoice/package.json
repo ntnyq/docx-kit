@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/plugin-invoice",
   "type": "module",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Professional invoice with line items, totals, and tax — docx-kit plugin",
   "keywords": [
     "docx",
