@@ -9,6 +9,7 @@ import {
 import { describe, expect, it, vi } from 'vitest'
 import { calloutPlugin } from '../../../packages-plugins/callout/src/index'
 import { watermarkPlugin } from '../../../packages-plugins/watermark/src/index'
+import packageJson from '../package.json'
 import { createPluginLoader as createBrowserPluginLoader } from '../src/loader-browser'
 import { createPluginLoader as createNodePluginLoader } from '../src/loader-node'
 import type {
@@ -244,7 +245,8 @@ describe('PluginLoader', () => {
 
   describe('Node platform factory', () => {
     it('loads a local plugin using its adjacent manifest', async () => {
-      const loader = createNodePluginLoader()
+      // Pair this static fixture with a fixed host version, independent of releases.
+      const loader = createNodePluginLoader({ kitVersion: '0.4.0' })
       const pluginDirectory = fileURLToPath(
         new URL('./fixtures/node-plugin', import.meta.url),
       )
@@ -265,7 +267,7 @@ describe('PluginLoader', () => {
         Response.json(
           {
             ...TEST_MANIFEST,
-            docxKit: '^0.4.0',
+            docxKit: `^${packageJson.version}`,
             main: './index.mjs',
             plugin: { name: 'fixture' },
           },

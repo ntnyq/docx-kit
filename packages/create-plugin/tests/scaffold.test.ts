@@ -2,6 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import packageJson from '../package.json'
 import { createPlugin } from '../src/commands/create-plugin'
 
 // Mock prompts to avoid interactive input during tests
@@ -62,7 +63,7 @@ describe('createPlugin', () => {
     )
     expect(manifest.name).toBe('docx-kit-plugin-test')
     expect(manifest.plugin.name).toBe('test')
-    expect(manifest.docxKit).toBe('^0.4.0')
+    expect(manifest.docxKit).toBe(`^${packageJson.version}`)
 
     // Verify package.json content
     const pkg = JSON.parse(
@@ -70,7 +71,8 @@ describe('createPlugin', () => {
     )
     expect(pkg.name).toBe('docx-kit-plugin-test')
     expect(pkg.keywords).toContain('docx-kit-plugin')
-    expect(pkg.peerDependencies['docx-kit']).toBe('^0.4.0')
+    expect(pkg.peerDependencies['docx-kit']).toBe(`^${packageJson.version}`)
+    expect(pkg.devDependencies['docx-kit']).toBe(`^${packageJson.version}`)
     expect(pkg.devDependencies.tsdown).toBe('^0.22.9')
   })
 

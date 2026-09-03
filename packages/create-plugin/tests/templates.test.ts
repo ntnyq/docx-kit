@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import packageJson from '../package.json'
 import { renderEslintConfig } from '../src/templates/plugin/eslint-config'
 import { renderManifest } from '../src/templates/plugin/manifest'
 import { renderPackageJson } from '../src/templates/plugin/package-json'
@@ -29,7 +30,7 @@ describe('renderManifest', () => {
     const result = renderManifest('docx-kit-plugin-chart')
     const parsed = JSON.parse(result)
     expect(parsed.version).toBe('0.1.0')
-    expect(parsed.docxKit).toBe('^0.4.0')
+    expect(parsed.docxKit).toBe(`^${packageJson.version}`)
     expect(parsed.description).toBe('')
   })
 })
@@ -85,8 +86,8 @@ describe('renderPackageJson', () => {
     expect(parsed.exports['.'].default).toBe('./dist/index.js')
     expect(parsed.files).toContain('docx-kit.plugin.json')
     expect(parsed.peerDependencies.docx).toBe('^9.7.1')
-    expect(parsed.peerDependencies['docx-kit']).toBe('^0.4.0')
-    expect(parsed.devDependencies['docx-kit']).toBe('^0.4.0')
+    expect(parsed.peerDependencies['docx-kit']).toBe(`^${packageJson.version}`)
+    expect(parsed.devDependencies['docx-kit']).toBe(`^${packageJson.version}`)
     expect(parsed.devDependencies.tsdown).toBe('^0.22.9')
     expect(parsed.devDependencies.vitest).toBe('^4.1.10')
   })

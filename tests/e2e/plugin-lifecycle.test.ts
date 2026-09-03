@@ -52,7 +52,8 @@ describe('third-party plugin lifecycle', () => {
       },
     })
 
-    const loader = createPluginLoader()
+    // Pair this static fixture with a fixed host version, independent of releases.
+    const loader = createPluginLoader({ kitVersion: '0.4.0' })
     const loaded = await loader.load({
       path: fixtureRoot,
       type: 'local',
