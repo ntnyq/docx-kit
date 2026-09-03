@@ -10,6 +10,9 @@ import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
 import TSWorker from 'monaco-editor/language/typescript/ts.worker?worker'
 import * as typescript from 'monaco-editor/languages/features/typescript/register'
 
+// Syntax highlighting is registered separately from TypeScript language services.
+import 'monaco-editor/languages/definitions/typescript/register'
+
 const globalSelf = globalThis as {
   MonacoEnvironment?: {
     getWorker(_workerId: string, label: string): Worker

@@ -126,6 +126,7 @@ export default defineConfig({
     optimizeDeps: {
       include: [
         'monaco-editor/editor/editor.api',
+        'monaco-editor/languages/definitions/typescript/register',
         'monaco-editor/languages/features/typescript/register',
       ],
     },
