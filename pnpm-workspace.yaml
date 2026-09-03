@@ -13,3 +13,5 @@ allowBuilds:
   unrs-resolver: true
 
 minimumReleaseAge: 0
+
+storeDir: /tmp/pnpm-store2

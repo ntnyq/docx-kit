@@ -35,16 +35,16 @@
     "@docxkit/theme-minimal": "workspace:*",
     "@docxkit/theme-ocean": "workspace:*",
     "@docxkit/theme-warm": "workspace:*",
-    "@ntnyq/utils": "^0.21.0",
+    "@ntnyq/utils": "^0.22.0",
     "docx": "^9.7.1",
     "docx-kit": "workspace:*",
     "monaco-editor": "^0.56.0",
     "sucrase": "^3.35.1",
-    "tinysaver": "^0.2.0",
-    "vue": "^3.5.40"
+    "tinysaver": "^0.3.0",
+    "vue": "^3.5.42"
   },
   "devDependencies": {
-    "tsx": "^4.23.1",
+    "tsx": "^4.23.13",
     "vitepress": "2.0.0-alpha.18"
   }
 }
