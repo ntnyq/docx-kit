@@ -1,5 +1,5 @@
 /**
- * @docxkit/loader/node — Node.js platform plugin loader.
+ * `@docxkit/loader/node` — Node.js platform plugin loader.
  *
  * @packageDocumentation
  */

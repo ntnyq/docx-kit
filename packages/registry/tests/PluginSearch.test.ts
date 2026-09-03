@@ -14,20 +14,22 @@ describe('searchPlugins', () => {
   it('searches npm registry with keyword filter', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({
-        total: 1,
-        objects: [
-          {
-            score: { final: 0.8 },
-            package: {
-              description: 'A chart plugin',
-              keywords: ['docx-kit-plugin', 'chart'],
-              name: 'docx-kit-plugin-chart',
-              version: '1.0.0',
+      async json() {
+        return {
+          total: 1,
+          objects: [
+            {
+              score: { final: 0.8 },
+              package: {
+                description: 'A chart plugin',
+                keywords: ['docx-kit-plugin', 'chart'],
+                name: 'docx-kit-plugin-chart',
+                version: '1.0.0',
+              },
             },
-          },
-        ],
-      }),
+          ],
+        }
+      },
     })
 
     const results = await searchPlugins('chart')
@@ -77,25 +79,29 @@ describe('getPlugin', () => {
   it('returns plugin entry for valid package', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({
-        description: 'A chart plugin',
-        'dist-tags': { latest: '1.0.0' },
-        keywords: ['docx-kit-plugin'],
-        name: 'docx-kit-plugin-chart',
-        versions: {
-          '1.0.0': { keywords: ['docx-kit-plugin', 'chart'] },
-        },
-      }),
+      async json() {
+        return {
+          description: 'A chart plugin',
+          'dist-tags': { latest: '1.0.0' },
+          keywords: ['docx-kit-plugin'],
+          name: 'docx-kit-plugin-chart',
+          versions: {
+            '1.0.0': { keywords: ['docx-kit-plugin', 'chart'] },
+          },
+        }
+      },
     })
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({
-        docxKit: '^0.4.0',
-        main: './dist/index.js',
-        name: 'docx-kit-plugin-chart',
-        plugin: { name: 'chart' },
-        version: '1.0.0',
-      }),
+      async json() {
+        return {
+          docxKit: '^0.4.0',
+          main: './dist/index.js',
+          name: 'docx-kit-plugin-chart',
+          plugin: { name: 'chart' },
+          version: '1.0.0',
+        }
+      },
     })
 
     const result = await getPlugin('docx-kit-plugin-chart')
@@ -111,15 +117,17 @@ describe('getPlugin', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
-          description: 'A chart plugin',
-          'dist-tags': { latest: '1.0.0' },
-          keywords: ['docx-kit-plugin'],
-          name: 'docx-kit-plugin-chart',
-          versions: {
-            '1.0.0': { keywords: ['docx-kit-plugin', 'chart'] },
-          },
-        }),
+        async json() {
+          return {
+            description: 'A chart plugin',
+            'dist-tags': { latest: '1.0.0' },
+            keywords: ['docx-kit-plugin'],
+            name: 'docx-kit-plugin-chart',
+            versions: {
+              '1.0.0': { keywords: ['docx-kit-plugin', 'chart'] },
+            },
+          }
+        },
       })
       .mockResolvedValueOnce({ ok: false, status: 404 })
 
@@ -144,15 +152,17 @@ describe('getPlugin', () => {
   it('returns null for package without docx-kit-plugin keyword', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({
-        description: 'Some random package',
-        'dist-tags': { latest: '1.0.0' },
-        keywords: ['random', 'other'],
-        name: 'random-package',
-        versions: {
-          '1.0.0': { keywords: ['random', 'other'] },
-        },
-      }),
+      async json() {
+        return {
+          description: 'Some random package',
+          'dist-tags': { latest: '1.0.0' },
+          keywords: ['random', 'other'],
+          name: 'random-package',
+          versions: {
+            '1.0.0': { keywords: ['random', 'other'] },
+          },
+        }
+      },
     })
 
     const result = await getPlugin('random-package')

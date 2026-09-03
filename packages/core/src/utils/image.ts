@@ -21,11 +21,17 @@ export interface CreateImageRunOptions {
   alt?: string
   /** Floating layout configuration. */
   floating?: IFloating
-  /** Display height in pixels. @default 180 */
+  /**
+   * Display height in pixels.
+   * @default 180
+   */
   height?: number
   /** Image format. SVG images require `fallback`. */
   type?: ImageRunType
-  /** Display width in pixels. @default 300 */
+  /**
+   * Display width in pixels.
+   * @default 300
+   */
   width?: number
   /** Raster fallback required by DOCX readers that do not support SVG. */
   fallback?: {

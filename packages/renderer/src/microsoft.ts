@@ -1,5 +1,5 @@
 /**
- * @docxkit/renderer — Microsoft Office Online iframe fallback.
+ * `@docxkit/renderer` — Microsoft Office Online iframe fallback.
  *
  * Used when `options.renderer === 'microsoft'`. Only supports URL string
  * inputs because Microsoft's viewer must be able to reach the document.

@@ -1,7 +1,7 @@
 /**
  * docx-kit — Browser platform entry (default).
  *
- * Re-exports all APIs from @docxkit/core plus built-in plugins,
+ * Re-exports all APIs from `@docxkit/core` plus built-in plugins,
  * presets, and themes. This is the default import target.
  *
  * For Node.js–only APIs (filesystem save), import from 'docx-kit/node'.

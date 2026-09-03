@@ -1,5 +1,5 @@
 /**
- * @docxkit/renderer — Public type definitions.
+ * `@docxkit/renderer` — Public type definitions.
  *
  * @module renderer/types
  */

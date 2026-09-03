@@ -200,8 +200,9 @@ export function useDocxPlayground() {
         code.value,
         selectedPreset
           ? {
-              transformConfig: config =>
-                mergeWithPreset(selectedPreset.config, config),
+              transformConfig(config) {
+                return mergeWithPreset(selectedPreset.config, config)
+              },
             }
           : undefined,
       )

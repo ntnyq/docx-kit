@@ -22,16 +22,18 @@ function createTypeService() {
     getDefaultLibFileName: options => ts.getDefaultLibFilePath(options),
     getScriptFileNames: () => [MAIN_FILE, ...files.keys()],
     readFile: fileName => files.get(fileName) ?? ts.sys.readFile(fileName),
-    getCompilationSettings: () => ({
-      lib: ['lib.esnext.d.ts', 'lib.dom.d.ts'],
-      module: ts.ModuleKind.ESNext,
-      moduleResolution: ts.ModuleResolutionKind.NodeJs,
-      noEmit: true,
-      skipLibCheck: true,
-      strict: true,
-      target: ts.ScriptTarget.ESNext,
-    }),
-    getScriptSnapshot: fileName => {
+    getCompilationSettings() {
+      return {
+        lib: ['lib.esnext.d.ts', 'lib.dom.d.ts'],
+        module: ts.ModuleKind.ESNext,
+        moduleResolution: ts.ModuleResolutionKind.NodeJs,
+        noEmit: true,
+        skipLibCheck: true,
+        strict: true,
+        target: ts.ScriptTarget.ESNext,
+      }
+    },
+    getScriptSnapshot(fileName) {
       if (fileName === MAIN_FILE) {
         return ts.ScriptSnapshot.fromString(mainSource)
       }
@@ -41,8 +43,9 @@ function createTypeService() {
         ? undefined
         : ts.ScriptSnapshot.fromString(source)
     },
-    getScriptVersion: fileName =>
-      fileName === MAIN_FILE ? String(mainVersion) : '0',
+    getScriptVersion(fileName) {
+      return fileName === MAIN_FILE ? String(mainVersion) : '0'
+    },
   })
 
   return {

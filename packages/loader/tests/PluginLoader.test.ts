@@ -207,7 +207,7 @@ describe('PluginLoader', () => {
       const loader = new AuthorizedNpmLoader({
         kitVersion: '1.0.0',
         security: {
-          allowExecute: () => {
+          allowExecute() {
             loader.events.push('policy')
             return false
           },
@@ -226,7 +226,7 @@ describe('PluginLoader', () => {
       const loader = new AuthorizedNpmLoader({
         kitVersion: '1.0.0',
         security: {
-          allowExecute: () => {
+          allowExecute() {
             loader.events.push('policy')
             return true
           },

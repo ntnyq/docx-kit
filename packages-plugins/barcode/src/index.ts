@@ -33,23 +33,47 @@ export type BarcodeFormat = LiteralUnion<
 export interface BarcodeOptions {
   /** Value encoded by the barcode. */
   text: string
-  /** Paragraph alignment. @default "center" */
+  /**
+   * Paragraph alignment.
+   * @default "center"
+   */
   alignment?: 'center' | 'left' | 'right'
-  /** Background color as a hex string. @default "#FFFFFF" */
+  /**
+   * Background color as a hex string.
+   * @default "#FFFFFF"
+   */
   backgroundColor?: string
-  /** Bar color as a hex string. @default "#000000" */
+  /**
+   * Bar color as a hex string.
+   * @default "#000000"
+   */
   barColor?: string
-  /** Bar height in millimeters. @default 12 */
+  /**
+   * Bar height in millimeters.
+   * @default 12
+   */
   barHeight?: number
   /** Optional caption below the barcode. */
   caption?: string
-  /** Barcode symbology. @default "code128" */
+  /**
+   * Barcode symbology.
+   * @default "code128"
+   */
   format?: BarcodeFormat
-  /** Include the human-readable value below the bars. @default true */
+  /**
+   * Include the human-readable value below the bars.
+   * @default true
+   */
   includeText?: boolean
-  /** Barcode rotation. @default "N" */
+  /**
+   * Barcode rotation.
+   * @default "N"
+   */
   rotate?: 'I' | 'L' | 'N' | 'R'
-  /** Rasterization scale. @default 3 */
+  /**
+   * Rasterization scale.
+   * @default 3
+   */
   scale?: number
   /** Human-readable text color as a hex string. */
   textColor?: string

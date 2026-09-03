@@ -55,7 +55,7 @@ describe('DocxBuilder - bulletList', () => {
 
   it('supports custom bullet character', () => {
     const doc = new DocxBuilder()
-    doc.bulletList(['A', 'B'], { bullet: '\u25CB' })
+    doc.bulletList(['A', 'B'], { bullet: '\u{25CB}' })
 
     const json = doc.toJSON()
     const listNode = json.content[0]
@@ -63,7 +63,7 @@ describe('DocxBuilder - bulletList', () => {
     if (!isBulletListNode(listNode)) {
       throw new Error('expected bulletList node')
     }
-    expect(listNode.bullet).toBe('\u25CB')
+    expect(listNode.bullet).toBe('\u{25CB}')
   })
 })
 

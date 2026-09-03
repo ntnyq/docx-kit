@@ -7,7 +7,7 @@
   "repository": {
     "directory": "packages/create-plugin",
     "type": "git",
-    "url": "https://github.com/ntnyq/docx-kit"
+    "url": "git+https://github.com/ntnyq/docx-kit.git"
   },
   "bin": {
     "create-docx-kit-plugin": "./dist/index.js"

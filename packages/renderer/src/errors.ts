@@ -1,5 +1,5 @@
 /**
- * @docxkit/renderer — Error codes and factory.
+ * `@docxkit/renderer` — Error codes and factory.
  *
  * Renderer-local error codes. Cannot extend `@docxkit/core`'s `ERROR_CODES`
  * because the dependency direction is renderer → core, never the reverse.

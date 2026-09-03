@@ -285,7 +285,7 @@ describe('compileNode — plugin', () => {
   it('wraps plugin render errors as PLUGIN_RENDER_FAILED', async () => {
     const plugin = {
       name: 'broken',
-      render: () => {
+      render() {
         throw new Error('boom')
       },
     }

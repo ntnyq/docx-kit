@@ -37,17 +37,19 @@ export async function compilePlugin<TStyles extends StyleSheet>(
     utils: {
       image: {
         fromDataUrl: (dataUrl: string) => dataUrlToUint8Array(dataUrl),
-        fromBlob: async (blob: Blob) =>
-          new Uint8Array(await blob.arrayBuffer()),
+        async fromBlob(blob: Blob) {
+          return new Uint8Array(await blob.arrayBuffer())
+        },
       },
     },
-    compileNode: (childNode: BlockNode) =>
-      compileNode({
+    compileNode(childNode: BlockNode) {
+      return compileNode({
         config: config as DocxKitConfig,
         node: childNode,
         plugins,
         session,
-      }),
+      })
+    },
   }
 
   try {

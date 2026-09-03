@@ -1,8 +1,8 @@
 /**
- * @docxkit/types — Shared type definitions for docx-kit monorepo.
+ * `@docxkit/types` — Shared type definitions for docx-kit monorepo.
  *
  * This package exports all shared types, utility types, and
- * type-level helper functions used across @docxkit/* packages.
+ * type-level helper functions used across `@docxkit/*` packages.
  *
  * @packageDocumentation
  */

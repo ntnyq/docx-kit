@@ -1,5 +1,5 @@
 /**
- * @docxkit/renderer — Core rendering logic.
+ * `@docxkit/renderer` — Core rendering logic.
  *
  * Dispatches to the Microsoft iframe renderer or the `docx-preview`
  * DOM renderer based on {@link DocxPreviewOptions.renderer}.

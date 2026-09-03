@@ -1,5 +1,5 @@
 /**
- * @docxkit/core — CSS-like DOCX generation core engine.
+ * `@docxkit/core` — CSS-like DOCX generation core engine.
  *
  * Built on `dolanmiu/docx`, this package provides the builder API,
  * compiler pipeline, style resolution, DSL types, and cross-platform utilities.

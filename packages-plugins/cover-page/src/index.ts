@@ -32,7 +32,10 @@ import {
 export interface CoverPageOptions {
   /** Main title text (required). */
   title: string
-  /** Horizontal text alignment. @default CENTER */
+  /**
+   * Horizontal text alignment.
+   * @default CENTER
+   */
   alignment?: (typeof AlignmentType)[keyof typeof AlignmentType]
   /** Author or department name. */
   author?: string

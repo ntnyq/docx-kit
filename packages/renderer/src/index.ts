@@ -1,5 +1,5 @@
 /**
- * @docxkit/renderer — Browser DOCX preview for docx-kit.
+ * `@docxkit/renderer` — Browser DOCX preview for docx-kit.
  *
  * Renders `.docx` files directly in the browser using either
  * [`docx-preview`](https://github.com/VolodymyrBaydalka/docxjs) (DOM-based,

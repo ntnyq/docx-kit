@@ -1,5 +1,5 @@
 /**
- * @docxkit/renderer — `createDocxPreview` factory.
+ * `@docxkit/renderer` — `createDocxPreview` factory.
  *
  * Creates a stateful preview instance bound to a container element.
  * The instance tracks the most recently rendered input and provides

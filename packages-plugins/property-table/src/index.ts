@@ -55,10 +55,14 @@ export interface PropertyTableOptions {
   /** Key-value items to display. */
   items: PropertyItem[]
   /**
-   * Whether the key column text is bold. @default true
+   * Whether the key column text is bold.
+   * @default true
    */
   keyBold?: boolean
-  /** Alternate row background shading. @default true */
+  /**
+   * Alternate row background shading.
+   * @default true
+   */
   striped?: boolean
 }
 

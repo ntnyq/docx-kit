@@ -118,7 +118,7 @@ export function timelinePlugin() {
                   color: accentColor,
                   font: 'Arial',
                   size: 24,
-                  text: '\u25CF',
+                  text: '\u{25CF}',
                 }),
               ],
             }),

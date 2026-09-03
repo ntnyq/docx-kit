@@ -1,5 +1,5 @@
 /**
- * @docxkit/loader/browser — Browser platform plugin loader.
+ * `@docxkit/loader/browser` — Browser platform plugin loader.
  *
  * @packageDocumentation
  */

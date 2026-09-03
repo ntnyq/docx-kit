@@ -1,5 +1,5 @@
 /**
- * @docxkit/renderer — Input normalization.
+ * `@docxkit/renderer` — Input normalization.
  *
  * Converts any {@link DocxInput} to a `Blob` so the rest of the
  * pipeline can work with a single type.

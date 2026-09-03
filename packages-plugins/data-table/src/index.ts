@@ -64,13 +64,19 @@ export interface DataTableOptions {
   data: Record<string, unknown>[]
   /** Per-column alignment. Auto-detected from value types when omitted. */
   align?: Record<string, ColAlign>
-  /** Render visible table borders. @default true */
+  /**
+   * Render visible table borders.
+   * @default true
+   */
   bordered?: boolean
   /** Per-column value formatter. */
   format?: Record<string, ColFormat>
   /** Human-readable column labels (e.g. `{ salary: '薪资' }`). */
   labels?: Record<string, string>
-  /** Alternate row background shading. @default false */
+  /**
+   * Alternate row background shading.
+   * @default false
+   */
   striped?: boolean
 }
 
@@ -192,7 +198,7 @@ function formatValue(value: unknown, fmt?: ColFormat): string {
   if (fmt === 'currency') {
     const n = typeof value === 'number' ? value : Number(value)
     return Number.isFinite(n)
-      ? `\u00A5${n.toLocaleString('zh-CN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`
+      ? `\u{A5}${n.toLocaleString('zh-CN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`
       : String(value)
   }
   if (fmt === 'number') {

@@ -35,7 +35,10 @@ export interface CodeBlockOptions {
    * to monospaced rendering when the package is not installed.
    */
   language?: string
-  /** Prepend line numbers. @default false */
+  /**
+   * Prepend line numbers.
+   * @default false
+   */
   showLineNumbers?: boolean
 }
 
@@ -140,7 +143,7 @@ function linesToParagraphs(
                   color: LINE_NO_COLOR,
                   font: MONO_FONT,
                   size: FONT_SIZE,
-                  text: `${String(i + 1).padStart(maxDigits, ' ')} \u2502 `,
+                  text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
                 }),
               ]
             : []),
@@ -233,7 +236,7 @@ function tokensToParagraphs(
                 color: LINE_NO_COLOR,
                 font: MONO_FONT,
                 size: FONT_SIZE,
-                text: `${String(i + 1).padStart(maxDigits, ' ')} \u2502 `,
+                text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
               }),
             ]
           : []),

@@ -49,13 +49,25 @@ export interface EChartsPluginOptions {
   option: EChartsOption
   /** Optional caption text displayed below the chart. */
   caption?: string
-  /** Chart height in pixels. @default 360 */
+  /**
+   * Chart height in pixels.
+   * @default 360
+   */
   height?: number
-  /** Output image format. @default "png" */
+  /**
+   * Output image format.
+   * @default "png"
+   */
   imageType?: 'png' | 'svg'
-  /** ECharts rendering engine. @default "canvas" */
+  /**
+   * ECharts rendering engine.
+   * @default "canvas"
+   */
   renderer?: 'canvas' | 'svg'
-  /** Chart width in pixels. @default 640 */
+  /**
+   * Chart width in pixels.
+   * @default 640
+   */
   width?: number
 }
 

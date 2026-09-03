@@ -1,5 +1,5 @@
 /**
- * @docxkit/loader — Plugin loader with platform-specific sources.
+ * `@docxkit/loader` — Plugin loader with platform-specific sources.
  *
  * Re-exports the core `PluginLoader` and `createPluginLoader` from
  * `@docxkit/core`, plus source-specific standalone loader functions.

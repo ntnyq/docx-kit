@@ -31,8 +31,9 @@ export async function executePlaygroundCode(
     ...docxKit,
     ...(overrides.transformConfig
       ? {
-          createDocx: (config: DocxKitConfig = {}) =>
-            docxKit.createDocx(overrides.transformConfig!(config)),
+          createDocx(config: DocxKitConfig = {}) {
+            return docxKit.createDocx(overrides.transformConfig!(config))
+          },
         }
       : {}),
   }

@@ -24,7 +24,7 @@ export async function compileBulletList<TStyles extends StyleSheet>(
   config: DocxKitConfig<TStyles>,
   session: CompilationSession,
 ): Promise<Paragraph[]> {
-  const bullet = node.bullet ?? '\u2022'
+  const bullet = node.bullet ?? '\u{2022}'
   const ref = session.register('bullet', {
     levels: Array.from({ length: MAX_LIST_LEVEL + 1 }, (_, level) => ({
       alignment: AlignmentType.LEFT,

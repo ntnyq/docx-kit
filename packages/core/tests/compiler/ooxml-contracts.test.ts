@@ -120,9 +120,11 @@ describe('compiler OOXML contracts', () => {
         firstRow: true,
         noHBand: false,
       },
-      cellStyle: value => ({
-        backgroundColor: Number(value) > 0 ? '#dcfce7' : '#fee2e2',
-      }),
+      cellStyle(value) {
+        return {
+          backgroundColor: Number(value) > 0 ? '#dcfce7' : '#fee2e2',
+        }
+      },
     }
     const pkg = await renderPackage([table])
     const documentXml = await pkg.read('word/document.xml')
@@ -208,11 +210,12 @@ describe('compiler OOXML contracts', () => {
   it('shares the compilation session with nodes rendered by plugins', async () => {
     const plugin: DocxPlugin = {
       name: 'nestedFootnote',
-      render: async (_options, context) =>
-        context.compileNode({
+      async render(_options, context) {
+        return context.compileNode({
           content: ['Nested footnote body'],
           type: 'footnote',
-        }),
+        })
+      },
     }
     const pkg = await renderPackage(
       [{ name: 'nestedFootnote', options: {}, type: 'plugin' }],
@@ -450,14 +453,16 @@ describe('compiler OOXML contracts', () => {
         {
           key: 'name',
           title: 'Name',
-          render: value => [
-            { text: `Cell: ${String(value)}`, type: 'text' },
-            {
-              children: [' details'],
-              type: 'hyperlink',
-              url: 'https://example.com/details',
-            },
-          ],
+          render(value) {
+            return [
+              { text: `Cell: ${String(value)}`, type: 'text' },
+              {
+                children: [' details'],
+                type: 'hyperlink',
+                url: 'https://example.com/details',
+              },
+            ]
+          },
         },
       ],
     }

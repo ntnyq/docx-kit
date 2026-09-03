@@ -13,7 +13,7 @@
   "homepage": "https://docx-kit.ntnyq.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ntnyq/docx-kit",
+    "url": "git+https://github.com/ntnyq/docx-kit.git",
     "directory": "packages/types"
   },
   "bugs": {

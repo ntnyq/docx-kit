@@ -23,7 +23,10 @@ export interface CreateDocumentInput {
 
 /** Filesystem boundary for the create_document tool. */
 export interface CreateDocumentOptions {
-  /** Directory that contains every path the tool may write. @default process.cwd() */
+  /**
+   * Directory that contains every path the tool may write.
+   * @default process.cwd()
+   */
   outputDirectory?: string
   /**
    * Explicit plugin loader for schemas that execute external plugins.

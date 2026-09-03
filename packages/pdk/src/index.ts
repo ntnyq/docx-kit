@@ -178,8 +178,9 @@ export function createPluginTestContext(
     utils: {
       image: {
         fromDataUrl: (dataUrl: string) => dataUrlToUint8Array(dataUrl),
-        fromBlob: async (blob: Blob) =>
-          new Uint8Array(await blob.arrayBuffer()),
+        async fromBlob(blob: Blob) {
+          return new Uint8Array(await blob.arrayBuffer())
+        },
       },
     },
     compileNode: (node: BlockNode) => Promise.resolve(node),

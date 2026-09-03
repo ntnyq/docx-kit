@@ -1,5 +1,5 @@
 /**
- * Built-in plugin type map — augments {@link BuiltinPluginMap} from @docxkit/core
+ * Built-in plugin type map — augments {@link BuiltinPluginMap} from `@docxkit/core`
  * with all built-in plugins so they are type-safe without explicit `.use()` calls.
  *
  * @module docx-kit/plugin-map

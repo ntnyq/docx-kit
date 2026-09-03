@@ -42,9 +42,15 @@ export interface QRCodePluginOptions {
    * @default "M"
    */
   errorCorrectionLevel?: 'H' | 'L' | 'M' | 'Q'
-  /** QR code margin (in modules). @default 1 */
+  /**
+   * QR code margin (in modules).
+   * @default 1
+   */
   margin?: number
-  /** QR code image size in pixels. @default 128 */
+  /**
+   * QR code image size in pixels.
+   * @default 128
+   */
   size?: number
 }
 

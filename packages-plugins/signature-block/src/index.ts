@@ -36,7 +36,10 @@ import {
 export interface SignatureBlockOptions {
   /** The signing parties. */
   parties: SignatureParty[]
-  /** Number of columns in the signature grid. @default 2 */
+  /**
+   * Number of columns in the signature grid.
+   * @default 2
+   */
   columns?: number
 }
 

@@ -26,22 +26,22 @@ const CALLOUT_PRESETS = {
   danger: {
     bg: 'FCE4D6',
     border: 'FF0000',
-    icon: '\u26A0\uFE0F',
+    icon: '\u{26A0}\u{FE0F}',
   },
   info: {
     bg: 'D6E4F0',
     border: '4472C4',
-    icon: '\u2139\uFE0F',
+    icon: '\u{2139}\u{FE0F}',
   },
   success: {
     bg: 'E2F0D9',
     border: '70AD47',
-    icon: '\u2705',
+    icon: '\u{2705}',
   },
   warning: {
     bg: 'FFF2CC',
     border: 'FFC000',
-    icon: '\u26A0\uFE0F',
+    icon: '\u{26A0}\u{FE0F}',
   },
 } as const
 

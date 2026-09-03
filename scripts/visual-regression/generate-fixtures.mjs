@@ -436,10 +436,12 @@ function buildTablesFixture() {
         color: '#FFFFFF',
         fontWeight: 'bold',
       },
-      cellStyle: (_value, row) => ({
-        backgroundColor: row.status === 'At risk' ? '#FFF2CC' : '#FFFFFF',
-        verticalAlign: 'middle',
-      }),
+      cellStyle(_value, row) {
+        return {
+          backgroundColor: row.status === 'At risk' ? '#FFF2CC' : '#FFFFFF',
+          verticalAlign: 'middle',
+        }
+      },
     })
     .h2('Border Variants')
     .table({
