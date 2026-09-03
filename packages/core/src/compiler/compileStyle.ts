@@ -237,7 +237,7 @@ export function compileTextStyle(style: TextStyleRule) {
     color: normalizeColor(style.color),
     doubleStrike: style.doubleStrike,
     emboss: style.emboss,
-    font: style.fontFamily,
+    font: normalizeFontFamily(style.fontFamily),
     highlight: compileHighlight(style.highlight),
     imprint: style.imprint,
     italics: style.italic ?? style.fontStyle === 'italic',
@@ -354,6 +354,15 @@ function compileVerticalAlign(value: DocxStyleRule['verticalAlign']) {
  */
 function normalizeColor(color?: string) {
   return color?.replace(/^#/, '')
+}
+
+/**
+ * Word accepts one family per script, not a CSS fallback list. Preserve quoted
+ * family names (including commas) while selecting the first family in a stack.
+ */
+function normalizeFontFamily(value: string | undefined): string | undefined {
+  const match = value?.match(/^\s*(?:"([^"]+)"|'([^']+)'|([^,]+))/)
+  return (match?.[1] ?? match?.[2] ?? match?.[3])?.trim() || undefined
 }
 
 /**

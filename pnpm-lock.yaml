@@ -11,6 +11,9 @@ importers:
 
   .:
     devDependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:packages/core
       '@ntnyq/eslint-config':
         specifier: ^7.0.0-beta.19
         version: 7.0.0-beta.19(@typescript-eslint/eslint-plugin@8.69.0(@typescript-eslint/parser@8.69.0(eslint@10.9.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.9.1(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/parser@8.69.0(eslint@10.9.1(jiti@2.7.0))(typescript@6.0.3))(@typescript-eslint/typescript-estree@8.69.0(typescript@6.0.3))(@typescript-eslint/utils@8.69.0(eslint@10.9.1(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.42)(eslint@10.9.1(jiti@2.7.0))(oxfmt@0.66.0)(prettier@3.9.6)(typescript@6.0.3)(vitest@4.1.11(@types/node@26.4.1)(happy-dom@20.13.2)(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)))
@@ -654,9 +657,69 @@ importers:
       '@docxkit/core':
         specifier: workspace:*
         version: link:../core
+      '@docxkit/plugin-badge':
+        specifier: workspace:*
+        version: link:../../packages-plugins/badge
+      '@docxkit/plugin-barcode':
+        specifier: workspace:*
+        version: link:../../packages-plugins/barcode
+      '@docxkit/plugin-callout':
+        specifier: workspace:*
+        version: link:../../packages-plugins/callout
+      '@docxkit/plugin-changelog':
+        specifier: workspace:*
+        version: link:../../packages-plugins/changelog
+      '@docxkit/plugin-code-block':
+        specifier: workspace:*
+        version: link:../../packages-plugins/code-block
+      '@docxkit/plugin-cover-page':
+        specifier: workspace:*
+        version: link:../../packages-plugins/cover-page
+      '@docxkit/plugin-data-table':
+        specifier: workspace:*
+        version: link:../../packages-plugins/data-table
+      '@docxkit/plugin-divider':
+        specifier: workspace:*
+        version: link:../../packages-plugins/divider
+      '@docxkit/plugin-invoice':
+        specifier: workspace:*
+        version: link:../../packages-plugins/invoice
+      '@docxkit/plugin-letterhead':
+        specifier: workspace:*
+        version: link:../../packages-plugins/letterhead
+      '@docxkit/plugin-meeting-minutes':
+        specifier: workspace:*
+        version: link:../../packages-plugins/meeting-minutes
+      '@docxkit/plugin-page-number':
+        specifier: workspace:*
+        version: link:../../packages-plugins/page-number
+      '@docxkit/plugin-property-table':
+        specifier: workspace:*
+        version: link:../../packages-plugins/property-table
+      '@docxkit/plugin-qrcode':
+        specifier: workspace:*
+        version: link:../../packages-plugins/qrcode
+      '@docxkit/plugin-signature-block':
+        specifier: workspace:*
+        version: link:../../packages-plugins/signature-block
+      '@docxkit/plugin-timeline':
+        specifier: workspace:*
+        version: link:../../packages-plugins/timeline
+      '@docxkit/plugin-toc':
+        specifier: workspace:*
+        version: link:../../packages-plugins/toc
+      '@docxkit/plugin-watermark':
+        specifier: workspace:*
+        version: link:../../packages-plugins/watermark
       '@modelcontextprotocol/sdk':
         specifier: '>=1.0.0'
         version: 1.30.0(zod@4.5.4)
+      bwip-js:
+        specifier: ^4.11.4
+        version: 4.11.4
+      qrcode:
+        specifier: ^1.5.4
+        version: 1.5.4
       zod:
         specifier: '>=3.0.0'
         version: 4.5.4

@@ -38,6 +38,7 @@ import type {
   CheckboxNode,
   CommentNode,
   DocxKitConfig,
+  DocxStyleRule,
   FootnoteNode,
   MathExpression,
   MathNode,
@@ -57,15 +58,24 @@ import type { CompilationSession } from '../numbers'
  * @template TStyles - The document's stylesheet type
  * @param node - Bookmark identifier and enclosed text
  * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param baseStyle - Optional inherited paragraph or cell text style
  * @returns A bookmark containing the compiled text runs
  * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
  */
 export function compileBookmark<TStyles extends StyleSheet>(
   node: BookmarkNode<TStyles>,
   config: DocxKitConfig<TStyles>,
+  baseStyle?: DocxStyleRule,
 ) {
+  const style = resolveStyle({
+    base: { ...config.defaults?.text, ...baseStyle },
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+    theme: config.theme,
+  })
   return new Bookmark({
-    children: compileStyledText(node.children, config, node.style),
+    children: compileStyledText(node.children, config, style),
     id: node.name,
   })
 }
@@ -307,7 +317,9 @@ export function compileThematicBreak<TStyles extends StyleSheet>(
   })
 }
 
-function compileMathExpression(expression: MathExpression): MathComponent {
+function compileMathExpression(
+  expression: MathExpression,
+): MathComponent | MathComponent[] {
   switch (expression.type) {
     case 'fraction':
       return new MathFraction({
@@ -358,7 +370,7 @@ function compileMathExpression(expression: MathExpression): MathComponent {
       if (superScript) {
         return new MathSuperScript({ children, superScript })
       }
-      return new MathRun('')
+      return children
     }
     case 'sum':
       return new MathSum({
@@ -378,7 +390,7 @@ function compileMathExpression(expression: MathExpression): MathComponent {
 function compileMathExpressions(
   expressions: MathExpression[],
 ): MathComponent[] {
-  return expressions.map(compileMathExpression)
+  return expressions.flatMap(compileMathExpression)
 }
 
 function compileStyledText<TStyles extends StyleSheet>(

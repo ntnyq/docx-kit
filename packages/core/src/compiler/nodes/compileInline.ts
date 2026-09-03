@@ -57,7 +57,7 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
     nodes.map(async node => {
       switch (node.type) {
         case 'bookmark':
-          return compileBookmark(node, config)
+          return compileBookmark(node, config, baseStyle)
         case 'checkbox':
           return compileCheckbox(node, config)
         case 'comment':

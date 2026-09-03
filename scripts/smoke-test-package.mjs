@@ -157,7 +157,8 @@ if (output.length < 4 || output[0] !== 0x50 || output[1] !== 0x4b) {
 import { createDocx } from 'docx-kit'
 import { loadUrlPlugin } from 'docx-kit/loader/browser'
 import { loadNpmPlugin } from 'docx-kit/loader/node'
-import { TOOL_DEFINITIONS } from 'docx-kit/mcp'
+import { createDocxKitServer, TOOL_DEFINITIONS } from 'docx-kit/mcp'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import {
   createDocx as createNodeDocx,
   saveDocument,
@@ -177,6 +178,11 @@ void [
 ]
 
 void createNodeDocx().save('consumer-smoke.docx')
+
+const server = await createDocxKitServer()
+const [transport] = InMemoryTransport.createLinkedPair()
+await server.connect(transport)
+await server.close()
 `,
   )
 

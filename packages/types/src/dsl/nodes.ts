@@ -620,6 +620,8 @@ export interface TableColumn<
    * Span multiple columns horizontally.
    *
    * Applied to all cells in this column.
+   * Covered columns are omitted from the header and data rows.
+   * Must be a positive integer that fits within the table grid.
    */
   colSpan?: number
   /**
@@ -632,6 +634,8 @@ export interface TableColumn<
    * Set a keyed `_${key}_rowSpan: N` hint on an individual data object,
    * use `_rowSpan: N` for every cell in that row, or keep this as a static
    * column default.
+   * Covered cells in subsequent rows are omitted. Spans are clipped at the
+   * final data row and must be positive integers.
    */
   rowSpan?: number
   /**

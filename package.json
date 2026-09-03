@@ -27,13 +27,14 @@
     "release:verify": "run-s build release:check docs:verify release:artifacts release:consumer",
     "release:version": "bumpp -r",
     "test": "vitest",
-    "typecheck": "pnpm -r exec tsc --noEmit",
+    "typecheck": "tsc --noEmit && pnpm -r exec tsc --noEmit",
     "visual:check": "run-s visual:generate visual:render",
     "visual:generate": "pnpm --filter docs exec tsx ../scripts/visual-regression/generate-fixtures.mjs",
     "visual:render": "node scripts/visual-regression/render-and-compare.mjs",
     "visual:update": "pnpm run visual:generate && node scripts/visual-regression/render-and-compare.mjs --update"
   },
   "devDependencies": {
+    "@docxkit/core": "workspace:*",
     "@ntnyq/eslint-config": "^7.0.0-beta.19",
     "@ntnyq/prettier-config": "^3.1.0",
     "@types/node": "^26.4.1",

@@ -6,10 +6,21 @@
  * @module tests/mcp-server/tools
  */
 
-import { mkdtemp, readFile, rm, symlink } from 'node:fs/promises'
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  stat,
+  symlink,
+  writeFile,
+} from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+import { runInNewContext } from 'node:vm'
+import { createPluginLoader } from '@docxkit/core'
 import { describe, expect, it } from 'vitest'
+import { BUILTIN_PLUGIN_CATALOG } from '../src/plugins/catalog'
 import { docxSchemaResource } from '../src/resources/schema'
 import { BLOCK_NODE_TYPES } from '../src/schema/blockNodes'
 import { applyTemplate } from '../src/tools/applyTemplate'
@@ -21,7 +32,7 @@ import {
 } from '../src/tools/listPlugins'
 import { buildTemplateInfoList } from '../src/tools/listTemplates'
 import { validateSchema } from '../src/tools/validateSchema'
-import type { DocxPlugin } from '@docxkit/core'
+import type { DocxPlugin, PluginSource } from '@docxkit/core'
 
 describe('validateSchema', () => {
   it('validates a correct schema', () => {
@@ -221,6 +232,131 @@ describe('validateSchema', () => {
 })
 
 describe('createDocument', () => {
+  it('applies an explicit loader policy only to schema plugin sources', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-'))
+    const sources: PluginSource[] = []
+    const source: PluginSource = {
+      plugin: { name: 'custom', render: () => 'Custom content' },
+      type: 'inline',
+    }
+    const pluginLoader = createPluginLoader({
+      security: {
+        allowLoad(candidate) {
+          sources.push(candidate)
+          return candidate === source
+        },
+      },
+    })
+    try {
+      const result = await createDocument(
+        {
+          outputPath: 'custom.docx',
+          schema: {
+            content: [{ name: 'custom', options: {}, type: 'plugin' }],
+            plugins: [source],
+          },
+        },
+        { outputDirectory: directory, pluginLoader },
+      )
+      expect(result.size).toBeGreaterThan(0)
+      expect(sources).toEqual([source])
+    } finally {
+      await rm(directory, { force: true, recursive: true })
+    }
+  })
+
+  it.each(BUILTIN_PLUGIN_CATALOG.filter(plugin => plugin.available))(
+    'renders the advertised $name example',
+    async plugin => {
+      const directory = await mkdtemp(
+        path.join(tmpdir(), 'docx-kit-mcp-catalog-'),
+      )
+      try {
+        // These examples are repository-owned source, not client input.
+        const schema = {
+          content: [runInNewContext(`(${plugin.usageExample})`)],
+        }
+        expect(validateSchema(schema).valid).toBe(true)
+        const result = await createDocument(
+          { outputPath: 'example.docx', schema },
+          { outputDirectory: directory },
+        )
+        expect(result.size).toBeGreaterThan(0)
+      } finally {
+        await rm(directory, { force: true, recursive: true })
+      }
+    },
+  )
+
+  it('allows a symlink whose resolved target stays inside the output directory', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-'))
+    try {
+      await mkdir(path.join(directory, 'real'))
+      await symlink(
+        path.join(directory, 'real'),
+        path.join(directory, 'linked'),
+      )
+      const result = await createDocument(
+        { outputPath: 'linked/nested/result.docx', schema: { content: [] } },
+        { outputDirectory: directory },
+      )
+      expect(result.size).toBeGreaterThan(0)
+      expect(
+        await readFile(path.join(directory, 'real/nested/result.docx')),
+      ).toHaveLength(result.size)
+    } finally {
+      await rm(directory, { force: true, recursive: true })
+    }
+  })
+
+  it('does not overwrite a file through a leaf symlink', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-'))
+    const outside = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-outside-'))
+    try {
+      const target = path.join(outside, 'original.docx')
+      await writeFile(target, 'original')
+      await symlink(target, path.join(directory, 'linked.docx'))
+      await expect(
+        createDocument(
+          { outputPath: 'linked.docx', schema: { content: [] } },
+          { outputDirectory: directory },
+        ),
+      ).rejects.toThrow()
+      expect(await readFile(target, 'utf8')).toBe('original')
+    } finally {
+      await Promise.all([
+        rm(directory, { force: true, recursive: true }),
+        rm(outside, { force: true, recursive: true }),
+      ])
+    }
+  })
+
+  it('renders a built-in plugin advertised by discovery', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-'))
+    try {
+      expect(
+        buildBuiltinPluginInfoList('badge').map(plugin => plugin.name),
+      ).toContain('badge')
+      const schema = {
+        content: [
+          {
+            name: 'badge',
+            options: { color: 'info', text: 'New' },
+            type: 'plugin' as const,
+          },
+        ],
+      }
+      expect(validateSchema(schema).valid).toBe(true)
+      const result = await createDocument(
+        { outputPath: 'badge.docx', schema },
+        { outputDirectory: directory },
+      )
+      expect(result.size).toBeGreaterThan(0)
+    } finally {
+      await rm(directory, { force: true, recursive: true })
+    }
+  })
+
   it('renders and writes a DOCX inside the configured directory', async () => {
     const directory = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-'))
 
@@ -293,12 +429,15 @@ describe('createDocument', () => {
       await expect(
         createDocument(
           {
-            outputPath: 'linked/escape.docx',
+            outputPath: 'linked/new-directory/escape.docx',
             schema: { content: [] },
           },
           { outputDirectory: directory },
         ),
       ).rejects.toThrow('must stay inside')
+      await expect(
+        stat(path.join(outside, 'new-directory')),
+      ).rejects.toMatchObject({ code: 'ENOENT' })
     } finally {
       await Promise.all([
         rm(directory, { force: true, recursive: true }),
@@ -350,10 +489,11 @@ describe('applyTemplate', () => {
 })
 
 describe('buildPluginInfoList', () => {
-  it('lists the complete canonical built-in catalog', () => {
+  it('lists only built-in plugins available in Node.js', () => {
     const info = buildBuiltinPluginInfoList()
 
-    expect(info).toHaveLength(19)
+    expect(info).toHaveLength(18)
+    expect(info.map(plugin => plugin.name)).not.toContain('echarts')
     expect(info.map(plugin => plugin.name)).toContain('signatureBlock')
     expect(info.map(plugin => plugin.name)).toContain('watermark')
   })

@@ -54,7 +54,7 @@ export const ERROR_CODES = {
    */
   STYLE_UNKNOWN_CLASS: 'STYLE_UNKNOWN_CLASS',
   /**
-   * Table was created with no columns.
+   * Table has no columns, invalid spans, or overlapping cell positions.
    */
   TABLE_INVALID_COLUMNS: 'TABLE_INVALID_COLUMNS',
   /**

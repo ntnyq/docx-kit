@@ -45,5 +45,27 @@
     "zod": {
       "optional": true
     }
+  },
+  "dependencies": {
+    "@docxkit/plugin-badge": "workspace:*",
+    "@docxkit/plugin-barcode": "workspace:*",
+    "@docxkit/plugin-callout": "workspace:*",
+    "@docxkit/plugin-changelog": "workspace:*",
+    "@docxkit/plugin-code-block": "workspace:*",
+    "@docxkit/plugin-cover-page": "workspace:*",
+    "@docxkit/plugin-data-table": "workspace:*",
+    "@docxkit/plugin-divider": "workspace:*",
+    "@docxkit/plugin-invoice": "workspace:*",
+    "@docxkit/plugin-letterhead": "workspace:*",
+    "@docxkit/plugin-meeting-minutes": "workspace:*",
+    "@docxkit/plugin-page-number": "workspace:*",
+    "@docxkit/plugin-property-table": "workspace:*",
+    "@docxkit/plugin-qrcode": "workspace:*",
+    "@docxkit/plugin-signature-block": "workspace:*",
+    "@docxkit/plugin-timeline": "workspace:*",
+    "@docxkit/plugin-toc": "workspace:*",
+    "@docxkit/plugin-watermark": "workspace:*",
+    "bwip-js": "^4.11.4",
+    "qrcode": "^1.5.4"
   }
 }

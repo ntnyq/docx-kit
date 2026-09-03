@@ -31,6 +31,7 @@ import {
   Paragraph,
   ShadingType,
   Table,
+  TableBorders,
   TableCell,
   TableRow,
   TextRun,
@@ -163,6 +164,7 @@ export function dataTablePlugin() {
       }
 
       return new Table({
+        borders: displayedBordered ? undefined : TableBorders.NONE,
         rows,
         width: { size: 100, type: WidthType.PERCENTAGE },
         margins: {

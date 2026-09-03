@@ -1,5 +1,7 @@
+import assert from 'node:assert/strict'
 import { createPluginTestContext } from '@docxkit/pdk'
-import { Paragraph, Table } from 'docx'
+import { Document, Packer, Paragraph, Table } from 'docx'
+import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 import { dataTablePlugin } from '../src'
 
@@ -62,15 +64,22 @@ describe('dataTablePlugin', () => {
     expect(result).toBeInstanceOf(Table)
   })
 
-  it('renders with bordered = false', () => {
-    const result = dataTablePlugin().render(
+  it('renders with bordered = false', async () => {
+    const result = await dataTablePlugin().render(
       {
         bordered: false,
         data: sampleData,
       },
       createPluginTestContext(),
     )
-    expect(result).toBeInstanceOf(Table)
+    assert.ok(result instanceof Table)
+    const document = new Document({ sections: [{ children: [result] }] })
+    const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
+    const xml = await archive.file('word/document.xml')?.async('string')
+    const borders = xml?.match(/<w:tblBorders>.*?<\/w:tblBorders>/)?.[0]
+    expect(borders).toBeDefined()
+    expect(borders).not.toContain('w:val="single"')
+    expect(borders?.match(/w:val="none"/g)).toHaveLength(6)
   })
 
   it('renders with explicit alignment', () => {

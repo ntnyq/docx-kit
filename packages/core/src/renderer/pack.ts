@@ -64,8 +64,7 @@ export async function packToBlob(doc: Document): Promise<Blob> {
 /**
  * Pack a document to a `Uint8Array` (browser & Node.js).
  *
- * Normalizes the `Packer.toBuffer()` Node.js Buffer to a
- * standard `Uint8Array` for cross-platform compatibility.
+ * Uses ArrayBuffer output so no Node.js Buffer global is required.
  *
  * @param doc - — A compiled `docx` `Document` instance
  * @returns Raw .docx bytes as `Uint8Array`
@@ -80,7 +79,7 @@ export async function packToBlob(doc: Document): Promise<Blob> {
  */
 export async function packToBuffer(doc: Document): Promise<Uint8Array> {
   try {
-    const buffer = await Packer.toBuffer(doc)
+    const buffer = await Packer.toArrayBuffer(doc)
     return new Uint8Array(buffer)
   } catch (error) {
     throw new DocxKitError(

@@ -9,6 +9,7 @@ import { mkdir, open, realpath } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { createPluginLoader, renderDocx } from '@docxkit/core'
+import { createBuiltinPluginSources } from '../plugins/catalog'
 import type { DocxSchema, PluginLoader } from '@docxkit/core'
 
 /**
@@ -31,6 +32,8 @@ export interface CreateDocumentInput {
 export interface CreateDocumentOptions {
   /**
    * Directory that contains every path the tool may write.
+   * The directory and its ancestors must be controlled by the server owner,
+   * not concurrently modified by untrusted local processes.
    * @default process.cwd()
    */
   outputDirectory?: string
@@ -100,45 +103,40 @@ export async function createDocument(
 ): Promise<CreateDocumentOutput> {
   const outputDirectory = path.resolve(options.outputDirectory ?? process.cwd())
   const filePath = path.resolve(outputDirectory, input.outputPath)
-  const relativePath = path.relative(outputDirectory, filePath)
-
-  if (
-    relativePath.startsWith(`..${path.sep}`)
-    || relativePath === '..'
-    || path.isAbsolute(relativePath)
-  ) {
-    throw new Error(
-      `Output path must stay inside the configured directory: ${outputDirectory}`,
-    )
-  }
+  assertInsideDirectory(outputDirectory, filePath)
   if (path.extname(filePath).toLowerCase() !== '.docx') {
     throw new Error('Output path must use the .docx extension')
   }
 
   await mkdir(outputDirectory, { recursive: true })
-  await mkdir(path.dirname(filePath), { recursive: true })
-
   const realOutputDirectory = await realpath(outputDirectory)
-  const realParentDirectory = await realpath(path.dirname(filePath))
-  const realRelativePath = path.relative(
+  const realParentDirectory = await createOutputParent(
     realOutputDirectory,
-    realParentDirectory,
+    path.relative(outputDirectory, path.dirname(filePath)),
   )
-  if (
-    realRelativePath.startsWith(`..${path.sep}`)
-    || realRelativePath === '..'
-    || path.isAbsolute(realRelativePath)
-  ) {
-    throw new Error(
-      `Output path must stay inside the configured directory: ${outputDirectory}`,
-    )
-  }
-
-  const safeFilePath = path.join(realParentDirectory, path.basename(filePath))
-  const document = await renderDocx(input.schema, {
-    pluginLoader: options.pluginLoader ?? createPluginLoader(),
+  // Apply caller security policy only to caller-supplied sources. Trusted
+  // built-ins do not need external loading; explicit plugins may override them.
+  const loader = options.pluginLoader ?? createPluginLoader()
+  const loadedPlugins = await Promise.all(
+    (input.schema.plugins ?? []).map(source => loader.load(source)),
+  )
+  const document = await renderDocx({
+    ...input.schema,
+    plugins: [
+      ...createBuiltinPluginSources(),
+      ...loadedPlugins.map(({ plugin }) => ({
+        plugin,
+        type: 'inline' as const,
+      })),
+    ],
   })
   const bytes = await document.toBuffer()
+  const verifiedParentDirectory = await realpath(realParentDirectory)
+  assertInsideDirectory(realOutputDirectory, verifiedParentDirectory)
+  const safeFilePath = path.join(
+    verifiedParentDirectory,
+    path.basename(filePath),
+  )
 
   const file = await open(
     safeFilePath,
@@ -158,4 +156,50 @@ export async function createDocument(
     filePath,
     size: bytes.byteLength,
   }
+}
+
+function assertInsideDirectory(directory: string, target: string): void {
+  const relativePath = path.relative(directory, target)
+  if (
+    relativePath === '..'
+    || relativePath.startsWith(`..${path.sep}`)
+    || path.isAbsolute(relativePath)
+  ) {
+    throw new Error(
+      `Output path must stay inside the configured directory: ${directory}`,
+    )
+  }
+}
+
+/**
+ * Resolve each existing ancestor before creating anything below it. A single
+ * non-recursive mkdir cannot create descendants through an unchecked symlink.
+ */
+async function createOutputParent(
+  directory: string,
+  relativeParent: string,
+): Promise<string> {
+  let parent = directory
+  for (const segment of relativeParent.split(path.sep)) {
+    if (!segment) {
+      continue
+    }
+    parent = await realpath(parent)
+    assertInsideDirectory(directory, parent)
+    const child = path.join(parent, segment)
+    try {
+      await mkdir(child)
+    } catch (error) {
+      if (
+        !(error instanceof Error)
+        || !('code' in error)
+        || error.code !== 'EEXIST'
+      ) {
+        throw error
+      }
+    }
+    parent = await realpath(child)
+    assertInsideDirectory(directory, parent)
+  }
+  return parent
 }

@@ -39,13 +39,13 @@ export function serializeThemeToSnippet(theme: EditableTheme): string {
     '  name: string',
     '  description: string',
     '} = {',
-    `  id: '${theme.id}',`,
-    `  name: '${theme.name}',`,
-    `  description: '${escapeSingleQuotes(theme.description)}',`,
+    `  id: ${JSON.stringify(theme.id)},`,
+    `  name: ${JSON.stringify(theme.name)},`,
+    `  description: ${JSON.stringify(theme.description)},`,
     `  colors: ${formatTokenObject(theme.colors)},`,
     `  fonts: ${formatTokenObject(theme.fonts)},`,
-    `  fontSize: ${formatTokenObject(theme.fontSize)},`,
-    `  spacing: ${formatTokenObject(theme.spacing)},`,
+    `  fontSize: ${formatTokenObject(normalizeNumericTokenMap(theme.fontSize))},`,
+    `  spacing: ${formatTokenObject(normalizeNumericTokenMap(theme.spacing))},`,
     '}',
     '',
   ].join('\n')
@@ -79,10 +79,6 @@ export function updateThemeToken(
   }
 }
 
-function escapeSingleQuotes(value: string): string {
-  return value.replaceAll("'", "\\'")
-}
-
 function formatTokenObject(tokens: Record<string, number | string>): string {
   const entries = Object.entries(tokens)
   if (entries.length === 0) {
@@ -91,12 +87,7 @@ function formatTokenObject(tokens: Record<string, number | string>): string {
 
   const body = entries
     .map(([key, value]) => {
-      const serializedValue =
-        typeof value === 'number'
-          ? String(value)
-          : `'${escapeSingleQuotes(value)}'`
-
-      return `    ${key}: ${serializedValue}`
+      return `    ${JSON.stringify(key)}: ${JSON.stringify(value)}`
     })
     .join(',\n')
 

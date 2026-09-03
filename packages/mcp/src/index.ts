@@ -35,6 +35,7 @@ import {
   validateSchemaToolDefinition,
 } from './tools/validateSchema'
 import type { PluginLoader } from '@docxkit/core'
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
  * All MCP tool definitions for docx-kit.
@@ -81,14 +82,14 @@ export interface CreateDocxKitServerOptions {
  * import { createDocxKitServer } from 'docx-kit/mcp'
  * import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
  *
- * const server = createDocxKitServer()
+ * const server = await createDocxKitServer()
  * const transport = new StdioServerTransport()
  * await server.connect(transport)
  * ```
  */
 export async function createDocxKitServer(
   options: CreateDocxKitServerOptions = {},
-): Promise<unknown> {
+): Promise<McpServer> {
   // Dynamic import — SDK is an optional peer dependency
   const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js')
   const { z } = await import('zod')

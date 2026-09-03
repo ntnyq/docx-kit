@@ -16,7 +16,7 @@ pnpm add @modelcontextprotocol/sdk zod
 import { createDocxKitServer } from 'docx-kit/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
-const server = createDocxKitServer()
+const server = await createDocxKitServer()
 const transport = new StdioServerTransport()
 await server.connect(transport)
 ```
@@ -33,7 +33,15 @@ Create a new .docx document from a docx-kit JSON schema.
 - `outputPath` (string): File path for the output .docx file
 - `schema` (object): A docx-kit DocxSchema JSON object
 
-**Returns:** Validation result and instructions for using `renderDocx()`.
+**Returns:** The created file's absolute `filePath` and byte `size`.
+
+The 18 Node-compatible built-in plugins are registered automatically. ECharts
+requires a browser and is not included in `list_plugins`. External plugin sources
+still require an explicitly configured `pluginLoader`.
+
+Files are restricted to `outputDirectory` (the working directory by default).
+Keep this directory and its ancestors under the server owner's control; do not
+allow untrusted local processes to replace directories while requests run.
 
 ### `validate_schema`
 
@@ -52,12 +60,12 @@ Checks for:
 
 ### `list_plugins`
 
-List all available docx-kit plugins and their option schemas.
+List the built-in docx-kit plugins available in the Node.js server.
 
 **Parameters:**
 - `filter` (string, optional): Filter by plugin name pattern
 
-**Returns:** Array of plugin info objects with name, description, and option schema.
+**Returns:** Array of plugin info objects with name and description.
 
 ### `get_plugin_help`
 
@@ -157,7 +165,7 @@ For HTTP-based access, use the StreamableHTTPServerTransport:
 import { createDocxKitServer } from 'docx-kit/mcp'
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 
-const server = createDocxKitServer()
+const server = await createDocxKitServer()
 const transport = new StreamableHTTPServerTransport({ port: 3000 })
 await server.connect(transport)
 ```

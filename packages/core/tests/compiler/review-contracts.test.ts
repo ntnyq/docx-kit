@@ -22,6 +22,221 @@ async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
 }
 
 describe('reviewed document contracts', () => {
+  it.each([
+    ['Georgia, serif', 'Georgia'],
+    ['Inter, Arial, sans-serif', 'Inter'],
+    ['Garamond, Georgia, serif', 'Garamond'],
+    ['JetBrains Mono, monospace', 'JetBrains Mono'],
+    ['  "Quoted, Family", serif', 'Quoted, Family'],
+    ["'Times New Roman', serif", 'Times New Roman'],
+  ])('emits one Word font family for %s', async (fontFamily, expected) => {
+    const read = await renderPackage([
+      { style: { fontFamily }, text: 'Text', type: 'paragraph' },
+    ])
+    expect(await read()).toContain(`w:ascii="${expected}"`)
+  })
+
+  it('preserves the grid for combined spans, including fully covered rows', async () => {
+    const read = await renderPackage([
+      {
+        header: false,
+        type: 'table',
+        columns: [
+          { key: 'a', title: 'A' },
+          { key: 'b', title: 'B' },
+          { key: 'c', title: 'C' },
+        ],
+        data: [
+          {
+            _a_colSpan: 2,
+            _a_rowSpan: 2,
+            _c_rowSpan: 2,
+            a: 'Merged',
+            b: 'Covered',
+            c: 'Right',
+          },
+          { a: 'Covered', b: 'Covered', c: 'Covered' },
+          { a: 'Left', b: 'Middle', c: 'Last' },
+        ],
+      },
+    ])
+    const xml = await read()
+    const rows = xml.match(/<w:tr>.*?<\/w:tr>/g) ?? []
+    expect(xml.match(/<w:gridCol /g)).toHaveLength(3)
+    expect(rows.map(row => row.match(/<w:tc>/g)?.length)).toEqual([2, 2, 3])
+    expect(rows[1].match(/w:vMerge w:val="continue"/g)).toHaveLength(2)
+    expect(rows[1]).toContain('<w:gridSpan w:val="2"/>')
+    expect(xml).not.toContain('Covered')
+  })
+
+  it('keeps all grid columns when every row has a horizontal span', async () => {
+    const read = await renderPackage([
+      {
+        data: [{ a: 'Merged', b: 'Covered' }],
+        type: 'table',
+        columns: [
+          { colSpan: 2, key: 'a', title: 'Group' },
+          { key: 'b', title: 'Covered header' },
+        ],
+      },
+    ])
+    const xml = await read()
+    expect(xml.match(/<w:gridCol /g)).toHaveLength(2)
+    expect(xml.match(/<w:tc>/g)).toHaveLength(2)
+    expect(xml).not.toContain('Covered')
+  })
+
+  it.each([0, -1, 1.5, Infinity, '2'])(
+    'rejects invalid row span %s',
+    async rowSpan => {
+      await expect(
+        renderPackage([
+          {
+            columns: [{ key: 'a', title: 'A' }],
+            data: [{ _a_rowSpan: rowSpan, a: 'Value' }],
+            type: 'table',
+          },
+        ]),
+      ).rejects.toThrow('positive integers')
+    },
+  )
+
+  it('rejects overlapping spans', async () => {
+    await expect(
+      renderPackage([
+        {
+          type: 'table',
+          columns: [
+            { key: 'a', title: 'A' },
+            { key: 'b', title: 'B' },
+          ],
+          data: [
+            { _b_rowSpan: 2, a: 'Left', b: 'Right' },
+            { _a_colSpan: 2, a: 'Overlap' },
+          ],
+        },
+      ]),
+    ).rejects.toThrow('spans overlap')
+  })
+
+  it('rejects column spans outside the grid', async () => {
+    await expect(
+      renderPackage([
+        {
+          columns: [{ colSpan: 2, key: 'a', title: 'A' }],
+          data: [],
+          type: 'table',
+        },
+      ]),
+    ).rejects.toThrow('exceeds the table grid')
+  })
+
+  it('inherits paragraph text styles in inline bookmarks', async () => {
+    const read = await renderPackage([
+      {
+        style: { color: '#123456' },
+        type: 'paragraph',
+        children: [
+          { children: ['Inherited'], name: 'target', type: 'bookmark' },
+        ],
+      },
+    ])
+    expect(await read()).toContain('<w:color w:val="123456"/>')
+  })
+
+  it('omits cells covered by row spans and preserves their grid positions', async () => {
+    const read = await renderPackage([
+      {
+        type: 'table',
+        columns: [
+          { key: 'name', title: 'Name' },
+          { key: 'score', title: 'Score' },
+        ],
+        data: [
+          { _name_rowSpan: 3, name: 'Alpha', score: 1 },
+          { name: 'Covered', score: 2 },
+          { score: 3 },
+          { name: 'Delta', score: 4 },
+        ],
+      },
+    ])
+    const xml = await read()
+    const rows = xml.match(/<w:tr>.*?<\/w:tr>/g) ?? []
+    expect(rows).toHaveLength(5)
+    for (const row of rows) {
+      expect(row.match(/<w:tc>/g)).toHaveLength(2)
+    }
+    expect(rows[2]).toMatch(/w:vMerge w:val="continue".*?<w:t[^>]*>2<\/w:t>/)
+    expect(rows[3]).toMatch(/w:vMerge w:val="continue".*?<w:t[^>]*>3<\/w:t>/)
+    expect(xml).not.toContain('Covered')
+    expect(rows[4]).toContain('Delta')
+  })
+
+  it('applies cell paragraph styles while allowing column alignment overrides', async () => {
+    const read = await renderPackage([
+      {
+        cellStyle: { lineHeight: 2, textAlign: 'right' },
+        data: [{ name: 'Alpha', score: 1 }],
+        header: false,
+        type: 'table',
+        columns: [
+          { key: 'name', title: 'Name' },
+          { align: 'center', key: 'score', title: 'Score' },
+        ],
+      },
+    ])
+    const xml = await read()
+    expect(xml).toContain('<w:jc w:val="right"/>')
+    expect(xml).toContain('<w:jc w:val="center"/>')
+    expect(
+      xml.match(/<w:spacing w:line="480" w:lineRule="auto"\/>/g),
+    ).toHaveLength(2)
+  })
+
+  it('resolves bookmark classes and preserves child style overrides', async () => {
+    const read = await renderPackage(
+      [
+        {
+          className: 'red',
+          name: 'target',
+          type: 'bookmark',
+          children: [
+            'Inherited',
+            { style: { color: '#0000FF' }, text: 'Override', type: 'text' },
+          ],
+        },
+      ],
+      { styles: { red: { color: '#FF0000' } } },
+    )
+    const xml = await read()
+    expect(xml).toContain('<w:color w:val="FF0000"/>')
+    expect(xml).toContain('<w:color w:val="0000FF"/>')
+  })
+
+  it('preserves nested math when a script has no operands', async () => {
+    const read = await renderPackage([
+      {
+        type: 'math',
+        children: [
+          {
+            type: 'script',
+            children: [
+              { text: 'BASE', type: 'text' },
+              {
+                denominator: [{ text: '2', type: 'text' }],
+                numerator: [{ text: '1', type: 'text' }],
+                type: 'fraction',
+              },
+            ],
+          },
+        ],
+      },
+    ])
+    const xml = await read()
+    expect(xml).toContain('<m:t>BASE</m:t>')
+    expect(xml).toContain('<m:f>')
+  })
+
   it('keeps tables as block children in headers and footers', async () => {
     const children: BlockNode[] = [
       {

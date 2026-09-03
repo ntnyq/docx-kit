@@ -15,7 +15,9 @@ vi.mock('docx', async () => {
     Packer: {
       toBase64String: vi.fn().mockResolvedValue('base64data'),
       toBlob: vi.fn().mockResolvedValue(new Blob(['test'])),
-      toBuffer: vi.fn().mockResolvedValue(new Uint8Array([80, 75, 3, 4])),
+      toArrayBuffer: vi
+        .fn()
+        .mockResolvedValue(new Uint8Array([80, 75, 3, 4]).buffer),
     },
   }
 })
@@ -40,9 +42,9 @@ describe('packToBlob', () => {
 })
 
 describe('packToBuffer', () => {
-  it('calls Packer.toBuffer and returns Uint8Array', async () => {
+  it('calls Packer.toArrayBuffer and returns Uint8Array', async () => {
     const result = await packToBuffer(mockDoc)
-    expect(Packer.toBuffer).toHaveBeenCalledWith(mockDoc)
+    expect(Packer.toArrayBuffer).toHaveBeenCalledWith(mockDoc)
     expect(result).toBeInstanceOf(Uint8Array)
   })
 })

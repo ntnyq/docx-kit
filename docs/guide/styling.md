@@ -30,7 +30,7 @@ const style = {
 | `fontSize` | `UnitValue` | Font size (bare number = pt) |
 | `fontWeight` | `FontWeight` | Font weight: `'bold'`, `'normal'`, or `100`–`900` |
 | `fontStyle` | `'italic' \| 'normal'` | Italic toggle |
-| `fontFamily` | `LiteralUnion<'Arial' \| 'Calibri' \| 'Times New Roman'>` | Font family |
+| `fontFamily` | `LiteralUnion<'Arial' \| 'Calibri' \| 'Times New Roman'>` | Font family; DOCX output uses the first family in a CSS fallback stack |
 | `color` | `string \| HexColor` | Text / foreground color |
 | `backgroundColor` | `string \| HexColor` | Background shading |
 | `highlight` | `HighlightColor` | Text highlighting (`'yellow'`, `'green'`, `'red'`, etc.) |

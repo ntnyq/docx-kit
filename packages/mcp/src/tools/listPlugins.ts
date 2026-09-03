@@ -22,7 +22,7 @@ export interface PluginInfo {
 }
 
 /**
- * Build plugin info for every built-in plugin in the canonical catalog.
+ * Build plugin info for built-in plugins available in the Node.js MCP server.
  *
  * @param filter - Optional case-insensitive substring used to match plugin names
  * @returns Matching built-in plugin names and descriptions in catalog order
@@ -31,7 +31,9 @@ export function buildBuiltinPluginInfoList(filter?: string): PluginInfo[] {
   const normalizedFilter = filter?.toLowerCase()
   return BUILTIN_PLUGIN_CATALOG.filter(
     plugin =>
-      !normalizedFilter || plugin.name.toLowerCase().includes(normalizedFilter),
+      plugin.available
+      && (!normalizedFilter
+        || plugin.name.toLowerCase().includes(normalizedFilter)),
   ).map(plugin => ({
     description: plugin.description,
     name: plugin.name,
