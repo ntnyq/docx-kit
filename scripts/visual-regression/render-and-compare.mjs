@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import {
   copyFileSync,
   existsSync,
@@ -9,13 +10,14 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs'
-import { basename, join, relative, resolve } from 'node:path'
+import { basename, join, relative, resolve, sep } from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import pixelmatch from 'pixelmatch'
 import { PNG } from 'pngjs'
 
 const updateBaselines = process.argv.includes('--update')
+const useSystemRenderer = process.argv.includes('--system')
 const repositoryRoot = resolve(import.meta.dirname, '../..')
 const temporaryRoot = join(repositoryRoot, 'tmp/visual-regression')
 const docxRoot = join(temporaryRoot, 'docx')
@@ -25,6 +27,7 @@ const profileRoot = join(temporaryRoot, 'libreoffice-profile')
 const baselineRoot = join(repositoryRoot, 'tests/visual/baselines')
 const artifactRoot = join(repositoryRoot, 'output/visual-regression')
 const diffRoot = join(artifactRoot, 'diffs')
+const currentArtifactRoot = join(artifactRoot, 'current')
 const manifestPath = join(temporaryRoot, 'manifest.json')
 const maximumMismatchRatio = 0.01
 const minimumInkRatio = 0.002
@@ -37,20 +40,51 @@ if (!existsSync(manifestPath)) {
   process.exit(1)
 }
 
-const libreOffice = resolveBinary(
-  process.env.LIBREOFFICE_BIN,
-  'soffice',
-  'libreoffice',
-)
-const pdfToPpm = resolveBinary(process.env.PDFTOPPM_BIN, 'pdftoppm')
-const pdfInfo = resolveBinary(process.env.PDFINFO_BIN, 'pdfinfo')
+if (useSystemRenderer && updateBaselines) {
+  console.error(
+    'Update baselines with the pinned Docker renderer, without --system.',
+  )
+  process.exit(1)
+}
+
+const docker = useSystemRenderer ? null : resolveBinary('docker')
+const dockerContext = join(repositoryRoot, 'scripts/visual-regression/docker')
+const dockerImage = `docx-kit-visual:${createHash('sha256')
+  .update(readFileSync(join(dockerContext, 'Dockerfile')))
+  .update(readFileSync(join(dockerContext, 'fonts.conf')))
+  .digest('hex')
+  .slice(0, 12)}`
+const libreOffice = useSystemRenderer
+  ? resolveBinary(process.env.LIBREOFFICE_BIN, 'soffice', 'libreoffice')
+  : 'libreoffice'
+const pdfToPpm = useSystemRenderer
+  ? resolveBinary(process.env.PDFTOPPM_BIN, 'pdftoppm')
+  : 'pdftoppm'
+const pdfInfo = useSystemRenderer
+  ? resolveBinary(process.env.PDFINFO_BIN, 'pdfinfo')
+  : 'pdfinfo'
 const fixtures = JSON.parse(readFileSync(manifestPath, 'utf8'))
+
+if (docker) {
+  console.log(
+    'Building the pinned Linux visual renderer (cached after the first run).',
+  )
+  run(docker, [
+    'build',
+    '--platform',
+    'linux/amd64',
+    '--tag',
+    dockerImage,
+    dockerContext,
+  ])
+}
 
 for (const directory of [pdfRoot, currentRoot, profileRoot, artifactRoot]) {
   rmSync(directory, { force: true, recursive: true })
   mkdirSync(directory, { recursive: true })
 }
 mkdirSync(diffRoot, { recursive: true })
+mkdirSync(currentArtifactRoot, { recursive: true })
 mkdirSync(baselineRoot, { recursive: true })
 
 for (const fixture of fixtures) {
@@ -59,6 +93,10 @@ for (const fixture of fixtures) {
 
 const currentPages = listPngFiles(currentRoot)
 const expectedBaselines = new Set(currentPages.map(path => basename(path)))
+
+for (const path of currentPages) {
+  copyFileSync(path, join(currentArtifactRoot, basename(path)))
+}
 
 if (updateBaselines) {
   for (const path of listPngFiles(baselineRoot)) {
@@ -83,6 +121,7 @@ writeFileSync(
       fixtureCount: fixtures.length,
       libreOffice: getVersion(libreOffice),
       pageCount: currentPages.length,
+      renderer: useSystemRenderer ? 'system' : dockerImage,
       updateBaselines,
     },
     null,
@@ -157,7 +196,7 @@ function displayPath(path) {
 }
 
 function getVersion(binary) {
-  return run(binary, ['--version']).stdout.trim().split('\n')[0]
+  return runRenderer(binary, ['--version']).stdout.trim().split('\n')[0]
 }
 
 function listPngFiles(directory) {
@@ -170,18 +209,26 @@ function listPngFiles(directory) {
     .sort()
 }
 
+function rendererPath(path) {
+  return useSystemRenderer
+    ? path
+    : `/work/${relative(temporaryRoot, path).split(sep).join('/')}`
+}
+
 function renderFixture({ expectedPages, name }) {
   const docxPath = join(docxRoot, `${name}.docx`)
-  const profileUrl = pathToFileURL(profileRoot).href
+  const profileUrl = useSystemRenderer
+    ? pathToFileURL(profileRoot).href
+    : 'file:///work/libreoffice-profile'
 
-  run(libreOffice, [
+  runRenderer(libreOffice, [
     '--headless',
     `-env:UserInstallation=${profileUrl}`,
     '--convert-to',
     'pdf',
     '--outdir',
-    pdfRoot,
-    docxPath,
+    rendererPath(pdfRoot),
+    rendererPath(docxPath),
   ])
 
   const pdfPath = join(pdfRoot, `${name}.pdf`)
@@ -190,7 +237,7 @@ function renderFixture({ expectedPages, name }) {
     return
   }
 
-  const info = run(pdfInfo, [pdfPath]).stdout
+  const info = runRenderer(pdfInfo, [rendererPath(pdfPath)]).stdout
   const pageCount = Number(info.match(/^Pages:\s+(\d+)$/mu)?.[1] ?? '')
   if (pageCount !== expectedPages) {
     errors.push(
@@ -199,7 +246,13 @@ function renderFixture({ expectedPages, name }) {
   }
 
   const prefix = join(currentRoot, name)
-  run(pdfToPpm, ['-png', '-r', '96', pdfPath, prefix])
+  runRenderer(pdfToPpm, [
+    '-png',
+    '-r',
+    '96',
+    rendererPath(pdfPath),
+    rendererPath(prefix),
+  ])
 
   const renderedPages = listPngFiles(currentRoot).filter(path =>
     basename(path).startsWith(`${name}-`),
@@ -266,4 +319,26 @@ function run(command, arguments_) {
   }
 
   return result
+}
+
+function runRenderer(command, arguments_) {
+  if (!docker) {
+    return run(command, arguments_)
+  }
+
+  return run(docker, [
+    'run',
+    '--rm',
+    '--platform',
+    'linux/amd64',
+    '--network',
+    'none',
+    '--user',
+    `${process.getuid?.() ?? 1000}:${process.getgid?.() ?? 1000}`,
+    '--mount',
+    `type=bind,source=${temporaryRoot},target=/work`,
+    dockerImage,
+    command,
+    ...arguments_,
+  ])
 }

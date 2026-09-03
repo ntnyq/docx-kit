@@ -4,6 +4,16 @@ This suite generates ten deterministic DOCX fixtures, converts them with
 LibreOffice, renders the resulting PDFs with Poppler, and compares every page
 with a committed PNG baseline.
 
+The default renderer runs in Docker on `linux/amd64`, using the Ubuntu image
+digest and package snapshot pinned in
+`scripts/visual-regression/docker/Dockerfile`. This keeps LibreOffice, Poppler,
+font substitution, and font metrics identical on developer machines and CI.
+Docker must be running; the first invocation builds the image and later runs
+reuse its cached layers. Rendering itself runs without network access.
+The image includes LibreOffice Math for Office Math objects, Carlito for Calibri
+fallback, and an explicit Liberation Serif fallback for the Ocean theme's
+`Georgia, serif` family.
+
 ## Coverage
 
 | Fixture | Compatibility surface |
@@ -37,7 +47,23 @@ pnpm run visual:update
 
 Never update baselines just to make CI green. Inspect every changed page and
 record the reason in the pull request. Failed comparisons are written to
-`output/visual-regression/` and uploaded by CI.
+`output/visual-regression/` and uploaded by CI, including the actual page PNGs,
+diffs, and renderer version report.
+
+When updating the renderer image or package snapshot, review all regenerated
+pages and commit the Dockerfile and baselines together. Page count, nonblank-page
+checks, and the 1% pixel-difference limit remain enforced.
+
+To investigate a locally installed LibreOffice version, use:
+
+```shell
+pnpm run visual:generate
+pnpm run visual:render --system
+```
+
+`LIBREOFFICE_BIN`, `PDFTOPPM_BIN`, and `PDFINFO_BIN` override the native binaries
+only in this diagnostic mode. Native renders may differ from the pinned
+environment and cannot update the committed baselines.
 
 ## Microsoft Word release check
 

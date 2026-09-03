@@ -50,10 +50,6 @@ jobs:
       - run: pnpm run build
       - run: pnpm run test
       - if: matrix.visual
-        run:
-          sudo apt-get update && sudo apt-get install -y --no-install-recommends
-          fonts-liberation libreoffice-writer poppler-utils
-      - if: matrix.visual
         run: pnpm run visual:check
       - if: failure() && matrix.visual
         uses: actions/upload-artifact@v7
