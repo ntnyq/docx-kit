@@ -5,7 +5,7 @@
  */
 
 import { constants } from 'node:fs'
-import { mkdir, open, realpath } from 'node:fs/promises'
+import { lstat, mkdir, open, realpath } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { createPluginLoader, renderDocx } from '@docxkit/core'
@@ -94,7 +94,7 @@ export const createDocxToolDefinition = {
  * @param input - Document schema and output path relative to the configured directory
  * @param options - Optional output directory and plugin loader
  * @returns A promise that resolves to the absolute output path and byte size
- * @throws {Error} If the output escapes the configured directory or lacks a `.docx` extension
+ * @throws {Error} If the output escapes the configured directory, is a symbolic link, or lacks a `.docx` extension
  * @throws If plugin loading, document export, or filesystem operations fail
  */
 export async function createDocument(
@@ -138,10 +138,26 @@ export async function createDocument(
     path.basename(filePath),
   )
 
+  // O_NOFOLLOW is unavailable on Windows. Inspect the leaf itself (including
+  // dangling links) before truncating, within the owner-controlled directory.
+  try {
+    if ((await lstat(safeFilePath)).isSymbolicLink()) {
+      throw new Error('Output path must not be a symbolic link')
+    }
+  } catch (error) {
+    if (
+      !(error instanceof Error)
+      || !('code' in error)
+      || error.code !== 'ENOENT'
+    ) {
+      throw error
+    }
+  }
+
   const file = await open(
     safeFilePath,
     constants.O_CREAT
-      | constants.O_NOFOLLOW
+      | (constants.O_NOFOLLOW ?? 0)
       | constants.O_TRUNC
       | constants.O_WRONLY,
     0o600,
