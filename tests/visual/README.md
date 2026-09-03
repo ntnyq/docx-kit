@@ -54,6 +54,26 @@ When updating the renderer image or package snapshot, review all regenerated
 pages and commit the Dockerfile and baselines together. Page count, nonblank-page
 checks, and the 1% pixel-difference limit remain enforced.
 
+### Baseline review: 2026-09-03
+
+The baselines include the document-style fixes from `b8dd1e1`. All twelve
+pages were compared with the previous baselines using the unchanged pinned
+renderer (`docx-kit-visual:2a5e50ea2b30`, LibreOffice 24.2.7.2). The reviewed
+changes are:
+
+- Borders use eighth-points instead of twips, producing the requested widths
+  for heading rules, paragraph boxes, theme accents, and table borders.
+- Text defaults now reach headings, lists, links, semantic nodes, table cells,
+  and header/footer strings, making their typography consistent with the
+  configured font and size.
+- Table headers honor their configured font, color, and weight.
+- Explicit line-spacing rules preserve numeric multipliers and absolute
+  heights, with corresponding paragraph and theme-spacing changes.
+
+The ten fixtures still produce twelve pages. No new clipping or missing
+content was found. The existing page-count, nonblank-page, and 1% difference
+checks remain in place.
+
 To investigate a locally installed LibreOffice version, use:
 
 ```shell
