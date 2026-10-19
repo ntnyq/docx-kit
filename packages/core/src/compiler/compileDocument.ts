@@ -196,7 +196,10 @@ export async function compileDocument<TStyles extends StyleSheet>(
     title: options.config.metadata?.title,
     customProperties: Object.entries(
       options.config.metadata?.customProperties ?? {},
-    ).map(([name, value]) => ({ name, value })),
+    ).map(([name, value]) => ({
+      name,
+      value,
+    })),
     evenAndOddHeaderAndFooters: sectionGroups.some(({ config }) =>
       Boolean(config?.header?.even || config?.footer?.even),
     ),
@@ -573,5 +576,9 @@ function compilePageSize(
   }
 
   // docx performs the width/height swap when serializing landscape pages.
-  return { height, orientation, width }
+  return {
+    height,
+    orientation,
+    width,
+  }
 }

@@ -138,7 +138,10 @@ export async function loadNpmPlugin(
     )
   }
 
-  return { manifest, plugin }
+  return {
+    manifest,
+    plugin,
+  }
 }
 
 // ---------- Helpers ----------

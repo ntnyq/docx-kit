@@ -8,7 +8,6 @@ import ThemeStudioHeader from './ThemeStudioHeader.vue'
 const {
   activeBaseTheme,
   editableTheme,
-  error,
   generatedSnippet,
   lastRenderedLabel,
   loading,
@@ -19,6 +18,7 @@ const {
   selectTheme,
   setMetadata,
   setToken,
+  studioError,
   themes,
   themeStats,
 } = useThemeStudio()
@@ -82,7 +82,7 @@ const accentColor = computed(
         <ThemePreviewPane
           :accent-color
           :blob="previewBlob"
-          :error
+          :error="studioError"
           :loading
         />
       </main>

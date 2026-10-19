@@ -55,7 +55,10 @@ class NodePluginLoader extends PluginLoader {
     if (!result.manifest) {
       throw new Error('npm plugin loader returned no manifest')
     }
-    return { manifest: result.manifest, plugin: result.plugin }
+    return {
+      manifest: result.manifest,
+      plugin: result.plugin,
+    }
   }
 }
 

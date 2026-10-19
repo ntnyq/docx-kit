@@ -70,7 +70,7 @@ export function createDocxPreview(
   }
 
   const instance: DocxPreview = {
-    clear(): void {
+    clear() {
       state.activeController?.abort()
       state.activeController = null
       state.renderId += 1
@@ -88,7 +88,7 @@ export function createDocxPreview(
       return state.currentInput
     },
 
-    destroy(): void {
+    destroy() {
       if (state.destroyed) {
         return
       }
@@ -103,7 +103,7 @@ export function createDocxPreview(
       state.destroyed = true
     },
 
-    async render(input: DocxInput): Promise<void> {
+    async render(input: DocxInput) {
       if (state.destroyed) {
         throw new Error(
           'DocxPreview has been destroyed. Create a new instance with createDocxPreview().',

@@ -109,15 +109,30 @@ export function parseShorthandTwip(
   const parts = String(value).trim().split(/\s+/)
   if (parts.length === 1) {
     const v = toTwip(parts[0]) ?? 0
-    return { bottom: v, left: v, right: v, top: v }
+    return {
+      bottom: v,
+      left: v,
+      right: v,
+      top: v,
+    }
   }
   if (parts.length === 2) {
     const [tb, lr] = parts.map(p => toTwip(p) ?? 0)
-    return { bottom: tb, left: lr, right: lr, top: tb }
+    return {
+      bottom: tb,
+      left: lr,
+      right: lr,
+      top: tb,
+    }
   }
   if (parts.length === 4) {
     const [top, right, bottom, left] = parts.map(p => toTwip(p) ?? 0)
-    return { bottom, left, right, top }
+    return {
+      bottom,
+      left,
+      right,
+      top,
+    }
   }
   return undefined
 }

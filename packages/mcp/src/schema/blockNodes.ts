@@ -30,7 +30,10 @@ const array = (
 })
 const number = (
   options: Omit<SchemaFieldRule, 'kind'> = {},
-): SchemaFieldRule => ({ kind: 'number', ...options })
+): SchemaFieldRule => ({
+  kind: 'number',
+  ...options,
+})
 const object = (required = false): SchemaFieldRule => ({
   kind: 'object',
   required,

@@ -35,7 +35,7 @@ export class PluginManager<
    * @returns A promise that resolves after all pending setup hooks succeed
    * @throws Propagates the original rejection reason if a plugin setup hook fails
    */
-  async awaitSetups(): Promise<void> {
+  async awaitSetups() {
     const results = await Promise.all(this._pendingSetups)
     for (const result of results) {
       if (result.status === 'rejected') {
@@ -90,8 +90,20 @@ export class PluginManager<
       // Observe failures now, even if this builder is exported much later.
       this._pendingSetups.push(
         Promise.resolve(plugin.setup())
-          .then(() => ({ status: 'fulfilled', value: undefined }) as const)
-          .catch(error => ({ reason: error, status: 'rejected' }) as const),
+          .then(
+            () =>
+              ({
+                status: 'fulfilled',
+                value: undefined,
+              }) as const,
+          )
+          .catch(
+            error =>
+              ({
+                reason: error,
+                status: 'rejected',
+              }) as const,
+          ),
       )
     }
     return this as unknown as PluginManager<Record<TName, TOptions> & TPlugins>

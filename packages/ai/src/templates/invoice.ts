@@ -259,7 +259,9 @@ function generate(params: InvoiceParams): DocxSchema {
     totalNode,
   ]
 
-  return { content }
+  return {
+    content,
+  }
 }
 
 export const invoiceTemplate: AiTemplate<InvoiceParams> = {

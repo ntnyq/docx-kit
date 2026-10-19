@@ -169,7 +169,7 @@ function validateCollection(
   path: string,
   errors: ValidationError[],
   depth: number,
-): void {
+) {
   if (depth > 64) {
     errors.push({ message: 'Content nesting exceeds 64 levels', path })
     return
@@ -229,7 +229,7 @@ function validateDefinition(
   path: string,
   errors: ValidationError[],
   depth: number,
-): void {
+) {
   for (const [field, rule] of Object.entries(definition.fields)) {
     const hasField = Object.hasOwn(node, field)
     if (rule.required && !hasField) {
@@ -263,7 +263,7 @@ function validateField(
   path: string,
   errors: ValidationError[],
   depth = 0,
-): void {
+) {
   if (rule.kind !== 'unknown' && !matchesKind(value, rule.kind)) {
     errors.push({
       message: `Field "${field}" must be ${article(rule.kind)} ${rule.kind}`,
@@ -322,7 +322,7 @@ function validateHeaderFooters(
   path: string,
   errors: ValidationError[],
   depth: number,
-): void {
+) {
   if (!isRecord(config)) {
     return
   }
@@ -373,7 +373,7 @@ function validateNode(
   path: string,
   errors: ValidationError[],
   depth = 0,
-): void {
+) {
   const definition = BLOCK_NODE_DEFINITIONS[nodeType]
 
   validateDefinition(node, definition, path, errors, depth)
@@ -399,7 +399,7 @@ function validateTableColumns(
   value: unknown,
   path: string,
   errors: ValidationError[],
-): void {
+) {
   if (!Array.isArray(value)) {
     return
   }

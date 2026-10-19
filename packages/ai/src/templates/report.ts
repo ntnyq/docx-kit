@@ -147,7 +147,9 @@ function generate(params: ReportParams): DocxSchema {
     )
   }
 
-  return { content }
+  return {
+    content,
+  }
 }
 
 export const reportTemplate: AiTemplate<ReportParams> = {

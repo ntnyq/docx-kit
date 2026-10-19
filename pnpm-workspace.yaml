@@ -6,7 +6,7 @@ packages:
   - packages/*
 
 overrides:
-  monaco-editor>dompurify: 3.4.12
+  monaco-editor>dompurify: 3.4.17
 
 allowBuilds:
   esbuild: true

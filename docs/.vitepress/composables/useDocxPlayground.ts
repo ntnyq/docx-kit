@@ -37,7 +37,7 @@ export function useDocxPlayground() {
   const code = shallowRef(DEFAULT_CODE)
   const activePreset = shallowRef(PRESETS[0].label)
   const loading = shallowRef(false)
-  const error = shallowRef('')
+  const playgroundError = shallowRef('')
   const resultBlob = shallowRef<Blob | null>(null)
   const editorContainer = shallowRef<HTMLElement | null>(null)
   const editorError = shallowRef('')
@@ -170,7 +170,7 @@ export function useDocxPlayground() {
       editorInstance.setValue(preset.code)
     }
     resultBlob.value = null
-    error.value = ''
+    playgroundError.value = ''
   }
 
   // -------------------------------------------------------------------------
@@ -179,14 +179,14 @@ export function useDocxPlayground() {
   function selectStylePreset(sp: DocxPreset | null) {
     activeStylePreset.value = sp
     resultBlob.value = null
-    error.value = ''
+    playgroundError.value = ''
   }
 
   // -------------------------------------------------------------------------
   // Run — execute user code in a sandboxed async IIFE
   // -------------------------------------------------------------------------
   async function run() {
-    error.value = ''
+    playgroundError.value = ''
     loading.value = true
     resultBlob.value = null
 
@@ -223,8 +223,8 @@ export function useDocxPlayground() {
           })
         }
       }
-    } catch (error_) {
-      error.value = String(error_)
+    } catch (error) {
+      playgroundError.value = String(error)
     } finally {
       loading.value = false
     }
@@ -254,9 +254,9 @@ export function useDocxPlayground() {
     download,
     editorContainer,
     editorError,
-    error,
     loading,
     loadPreset,
+    playgroundError,
     presets: PRESETS,
     resetCode,
     resultBlob,

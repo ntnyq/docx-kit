@@ -174,7 +174,9 @@ export function compileParagraphBorder(style: ParagraphStyleRule) {
   if (!borders) {
     return {}
   }
-  return { border: borders }
+  return {
+    border: borders,
+  }
 }
 
 // ---------- Column width ----------
@@ -381,7 +383,11 @@ function resolveIndent(style: DocxStyleRule) {
   if (left == null && right == null && firstLine == null) {
     return undefined
   }
-  return { firstLine, left, right }
+  return {
+    firstLine,
+    left,
+    right,
+  }
 }
 
 /**

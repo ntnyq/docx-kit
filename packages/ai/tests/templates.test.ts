@@ -52,7 +52,7 @@ function isTextParagraphNode(
 
 function validateTemplate<TParams extends object>(
   template: AiTemplate<TParams>,
-): void {
+) {
   expect(template.name).toBeTypeOf('string')
   expect(template.name.length).toBeGreaterThan(0)
   expect(template.description).toBeTypeOf('string')

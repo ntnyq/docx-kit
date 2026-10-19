@@ -277,7 +277,7 @@ export class PluginLoader {
    *
    * @internal
    */
-  protected _checkCompatibility(manifest: PluginManifest): void {
+  protected _checkCompatibility(manifest: PluginManifest) {
     const range = manifest.docxKit.trim()
     const kitVersion = this.options.kitVersion
 
@@ -305,7 +305,10 @@ export class PluginLoader {
     manifest: null
     plugin: DocxPlugin
   } {
-    return { manifest: null, plugin }
+    return {
+      manifest: null,
+      plugin,
+    }
   }
 
   /**
@@ -411,7 +414,7 @@ export class PluginLoader {
   private async checkAllowExecute(
     manifest: PluginManifest,
     source: PluginSource,
-  ): Promise<void> {
+  ) {
     if (this.options.security.allowExecute) {
       const allowed = await this.options.security.allowExecute(manifest, source)
       if (!allowed) {
@@ -428,7 +431,7 @@ export class PluginLoader {
    *
    * @internal
    */
-  private async checkAllowLoad(source: PluginSource): Promise<void> {
+  private async checkAllowLoad(source: PluginSource) {
     if (this.options.security.allowLoad) {
       const allowed = await this.options.security.allowLoad(source)
       if (!allowed) {

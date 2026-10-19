@@ -231,7 +231,9 @@ function generate(params: ResumeParams): DocxSchema {
     )
   }
 
-  return { content }
+  return {
+    content,
+  }
 }
 
 export const resumeTemplate: AiTemplate<ResumeParams> = {

@@ -15,9 +15,9 @@ const {
   download,
   editorContainer,
   editorError,
-  error,
   loading,
   loadPreset,
+  playgroundError,
   presets,
   resetCode,
   resultBlob,
@@ -195,11 +195,11 @@ onBeforeUnmount(() => {
         <div class="preview-content">
           <!-- Run error: blocks everything -->
           <div
-            v-if="error"
+            v-if="playgroundError"
             class="error-box"
           >
             <strong>Run Error:</strong>
-            <pre>{{ error }}</pre>
+            <pre>{{ playgroundError }}</pre>
           </div>
 
           <!-- Stage: rendered preview + overlays -->

@@ -132,7 +132,7 @@ describe('normalizeDocxInput', () => {
   })
 })
 
-async function expectInvalid(value: unknown): Promise<void> {
+async function expectInvalid(value: unknown) {
   await expect(normalizeDocxInput(value as never)).rejects.toMatchObject({
     code: PREVIEW_ERROR_CODES.PREVIEW_INPUT_INVALID,
   })

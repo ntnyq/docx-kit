@@ -79,7 +79,7 @@ export class PluginRegistry {
    * Subsequent `search()` or `get()` calls will fetch
    * fresh data from the npm registry.
    */
-  refresh(): void {
+  refresh() {
     this.cache.clear()
   }
 

@@ -48,7 +48,12 @@ describe('searchPlugins', () => {
   it('returns empty array when no results', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ objects: [], total: 0 }),
+      async json() {
+        return {
+          objects: [],
+          total: 0,
+        }
+      },
     })
 
     const results = await searchPlugins('nonexistent')

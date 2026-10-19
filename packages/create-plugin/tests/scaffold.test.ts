@@ -73,7 +73,7 @@ describe('createPlugin', () => {
     expect(pkg.keywords).toContain('docx-kit-plugin')
     expect(pkg.peerDependencies['docx-kit']).toBe(`^${packageJson.version}`)
     expect(pkg.devDependencies['docx-kit']).toBe(`^${packageJson.version}`)
-    expect(pkg.devDependencies.tsdown).toBe('^0.22.9')
+    expect(pkg.devDependencies.tsdown).toBe('^0.23.3')
   })
 
   it('does not overwrite existing directory', async () => {

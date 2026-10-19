@@ -262,7 +262,10 @@ async function renderInBrowser(
   }
 
   container.remove()
-  return { data: await dataUrlToUint8Array(dataUrl), type: 'png' }
+  return {
+    data: await dataUrlToUint8Array(dataUrl),
+    type: 'png',
+  }
 }
 
 /**

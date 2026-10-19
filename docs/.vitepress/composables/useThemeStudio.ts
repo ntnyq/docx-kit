@@ -74,7 +74,7 @@ export function useThemeStudio() {
   const editableTheme = ref<EditableTheme>(cloneThemeForEditing(BASE_THEME))
   const previewBlob = shallowRef<Blob | null>(null)
   const loading = shallowRef(false)
-  const error = shallowRef('')
+  const studioError = shallowRef('')
   const lastRenderedLabel = shallowRef('')
 
   let renderTimer: ReturnType<typeof setTimeout> | null = null
@@ -126,12 +126,12 @@ export function useThemeStudio() {
       BUILTIN_THEMES.find(theme => theme.id === themeId) ?? BASE_THEME
     selectedThemeId.value = nextTheme.id
     editableTheme.value = cloneThemeForEditing(nextTheme)
-    error.value = ''
+    studioError.value = ''
   }
 
   function resetTheme() {
     editableTheme.value = cloneThemeForEditing(activeBaseTheme.value)
-    error.value = ''
+    studioError.value = ''
   }
 
   function setToken(
@@ -171,7 +171,7 @@ export function useThemeStudio() {
   async function renderPreview() {
     const token = ++renderToken
     loading.value = true
-    error.value = ''
+    studioError.value = ''
 
     try {
       const theme = toDocxTheme(editableTheme.value)
@@ -248,12 +248,12 @@ export function useThemeStudio() {
         minute: '2-digit',
         second: '2-digit',
       }).format(new Date())
-    } catch (error_) {
+    } catch (error) {
       if (token !== renderToken) {
         return
       }
 
-      error.value = String(error_)
+      studioError.value = String(error)
       previewBlob.value = null
     } finally {
       if (token === renderToken) {
@@ -286,7 +286,6 @@ export function useThemeStudio() {
   return {
     activeBaseTheme,
     editableTheme,
-    error,
     generatedSnippet,
     lastRenderedLabel,
     loading,
@@ -297,6 +296,7 @@ export function useThemeStudio() {
     selectTheme,
     setMetadata,
     setToken,
+    studioError,
     themes: BUILTIN_THEMES,
     themeStats,
   }

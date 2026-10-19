@@ -129,7 +129,9 @@ function generate(params: LetterParams): DocxSchema {
     { text: params.senderName, type: 'paragraph' },
   )
 
-  return { content }
+  return {
+    content,
+  }
 }
 
 export const letterTemplate: AiTemplate<LetterParams> = {

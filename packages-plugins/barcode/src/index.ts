@@ -220,7 +220,10 @@ async function renderBarcode(
 
   if (renderer.toBuffer) {
     const data = new Uint8Array(await renderer.toBuffer(renderOptions))
-    return { data, ...readPngDimensions(data) }
+    return {
+      data,
+      ...readPngDimensions(data),
+    }
   }
 
   if (renderer.toCanvas && typeof document !== 'undefined') {

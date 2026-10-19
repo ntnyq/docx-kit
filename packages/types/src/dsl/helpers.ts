@@ -28,7 +28,10 @@ import type { ImageNode, TextNode } from './nodes'
  * ```
  */
 export function inlineImg(options: Omit<ImageNode, 'type'>): ImageNode {
-  return { type: 'image', ...options }
+  return {
+    type: 'image',
+    ...options,
+  }
 }
 
 /**

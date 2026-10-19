@@ -92,7 +92,7 @@ describe('validateManifest', () => {
     function expectManifestError(
       manifest: unknown,
       checker: (err: DocxKitError) => void,
-    ): void {
+    ) {
       try {
         validateManifest(manifest as unknown as Record<string, unknown>)
       } catch (error) {

@@ -88,8 +88,14 @@ describe('renderPackageJson', () => {
     expect(parsed.peerDependencies.docx).toBe('^9.7.1')
     expect(parsed.peerDependencies['docx-kit']).toBe(`^${packageJson.version}`)
     expect(parsed.devDependencies['docx-kit']).toBe(`^${packageJson.version}`)
-    expect(parsed.devDependencies.tsdown).toBe('^0.22.9')
-    expect(parsed.devDependencies.vitest).toBe('^4.1.10')
+    expect(parsed.devDependencies.tsdown).toBe('^0.23.3')
+    expect(parsed.devDependencies.vitest).toBe('^5.0.5')
+    expect(parsed.devDependencies['@typescript/native']).toBe(
+      'npm:typescript@^7.0.2',
+    )
+    expect(parsed.devDependencies.typescript).toBe(
+      'npm:@typescript/typescript6@^6.0.2',
+    )
   })
 
   it('uses defaults for optional fields', () => {

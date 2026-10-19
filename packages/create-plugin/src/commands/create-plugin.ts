@@ -41,7 +41,7 @@ interface ScaffoldOptions {
  *
  * @param nameArg - — Optional plugin name from CLI argument
  */
-export async function createPlugin(nameArg?: string): Promise<void> {
+export async function createPlugin(nameArg?: string) {
   const options = await promptOptions(nameArg)
 
   if (!options) {
@@ -162,10 +162,7 @@ async function promptOptions(
 /**
  * Write all scaffold files to the target directory.
  */
-async function writeScaffold(
-  targetDir: string,
-  options: ScaffoldOptions,
-): Promise<void> {
+async function writeScaffold(targetDir: string, options: ScaffoldOptions) {
   const srcDir = path.join(targetDir, 'src')
   const testDir = path.join(targetDir, 'tests')
 

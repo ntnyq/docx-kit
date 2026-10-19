@@ -37,7 +37,10 @@ async function renderPackage(
     return file.async('uint8array')
   }
 
-  return { read, readBytes }
+  return {
+    read,
+    readBytes,
+  }
 }
 
 describe('compiler OOXML contracts', () => {
@@ -132,10 +135,11 @@ describe('compiler OOXML contracts', () => {
     expect(documentXml).toContain('<w:tblStyle w:val="TableGrid"/>')
     expect(documentXml).toContain('<w:tblLayout w:type="fixed"/>')
     expect(documentXml).toContain('<w:jc w:val="center"/>')
-    expect(documentXml).toContain('<w:tblW w:type="pct" w:w="60%"/>')
+    expect(documentXml).toContain('<w:tblW w:type="pct" w:w="3000"/>')
     expect(documentXml).toContain(
-      '<w:tblpPr w:tblpX="1440" w:tblpY="2880" w:horzAnchor="page" w:vertAnchor="margin"><w:tblOverlap w:val="never"/></w:tblpPr>',
+      '<w:tblpPr w:tblpX="1440" w:tblpY="2880" w:horzAnchor="page" w:vertAnchor="margin"/>',
     )
+    expect(documentXml).toContain('<w:tblOverlap w:val="never"/>')
     expect(documentXml).toContain(
       '<w:insideH w:val="dotted" w:color="94a3b8" w:sz="4"/>',
     )

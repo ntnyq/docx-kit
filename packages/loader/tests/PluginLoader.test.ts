@@ -40,7 +40,10 @@ class AuthorizedNpmLoader extends PluginLoader {
     this.events.push('manifest')
     const manifest = await authorizeManifest(TEST_MANIFEST)
     this.events.push('execute')
-    return { manifest, plugin: callout }
+    return {
+      manifest,
+      plugin: callout,
+    }
   }
 }
 

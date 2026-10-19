@@ -35,17 +35,17 @@
     "@docxkit/theme-minimal": "workspace:*",
     "@docxkit/theme-ocean": "workspace:*",
     "@docxkit/theme-warm": "workspace:*",
-    "@ntnyq/utils": "^0.22.0",
-    "acorn": "^8.18.0",
-    "docx": "^9.7.1",
+    "@ntnyq/utils": "^0.23.0",
+    "acorn": "^8.19.0",
+    "docx": "^9.15.0",
     "docx-kit": "workspace:*",
-    "monaco-editor": "^0.56.0",
+    "monaco-editor": "^0.57.0",
     "sucrase": "^3.35.1",
     "tinysaver": "^0.3.0",
-    "vue": "^3.5.42"
+    "vue": "^3.5.44"
   },
   "devDependencies": {
-    "tsx": "^4.23.13",
+    "tsx": "^4.23.15",
     "vitepress": "2.0.0-alpha.18"
   }
 }

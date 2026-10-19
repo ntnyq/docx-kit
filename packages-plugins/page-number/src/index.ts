@@ -61,9 +61,8 @@ export function pageNumberPlugin() {
       // docx's `TextRun.size` is in half-points; user-facing option is in points.
       const halfPoints = (options.fontSize ?? 10) * 2
 
-      // Per the docx library docs, `PageNumber.CURRENT` and `PageNumber.TOTAL_PAGES`
-      // must be placed inside a single `TextRun.children` array — splitting them across
-      // multiple `TextRun`s breaks the field rendering in Word.
+      // Keep text and fields in one children array so docx preserves their order
+      // and applies the same formatting when expanding fields into separate runs.
       const children: (string | typeof PageNumber.CURRENT)[] = options.showTotal
         ? ['Page ', PageNumber.CURRENT, ' of ', PageNumber.TOTAL_PAGES]
         : [PageNumber.CURRENT]

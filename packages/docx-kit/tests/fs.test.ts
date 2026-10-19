@@ -17,7 +17,9 @@ vi.mock('node:fs', async () => {
         },
       }),
   )
-  return { createWriteStream }
+  return {
+    createWriteStream,
+  }
 })
 
 // Mock docx Packer

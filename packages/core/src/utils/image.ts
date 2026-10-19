@@ -134,7 +134,10 @@ export function resolveImageDimensions(
   defaults: { height: number; width: number },
 ): { height: number; width: number } {
   if (width !== undefined && height !== undefined) {
-    return { height, width }
+    return {
+      height,
+      width,
+    }
   }
 
   const intrinsicWidth = metadata.width

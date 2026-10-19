@@ -110,7 +110,15 @@ try {
   )
   writeFileSync(
     join(temporaryRoot, 'pnpm-workspace.yaml'),
-    `${JSON.stringify({ overrides, packages: [] }, null, 2)}\n`,
+    [
+      'packages: []',
+      'overrides:',
+      ...Object.entries(overrides).map(
+        ([name, tarball]) =>
+          `  ${JSON.stringify(name)}: ${JSON.stringify(tarball)}`,
+      ),
+      '',
+    ].join('\n'),
   )
   writeFileSync(
     join(temporaryRoot, 'smoke.mjs'),

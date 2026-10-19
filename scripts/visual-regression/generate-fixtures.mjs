@@ -84,7 +84,10 @@ for (const fixture of fixtures) {
 await writeFile(
   join(outputRoot, 'manifest.json'),
   `${JSON.stringify(
-    fixtures.map(({ expectedPages, name }) => ({ expectedPages, name })),
+    fixtures.map(({ expectedPages, name }) => ({
+      expectedPages,
+      name,
+    })),
     null,
     2,
   )}\n`,

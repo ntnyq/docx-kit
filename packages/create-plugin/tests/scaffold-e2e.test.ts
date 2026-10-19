@@ -20,7 +20,7 @@ vi.mock('prompts', () => ({
 
 const repositoryRoot = path.resolve(import.meta.dirname, '../../..')
 
-function runPnpm(cwd: string, args: string[]): void {
+function runPnpm(cwd: string, args: string[]) {
   try {
     execFileSync('pnpm', args, {
       cwd,
@@ -74,6 +74,10 @@ describe('generated plugin project', () => {
       '@ntnyq/eslint-config': path.join(
         repositoryRoot,
         'node_modules/@ntnyq/eslint-config',
+      ),
+      '@typescript/native': path.join(
+        repositoryRoot,
+        'node_modules/@typescript/native',
       ),
     }
 

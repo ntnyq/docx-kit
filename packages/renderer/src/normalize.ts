@@ -48,7 +48,9 @@ export async function normalizeDocxInput(
 ): Promise<NormalizedDocx> {
   // Blob or File — pass through unchanged
   if (input instanceof Blob) {
-    return { blob: input }
+    return {
+      blob: input,
+    }
   }
 
   // ArrayBuffer — wrap in a Blob
@@ -97,7 +99,9 @@ async function fetchDocxFromUrl(
       )
     }
     const blob = await response.blob()
-    return { blob }
+    return {
+      blob,
+    }
   } catch (error) {
     // Re-throw AbortError as-is so callers can distinguish cancellation
     if (error instanceof Error && error.name === 'AbortError') {

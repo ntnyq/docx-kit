@@ -20,5 +20,8 @@ export function loadInlinePlugin(plugin: DocxPlugin): {
   manifest: null
   plugin: DocxPlugin
 } {
-  return { manifest: null, plugin }
+  return {
+    manifest: null,
+    plugin,
+  }
 }

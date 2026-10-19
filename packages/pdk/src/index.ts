@@ -79,7 +79,7 @@ export function assertRendersChildType(
   result: unknown,
   ExpectedCtor: DocxConstructor,
   count?: number,
-): void {
+) {
   const results = Array.isArray(result) ? result : [result]
 
   const matches = results.filter(item => item instanceof ExpectedCtor)
@@ -110,10 +110,7 @@ export function assertRendersChildType(
  * @param expectedText - — If provided, checks paragraph text content
  * @throws {DocxKitError} if the result does not contain a matching paragraph
  */
-export function assertRendersParagraph(
-  result: unknown,
-  expectedText?: string,
-): void {
+export function assertRendersParagraph(result: unknown, expectedText?: string) {
   const results = Array.isArray(result) ? result : [result]
 
   if (results.length === 0) {

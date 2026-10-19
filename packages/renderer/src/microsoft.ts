@@ -33,7 +33,7 @@ export function createMicrosoftIframe(
   container: HTMLElement,
   url: string,
   options: DocxPreviewOptions,
-): void {
+) {
   container.innerHTML = ''
 
   const baseUrl = options.microsoftViewerUrl ?? DEFAULT_MICROSOFT_VIEWER_URL

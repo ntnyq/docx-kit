@@ -31,6 +31,6 @@
     "@docxkit/core": "workspace:*",
     "@docxkit/loader": "workspace:*",
     "@types/prompts": "^2.4.9",
-    "tsdown": "^0.22.14"
+    "tsdown": "^0.23.3"
   }
 }

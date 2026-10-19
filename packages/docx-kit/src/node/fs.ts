@@ -26,10 +26,7 @@ import type { Document } from 'docx'
  * await saveDocument(doc, 'report.docx')
  * ```
  */
-export async function saveDocument(
-  doc: Document,
-  filename: string,
-): Promise<void> {
+export async function saveDocument(doc: Document, filename: string) {
   const [{ createWriteStream }, { pipeline }] = await Promise.all([
     import('node:fs'),
     import('node:stream/promises'),

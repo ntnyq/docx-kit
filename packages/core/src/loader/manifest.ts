@@ -176,7 +176,7 @@ export function validateManifest(json: unknown): PluginManifest {
 
 // ---------- Internal validation helpers ----------
 
-function assertRange(range: string, field: string): void {
+function assertRange(range: string, field: string) {
   if (!isValidRange(range)) {
     throw new DocxKitError(
       'MANIFEST_INVALID',
@@ -185,7 +185,7 @@ function assertRange(range: string, field: string): void {
   }
 }
 
-function assertRelativePath(path: string, field: string): void {
+function assertRelativePath(path: string, field: string) {
   const normalized = path.replaceAll('\\', '/')
   const segments = normalized.split('/')
 
@@ -201,7 +201,7 @@ function assertRelativePath(path: string, field: string): void {
   }
 }
 
-function assertSemver(version: string, field: string): void {
+function assertSemver(version: string, field: string) {
   if (!SEMVER_RE.test(version)) {
     throw new DocxKitError(
       'MANIFEST_INVALID',

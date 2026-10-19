@@ -174,7 +174,7 @@ export async function createDocument(
   }
 }
 
-function assertInsideDirectory(directory: string, target: string): void {
+function assertInsideDirectory(directory: string, target: string) {
   const relativePath = path.relative(directory, target)
   if (
     relativePath === '..'
