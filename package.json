@@ -2,7 +2,7 @@
   "name": "docx-kit",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.16.1",
   "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
   "license": "MIT",
   "scripts": {
@@ -43,7 +43,7 @@
     "@docxkit/core": "workspace:*",
     "@ntnyq/eslint-config": "^7.0.0-beta.28",
     "@ntnyq/prettier-config": "^3.1.0",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/pngjs": "^6.0.5",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitejs/plugin-vue": "^6.0.10",

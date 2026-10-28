@@ -9,6 +9,9 @@
     "source.organizeImports": "never",
     "source.sortImports": "never"
   },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
   "eslint.validate": [
     "vue",
     "yaml",
@@ -42,6 +45,7 @@
     "OOXML",
     "pnpm",
     "qrcode",
+    "reka",
     "rels",
     "Segoe",
     "tsdown",
@@ -54,6 +58,7 @@
     "vite",
     "vitepress",
     "vitest",
+    "vueuse",
     "wordprocessingml",
     "xlarge"
   ],
