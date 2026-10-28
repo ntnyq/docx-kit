@@ -6,11 +6,11 @@ import { pathToFileURL } from 'node:url'
 import JSZip from 'jszip'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createDocx as createCoreDocx } from '../../core/src/builder/createDocx'
-import { createDocx, renderDocx } from '../src/node'
+import { createDocx, figurePlugin, renderDocx } from '../src/node'
 
 const png = Uint8Array.from(
   Buffer.from(
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=',
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
     'base64',
   ),
 )
@@ -46,6 +46,16 @@ describe('image path adapters', () => {
       const source = isFileURL ? pathToFileURL(filename).href : filename
       const documents = [
         createDocx().image({ data: source }),
+        createDocx()
+          .use(figurePlugin())
+          .plugin('figure', { caption: 'Local figure', data: source }),
+        (
+          await renderDocx({
+            content: [
+              { name: 'figure', options: { data: source }, type: 'plugin' },
+            ],
+          })
+        ).use(figurePlugin()),
         await renderDocx({
           content: [
             { children: [{ data: source, type: 'image' }], type: 'paragraph' },

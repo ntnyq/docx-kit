@@ -57,6 +57,9 @@ describe('buildFreeformPrompt', () => {
     expect(prompt).toContain('coverPage')
     expect(prompt).toContain('callout')
     expect(prompt).toContain('qrcode')
+    expect(prompt).toContain('checklist')
+    expect(prompt).toContain('figure')
+    expect(prompt).toContain('metricCard')
   })
 
   it('includes user context when provided', () => {
@@ -94,6 +97,9 @@ describe('generateSchemaGuide', () => {
     expect(guide).toContain('barcode')
     expect(guide).toContain('callout')
     expect(guide).toContain('qrcode')
+    expect(guide).toContain('checklist')
+    expect(guide).toContain('figure')
+    expect(guide).toContain('metricCard')
     expect(guide).toContain('watermark')
     expect(guide).toContain('echarts')
   })

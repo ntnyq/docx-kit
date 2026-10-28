@@ -46,6 +46,9 @@ This page is the package-level map of the current docx-kit monorepo. It compleme
 | `@docxkit/plugin-page-number` | Page number fields |
 | `@docxkit/plugin-property-table` | Key-value tables |
 | `@docxkit/plugin-qrcode` | QR codes |
+| `@docxkit/plugin-checklist` | Grouped native Word checkboxes |
+| `@docxkit/plugin-figure` | Images with captions and source credits |
+| `@docxkit/plugin-metric-card` | Multi-column metric summaries |
 | `@docxkit/plugin-signature-block` | Approval and signature layouts |
 | `@docxkit/plugin-timeline` | Milestone timelines |
 | `@docxkit/plugin-toc` | Table of contents fields |

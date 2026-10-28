@@ -1,7 +1,7 @@
 import { unindent } from '@ntnyq/utils'
 
 /**
- * Plugins playground preset — showcases all 19 built-in plugins.
+ * Plugins playground preset — showcases all 22 built-in plugins.
  *
  * Plugin list:
  *   1. badge          — short status labels
@@ -23,6 +23,9 @@ import { unindent } from '@ntnyq/utils'
  *  17. timeline       — chronological timeline table
  *  18. toc            — Word table of contents field
  *  19. watermark      — text watermark for branding
+ *  20. checklist      — grouped Word checkbox tasks
+ *  21. figure         — image with caption and source
+ *  22. metricCard     — metric summary grid
  */
 export const PLUGIN_CODE = unindent(`
   import {
@@ -31,6 +34,9 @@ export const PLUGIN_CODE = unindent(`
     barcodePlugin,
     calloutPlugin,
     changelogPlugin,
+    checklistPlugin,
+    figurePlugin,
+    metricCardPlugin,
     codeBlockPlugin,
     coverPagePlugin,
     dataTablePlugin,
@@ -57,6 +63,9 @@ export const PLUGIN_CODE = unindent(`
     .use(barcodePlugin())
     .use(calloutPlugin())
     .use(changelogPlugin())
+    .use(checklistPlugin())
+    .use(figurePlugin())
+    .use(metricCardPlugin())
     .use(codeBlockPlugin())
     .use(coverPagePlugin())
     .use(dataTablePlugin())
@@ -78,7 +87,7 @@ export const PLUGIN_CODE = unindent(`
   // ════════════════════════════════════════════════════════════
   doc.plugin('coverPage', {
     title: 'docx-kit Built-in Plugins',
-    subtitle: 'All 19 plugins in one document',
+    subtitle: 'All 22 plugins in one document',
     author: 'Playground',
     date: new Date().toISOString().slice(0, 10),
     organization: 'docx-kit',
@@ -313,6 +322,35 @@ export const PLUGIN_CODE = unindent(`
     .h1('17. Table of Contents')
     .p('Open the generated file in Word and update fields to refresh page numbers.')
     .plugin('toc', { title: 'Document Contents', maxLevel: 2 })
+
+  doc
+    .h1('18. Checklist')
+    .plugin('checklist', {
+      title: 'Release tasks',
+      items: [
+        { text: 'Review changes', checked: true, owner: 'Alice', group: 'Before release' },
+        { text: 'Run acceptance tests', owner: 'Bob', note: 'Attach the test report', group: 'Before release' },
+        { text: 'Monitor errors', group: 'After release' },
+      ],
+    })
+    .h1('19. Figure')
+    .plugin('figure', {
+      data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      width: 120,
+      alt: 'Sample color swatch',
+      caption: 'Figure 1. Sample image',
+      source: 'Source: Built-in playground sample',
+    })
+    .h1('20. Metric Card')
+    .plugin('metricCard', {
+      columns: 3,
+      items: [
+        { label: 'Revenue', value: '128,000', unit: 'USD', trend: 'up', change: '+12%' },
+        { label: 'Active users', value: 4200, trend: 'down', change: '-3%' },
+        { label: 'Uptime', value: 99.9, unit: '%', trend: 'neutral', change: 'Unchanged' },
+        { label: 'Incidents', value: 0 },
+      ],
+    })
 
   doc.toBlob()
 `)

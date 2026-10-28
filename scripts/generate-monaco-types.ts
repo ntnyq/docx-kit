@@ -38,6 +38,12 @@ const WORKSPACE_MODULES = [
   ['docx-kit', 'packages/docx-kit/dist/browser.d.ts'],
   ['@docxkit/core', 'packages/core/dist/index.d.ts'],
   ['@docxkit/plugin-badge', 'packages-plugins/badge/dist/index.d.ts'],
+  ['@docxkit/plugin-checklist', 'packages-plugins/checklist/dist/index.d.ts'],
+  ['@docxkit/plugin-figure', 'packages-plugins/figure/dist/index.d.ts'],
+  [
+    '@docxkit/plugin-metric-card',
+    'packages-plugins/metric-card/dist/index.d.ts',
+  ],
   ['@docxkit/plugin-barcode', 'packages-plugins/barcode/dist/index.d.ts'],
   ['@docxkit/plugin-callout', 'packages-plugins/callout/dist/index.d.ts'],
   ['@docxkit/plugin-changelog', 'packages-plugins/changelog/dist/index.d.ts'],

@@ -1,6 +1,6 @@
 # 外掛總覽
 
-目前共有 **19 個內建外掛**，每個外掛都對應一個獨立 package 與一個獨立文件頁。
+目前共有 **22 個內建外掛**，每個外掛都對應一個獨立 package 與一個獨立文件頁。
 
 | 外掛 | 節點名 | 套件名 | 說明 |
 | --- | --- | --- | --- |
@@ -19,6 +19,9 @@
 | [Page Number](./page-number) | `pageNumber` | `@docxkit/plugin-page-number` | 頁碼 |
 | [Property Table](./property-table) | `propertyTable` | `@docxkit/plugin-property-table` | 屬性表 |
 | [QR Code](./qrcode) | `qrcode` | `@docxkit/plugin-qrcode` | QR Code |
+| [Checklist](./checklist) | `checklist` | `@docxkit/plugin-checklist` | 分組工作清單 |
+| [Figure](./figure) | `figure` | `@docxkit/plugin-figure` | 圖片、圖說與來源 |
+| [Metric Card](./metric-card) | `metricCard` | `@docxkit/plugin-metric-card` | 多欄指標摘要 |
 | [Signature Block](./signature-block) | `signatureBlock` | `@docxkit/plugin-signature-block` | 簽署區塊 |
 | [Timeline](./timeline) | `timeline` | `@docxkit/plugin-timeline` | 時間線 |
 | [TOC](./toc) | `toc` | `@docxkit/plugin-toc` | 目錄欄位 |

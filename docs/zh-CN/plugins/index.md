@@ -1,6 +1,6 @@
 # 插件总览
 
-当前共有 **19 个内置插件**，每个插件都对应一个独立 package 与一个独立文档页。
+当前共有 **22 个内置插件**，每个插件都对应一个独立 package 与一个独立文档页。
 
 | 插件 | 节点名 | 包名 | 说明 |
 | --- | --- | --- | --- |
@@ -19,6 +19,9 @@
 | [Page Number](./page-number) | `pageNumber` | `@docxkit/plugin-page-number` | 页码 |
 | [Property Table](./property-table) | `propertyTable` | `@docxkit/plugin-property-table` | 属性表 |
 | [QR Code](./qrcode) | `qrcode` | `@docxkit/plugin-qrcode` | 二维码 |
+| [Checklist](./checklist) | `checklist` | `@docxkit/plugin-checklist` | 分组任务清单 |
+| [Figure](./figure) | `figure` | `@docxkit/plugin-figure` | 图片、题注与来源 |
+| [Metric Card](./metric-card) | `metricCard` | `@docxkit/plugin-metric-card` | 多列指标摘要 |
 | [Signature Block](./signature-block) | `signatureBlock` | `@docxkit/plugin-signature-block` | 签署区块 |
 | [Timeline](./timeline) | `timeline` | `@docxkit/plugin-timeline` | 时间线 |
 | [TOC](./toc) | `toc` | `@docxkit/plugin-toc` | 目录字段 |

@@ -23,7 +23,7 @@ features:
     title: CSS 風格樣式
     details: "直接使用 `fontSize`、`color`、`margin`、`border` 等熟悉屬性來描述文件樣式。"
   - icon: 🧩
-    title: 19 個內建外掛
+    title: 22 個內建外掛
     details: "涵蓋 badge、barcode、callout、changelog、invoice、toc、watermark 等常見文件模組。"
   - icon: 📦
     title: 完整 monorepo 文件

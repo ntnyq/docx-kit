@@ -23,7 +23,7 @@ features:
     title: CSS 风格样式
     details: "直接使用 `fontSize`、`color`、`margin`、`border` 等熟悉的属性组织文档样式。"
   - icon: 🧩
-    title: 19 个内置插件
+    title: 22 个内置插件
     details: "覆盖 badge、barcode、callout、changelog、invoice、toc、watermark 等常见文档模块。"
   - icon: 📦
     title: 完整 monorepo 文档

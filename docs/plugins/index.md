@@ -1,6 +1,6 @@
 # Plugins
 
-docx-kit currently ships with **19 built-in plugins**. Each plugin lives in its own workspace package under `packages-plugins/`, can be registered with `.use(...)`, and is invoked through `.plugin(name, options)`.
+docx-kit currently ships with **22 built-in plugins**. Each plugin lives in its own workspace package under `packages-plugins/`, can be registered with `.use(...)`, and is invoked through `.plugin(name, options)`.
 
 ## Catalog
 
@@ -21,6 +21,9 @@ docx-kit currently ships with **19 built-in plugins**. Each plugin lives in its 
 | [Page Number](./page-number) | `@docxkit/plugin-page-number` | `pageNumber` | Current page or page X of Y fields |
 | [Property Table](./property-table) | `@docxkit/plugin-property-table` | `propertyTable` | Key-value metadata tables |
 | [QR Code](./qrcode) | `@docxkit/plugin-qrcode` | `qrcode` | QR code images from text or URLs |
+| [Checklist](./checklist) | `@docxkit/plugin-checklist` | `checklist` | Grouped native Word checkboxes |
+| [Figure](./figure) | `@docxkit/plugin-figure` | `figure` | Images with captions and source credits |
+| [Metric Card](./metric-card) | `@docxkit/plugin-metric-card` | `metricCard` | Multi-column metric summaries |
 | [Signature Block](./signature-block) | `@docxkit/plugin-signature-block` | `signatureBlock` | Signature grids for approvals and contracts |
 | [Timeline](./timeline) | `@docxkit/plugin-timeline` | `timeline` | Chronological milestone rendering |
 | [Table of Contents](./toc) | `@docxkit/plugin-toc` | `toc` | Word TOC fields based on headings |

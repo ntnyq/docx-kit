@@ -35,7 +35,7 @@ Create a new .docx document from a docx-kit JSON schema.
 
 **Returns:** The created file's absolute `filePath` and byte `size`.
 
-The 18 Node-compatible built-in plugins are registered automatically. ECharts
+The 21 Node-compatible built-in plugins are registered automatically. ECharts
 requires a browser and is not included in `list_plugins`. External plugin sources
 still require an explicitly configured `pluginLoader`.
 

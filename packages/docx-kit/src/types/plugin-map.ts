@@ -9,14 +9,17 @@ import type { BadgeOptions } from '@docxkit/plugin-badge'
 import type { BarcodeOptions } from '@docxkit/plugin-barcode'
 import type { CalloutOptions } from '@docxkit/plugin-callout'
 import type { ChangelogOptions } from '@docxkit/plugin-changelog'
+import type { ChecklistOptions } from '@docxkit/plugin-checklist'
 import type { CodeBlockOptions } from '@docxkit/plugin-code-block'
 import type { CoverPageOptions } from '@docxkit/plugin-cover-page'
 import type { DataTableOptions } from '@docxkit/plugin-data-table'
 import type { DividerOptions } from '@docxkit/plugin-divider'
 import type { EChartsPluginOptions } from '@docxkit/plugin-echarts'
+import type { FigureOptions } from '@docxkit/plugin-figure'
 import type { InvoiceOptions } from '@docxkit/plugin-invoice'
 import type { LetterheadOptions } from '@docxkit/plugin-letterhead'
 import type { MeetingMinutesOptions } from '@docxkit/plugin-meeting-minutes'
+import type { MetricCardOptions } from '@docxkit/plugin-metric-card'
 import type { PageNumberOptions } from '@docxkit/plugin-page-number'
 import type { PropertyTableOptions } from '@docxkit/plugin-property-table'
 import type { QRCodePluginOptions } from '@docxkit/plugin-qrcode'
@@ -31,14 +34,17 @@ declare module '@docxkit/core' {
     barcode: BarcodeOptions
     callout: CalloutOptions
     changelog: ChangelogOptions
+    checklist: ChecklistOptions
     codeBlock: CodeBlockOptions
     coverPage: CoverPageOptions
     dataTable: DataTableOptions
     divider: DividerOptions
     echarts: EChartsPluginOptions
+    figure: FigureOptions
     invoice: InvoiceOptions
     letterhead: LetterheadOptions
     meetingMinutes: MeetingMinutesOptions
+    metricCard: MetricCardOptions
     pageNumber: PageNumberOptions
     propertyTable: PropertyTableOptions
     qrcode: QRCodePluginOptions

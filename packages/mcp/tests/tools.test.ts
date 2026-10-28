@@ -19,6 +19,8 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { runInNewContext } from 'node:vm'
 import { createPluginLoader } from '@docxkit/core'
+import JSZip from 'jszip'
+import { PNG } from 'pngjs'
 import { describe, expect, it } from 'vitest'
 import { BUILTIN_PLUGIN_CATALOG } from '../src/plugins/catalog'
 import { docxSchemaResource } from '../src/resources/schema'
@@ -282,6 +284,12 @@ describe('createDocument', () => {
           { outputDirectory: directory },
         )
         expect(result.size).toBeGreaterThan(0)
+        const archive = await JSZip.loadAsync(await readFile(result.filePath))
+        for (const image of archive.file(/word\/media\/.*\.png$/)) {
+          expect(
+            PNG.sync.read(await image.async('nodebuffer')).width,
+          ).toBeGreaterThan(0)
+        }
       } finally {
         await rm(directory, { force: true, recursive: true })
       }
@@ -492,7 +500,7 @@ describe('buildPluginInfoList', () => {
   it('lists only built-in plugins available in Node.js', () => {
     const info = buildBuiltinPluginInfoList()
 
-    expect(info).toHaveLength(18)
+    expect(info).toHaveLength(21)
     expect(info.map(plugin => plugin.name)).not.toContain('echarts')
     expect(info.map(plugin => plugin.name)).toContain('signatureBlock')
     expect(info.map(plugin => plugin.name)).toContain('watermark')

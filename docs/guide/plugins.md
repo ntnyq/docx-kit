@@ -24,12 +24,12 @@ const doc = createDocx()
 
 ## Built-in Coverage
 
-docx-kit now includes **19 built-in plugins** across the workspace:
+docx-kit now includes **22 built-in plugins** across the workspace:
 
-- Content blocks: `badge`, `callout`, `codeBlock`, `divider`, `watermark`
+- Content blocks: `badge`, `callout`, `checklist`, `codeBlock`, `divider`, `watermark`
 - Report scaffolding: `coverPage`, `letterhead`, `toc`, `pageNumber`
-- Structured business data: `dataTable`, `propertyTable`, `timeline`, `invoice`, `meetingMinutes`, `changelog`
-- Media and embeds: `barcode`, `echarts`, `qrcode`
+- Structured business data: `dataTable`, `metricCard`, `propertyTable`, `timeline`, `invoice`, `meetingMinutes`, `changelog`
+- Media and embeds: `barcode`, `echarts`, `figure`, `qrcode`
 - Approval workflows: `signatureBlock`
 
 The full reference lives in the [Plugins section](/plugins/).
@@ -44,14 +44,17 @@ packages-plugins/
   barcode/
   callout/
   changelog/
+  checklist/
   code-block/
   cover-page/
   data-table/
   divider/
   echarts/
+  figure/
   invoice/
   letterhead/
   meeting-minutes/
+  metric-card/
   page-number/
   property-table/
   qrcode/

@@ -75,7 +75,7 @@ doc.use(myPlugin).plugin('myPlugin', { text: 'Aligned label' }, {
 
 ## Built-in Plugin Option Types
 
-All 19 built-in plugins and their option types.
+All 22 built-in plugins and their option types.
 
 ### `BadgeOptions`
 
@@ -131,6 +131,23 @@ interface ChangelogEntry {
   date: string
   type: 'added' | 'changed' | 'fixed' | 'removed'
   version: string
+}
+```
+
+### `ChecklistOptions`
+
+```ts
+interface ChecklistOptions {
+  items: ChecklistItem[]
+  title?: string
+}
+
+interface ChecklistItem {
+  text: string
+  checked?: boolean // default: false; native Word checkbox
+  group?: string // heading on each group change; preserves input order
+  note?: string
+  owner?: string
 }
 ```
 
@@ -201,6 +218,23 @@ interface EChartsPluginOptions {
 
 > ECharts requires the `echarts` peer dependency. Works in browser environments; Node.js needs a server-side canvas.
 
+### `FigureOptions`
+
+```ts
+interface FigureOptions {
+  data: string | ArrayBuffer | Blob | Uint8Array
+  alignment?: 'center' | 'left' | 'right' // default: center
+  alt?: string
+  caption?: string // literal text; no automatic numbering
+  height?: UnitValue
+  imageType?: 'bmp' | 'gif' | 'jpeg' | 'jpg' | 'png'
+  source?: string // literal credit; no prefix added
+  width?: UnitValue
+}
+```
+
+> Image input and sizing follow the core image compiler. File paths require `docx-kit/node` or `config.resolveImage`; URLs require an explicit resolver.
+
 ### `InvoiceOptions`
 
 ```ts
@@ -259,6 +293,25 @@ interface AgendaItem {
   owner?: string
 }
 ```
+
+### `MetricCardOptions`
+
+```ts
+interface MetricCardOptions {
+  items: MetricItem[]
+  columns?: number // positive safe integer, default: 3
+}
+
+interface MetricItem {
+  label: string
+  value: number | string // displayed verbatim, including zero
+  change?: string
+  trend?: 'down' | 'neutral' | 'up'
+  unit?: string
+}
+```
+
+> `change` and `trend` work independently. The final row is padded; empty input renders a placeholder.
 
 ### `PageNumberOptions`
 
@@ -371,6 +424,9 @@ interface WatermarkOptions {
 | `pageNumberPlugin`     | `pageNumber`     | Paragraph                    | No     | —                         |
 | `propertyTablePlugin`  | `propertyTable`  | Table                        | No     | —                         |
 | `qrcodePlugin`         | `qrcode`         | Paragraph(s)                 | Yes    | `qrcode`                  |
+| `checklistPlugin`     | `checklist`      | Paragraph[]                  | No     | —                         |
+| `figurePlugin`        | `figure`         | Paragraph[]                  | Yes    | —                         |
+| `metricCardPlugin`    | `metricCard`     | Table or Paragraph           | No     | —                         |
 | `signatureBlockPlugin` | `signatureBlock` | Table                        | No     | —                         |
 | `timelinePlugin`       | `timeline`       | Table                        | No     | —                         |
 | `tocPlugin`            | `toc`            | [Paragraph, TableOfContents] | No     | —                         |

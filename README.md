@@ -28,7 +28,7 @@ Built on [docx](https://github.com/dolanmiu/docx).
 
 - **CSS-like styling** — `fontSize`, `color`, `margin`, `border`... just like CSS
 - **Fluent builder API** — `.h1()` `.p()` `.table()` `.image()` `.use().plugin()`
-- **19 built-in plugins** — Barcodes, QR codes, ECharts, code blocks, invoices, TOCs, and more
+- **22 built-in plugins** — Barcodes, QR codes, ECharts, code blocks, invoices, TOCs, and more
 - **Style presets** — `classic` (gov-doc), `modern` (business), `academic` (thesis)
 - **Themes** — `minimal`, `ocean`, `warm` with token system (`$colors.primary`)
 - **JSON DSL** — `renderDocx()` for AI/LLM-driven document generation
@@ -81,7 +81,7 @@ await doc.save('output.docx') // Node.js entry
 
 ## Plugins
 
-19 built-in plugins: Badge, Barcode, Callout, Changelog, Code Block, Cover Page, Data Table, Divider, ECharts, Invoice, Letterhead, Meeting Minutes, Page Number, Property Table, QR Code, Signature Block, Timeline, TOC, Watermark.
+22 built-in plugins: Badge, Barcode, Callout, Changelog, Checklist, Code Block, Cover Page, Data Table, Divider, ECharts, Figure, Invoice, Letterhead, Meeting Minutes, Metric Card, Page Number, Property Table, QR Code, Signature Block, Timeline, TOC, Watermark.
 
 → [Plugin Documentation](https://docx-kit.ntnyq.dev/plugins/)
 

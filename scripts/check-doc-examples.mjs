@@ -13,6 +13,9 @@ const documentationRoots = [
 
 const pluginFactories = [
   'badgePlugin',
+  'checklistPlugin',
+  'figurePlugin',
+  'metricCardPlugin',
   'calloutPlugin',
   'changelogPlugin',
   'codeBlockPlugin',

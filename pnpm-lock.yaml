@@ -256,6 +256,9 @@ importers:
       '@docxkit/plugin-changelog':
         specifier: workspace:*
         version: link:../packages-plugins/changelog
+      '@docxkit/plugin-checklist':
+        specifier: workspace:*
+        version: link:../packages-plugins/checklist
       '@docxkit/plugin-code-block':
         specifier: workspace:*
         version: link:../packages-plugins/code-block
@@ -271,6 +274,9 @@ importers:
       '@docxkit/plugin-echarts':
         specifier: workspace:*
         version: link:../packages-plugins/echarts
+      '@docxkit/plugin-figure':
+        specifier: workspace:*
+        version: link:../packages-plugins/figure
       '@docxkit/plugin-invoice':
         specifier: workspace:*
         version: link:../packages-plugins/invoice
@@ -280,6 +286,9 @@ importers:
       '@docxkit/plugin-meeting-minutes':
         specifier: workspace:*
         version: link:../packages-plugins/meeting-minutes
+      '@docxkit/plugin-metric-card':
+        specifier: workspace:*
+        version: link:../packages-plugins/metric-card
       '@docxkit/plugin-page-number':
         specifier: workspace:*
         version: link:../packages-plugins/page-number
@@ -412,6 +421,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/pdk
 
+  packages-plugins/checklist:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.15.0
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
   packages-plugins/code-block:
     dependencies:
       '@docxkit/core':
@@ -486,6 +508,19 @@ importers:
         specifier: workspace:*
         version: link:../../packages/pdk
 
+  packages-plugins/figure:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.15.0
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
   packages-plugins/invoice:
     dependencies:
       '@docxkit/core':
@@ -513,6 +548,19 @@ importers:
         version: link:../../packages/pdk
 
   packages-plugins/meeting-minutes:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.7.1
+        version: 9.15.0
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+
+  packages-plugins/metric-card:
     dependencies:
       '@docxkit/core':
         specifier: workspace:*
@@ -728,6 +776,9 @@ importers:
       '@docxkit/plugin-changelog':
         specifier: workspace:*
         version: link:../../packages-plugins/changelog
+      '@docxkit/plugin-checklist':
+        specifier: workspace:*
+        version: link:../../packages-plugins/checklist
       '@docxkit/plugin-code-block':
         specifier: workspace:*
         version: link:../../packages-plugins/code-block
@@ -743,6 +794,9 @@ importers:
       '@docxkit/plugin-echarts':
         specifier: workspace:*
         version: link:../../packages-plugins/echarts
+      '@docxkit/plugin-figure':
+        specifier: workspace:*
+        version: link:../../packages-plugins/figure
       '@docxkit/plugin-invoice':
         specifier: workspace:*
         version: link:../../packages-plugins/invoice
@@ -752,6 +806,9 @@ importers:
       '@docxkit/plugin-meeting-minutes':
         specifier: workspace:*
         version: link:../../packages-plugins/meeting-minutes
+      '@docxkit/plugin-metric-card':
+        specifier: workspace:*
+        version: link:../../packages-plugins/metric-card
       '@docxkit/plugin-page-number':
         specifier: workspace:*
         version: link:../../packages-plugins/page-number
@@ -830,6 +887,9 @@ importers:
       '@docxkit/plugin-changelog':
         specifier: workspace:*
         version: link:../../packages-plugins/changelog
+      '@docxkit/plugin-checklist':
+        specifier: workspace:*
+        version: link:../../packages-plugins/checklist
       '@docxkit/plugin-code-block':
         specifier: workspace:*
         version: link:../../packages-plugins/code-block
@@ -842,6 +902,9 @@ importers:
       '@docxkit/plugin-divider':
         specifier: workspace:*
         version: link:../../packages-plugins/divider
+      '@docxkit/plugin-figure':
+        specifier: workspace:*
+        version: link:../../packages-plugins/figure
       '@docxkit/plugin-invoice':
         specifier: workspace:*
         version: link:../../packages-plugins/invoice
@@ -851,6 +914,9 @@ importers:
       '@docxkit/plugin-meeting-minutes':
         specifier: workspace:*
         version: link:../../packages-plugins/meeting-minutes
+      '@docxkit/plugin-metric-card':
+        specifier: workspace:*
+        version: link:../../packages-plugins/metric-card
       '@docxkit/plugin-page-number':
         specifier: workspace:*
         version: link:../../packages-plugins/page-number

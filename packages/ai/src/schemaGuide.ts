@@ -97,6 +97,21 @@ export function generateSchemaGuide(): string {
 
   const pluginDescriptions: [string, string, string][] = [
     [
+      'checklist',
+      'Grouped Word checkbox tasks',
+      '{ items: [{ text: string, checked?: boolean, owner?: string, note?: string, group?: string }], title?: string }',
+    ],
+    [
+      'figure',
+      'Image with caption and source credit',
+      '{ data: string, caption?: string, source?: string, alt?: string, width?: number | string, height?: number | string, alignment?: "center" | "left" | "right" }',
+    ],
+    [
+      'metricCard',
+      'Multi-column metric summary grid',
+      '{ items: [{ label: string, value: number | string, unit?: string, change?: string, trend?: "up" | "down" | "neutral" }], columns?: number }',
+    ],
+    [
       'barcode',
       'Linear barcode generation',
       '{ text: string, format?: string, width?: number }',

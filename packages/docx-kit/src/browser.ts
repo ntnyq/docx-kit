@@ -52,6 +52,7 @@ export { tocPlugin } from '@docxkit/plugin-toc'
 export { badgePlugin } from '@docxkit/plugin-badge'
 // ---------- Browser-specific APIs ----------
 export { normalizeImageData } from './browser/index'
+export { figurePlugin } from '@docxkit/plugin-figure'
 export { qrcodePlugin } from '@docxkit/plugin-qrcode'
 export { barcodePlugin } from '@docxkit/plugin-barcode'
 export { calloutPlugin } from '@docxkit/plugin-callout'
@@ -60,11 +61,13 @@ export { echartsPlugin } from '@docxkit/plugin-echarts'
 export { invoicePlugin } from '@docxkit/plugin-invoice'
 export { timelinePlugin } from '@docxkit/plugin-timeline'
 export { changelogPlugin } from '@docxkit/plugin-changelog'
+export { checklistPlugin } from '@docxkit/plugin-checklist'
 export { watermarkPlugin } from '@docxkit/plugin-watermark'
 export { codeBlockPlugin } from '@docxkit/plugin-code-block'
 export { coverPagePlugin } from '@docxkit/plugin-cover-page'
 export { dataTablePlugin } from '@docxkit/plugin-data-table'
 export { letterheadPlugin } from '@docxkit/plugin-letterhead'
+export { metricCardPlugin } from '@docxkit/plugin-metric-card'
 export { pageNumberPlugin } from '@docxkit/plugin-page-number'
 export { propertyTablePlugin } from '@docxkit/plugin-property-table'
 export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
@@ -74,6 +77,7 @@ export { createDocxPreview, PREVIEW_ERROR_CODES } from '@docxkit/renderer'
 export type { TocOptions } from '@docxkit/plugin-toc'
 // ---------- Plugin option types ----------
 export type { BadgeOptions } from '@docxkit/plugin-badge'
+export type { FigureOptions } from '@docxkit/plugin-figure'
 export type { CalloutOptions } from '@docxkit/plugin-callout'
 export type { DividerOptions } from '@docxkit/plugin-divider'
 export type { QRCodePluginOptions } from '@docxkit/plugin-qrcode'
@@ -85,41 +89,14 @@ export type { LetterheadOptions } from '@docxkit/plugin-letterhead'
 export type { PageNumberOptions } from '@docxkit/plugin-page-number'
 export type { BarcodeFormat, BarcodeOptions } from '@docxkit/plugin-barcode'
 export type { TimelineEvent, TimelineOptions } from '@docxkit/plugin-timeline'
+
+export type { ChecklistItem, ChecklistOptions } from '@docxkit/plugin-checklist'
+
+export type { MetricCardOptions, MetricItem } from '@docxkit/plugin-metric-card'
 export type {
   ChangelogEntry,
   ChangelogOptions,
 } from '@docxkit/plugin-changelog'
-export type {
-  AgendaItem,
-  MeetingMinutesOptions,
-} from '@docxkit/plugin-meeting-minutes'
-export type {
-  PropertyItem,
-  PropertyTableOptions,
-} from '@docxkit/plugin-property-table'
-export type {
-  ColAlign,
-  ColFormat,
-  DataTableOptions,
-} from '@docxkit/plugin-data-table'
-
-export type {
-  SignatureBlockOptions,
-  SignatureParty,
-} from '@docxkit/plugin-signature-block'
-
-export type {
-  InvoiceLineItem,
-  InvoiceOptions,
-  InvoiceParty,
-} from '@docxkit/plugin-invoice'
-export type {
-  DocxInput,
-  DocxPreview,
-  DocxPreviewOptions,
-  PreviewErrorCode,
-  RendererKind,
-} from '@docxkit/renderer'
 
 export { academicPreset, classicPreset, modernPreset }
 
@@ -180,3 +157,33 @@ export const THEME_LIST: readonly DocxTheme[] = [
 export function useTheme(id: string): DocxTheme | undefined {
   return BUILTIN_THEMES.get(id)
 }
+
+export type {
+  AgendaItem,
+  MeetingMinutesOptions,
+} from '@docxkit/plugin-meeting-minutes'
+export type {
+  PropertyItem,
+  PropertyTableOptions,
+} from '@docxkit/plugin-property-table'
+export type {
+  ColAlign,
+  ColFormat,
+  DataTableOptions,
+} from '@docxkit/plugin-data-table'
+export type {
+  SignatureBlockOptions,
+  SignatureParty,
+} from '@docxkit/plugin-signature-block'
+export type {
+  InvoiceLineItem,
+  InvoiceOptions,
+  InvoiceParty,
+} from '@docxkit/plugin-invoice'
+export type {
+  DocxInput,
+  DocxPreview,
+  DocxPreviewOptions,
+  PreviewErrorCode,
+  RendererKind,
+} from '@docxkit/renderer'
