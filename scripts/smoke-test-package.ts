@@ -21,6 +21,12 @@ const packageRoots = [
 const temporaryRoot = mkdtempSync(join(tmpdir(), 'docx-kit-package-smoke-'))
 const tarballDirectory = join(temporaryRoot, 'tarballs')
 
+interface PackageManifest {
+  name: string
+  peerDependencies?: Record<string, string>
+  private?: boolean
+}
+
 function collectPackages() {
   return packageRoots.flatMap(packageRoot => {
     const absoluteRoot = join(repositoryRoot, packageRoot)
@@ -32,15 +38,17 @@ function collectPackages() {
       )
       .map(packageDirectory => ({
         directory: packageDirectory,
-        manifest: JSON.parse(
-          readFileSync(join(packageDirectory, 'package.json'), 'utf8'),
-        ),
+        manifest: readPackageManifest(packageDirectory),
       }))
       .filter(pkg => !pkg.manifest.private)
   })
 }
 
-function run(command, args, cwd) {
+function readPackageManifest(directory: string): PackageManifest {
+  return JSON.parse(readFileSync(join(directory, 'package.json'), 'utf8'))
+}
+
+function run(command: string, args: string[], cwd: string) {
   execFileSync(command, args, {
     cwd,
     env: process.env,
@@ -48,7 +56,7 @@ function run(command, args, cwd) {
   })
 }
 
-function runSilently(command, args, cwd) {
+function runSilently(command: string, args: string[], cwd: string) {
   execFileSync(command, args, {
     cwd,
     env: process.env,
@@ -60,7 +68,7 @@ let succeeded = false
 
 try {
   const packages = collectPackages()
-  const overrides = {}
+  const overrides: Record<string, string> = {}
 
   for (const pkg of packages) {
     const existingTarballs = new Set(

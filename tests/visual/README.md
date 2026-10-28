@@ -109,7 +109,7 @@ environment and cannot update the committed baselines.
 The document-design samples can be generated separately after building:
 
 ```shell
-pnpm --filter docs exec tsx ../scripts/visual-regression/generate-design-samples.mjs
+pnpm --filter docs exec tsx ../scripts/visual-regression/generate-design-samples.ts
 ```
 
 This writes nine layout/theme combinations, three theme-only documents, and

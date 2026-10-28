@@ -10,7 +10,16 @@ const packageRoots = [
   'packages-themes',
 ]
 
-function collectLocalPaths(value, field, paths) {
+interface ArtifactPath {
+  field: string
+  path: string
+}
+
+function collectLocalPaths(
+  value: unknown,
+  field: string,
+  paths: ArtifactPath[],
+) {
   if (typeof value === 'string') {
     if (value.startsWith('./')) {
       paths.push({ field, path: value })
@@ -44,17 +53,19 @@ function collectPackageDirectories() {
   })
 }
 
-const missingArtifacts = []
+const missingArtifacts: string[] = []
 
 for (const packageDirectory of collectPackageDirectories()) {
   const manifestPath = join(packageDirectory, 'package.json')
-  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  const manifest: Record<string, unknown> = JSON.parse(
+    readFileSync(manifestPath, 'utf8'),
+  )
 
   if (manifest.private) {
     continue
   }
 
-  const artifactPaths = []
+  const artifactPaths: ArtifactPath[] = []
   for (const field of [
     'bin',
     'browser',

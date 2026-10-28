@@ -13,6 +13,42 @@ import { dirname, resolve } from 'node:path'
 import process from 'node:process'
 import { setTimeout as delay } from 'node:timers/promises'
 import { createServer } from 'vite'
+import type { ChildProcess } from 'node:child_process'
+
+interface BrowserReport {
+  scenarios: BrowserScenarioSummary[]
+}
+
+interface BrowserScenarioSummary {
+  durationMedianMs: number
+  heapDeltaMaxBytes: number
+  outputMedianBytes: number
+  scenario: string
+}
+
+interface ChromeTarget {
+  type: string
+  url: string
+  webSocketDebuggerUrl: string
+}
+
+interface DevToolsConnection {
+  close: () => void
+  send: (
+    method: string,
+    params?: Record<string, unknown>,
+  ) => Promise<DevToolsResult>
+}
+
+interface DevToolsMessage {
+  id: number
+  result: DevToolsResult
+  error?: { message: string }
+}
+
+interface DevToolsResult {
+  result?: { value?: string }
+}
 
 const repositoryRoot = resolve(import.meta.dirname, '../..')
 const browserRoot = resolve(repositoryRoot, 'benchmarks/browser')
@@ -39,7 +75,7 @@ const server = await createServer({
   },
 })
 
-let chrome
+let chrome: ChildProcess | undefined
 
 try {
   await server.listen()
@@ -100,10 +136,16 @@ try {
   })
 }
 
-function connectDevTools(webSocketUrl) {
+function connectDevTools(webSocketUrl: string): Promise<DevToolsConnection> {
   return new Promise((resolveConnection, rejectConnection) => {
     const socket = new WebSocket(webSocketUrl)
-    const pending = new Map()
+    const pending = new Map<
+      number,
+      {
+        reject: (reason: Error) => void
+        resolve: (result: DevToolsResult) => void
+      }
+    >()
     let nextId = 1
 
     socket.addEventListener('error', rejectConnection, { once: true })
@@ -111,7 +153,7 @@ function connectDevTools(webSocketUrl) {
       'open',
       () => {
         socket.addEventListener('message', event => {
-          const message = JSON.parse(event.data)
+          const message: DevToolsMessage = JSON.parse(String(event.data))
           const request = pending.get(message.id)
           if (!request) {
             return
@@ -127,15 +169,17 @@ function connectDevTools(webSocketUrl) {
         resolveConnection({
           close: () => socket.close(),
           send(method, params = {}) {
-            return new Promise((resolveRequest, rejectRequest) => {
-              const id = nextId
-              nextId += 1
-              pending.set(id, {
-                reject: rejectRequest,
-                resolve: resolveRequest,
-              })
-              socket.send(JSON.stringify({ id, method, params }))
-            })
+            return new Promise<DevToolsResult>(
+              (resolveRequest, rejectRequest) => {
+                const id = nextId
+                nextId += 1
+                pending.set(id, {
+                  reject: rejectRequest,
+                  resolve: resolveRequest,
+                })
+                socket.send(JSON.stringify({ id, method, params }))
+              },
+            )
           },
         })
       },
@@ -153,7 +197,7 @@ async function findChrome() {
     '/usr/bin/google-chrome-stable',
     '/usr/bin/chromium',
     '/usr/bin/chromium-browser',
-  ].filter(Boolean)
+  ].filter((candidate): candidate is string => Boolean(candidate))
 
   for (const candidate of candidates) {
     try {
@@ -169,7 +213,7 @@ async function findChrome() {
   )
 }
 
-function formatBytes(bytes) {
+function formatBytes(bytes: number) {
   const units = ['B', 'KiB', 'MiB', 'GiB']
   let value = bytes
   let unitIndex = 0
@@ -180,7 +224,9 @@ function formatBytes(bytes) {
   return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`
 }
 
-async function readBenchmarkReport(webSocketUrl) {
+async function readBenchmarkReport(
+  webSocketUrl: string,
+): Promise<BrowserReport> {
   const connection = await connectDevTools(webSocketUrl)
   const timeoutAt = Date.now() + 120_000
 
@@ -206,7 +252,7 @@ async function readBenchmarkReport(webSocketUrl) {
   throw new Error('Browser benchmark did not complete within 120 seconds')
 }
 
-async function stopChrome(childProcess) {
+async function stopChrome(childProcess: ChildProcess | undefined) {
   if (!childProcess || childProcess.exitCode != null) {
     return
   }
@@ -222,7 +268,7 @@ async function stopChrome(childProcess) {
   }
 }
 
-async function waitForFile(path) {
+async function waitForFile(path: string) {
   const timeoutAt = Date.now() + 15_000
   while (Date.now() < timeoutAt) {
     try {
@@ -235,12 +281,12 @@ async function waitForFile(path) {
   throw new Error(`Timed out waiting for ${path}`)
 }
 
-async function waitForTarget(port, benchmarkUrl) {
+async function waitForTarget(port: number, benchmarkUrl: string) {
   const timeoutAt = Date.now() + 15_000
   while (Date.now() < timeoutAt) {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/json/list`)
-      const targets = await response.json()
+      const targets: ChromeTarget[] = await response.json()
       const target = targets.find(
         item => item.type === 'page' && item.url.startsWith(benchmarkUrl),
       )

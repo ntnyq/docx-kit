@@ -11,7 +11,7 @@ import {
   oceanTheme,
   signatureBlockPlugin,
   timelinePlugin,
-} from '../../packages/docx-kit/src/node.ts'
+} from '../../packages/docx-kit/src/node'
 
 const outputRoot = resolve(
   import.meta.dirname,
@@ -287,7 +287,7 @@ function buildRevisionsFixture() {
       date: '2026-07-26T00:00:00Z',
       revisionId: 102,
     })
-    .thematicBreak({ style: { borderBottomColor: '#2563EB' } })
+    .thematicBreak({ style: { borderBottom: { color: '#2563EB' } } })
     .textBox({
       box: {
         height: '55pt',
@@ -473,7 +473,6 @@ function buildThemeFixture() {
     callout: {
       backgroundColor: '$colors.info',
       color: '#FFFFFF',
-      padding: '$spacing.sm',
       borderLeft: {
         color: '$colors.primary',
         style: 'single',
@@ -529,7 +528,7 @@ function buildTypographyFixture() {
       { style: { fontStyle: 'italic' }, text: 'italic', type: 'text' },
       { text: ', ', type: 'text' },
       {
-        style: { color: '#DC2626', textDecoration: 'underline' },
+        style: { color: '#DC2626', underline: true },
         text: 'underlined red',
         type: 'text',
       },
@@ -557,7 +556,6 @@ function buildTypographyFixture() {
       style: {
         backgroundColor: '#EFF6FF',
         border: { color: '#2563EB', style: 'single', width: '1pt' },
-        padding: 8,
         textAlign: 'center',
       },
     })
@@ -584,7 +582,11 @@ function createBanner() {
   return PNG.sync.write(png)
 }
 
-function createBaseDocument(title, overrides = {}, includeTitle = true) {
+function createBaseDocument(
+  title: string,
+  overrides: Parameters<typeof createDocx>[0] = {},
+  includeTitle = true,
+) {
   const styles = defineStyles({
     h1: {
       borderBottom: { color: '#2563EB', style: 'single', width: '1.5pt' },

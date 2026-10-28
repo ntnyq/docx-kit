@@ -123,7 +123,7 @@ export default defineConfig({
   vite: {
     build: {
       // Large Monaco/runtime chunks are lazy and have targeted budgets in
-      // scripts/check-doc-bundle.mjs.
+      // scripts/check-doc-bundle.ts.
       chunkSizeWarningLimit: 7 * 1024,
     },
     optimizeDeps: {

@@ -1,3 +1,25 @@
+import type {
+  calloutPlugin,
+  createDocx,
+} from '../../packages/docx-kit/src/browser'
+
+/**
+ * Platform-specific document and plugin factories used to build a workload.
+ */
+export interface PerformanceRuntime {
+  calloutPlugin: typeof calloutPlugin
+  createDocx: typeof createDocx
+}
+
+/**
+ * Workload configuration shared by the Node.js and browser benchmarks.
+ */
+export interface PerformanceScenario {
+  count: number
+  kind: 'images' | 'paragraphs' | 'plugins' | 'table'
+  name: string
+}
+
 const PIXEL_PNG = Uint8Array.from(
   atob(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Zl1sAAAAASUVORK5CYII=',
@@ -5,7 +27,10 @@ const PIXEL_PNG = Uint8Array.from(
   character => character.codePointAt(0) ?? 0,
 )
 
-export const PERFORMANCE_SCENARIOS = [
+/**
+ * Repeatable document workloads and their content counts.
+ */
+export const PERFORMANCE_SCENARIOS: PerformanceScenario[] = [
   { count: 100, kind: 'paragraphs', name: 'paragraphs-100' },
   { count: 1_000, kind: 'paragraphs', name: 'paragraphs-1000' },
   { count: 10_000, kind: 'paragraphs', name: 'paragraphs-10000' },
@@ -14,7 +39,15 @@ export const PERFORMANCE_SCENARIOS = [
   { count: 500, kind: 'plugins', name: 'plugins-500' },
 ]
 
-export function buildPerformanceScenario(runtime, scenarioName) {
+/**
+ * Build a named workload with the supplied platform runtime.
+ *
+ * @throws If the scenario name or workload kind is unknown
+ */
+export function buildPerformanceScenario(
+  runtime: PerformanceRuntime,
+  scenarioName: string,
+): Pick<ReturnType<typeof createDocx>, 'toBlob' | 'toBuffer'> {
   const scenario = PERFORMANCE_SCENARIOS.find(
     item => item.name === scenarioName,
   )
@@ -36,7 +69,7 @@ export function buildPerformanceScenario(runtime, scenarioName) {
   }
 }
 
-function buildImageDocument({ createDocx }, count) {
+function buildImageDocument({ createDocx }: PerformanceRuntime, count: number) {
   const document = createDocx().h1(`Image benchmark: ${count} images`)
 
   for (let index = 0; index < count; index += 1) {
@@ -52,7 +85,10 @@ function buildImageDocument({ createDocx }, count) {
   return document
 }
 
-function buildParagraphDocument({ createDocx }, count) {
+function buildParagraphDocument(
+  { createDocx }: PerformanceRuntime,
+  count: number,
+) {
   const document = createDocx().h1(`Paragraph benchmark: ${count} paragraphs`)
 
   for (let index = 0; index < count; index += 1) {
@@ -70,11 +106,14 @@ function buildParagraphDocument({ createDocx }, count) {
   return document
 }
 
-function buildPluginDocument({ calloutPlugin, createDocx }, count) {
+function buildPluginDocument(
+  { calloutPlugin, createDocx }: PerformanceRuntime,
+  count: number,
+) {
   const document = createDocx()
     .use(calloutPlugin())
     .h1(`Plugin benchmark: ${count} callouts`)
-  const types = ['danger', 'info', 'success', 'warning']
+  const types = ['danger', 'info', 'success', 'warning'] as const
 
   for (let index = 0; index < count; index += 1) {
     document.plugin('callout', {
@@ -87,7 +126,7 @@ function buildPluginDocument({ calloutPlugin, createDocx }, count) {
   return document
 }
 
-function buildTableDocument({ createDocx }, count) {
+function buildTableDocument({ createDocx }: PerformanceRuntime, count: number) {
   const rows = Array.from({ length: count }, (_, index) => ({
     amount: (index + 1) * 17.25,
     category: `Category ${(index % 12) + 1}`,
@@ -110,7 +149,7 @@ function buildTableDocument({ createDocx }, count) {
         {
           key: 'amount',
           title: 'Amount',
-          format: value => Number(value).toFixed(2),
+          render: value => Number(value).toFixed(2),
         },
       ],
     })

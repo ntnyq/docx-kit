@@ -48,7 +48,6 @@
     "vue": "^3.5.44"
   },
   "devDependencies": {
-    "tsx": "^4.23.15",
     "vitepress": "2.0.0-alpha.18"
   }
 }

@@ -4,7 +4,20 @@ import { arch, cpus, platform, release } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import process from 'node:process'
 import { promisify } from 'node:util'
-import { PERFORMANCE_SCENARIOS } from './scenarios.mjs'
+import { PERFORMANCE_SCENARIOS } from './scenarios'
+
+interface PerformanceReport {
+  scenarios: ScenarioSummary[]
+}
+
+interface PerformanceSample {
+  durationMs: number
+  outputBytes: number
+  peakRssBytes: number
+  peakRssDeltaBytes: number
+}
+
+type ScenarioSummary = ReturnType<typeof summarizeSamples>
 
 const execFileAsync = promisify(execFile)
 const repositoryRoot = resolve(import.meta.dirname, '../..')
@@ -13,7 +26,7 @@ const defaultOutputPath = resolve(
   'output/performance/node-latest.json',
 )
 const baselinePath = resolve(repositoryRoot, 'benchmarks/baselines/node.json')
-const workerPath = resolve(import.meta.dirname, 'node-worker.mjs')
+const workerPath = resolve(import.meta.dirname, 'node-worker.ts')
 const updateBaseline = process.argv.includes('--update-baseline')
 const runsArgumentIndex = process.argv.indexOf('--runs')
 const runs = Math.max(
@@ -33,12 +46,12 @@ const outputPath =
 const results = []
 
 for (const scenario of PERFORMANCE_SCENARIOS) {
-  const samples = []
+  const samples: PerformanceSample[] = []
 
   for (let run = 0; run < runs; run += 1) {
     const { stdout } = await execFileAsync(
       process.execPath,
-      ['--expose-gc', workerPath, scenario.name],
+      ['--expose-gc', '--import', 'tsx', workerPath, scenario.name],
       {
         cwd: repositoryRoot,
         maxBuffer: 1024 * 1024,
@@ -75,7 +88,7 @@ if (updateBaseline) {
   console.log(`Baseline updated: ${baselinePath}`)
 }
 
-function formatBytes(bytes) {
+function formatBytes(bytes: number) {
   const units = ['B', 'KiB', 'MiB', 'GiB']
   let value = bytes
   let unitIndex = 0
@@ -86,7 +99,7 @@ function formatBytes(bytes) {
   return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`
 }
 
-function formatDelta(current, previous) {
+function formatDelta(current: number, previous: number | undefined) {
   if (!previous) {
     return 'new'
   }
@@ -94,7 +107,7 @@ function formatDelta(current, previous) {
   return `${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%`
 }
 
-function median(values) {
+function median(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right)
   const middle = Math.floor(sorted.length / 2)
   return sorted.length % 2 === 0
@@ -102,8 +115,8 @@ function median(values) {
     : sorted[middle]
 }
 
-async function printComparison(current) {
-  let baseline
+async function printComparison(current: PerformanceReport) {
+  let baseline: PerformanceReport
   try {
     baseline = JSON.parse(await readFile(baselinePath, 'utf8'))
   } catch {
@@ -135,7 +148,7 @@ async function printComparison(current) {
   )
 }
 
-function printResults(report) {
+function printResults(report: PerformanceReport) {
   console.table(
     report.scenarios.map(scenario => ({
       duration: `${scenario.durationMedianMs.toFixed(1)} ms`,
@@ -147,7 +160,7 @@ function printResults(report) {
   )
 }
 
-function summarizeSamples(scenario, samples) {
+function summarizeSamples(scenario: string, samples: PerformanceSample[]) {
   return {
     durationMedianMs: median(samples.map(sample => sample.durationMs)),
     durationSamplesMs: samples.map(sample => sample.durationMs),
@@ -160,7 +173,7 @@ function summarizeSamples(scenario, samples) {
   }
 }
 
-async function writeJson(path, value) {
+async function writeJson(path: string, value: unknown) {
   await mkdir(dirname(path), { recursive: true })
   await writeFile(path, `${JSON.stringify(value, null, 2)}\n`)
 }

@@ -3,9 +3,10 @@ import { resolve } from 'node:path'
 import {
   createThemeSample,
   DOCUMENT_LAYOUTS,
-} from '../../docs/.vitepress/utils/documentSamples.ts'
+} from '../../docs/.vitepress/utils/documentSamples'
 import {
   badgePlugin,
+  BUILTIN_THEMES,
   calloutPlugin,
   changelogPlugin,
   codeBlockPlugin,
@@ -17,22 +18,21 @@ import {
   meetingMinutesPlugin,
   modernPreset,
   propertyTablePlugin,
-  THEME_LIST,
   timelinePlugin,
-} from '../../packages/docx-kit/src/node.ts'
+} from '../../packages/docx-kit/src/node'
 
 const outputRoot = resolve(import.meta.dirname, '../../output/document-design')
 await mkdir(outputRoot, { recursive: true })
 
 for (const { preset } of DOCUMENT_LAYOUTS) {
-  for (const theme of THEME_LIST) {
-    await save(`${preset.id}-${theme.id}`, createThemeSample(preset.id, theme))
+  for (const [themeId, theme] of BUILTIN_THEMES) {
+    await save(`${preset.id}-${themeId}`, createThemeSample(preset.id, theme))
   }
 }
 
-for (const theme of THEME_LIST) {
+for (const [themeId, theme] of BUILTIN_THEMES) {
   await save(
-    `theme-${theme.id}`,
+    `theme-${themeId}`,
     createDocx({ theme })
       .use(calloutPlugin())
       .h1('Document design review')
@@ -196,7 +196,10 @@ doc
   })
 await save('plugin-showcase', doc)
 
-async function save(name, document) {
+async function save(
+  name: string,
+  document: Pick<ReturnType<typeof createDocx>, 'toUint8Array'>,
+) {
   const path = resolve(outputRoot, `${name}.docx`)
   await writeFile(path, await document.toUint8Array())
   console.log(path)

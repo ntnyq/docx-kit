@@ -35,7 +35,7 @@ const pluginFactories = [
   'watermarkPlugin',
 ]
 
-function collectMarkdownFiles(path) {
+function collectMarkdownFiles(path: string): string[] {
   const stats = statSync(path)
   if (stats.isFile()) {
     return path.endsWith('.md') ? [path] : []
@@ -49,11 +49,11 @@ function collectMarkdownFiles(path) {
   })
 }
 
-function getLineNumber(source, index) {
+function getLineNumber(source: string, index: number) {
   return source.slice(0, index).split('\n').length
 }
 
-const errors = []
+const errors: string[] = []
 const markdownFiles = documentationRoots.flatMap(collectMarkdownFiles)
 
 for (const file of markdownFiles) {

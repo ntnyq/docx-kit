@@ -31,7 +31,12 @@ const currentArtifactRoot = join(artifactRoot, 'current')
 const manifestPath = join(temporaryRoot, 'manifest.json')
 const maximumMismatchRatio = 0.01
 const minimumInkRatio = 0.002
-const errors = []
+interface VisualFixture {
+  expectedPages: number
+  name: string
+}
+
+const errors: string[] = []
 
 if (!existsSync(manifestPath)) {
   console.error(
@@ -63,7 +68,7 @@ const pdfToPpm = useSystemRenderer
 const pdfInfo = useSystemRenderer
   ? resolveBinary(process.env.PDFINFO_BIN, 'pdfinfo')
   : 'pdfinfo'
-const fixtures = JSON.parse(readFileSync(manifestPath, 'utf8'))
+const fixtures: VisualFixture[] = JSON.parse(readFileSync(manifestPath, 'utf8'))
 
 if (docker) {
   console.log(
@@ -139,7 +144,7 @@ if (errors.length > 0) {
   )
 }
 
-function comparePages(currentPages) {
+function comparePages(currentPages: string[]) {
   for (const currentPath of currentPages) {
     const name = basename(currentPath)
     const baselinePath = join(baselineRoot, name)
@@ -183,7 +188,7 @@ function comparePages(currentPages) {
   }
 }
 
-function detectStaleBaselines(expectedBaselines) {
+function detectStaleBaselines(expectedBaselines: Set<string>) {
   for (const path of listPngFiles(baselineRoot)) {
     if (!expectedBaselines.has(basename(path))) {
       errors.push(`stale baseline ${displayPath(path)}`)
@@ -191,15 +196,15 @@ function detectStaleBaselines(expectedBaselines) {
   }
 }
 
-function displayPath(path) {
+function displayPath(path: string) {
   return relative(repositoryRoot, path)
 }
 
-function getVersion(binary) {
+function getVersion(binary: string) {
   return runRenderer(binary, ['--version']).stdout.trim().split('\n')[0]
 }
 
-function listPngFiles(directory) {
+function listPngFiles(directory: string) {
   if (!existsSync(directory)) {
     return []
   }
@@ -209,13 +214,13 @@ function listPngFiles(directory) {
     .sort()
 }
 
-function rendererPath(path) {
+function rendererPath(path: string) {
   return useSystemRenderer
     ? path
     : `/work/${relative(temporaryRoot, path).split(sep).join('/')}`
 }
 
-function renderFixture({ expectedPages, name }) {
+function renderFixture({ expectedPages, name }: VisualFixture) {
   const docxPath = join(docxRoot, `${name}.docx`)
   const profileUrl = useSystemRenderer
     ? pathToFileURL(profileRoot).href
@@ -284,8 +289,10 @@ function renderFixture({ expectedPages, name }) {
   }
 }
 
-function resolveBinary(...candidates) {
-  const availableCandidates = candidates.filter(Boolean)
+function resolveBinary(...candidates: (string | undefined)[]) {
+  const availableCandidates = candidates.filter(
+    (candidate): candidate is string => Boolean(candidate),
+  )
 
   for (const candidate of availableCandidates) {
     if (candidate.includes('/') && existsSync(candidate)) {
@@ -303,7 +310,7 @@ function resolveBinary(...candidates) {
   process.exit(1)
 }
 
-function run(command, arguments_) {
+function run(command: string, arguments_: string[]) {
   const result = spawnSync(command, arguments_, {
     encoding: 'utf8',
     env: process.env,
@@ -321,7 +328,7 @@ function run(command, arguments_) {
   return result
 }
 
-function runRenderer(command, arguments_) {
+function runRenderer(command: string, arguments_: string[]) {
   if (!docker) {
     return run(command, arguments_)
   }

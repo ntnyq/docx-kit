@@ -13,7 +13,12 @@ const budgets = {
 const forbiddenWorkers = new Set(['css.worker', 'html.worker', 'json.worker'])
 const repositoryRoot = resolve(import.meta.dirname, '..')
 const assetsRoot = join(repositoryRoot, 'docs/.vitepress/dist/assets')
-const errors = []
+interface Asset {
+  bytes: number
+  path: string
+}
+
+const errors: string[] = []
 
 if (!existsSync(assetsRoot)) {
   console.error('Documentation assets are missing. Run pnpm docs:build first.')
@@ -81,7 +86,7 @@ if (errors.length > 0) {
   )
 }
 
-function checkBudgets(entries, maximumBytes, label) {
+function checkBudgets(entries: Asset[], maximumBytes: number, label: string) {
   for (const entry of entries) {
     if (entry.bytes > maximumBytes) {
       errors.push(
@@ -91,25 +96,25 @@ function checkBudgets(entries, maximumBytes, label) {
   }
 }
 
-function collectFiles(directory) {
+function collectFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
     const path = join(directory, entry.name)
     return entry.isDirectory() ? collectFiles(path) : [path]
   })
 }
 
-function displayPath(path) {
+function displayPath(path: string) {
   return relative(repositoryRoot, path)
 }
 
-function formatBytes(bytes) {
+function formatBytes(bytes: number) {
   if (bytes >= MEBIBYTE) {
     return `${(bytes / MEBIBYTE).toFixed(2)} MiB`
   }
   return `${(bytes / KIBIBYTE).toFixed(1)} KiB`
 }
 
-function requireAssets(label, entries, expectedMinimum = 1) {
+function requireAssets(label: string, entries: Asset[], expectedMinimum = 1) {
   if (entries.length < expectedMinimum) {
     errors.push(`missing ${label}`)
   }

@@ -2,7 +2,7 @@ import { calloutPlugin, createDocx } from '../../packages/docx-kit/src/browser'
 import {
   buildPerformanceScenario,
   PERFORMANCE_SCENARIOS,
-} from '../../scripts/performance/scenarios.mjs'
+} from '../../scripts/performance/scenarios'
 
 interface ChromiumPerformanceMemory {
   usedJSHeapSize: number

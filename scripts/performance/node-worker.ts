@@ -2,7 +2,7 @@ import { performance } from 'node:perf_hooks'
 import process from 'node:process'
 // eslint-disable-next-line antfu/no-import-dist -- the benchmark intentionally measures the built package
 import { calloutPlugin, createDocx } from '../../packages/docx-kit/dist/node.js'
-import { buildPerformanceScenario } from './scenarios.mjs'
+import { buildPerformanceScenario } from './scenarios'
 
 const scenarioName = process.argv[2]
 
