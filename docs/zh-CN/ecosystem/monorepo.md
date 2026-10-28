@@ -6,8 +6,12 @@ docx-kit 以 **pnpm workspace monorepo** 维护。文档涵盖当前工作区中
 
 ```text
 docx-kit/
+├── apps/
+│   ├── playground/
+│   └── theme-studio/
 ├── packages/
 │   ├── ai/
+│   ├── app-shared/
 │   ├── core/
 │   ├── create-plugin/
 │   ├── docx-kit/
@@ -57,10 +61,14 @@ docx-kit/
 
 | 范围 | 数量 | 说明 |
 | ------------------- | ----- | ------------------------------------------------------------ |
-| `packages/` | 12 | 运行时、工具、AI、渲染器、Markdown 与共享类型 |
+| `packages/` | 13 | 运行时、工具、AI、渲染器、Markdown 与共享类型 |
 | `packages-plugins/` | 22 | 每个内置插件都有独立的包、测试与 README |
 | `packages-presets/` | 3 | 常见文档类型的样式预设 |
 | `packages-themes/` | 3 | 基于令牌的配色主题 |
+
+`apps/` 中的两个私有应用独立构建和部署。[Playground](https://docx-kit-playground.ntnyq.dev/?lang=zh-CN) 负责 TypeScript 编辑器和示例；[Theme Studio](https://docx-kit-theme-studio.ntnyq.dev/?lang=zh-CN) 负责主题编辑。`packages/app-shared` 是共享 UI、偏好设置和预览生命周期的私有源码包，不发布到 npm。
+
+在仓库根目录先运行 `pnpm build`，再运行 `pnpm playground:dev` 或 `pnpm theme-studio:dev`。`pnpm apps:build` 构建两个应用，`pnpm docs:build` 仅构建文档站点。
 
 ## `packages/` 中的内容
 

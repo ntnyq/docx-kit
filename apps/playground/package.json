@@ -1,0 +1,35 @@
+{
+  "name": "@docxkit/playground",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "pnpm run generate:monaco-types && vite build",
+    "dev": "pnpm run generate:monaco-types && vite",
+    "generate:monaco-types": "tsx ../../scripts/generate-monaco-types.ts",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@docxkit/app-shared": "workspace:*",
+    "@docxkit/preset-academic": "workspace:*",
+    "@docxkit/preset-classic": "workspace:*",
+    "@docxkit/preset-modern": "workspace:*",
+    "@lucide/vue": "^1.63.0",
+    "@ntnyq/utils": "^0.24.0",
+    "@vueuse/core": "^15.0.0",
+    "acorn": "^8.19.0",
+    "docx": "^9.15.0",
+    "docx-kit": "workspace:*",
+    "monaco-editor": "^0.57.0",
+    "sucrase": "^3.35.1",
+    "vue": "^3.5.44",
+    "vue-i18n": "^11.4.16"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.5",
+    "vue-tsc": "^3.3.13"
+  }
+}

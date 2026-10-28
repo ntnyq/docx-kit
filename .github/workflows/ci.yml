@@ -24,6 +24,7 @@ jobs:
       - run: pnpm run lint
       - run: pnpm run typecheck
       - run: pnpm run docs:verify
+      - run: pnpm run apps:verify
       - run: pnpm run release:artifacts
       - run: pnpm run release:consumer
 

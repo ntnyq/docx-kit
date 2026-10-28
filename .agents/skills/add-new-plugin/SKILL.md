@@ -115,16 +115,17 @@ After integration, run:
 ```sh
 pnpm run build
 pnpm typecheck
-pnpm exec vitest run packages-plugins/status-panel/tests packages/docx-kit/tests/exports.test.ts packages/docx-kit/tests/builtin-plugin-styles.test.ts packages/mcp/tests packages/ai/tests/promptBuilder.test.ts docs/.vitepress/utils/playgroundRunner.test.ts docs/.vitepress/utils/monacoTypes.test.ts tests/e2e/plugin-lifecycle.test.ts
+pnpm exec vitest run packages-plugins/status-panel/tests packages/docx-kit/tests/exports.test.ts packages/docx-kit/tests/builtin-plugin-styles.test.ts packages/mcp/tests packages/ai/tests/promptBuilder.test.ts apps/playground/src/utils/playgroundRunner.test.ts apps/playground/src/utils/monacoTypes.test.ts tests/e2e/plugin-lifecycle.test.ts
 pnpm run lint
 pnpm run docs:verify
+pnpm run apps:verify
 pnpm run release:artifacts
 pnpm run release:consumer
 ```
 
 Replace the example slug with the actual name. For core compiler, OOXML, or broad changes, also run `pnpm run visual:check` and the full `pnpm run release:verify` as required by `CONTRIBUTING.md`.
 
-`docs:build` regenerates `docs/.vitepress/utils/monacoTypes.generated.ts`. Generate and review intended changes first. The `docs:generated` step in `docs:verify` checks generated files with Git diff, so expected uncommitted changes also fail this gate. Do not stage or commit without authorization just to pass it. Independently verify that repeated generation produces no changes and report the gate's status accurately.
+`apps:build` regenerates `apps/playground/src/utils/monacoTypes.generated.ts`. Generate and review intended changes first. The `apps:generated` step in `apps:verify` checks generated files with Git diff, so expected uncommitted changes also fail this gate. Do not stage or commit without authorization just to pass it. Independently verify that repeated generation produces no changes and report the gate's status accurately.
 
 Add representative visual fixtures for new layouts and inspect both the preview and exported DOCX. Follow the contribution guide's browser smoke check for Playground/documentation UI changes. Report unavailable visual tooling as an incomplete check. Update baselines only after confirming the rendering change is intentional and reviewing every changed page.
 

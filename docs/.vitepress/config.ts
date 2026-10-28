@@ -119,22 +119,4 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/ntnyq/docx-kit' },
     ],
   },
-
-  vite: {
-    build: {
-      // Large Monaco/runtime chunks are lazy and have targeted budgets in
-      // scripts/check-doc-bundle.ts.
-      chunkSizeWarningLimit: 7 * 1024,
-    },
-    optimizeDeps: {
-      include: [
-        'monaco-editor/editor/editor.api',
-        'monaco-editor/languages/definitions/typescript/register',
-        'monaco-editor/languages/features/typescript/register',
-      ],
-    },
-    worker: {
-      format: 'es',
-    },
-  },
 })

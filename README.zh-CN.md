@@ -24,6 +24,10 @@
 
 👉 **完整指南、API 参考、插件与示例：https://docx-kit.ntnyq.dev/zh-CN/**
 
+
+- [Playground](https://docx-kit-playground.ntnyq.dev/?lang=zh-CN)：在线编辑、预览并导出 Word 文档。
+- [Theme Studio](https://docx-kit-theme-studio.ntnyq.dev/?lang=zh-CN)：编辑主题令牌、切换版式并导出主题。
+
 ---
 
 ## 特性

@@ -2,5 +2,67 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm run build && pnpm run docs:build",
-  "outputDirectory": "docs/.vitepress/dist"
+  "outputDirectory": "docs/.vitepress/dist",
+  "redirects": [
+    {
+      "source": "/playground",
+      "destination": "https://docx-kit-playground.ntnyq.dev/?lang=en-US",
+      "permanent": true
+    },
+    {
+      "source": "/playground.html",
+      "destination": "https://docx-kit-playground.ntnyq.dev/?lang=en-US",
+      "permanent": true
+    },
+    {
+      "source": "/theme-studio",
+      "destination": "https://docx-kit-theme-studio.ntnyq.dev/?lang=en-US",
+      "permanent": true
+    },
+    {
+      "source": "/theme-studio.html",
+      "destination": "https://docx-kit-theme-studio.ntnyq.dev/?lang=en-US",
+      "permanent": true
+    },
+    {
+      "source": "/zh-CN/playground",
+      "destination": "https://docx-kit-playground.ntnyq.dev/?lang=zh-CN",
+      "permanent": true
+    },
+    {
+      "source": "/zh-CN/playground.html",
+      "destination": "https://docx-kit-playground.ntnyq.dev/?lang=zh-CN",
+      "permanent": true
+    },
+    {
+      "source": "/zh-CN/theme-studio",
+      "destination": "https://docx-kit-theme-studio.ntnyq.dev/?lang=zh-CN",
+      "permanent": true
+    },
+    {
+      "source": "/zh-CN/theme-studio.html",
+      "destination": "https://docx-kit-theme-studio.ntnyq.dev/?lang=zh-CN",
+      "permanent": true
+    },
+    {
+      "source": "/zh-TW/playground",
+      "destination": "https://docx-kit-playground.ntnyq.dev/?lang=zh-TW",
+      "permanent": true
+    },
+    {
+      "source": "/zh-TW/playground.html",
+      "destination": "https://docx-kit-playground.ntnyq.dev/?lang=zh-TW",
+      "permanent": true
+    },
+    {
+      "source": "/zh-TW/theme-studio",
+      "destination": "https://docx-kit-theme-studio.ntnyq.dev/?lang=zh-TW",
+      "permanent": true
+    },
+    {
+      "source": "/zh-TW/theme-studio.html",
+      "destination": "https://docx-kit-theme-studio.ntnyq.dev/?lang=zh-TW",
+      "permanent": true
+    }
+  ]
 }

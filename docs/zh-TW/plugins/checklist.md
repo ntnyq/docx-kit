@@ -22,10 +22,10 @@
 
 ## 完整範例
 
-[在 Playground 中開啟完整範例](/zh-TW/playground?example=checklist)，可直接修改程式碼、預覽效果並下載 DOCX。
+[在 Playground 中開啟完整範例](https://docx-kit-playground.ntnyq.dev/?lang=zh-TW&example=checklist)，可直接修改程式碼、預覽效果並下載 DOCX。
 
 這份 Ocean 主題範例包含發佈前後兩個分組、負責人、備註，以及已勾選與未勾選的工作。正文為 12pt，分組標題為 14.5pt，負責人為 10pt，備註為 9.5pt。
 
 ![包含分組標題、負責人與備註的完整 Checklist 效果](/examples/checklist.png)
 
-<<< @/.vitepress/constants/templates/checklist.ts#checklist-example
+<<< @/../apps/playground/src/constants/templates/checklist.ts#checklist-example

@@ -1,5 +1,5 @@
 /**
- * Generate Monaco type libraries for the documentation playground.
+ * Generate Monaco type libraries for the standalone playground.
  *
  * Each real declaration file is mounted at the same logical path it would
  * have under `node_modules`. This preserves imports, re-exports, aliases,
@@ -19,7 +19,10 @@ interface TypeLibSource {
 
 const ROOT = resolve(import.meta.dirname, '..')
 
-const OUTPUT = resolve(ROOT, 'docs/.vitepress/utils/monacoTypes.generated.ts')
+const OUTPUT = resolve(
+  ROOT,
+  'apps/playground/src/utils/monacoTypes.generated.ts',
+)
 
 const HEADER = [
   '/**',
@@ -29,7 +32,7 @@ const HEADER = [
   ' * path so Monaco resolves the same public API as TypeScript.',
   ' *',
   ' * To regenerate, run `pnpm tsx scripts/generate-monaco-types.ts`',
-  ' * (also runs automatically as part of `pnpm docs:build`).',
+  ' * (also runs automatically as part of `pnpm apps:build`).',
   ' */',
   '',
 ]

@@ -24,6 +24,10 @@
 
 👉 **Full guides, API reference, plugins, and examples: https://docx-kit.ntnyq.dev**
 
+
+- [Playground](https://docx-kit-playground.ntnyq.dev/): edit, preview, and export Word documents online.
+- [Theme Studio](https://docx-kit-theme-studio.ntnyq.dev/): edit theme tokens, compare layouts, and export reusable themes.
+
 ---
 
 ## Features

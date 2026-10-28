@@ -40,16 +40,16 @@ Verify these real usage paths at minimum:
 
 | File | Change |
 | --- | --- |
-| `docs/.vitepress/constants/templates/plugins.ts` | Import, register, and demonstrate the plugin; update the showcase list, headings, and counts |
-| `docs/.vitepress/utils/playgroundRunner.test.ts` | Update the built-in factory map, verify exported and runtime names match, and exercise the new example |
+| `apps/playground/src/constants/templates/plugins.ts` | Import, register, and demonstrate the plugin; update the showcase list, headings, and counts |
+| `apps/playground/src/utils/playgroundRunner.test.ts` | Update the built-in factory map, verify exported and runtime names match, and exercise the new example |
 | `scripts/generate-monaco-types.ts` | Add the package and real `dist/index.d.ts` path to `WORKSPACE_MODULES`; ensure additional referenced modules resolve in the type libraries |
-| `docs/.vitepress/utils/monacoTypes.test.ts` | Verify that new exports, options, and public usage examples resolve in Monaco |
-| `docs/.vitepress/utils/monacoTypes.generated.ts` | Build packages first, then regenerate; do not edit by hand |
+| `apps/playground/src/utils/monacoTypes.test.ts` | Verify that new exports, options, and public usage examples resolve in Monaco |
+| `apps/playground/src/utils/monacoTypes.generated.ts` | Build packages first, then regenerate; do not edit by hand |
 | `scripts/check-doc-examples.ts` | Add the factory to `pluginFactories` so documentation checks catch missing factory calls |
 
 The Playground currently injects only named imports from `docx-kit` and `docx`. Examples must use public entry points and cannot assume arbitrary third-party imports execute. The runtime loads through `import('docx-kit')`; no additional static injection table is needed.
 
-Add reusable example templates and maintain `docs/.vitepress/constants/templates/index.ts` when useful. Extend the existing template for a simple showcase addition. Update `docs/package.json` and related build configuration only when additional dependencies are required in the browser.
+Add reusable example templates and maintain `apps/playground/src/constants/templates/index.ts` when useful. Extend the existing template for a simple showcase addition. Update `apps/playground/package.json` and related build configuration only when additional dependencies are required in the browser.
 
 Regenerate declarations independently with:
 
@@ -57,7 +57,7 @@ Regenerate declarations independently with:
 pnpm -C docs run generate:monaco-types
 ```
 
-Generate and review once, then repeat to verify stable output. `docs:generated` checks the Git diff, which is different from comparing successive generation results.
+Generate and review once, then repeat to verify stable output. `apps:generated` checks the Git diff, which is different from comparing successive generation results.
 
 ## Documentation and discovery
 

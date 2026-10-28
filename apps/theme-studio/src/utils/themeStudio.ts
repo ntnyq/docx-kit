@@ -1,0 +1,126 @@
+import { normalizeThemeColor } from './normalizeThemeColor'
+import type { DocxTheme } from 'docx-kit'
+
+export type BuiltinTheme = DocxTheme & {
+  id: string
+  name: string
+  description?: string
+}
+
+export interface EditableTheme {
+  colors: Record<string, string>
+  description: string
+  fonts: Record<string, string>
+  fontSize: Record<string, number | string>
+  id: string
+  name: string
+  spacing: Record<string, number | string>
+}
+
+export type EditableThemeCategory = 'colors' | 'fonts' | 'fontSize' | 'spacing'
+
+export function cloneThemeForEditing(theme: BuiltinTheme): EditableTheme {
+  return {
+    colors: { ...(theme.colors ?? {}) },
+    description: theme.description ?? '',
+    fonts: { ...(theme.fonts ?? {}) },
+    fontSize: { ...(theme.fontSize ?? {}) },
+    id: theme.id,
+    name: theme.name,
+    spacing: { ...(theme.spacing ?? {}) },
+  }
+}
+
+export function serializeThemeToSnippet(theme: EditableTheme): string {
+  return [
+    "import type { DocxTheme } from 'docx-kit'",
+    '',
+    'export const customTheme: DocxTheme & {',
+    '  id: string',
+    '  name: string',
+    '  description: string',
+    '} = {',
+    `  id: ${JSON.stringify(theme.id)},`,
+    `  name: ${JSON.stringify(theme.name)},`,
+    `  description: ${JSON.stringify(theme.description)},`,
+    `  colors: ${formatTokenObject(normalizeColorTokenMap(theme.colors))},`,
+    `  fonts: ${formatTokenObject(theme.fonts)},`,
+    `  fontSize: ${formatTokenObject(normalizeNumericTokenMap(theme.fontSize))},`,
+    `  spacing: ${formatTokenObject(normalizeNumericTokenMap(theme.spacing))},`,
+    '}',
+    '',
+  ].join('\n')
+}
+
+export function toDocxTheme(theme: EditableTheme): DocxTheme {
+  return {
+    colors: normalizeColorTokenMap(theme.colors),
+    fonts: { ...theme.fonts },
+    fontSize: normalizeNumericTokenMap(theme.fontSize) as NonNullable<
+      DocxTheme['fontSize']
+    >,
+    spacing: normalizeNumericTokenMap(theme.spacing) as NonNullable<
+      DocxTheme['spacing']
+    >,
+  }
+}
+
+export function updateThemeToken(
+  theme: EditableTheme,
+  category: EditableThemeCategory,
+  key: string,
+  value: string,
+): EditableTheme {
+  return {
+    ...theme,
+    [category]: {
+      ...theme[category],
+      [key]: value,
+    },
+  }
+}
+
+function formatTokenObject(tokens: Record<string, number | string>): string {
+  const entries = Object.entries(tokens)
+  if (entries.length === 0) {
+    return '{}'
+  }
+
+  const body = entries
+    .map(([key, value]) => {
+      return `    ${JSON.stringify(key)}: ${JSON.stringify(value)}`
+    })
+    .join(',\n')
+
+  return `{\n${body}\n  }`
+}
+
+function normalizeColorTokenMap(
+  tokens: Record<string, string>,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(tokens).map(([key, value]) => [
+      key,
+      normalizeThemeColor(value),
+    ]),
+  )
+}
+
+function normalizeNumericTokenMap(
+  tokens: Record<string, number | string>,
+): Record<string, number | string> {
+  return Object.fromEntries(
+    Object.entries(tokens).map(([key, value]) => {
+      if (typeof value === 'number') {
+        return [key, value]
+      }
+
+      const trimmed = value.trim()
+      if (/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(trimmed)) {
+        return [key, Number(trimmed)]
+      }
+
+      return [key, trimmed]
+    }),
+  )
+}

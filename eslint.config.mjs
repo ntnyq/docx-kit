@@ -10,6 +10,6 @@ export default defineESLintConfig(
   },
   // Auto-generated artifacts — content is produced by build scripts, not humans.
   {
-    ignores: ['docs/.vitepress/utils/monacoTypes.generated.ts'],
+    ignores: ['apps/playground/src/utils/monacoTypes.generated.ts'],
   },
 )

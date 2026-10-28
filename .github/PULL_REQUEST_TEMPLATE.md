@@ -14,7 +14,8 @@ Describe the problem and the resulting behavior.
 - [ ] `pnpm run lint`
 - [ ] `pnpm run typecheck`
 - [ ] `pnpm run build`
-- [ ] `pnpm run docs:verify` when docs/playground changed
+- [ ] `pnpm run docs:verify` when documentation changed
+- [ ] `pnpm run apps:verify` when browser applications changed
 - [ ] `pnpm run visual:check` when OOXML/rendering changed
 - [ ] Node/browser performance checked when a hot path changed
 

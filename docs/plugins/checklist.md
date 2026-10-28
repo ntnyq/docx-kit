@@ -32,13 +32,13 @@ Adjacent items with the same group share one heading. A group that reappears lat
 
 ## Complete example
 
-[Open this example in the Playground](/playground?example=checklist) to edit the code, preview it, or download the DOCX.
+[Open this example in the Playground](https://docx-kit-playground.ntnyq.dev/?lang=en-US&example=checklist) to edit the code, preview it, or download the DOCX.
 
 This Ocean theme sample includes both groups, owners, notes, and checked and unchecked tasks. Body text is 12pt, group headings are 14.5pt, owners are 10pt, and notes are 9.5pt.
 
 ![Complete checklist with group headings, owners, and notes](/examples/checklist.png)
 
-<<< @/.vitepress/constants/templates/checklist.ts#checklist-example
+<<< @/../apps/playground/src/constants/templates/checklist.ts#checklist-example
 
 The default `'github'` style uses SVG graphics with high-resolution PNG fallbacks. Checked boxes use the theme's `accent` color (falling back to `primary`) with a white check. Unchecked outlines use `muted` (falling back to `border`), and their fill uses `background`. Both image formats follow the same theme colors. Graphic checkboxes scale with the task's effective font size and align with the text's visual center; wrapped text and notes share the same text inset. These are static images and do not depend on symbol fonts.
 

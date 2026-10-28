@@ -1,0 +1,147 @@
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #20293a;
+  --card: #ffffff;
+  --card-foreground: #20293a;
+  --popover: #ffffff;
+  --popover-foreground: #20293a;
+  --primary: #355cf4;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f5f9;
+  --secondary-foreground: #475569;
+  --muted: #f3f5f9;
+  --muted-foreground: #5a687d;
+  --accent: #eef2ff;
+  --accent-foreground: #355cf4;
+  --destructive: #c83248;
+  --border: #dfe4ed;
+  --input: #d7deea;
+  --ring: #355cf4;
+  --radius: 0.45rem;
+  --canvas: #e9edf3;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #101827;
+  --foreground: #e3e9f4;
+  --card: #101827;
+  --card-foreground: #e3e9f4;
+  --popover: #182235;
+  --popover-foreground: #e3e9f4;
+  --primary: #7894ff;
+  --primary-foreground: #101827;
+  --secondary: #1d293d;
+  --secondary-foreground: #c1cde0;
+  --muted: #1a2538;
+  --muted-foreground: #9baac0;
+  --accent: #25345a;
+  --accent-foreground: #a6b7ff;
+  --destructive: #ff8796;
+  --border: #2c384d;
+  --input: #36445d;
+  --ring: #7894ff;
+  --canvas: #0a111e;
+}
+
+:root[data-app='theme-studio'] {
+  --primary: #0f837a;
+  --accent: #e7f5f2;
+  --accent-foreground: #0f837a;
+  --ring: #0f837a;
+}
+
+:root.dark[data-app='theme-studio'] {
+  --primary: #5bd5c7;
+  --accent: #173e3c;
+  --accent-foreground: #73e1d5;
+  --ring: #5bd5c7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans:
+    'Inter', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply m-0 bg-background font-sans text-sm text-foreground antialiased;
+  }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    touch-action: manipulation;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+  #app {
+    min-height: 100dvh;
+  }
+}
+
+@layer components {
+  .workspace {
+    @apply flex min-h-dvh flex-col overflow-hidden;
+    height: 100dvh;
+  }
+  .workspace-toolbar {
+    @apply flex min-h-14 flex-wrap items-center gap-2 border-b px-3 py-2 sm:gap-3 sm:px-5;
+  }
+  .pane-heading {
+    @apply flex h-11 shrink-0 items-center gap-2 border-b bg-background px-3 text-xs;
+  }
+  .workspace-status {
+    @apply flex min-h-8 shrink-0 items-center justify-between gap-3 border-t px-3 py-1 text-xs text-muted-foreground;
+  }
+  .field-label {
+    @apply mb-1.5 block text-xs text-muted-foreground;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

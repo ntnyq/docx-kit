@@ -3,22 +3,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "pnpm run generate:monaco-types && vitepress build",
-    "dev": "pnpm run generate:monaco-types && vitepress dev",
-    "generate:monaco-types": "tsx ../scripts/generate-monaco-types.ts"
+    "build": "vitepress build",
+    "dev": "vitepress dev"
   },
   "dependencies": {
-    "@docxkit/preset-academic": "workspace:*",
-    "@docxkit/preset-classic": "workspace:*",
-    "@docxkit/preset-modern": "workspace:*",
-    "@docxkit/renderer": "workspace:*",
-    "@ntnyq/utils": "^0.23.0",
-    "acorn": "^8.19.0",
-    "docx": "^9.15.0",
-    "docx-kit": "workspace:*",
-    "monaco-editor": "^0.57.0",
-    "sucrase": "^3.35.1",
-    "tinysaver": "^0.3.0",
     "vue": "^3.5.44"
   },
   "devDependencies": {

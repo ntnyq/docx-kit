@@ -252,7 +252,7 @@ const doc = createDocx({
 
 ## Preview common Word layouts
 
-[Theme Studio](/theme-studio) offers business report, Chinese formal, and academic layouts. Each layout includes representative content and styled tables. The studio explicitly binds the layout's fonts, main type sizes, and heading spacing to the editable theme tokens; the Export tab includes that configuration. Use **Download Word** to save the same file shown in the preview. The preview preserves the exported page margins; installed fonts and the Word layout engine may still differ from browser rendering.
+[Theme Studio](https://docx-kit-theme-studio.ntnyq.dev/?lang=en-US) offers business report, Chinese formal, and academic layouts. Each layout includes representative content and styled tables. The studio explicitly binds the layout's fonts, main type sizes, and heading spacing to the editable theme tokens; the Export theme drawer includes that configuration. Use **Download Word** to save the same file shown in the preview. The preview preserves the exported page margins; installed fonts and the Word layout engine may still differ from browser rendering.
 
 ## Next Steps
 

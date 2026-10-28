@@ -29,7 +29,9 @@ Generated `dist/`, `output/`, and `tmp/` content must not be committed.
   points
 - `packages-plugins/`: built-in plugin packages
 - `packages-presets/` and `packages-themes/`: reusable document styling
-- `docs/`: VitePress documentation and browser playground
+- `apps/playground/` and `apps/theme-studio/`: independent browser applications
+- `packages/app-shared/`: private UI, preferences, and document preview source
+- `docs/`: VitePress documentation
 - `tests/e2e/`: cross-package lifecycle tests
 - `tests/visual/`: committed LibreOffice-rendered PNG baselines
 - `benchmarks/`: Node and browser performance baselines
@@ -54,6 +56,7 @@ pnpm run typecheck
 pnpm run test
 pnpm run build
 pnpm run docs:verify
+pnpm run apps:verify
 pnpm run release:verify
 ```
 
@@ -65,7 +68,8 @@ pnpm run release:verify
 | Compiler or OOXML          | Focused tests, `visual:check`, `release:verify`  |
 | Plugin package             | Plugin tests, build, plugin lifecycle E2E        |
 | Loader or registry         | Loader/registry tests, plugin lifecycle E2E      |
-| Playground or docs UI      | `docs:verify` and a real-browser smoke check     |
+| Browser applications       | `apps:verify` and a real-browser smoke check     |
+| Documentation UI           | `docs:verify` and a real-browser smoke check     |
 | Documentation only         | `docs:examples` and `docs:build`                 |
 | Performance-sensitive path | `bench:node` and, when relevant, `bench:browser` |
 

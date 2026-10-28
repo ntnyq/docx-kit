@@ -26,6 +26,18 @@ function section(
 }
 
 function withPrefix(prefix: string, link: string) {
+  if (/^https?:\/\//.test(link)) {
+    const url = new URL(link)
+    if (
+      [
+        'docx-kit-playground.ntnyq.dev',
+        'docx-kit-theme-studio.ntnyq.dev',
+      ].includes(url.hostname)
+    ) {
+      url.searchParams.set('lang', prefix.slice(1) || 'en-US')
+    }
+    return url.href
+  }
   return prefix ? `${prefix}${link}` : link
 }
 
@@ -35,8 +47,8 @@ export const englishNav: LinkItem[] = [
   { link: '/ecosystem/packages', text: 'Packages' },
   { link: '/plugins/', text: 'Plugins' },
   { link: '/examples/basic-report', text: 'Examples' },
-  { link: '/playground', text: 'Playground' },
-  { link: '/theme-studio', text: 'Theme Studio' },
+  { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
+  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: 'Theme Studio' },
 ]
 
 export const simplifiedNav: LinkItem[] = [
@@ -45,8 +57,8 @@ export const simplifiedNav: LinkItem[] = [
   { link: '/ecosystem/packages', text: '包总览' },
   { link: '/plugins/', text: '插件' },
   { link: '/examples/basic-report', text: '示例' },
-  { link: '/playground', text: 'Playground' },
-  { link: '/theme-studio', text: '主题工作室' },
+  { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
+  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主题工作室' },
 ]
 
 export const traditionalNav: LinkItem[] = [
@@ -55,8 +67,8 @@ export const traditionalNav: LinkItem[] = [
   { link: '/ecosystem/packages', text: '套件總覽' },
   { link: '/plugins/', text: '外掛' },
   { link: '/examples/basic-report', text: '範例' },
-  { link: '/playground', text: 'Playground' },
-  { link: '/theme-studio', text: '主題工作室' },
+  { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
+  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主題工作室' },
 ]
 
 export const apiLinks: LinkItem[] = [
@@ -72,8 +84,8 @@ export const ecosystemLinks: LinkItem[] = [
   { link: '/ecosystem/monorepo', text: 'Monorepo Structure' },
   { link: '/ecosystem/packages', text: 'Package Catalog' },
   { link: '/ecosystem/creating-plugins', text: 'Creating Plugins' },
-  { link: '/playground', text: 'Online Playground' },
-  { link: '/theme-studio', text: 'Theme Studio' },
+  { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Online Playground' },
+  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: 'Theme Studio' },
 ]
 
 export const exampleLinks: LinkItem[] = [
@@ -166,8 +178,8 @@ export const zhEcosystemLinks: LinkItem[] = [
   { link: '/ecosystem/monorepo', text: 'Monorepo 结构' },
   { link: '/ecosystem/packages', text: '包总览' },
   { link: '/ecosystem/creating-plugins', text: '创建插件' },
-  { link: '/playground', text: '在线 Playground' },
-  { link: '/theme-studio', text: '主题工作室' },
+  { link: 'https://docx-kit-playground.ntnyq.dev/', text: '在线 Playground' },
+  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主题工作室' },
 ]
 
 export const zhExampleLinks: LinkItem[] = [
@@ -241,8 +253,8 @@ export const zhTwEcosystemLinks: LinkItem[] = [
   { link: '/ecosystem/monorepo', text: 'Monorepo 結構' },
   { link: '/ecosystem/packages', text: '套件總覽' },
   { link: '/ecosystem/creating-plugins', text: '建立外掛' },
-  { link: '/playground', text: '線上 Playground' },
-  { link: '/theme-studio', text: '主題工作室' },
+  { link: 'https://docx-kit-playground.ntnyq.dev/', text: '線上 Playground' },
+  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主題工作室' },
 ]
 
 export const zhTwExampleLinks: LinkItem[] = [

@@ -15,6 +15,12 @@ hero:
       text: 查看套件總覽
       link: /zh-TW/ecosystem/packages
     - theme: alt
+      text: Playground
+      link: https://docx-kit-playground.ntnyq.dev/?lang=zh-TW
+    - theme: alt
+      text: Theme Studio
+      link: https://docx-kit-theme-studio.ntnyq.dev/?lang=zh-TW
+    - theme: alt
       text: 查看 GitHub
       link: https://github.com/ntnyq/docx-kit
 

@@ -1,0 +1,32 @@
+{
+  "name": "@docxkit/theme-studio",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@docxkit/app-shared": "workspace:*",
+    "@lucide/vue": "^1.63.0",
+    "@shikijs/core": "^4.5.0",
+    "@shikijs/engine-javascript": "^4.5.0",
+    "@shikijs/langs": "^4.5.0",
+    "@shikijs/themes": "^4.5.0",
+    "@vueuse/core": "^15.0.0",
+    "docx": "^9.15.0",
+    "docx-kit": "workspace:*",
+    "vue": "^3.5.44",
+    "vue-i18n": "^11.4.16"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "sucrase": "^3.35.1",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.5",
+    "vue-tsc": "^3.3.13"
+  }
+}

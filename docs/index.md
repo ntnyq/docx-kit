@@ -15,6 +15,12 @@ hero:
       text: Browse Packages
       link: /ecosystem/packages
     - theme: alt
+      text: Playground
+      link: https://docx-kit-playground.ntnyq.dev/?lang=en-US
+    - theme: alt
+      text: Theme Studio
+      link: https://docx-kit-theme-studio.ntnyq.dev/?lang=en-US
+    - theme: alt
       text: View on GitHub
       link: https://github.com/ntnyq/docx-kit
 

@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import {
   createThemeSample,
   DOCUMENT_LAYOUTS,
-} from '../../docs/.vitepress/utils/documentSamples'
+} from '../../apps/theme-studio/src/utils/documentSamples'
 import {
   badgePlugin,
   BUILTIN_THEMES,
