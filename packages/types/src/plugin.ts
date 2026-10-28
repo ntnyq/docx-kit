@@ -7,10 +7,10 @@
  * @module plugin
  */
 
-import type { DocxKitConfig } from './document'
-import type { BlockNode } from './dsl/nodes'
-import type { DocxStyleRule } from './style'
-import type { MaybePromise } from './utility'
+import type { DocxKitConfig } from './document.js'
+import type { BlockNode } from './dsl/nodes.js'
+import type { DocxStyleRule } from './style.js'
+import type { MaybePromise } from './utility.js'
 
 /**
  * Built-in plugin type map.

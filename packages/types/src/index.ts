@@ -13,7 +13,7 @@ export type {
   DocxPlugin,
   PluginRegistry,
   PluginRenderContext,
-} from './plugin'
+} from './plugin.js'
 
 // ---------- Utility types ----------
 export type {
@@ -25,7 +25,7 @@ export type {
   StyleTokenCategory,
   ThemeToken,
   UnitValue,
-} from './utility'
+} from './utility.js'
 
 // ---------- Style types ----------
 export type {
@@ -42,7 +42,7 @@ export type {
   TextAlign,
   TextStyleRule,
   VerticalAlign,
-} from './style'
+} from './style.js'
 
 // ---------- Document types ----------
 export type {
@@ -66,7 +66,7 @@ export type {
   ThemeColors,
   ThemeFonts,
   ThemeSpacing,
-} from './document'
+} from './document.js'
 
 // ---------- DSL node types ----------
 export type {
@@ -110,4 +110,4 @@ export type {
   TextBoxOptions,
   TextNode,
   ThematicBreakNode,
-} from './dsl/nodes'
+} from './dsl/nodes.js'

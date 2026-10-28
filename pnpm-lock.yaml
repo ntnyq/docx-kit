@@ -184,18 +184,12 @@ importers:
       '@types/pngjs':
         specifier: ^6.0.5
         version: 6.0.5
-      '@types/qrcode':
-        specifier: ^1.5.6
-        version: 1.5.6
       '@typescript/native':
         specifier: npm:typescript@^7.0.2
         version: typescript@7.0.2
       bumpp:
         specifier: ^12.3.0
         version: 12.3.0
-      bwip-js:
-        specifier: ^4.11.4
-        version: 4.11.4
       echarts:
         specifier: ^6.1.0
         version: 6.1.0
@@ -223,9 +217,6 @@ importers:
       prettier:
         specifier: ^3.9.10
         version: 3.9.10
-      qrcode:
-        specifier: ^1.5.4
-        version: 1.5.4
       tsdown:
         specifier: ^0.23.3
         version: 0.23.3(@typescript/typescript6@6.0.2)(tsx@4.23.15)
@@ -244,75 +235,6 @@ importers:
 
   docs:
     dependencies:
-      '@docxkit/core':
-        specifier: workspace:*
-        version: link:../packages/core
-      '@docxkit/plugin-badge':
-        specifier: workspace:*
-        version: link:../packages-plugins/badge
-      '@docxkit/plugin-barcode':
-        specifier: workspace:*
-        version: link:../packages-plugins/barcode
-      '@docxkit/plugin-callout':
-        specifier: workspace:*
-        version: link:../packages-plugins/callout
-      '@docxkit/plugin-changelog':
-        specifier: workspace:*
-        version: link:../packages-plugins/changelog
-      '@docxkit/plugin-checklist':
-        specifier: workspace:*
-        version: link:../packages-plugins/checklist
-      '@docxkit/plugin-code-block':
-        specifier: workspace:*
-        version: link:../packages-plugins/code-block
-      '@docxkit/plugin-cover-page':
-        specifier: workspace:*
-        version: link:../packages-plugins/cover-page
-      '@docxkit/plugin-data-table':
-        specifier: workspace:*
-        version: link:../packages-plugins/data-table
-      '@docxkit/plugin-divider':
-        specifier: workspace:*
-        version: link:../packages-plugins/divider
-      '@docxkit/plugin-echarts':
-        specifier: workspace:*
-        version: link:../packages-plugins/echarts
-      '@docxkit/plugin-figure':
-        specifier: workspace:*
-        version: link:../packages-plugins/figure
-      '@docxkit/plugin-invoice':
-        specifier: workspace:*
-        version: link:../packages-plugins/invoice
-      '@docxkit/plugin-letterhead':
-        specifier: workspace:*
-        version: link:../packages-plugins/letterhead
-      '@docxkit/plugin-meeting-minutes':
-        specifier: workspace:*
-        version: link:../packages-plugins/meeting-minutes
-      '@docxkit/plugin-metric-card':
-        specifier: workspace:*
-        version: link:../packages-plugins/metric-card
-      '@docxkit/plugin-page-number':
-        specifier: workspace:*
-        version: link:../packages-plugins/page-number
-      '@docxkit/plugin-property-table':
-        specifier: workspace:*
-        version: link:../packages-plugins/property-table
-      '@docxkit/plugin-qrcode':
-        specifier: workspace:*
-        version: link:../packages-plugins/qrcode
-      '@docxkit/plugin-signature-block':
-        specifier: workspace:*
-        version: link:../packages-plugins/signature-block
-      '@docxkit/plugin-timeline':
-        specifier: workspace:*
-        version: link:../packages-plugins/timeline
-      '@docxkit/plugin-toc':
-        specifier: workspace:*
-        version: link:../packages-plugins/toc
-      '@docxkit/plugin-watermark':
-        specifier: workspace:*
-        version: link:../packages-plugins/watermark
       '@docxkit/preset-academic':
         specifier: workspace:*
         version: link:../packages-presets/academic
@@ -325,15 +247,6 @@ importers:
       '@docxkit/renderer':
         specifier: workspace:*
         version: link:../packages/renderer
-      '@docxkit/theme-minimal':
-        specifier: workspace:*
-        version: link:../packages-themes/minimal
-      '@docxkit/theme-ocean':
-        specifier: workspace:*
-        version: link:../packages-themes/ocean
-      '@docxkit/theme-warm':
-        specifier: workspace:*
-        version: link:../packages-themes/warm
       '@ntnyq/utils':
         specifier: ^0.23.0
         version: 0.23.0
@@ -381,9 +294,6 @@ importers:
       '@docxkit/core':
         specifier: workspace:*
         version: link:../../packages/core
-      bwip-js:
-        specifier: '>=4.10.0'
-        version: 4.11.4
       docx:
         specifier: ^9.7.1
         version: 9.15.0
@@ -391,9 +301,18 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      '@types/pngjs':
+        specifier: ^6.0.5
+        version: 6.0.5
+      bwip-js:
+        specifier: ^4.11.4
+        version: 4.11.4
       jszip:
         specifier: ^3.10.2
         version: 3.10.2
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
 
   packages-plugins/callout:
     dependencies:
@@ -407,6 +326,9 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/changelog:
     dependencies:
@@ -433,6 +355,15 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      '@types/pngjs':
+        specifier: ^6.0.5
+        version: 6.0.5
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
 
   packages-plugins/code-block:
     dependencies:
@@ -478,6 +409,9 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/divider:
     dependencies:
@@ -491,6 +425,9 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/echarts:
     dependencies:
@@ -507,6 +444,9 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/figure:
     dependencies:
@@ -520,6 +460,15 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      '@types/pngjs':
+        specifier: ^6.0.5
+        version: 6.0.5
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
 
   packages-plugins/invoice:
     dependencies:
@@ -572,6 +521,9 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/page-number:
     dependencies:
@@ -585,6 +537,9 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/property-table:
     dependencies:
@@ -607,13 +562,16 @@ importers:
       docx:
         specifier: ^9.7.1
         version: 9.15.0
-      qrcode:
-        specifier: '>=1.5.0'
-        version: 1.5.4
     devDependencies:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      '@types/qrcode':
+        specifier: ^1.5.6
+        version: 1.5.6
+      qrcode:
+        specifier: ^1.5.4
+        version: 1.5.4
 
   packages-plugins/signature-block:
     dependencies:
@@ -627,6 +585,9 @@ importers:
       '@docxkit/pdk':
         specifier: workspace:*
         version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/timeline:
     dependencies:
@@ -863,6 +824,10 @@ importers:
       docx:
         specifier: ^9.7.1
         version: 9.15.0
+    devDependencies:
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages/errors: {}
 
@@ -871,8 +836,9 @@ importers:
       '@docxkit/core':
         specifier: workspace:*
         version: link:../core
+    devDependencies:
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
 
   packages/markdown:
@@ -886,6 +852,10 @@ importers:
       marked:
         specifier: ^18.1.2
         version: 18.1.2
+    devDependencies:
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages/mcp:
     dependencies:
@@ -970,6 +940,16 @@ importers:
       zod:
         specifier: '>=3.0.0'
         version: 4.6.7
+    devDependencies:
+      '@types/pngjs':
+        specifier: ^6.0.5
+        version: 6.0.5
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
 
   packages/pdk:
     dependencies:

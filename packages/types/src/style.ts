@@ -7,7 +7,12 @@
  * @module style
  */
 
-import type { HexColor, LiteralUnion, StyleToken, UnitValue } from './utility'
+import type {
+  HexColor,
+  LiteralUnion,
+  StyleToken,
+  UnitValue,
+} from './utility.js'
 
 /**
  * A single border side descriptor.

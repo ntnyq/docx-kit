@@ -48,6 +48,8 @@
     }
   },
   "devDependencies": {
-    "@docxkit/pdk": "workspace:*"
+    "@docxkit/pdk": "workspace:*",
+    "@types/qrcode": "^1.5.6",
+    "qrcode": "^1.5.4"
   }
 }

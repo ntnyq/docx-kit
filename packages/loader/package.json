@@ -41,7 +41,9 @@
     "dev": "tsdown --watch"
   },
   "peerDependencies": {
-    "@docxkit/core": "workspace:*",
-    "docx": "^9.7.1"
+    "@docxkit/core": "workspace:*"
+  },
+  "devDependencies": {
+    "docx": "^9.15.0"
   }
 }

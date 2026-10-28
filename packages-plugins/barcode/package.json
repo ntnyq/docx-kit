@@ -50,6 +50,9 @@
   },
   "devDependencies": {
     "@docxkit/pdk": "workspace:*",
-    "jszip": "^3.10.2"
+    "@types/pngjs": "^6.0.5",
+    "bwip-js": "^4.11.4",
+    "jszip": "^3.10.2",
+    "pngjs": "^7.0.0"
   }
 }

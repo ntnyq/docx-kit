@@ -127,5 +127,8 @@
     "@docxkit/theme-minimal": "workspace:*",
     "@docxkit/theme-ocean": "workspace:*",
     "@docxkit/theme-warm": "workspace:*"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.2"
   }
 }

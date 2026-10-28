@@ -36,5 +36,8 @@
     "@docxkit/types": "workspace:*",
     "entities": "^8.1.0",
     "marked": "^18.1.2"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.2"
   }
 }

@@ -10,6 +10,7 @@ import {
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import process from 'node:process'
+import { pathToFileURL } from 'node:url'
 
 const repositoryRoot = resolve(import.meta.dirname, '..')
 const packageRoots = [
@@ -23,8 +24,81 @@ const tarballDirectory = join(temporaryRoot, 'tarballs')
 
 interface PackageManifest {
   name: string
+  bin?: Record<string, string>
   peerDependencies?: Record<string, string>
   private?: boolean
+}
+
+function checkInstalledCli() {
+  const packageDirectory = join(
+    temporaryRoot,
+    'node_modules/@docxkit/create-plugin',
+  )
+  const command = 'create-docx-kit-plugin'
+  const entry = readPackageManifest(packageDirectory).bin?.[command]
+  if (!entry) {
+    throw new Error(`Installed CLI does not expose ${command}`)
+  }
+  if (
+    !readFileSync(join(packageDirectory, entry), 'utf8').startsWith(
+      '#!/usr/bin/env node',
+    )
+  ) {
+    throw new Error('Installed CLI entry is missing its Node.js shebang')
+  }
+
+  const projectName = 'docx-kit-plugin-packed-consumer'
+  const preloadPath = join(temporaryRoot, 'cli-prompts.mjs')
+  writeFileSync(
+    preloadPath,
+    `import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
+const packageRequire = createRequire(require.resolve('@docxkit/create-plugin/package.json'))
+packageRequire('prompts').inject(${JSON.stringify([
+      projectName,
+      'Packed CLI consumer',
+      'docx-kit',
+      'MIT',
+      '0.1.0',
+    ])})
+`,
+  )
+
+  execFileSync('pnpm', ['exec', command, projectName], {
+    cwd: temporaryRoot,
+    shell: process.platform === 'win32',
+    stdio: 'inherit',
+    timeout: 30_000,
+    env: {
+      ...process.env,
+      NODE_OPTIONS: [
+        process.env.NODE_OPTIONS,
+        `--import=${pathToFileURL(preloadPath).href}`,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    },
+  })
+
+  const projectDirectory = join(temporaryRoot, projectName)
+  for (const file of [
+    'package.json',
+    'docx-kit.plugin.json',
+    'src/index.ts',
+    'tests/index.test.ts',
+    'tsconfig.json',
+    'tsdown.config.ts',
+    'eslint.config.mjs',
+    'README.md',
+  ]) {
+    if (!existsSync(join(projectDirectory, file))) {
+      throw new Error(`Installed CLI did not generate ${file}`)
+    }
+  }
+  if (readPackageManifest(projectDirectory).name !== projectName) {
+    throw new Error('Installed CLI generated an incorrect package name')
+  }
 }
 
 function collectPackages() {
@@ -110,6 +184,7 @@ try {
         dependencies: {
           ...externalPeers,
           '@docxkit/core': overrides['@docxkit/core'],
+          '@docxkit/create-plugin': overrides['@docxkit/create-plugin'],
           '@docxkit/errors': overrides['@docxkit/errors'],
           '@docxkit/types': overrides['@docxkit/types'],
           'docx-kit': overrides['docx-kit'],
@@ -239,12 +314,57 @@ await server.connect(transport)
 await server.close()
 `,
   )
+  writeFileSync(
+    join(temporaryRoot, 'types-smoke.ts'),
+    `import type {
+  DocxKitConfig,
+  DocxStyleRule,
+  ParagraphNode,
+  StyleSheet,
+  TextNode,
+} from '@docxkit/types'
+
+const styles = { body: { fontSize: '12pt' } } satisfies StyleSheet
+const config: DocxKitConfig<typeof styles> = { styles }
+const text: TextNode = { type: 'text', text: 'Strict NodeNext consumer' }
+const paragraph: ParagraphNode = { type: 'paragraph', children: [text] }
+
+// @ts-expect-error bold only accepts a boolean
+const invalidStyle: DocxStyleRule = { bold: 'yes' }
+
+// @ts-expect-error runtime helpers belong to @docxkit/core
+import type { defineStyles } from '@docxkit/types'
+// @ts-expect-error errors belong to @docxkit/errors
+import type { DocxKitError } from '@docxkit/types'
+
+void [config, invalidStyle, paragraph]
+`,
+  )
+
   run(
     'pnpm',
     ['install', '--ignore-scripts', '--no-frozen-lockfile'],
     temporaryRoot,
   )
+  checkInstalledCli()
   run('node', ['smoke.mjs'], temporaryRoot)
+  run(
+    join(repositoryRoot, 'node_modules/.bin/tsc'),
+    [
+      '--module',
+      'NodeNext',
+      '--moduleResolution',
+      'NodeNext',
+      '--noEmit',
+      '--skipLibCheck',
+      'false',
+      '--strict',
+      '--target',
+      'ES2022',
+      'types-smoke.ts',
+    ],
+    temporaryRoot,
+  )
   run(
     join(repositoryRoot, 'node_modules/.bin/tsc'),
     [
@@ -264,7 +384,7 @@ await server.close()
 
   succeeded = true
   console.log(
-    'Packed packages passed runtime imports and TypeScript consumer checks.',
+    'Packed packages passed installed CLI, runtime imports, strict NodeNext types, and TypeScript consumer checks.',
   )
 } finally {
   if (succeeded || process.env.DOCX_KIT_KEEP_SMOKE_TEMP !== '1') {

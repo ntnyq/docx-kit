@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import process from 'node:process'
@@ -15,13 +16,20 @@ interface ArtifactPath {
   path: string
 }
 
+interface PackedPackage {
+  files: { path: string }[]
+}
+
 function collectLocalPaths(
   value: unknown,
   field: string,
   paths: ArtifactPath[],
 ) {
   if (typeof value === 'string') {
-    if (value.startsWith('./')) {
+    if (
+      value.startsWith('./')
+      || /^(?:bin|main|module|types)(?:\.|$)/.test(field)
+    ) {
       paths.push({ field, path: value })
     }
     return
@@ -53,6 +61,22 @@ function collectPackageDirectories() {
   })
 }
 
+function collectPackedPaths(packageDirectory: string): Set<string> {
+  const output = execFileSync('pnpm', ['pack', '--dry-run', '--json'], {
+    cwd: packageDirectory,
+    encoding: 'utf8',
+    env: process.env,
+    shell: process.platform === 'win32',
+  })
+  const result: PackedPackage | PackedPackage[] = JSON.parse(output)
+  const packages = Array.isArray(result) ? result : [result]
+  return new Set(
+    packages.flatMap(pkg =>
+      pkg.files.map(file => file.path.replaceAll('\\', '/')),
+    ),
+  )
+}
+
 const missingArtifacts: string[] = []
 
 for (const packageDirectory of collectPackageDirectories()) {
@@ -77,19 +101,29 @@ for (const packageDirectory of collectPackageDirectories()) {
     collectLocalPaths(manifest[field], field, artifactPaths)
   }
 
+  const packedPaths = collectPackedPaths(packageDirectory)
+
   for (const artifact of artifactPaths) {
     if (!existsSync(resolve(packageDirectory, artifact.path))) {
       missingArtifacts.push(
         `${manifest.name}: ${artifact.field} -> ${artifact.path}`,
+      )
+    } else if (
+      !packedPaths.has(artifact.path.replaceAll('\\', '/').replace(/^\.\//, ''))
+    ) {
+      missingArtifacts.push(
+        `${manifest.name}: ${artifact.field} -> ${artifact.path} (not included in packed files)`,
       )
     }
   }
 }
 
 if (missingArtifacts.length > 0) {
-  console.error('Missing package artifacts:')
+  console.error('Invalid package artifacts:')
   missingArtifacts.forEach(artifact => console.error(`  - ${artifact}`))
   process.exitCode = 1
 } else {
-  console.log('All published package entrypoints resolve to built artifacts.')
+  console.log(
+    'All published package entrypoints exist and are included in packed files.',
+  )
 }

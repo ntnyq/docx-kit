@@ -1,5 +1,5 @@
 import ts from 'typescript'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PRESETS } from '../constants/templates'
 import { DOCX_KIT_TYPE_LIBS } from './monacoTypes'
 
@@ -49,6 +49,9 @@ function createTypeService() {
   })
 
   return {
+    dispose() {
+      service.dispose()
+    },
     getDiagnostics(source: string) {
       mainSource = source
       mainVersion++
@@ -85,21 +88,32 @@ function toVirtualFileName(filePath: string) {
 }
 
 describe('playground Monaco declarations', () => {
+  let typeService: ReturnType<typeof createTypeService>
+
+  beforeAll(() => {
+    typeService = createTypeService()
+    // Initialize the compiler and declaration graph once, outside preset checks.
+    typeService.getDiagnostics('')
+  })
+
+  afterAll(() => {
+    typeService.dispose()
+  })
+
   it('converts file URLs without requiring a Windows drive letter', () => {
     expect(toVirtualFileName('file:///node_modules/docx-kit/index.d.ts')).toBe(
       '/node_modules/docx-kit/index.d.ts',
     )
   })
 
-  it('type-checks every playground preset against the real package API', () => {
-    const typeService = createTypeService()
-
-    for (const preset of PRESETS) {
+  it.each(PRESETS)(
+    'type-checks the $label preset against the real package API',
+    preset => {
       const diagnostics = typeService.getDiagnostics(preset.code)
       expect(
         formatDiagnostics(diagnostics),
         `${preset.label} contains invalid playground types`,
       ).toBe('')
-    }
-  })
+    },
+  )
 })

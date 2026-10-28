@@ -70,5 +70,10 @@
     "@docxkit/plugin-watermark": "workspace:*",
     "bwip-js": "^4.11.4",
     "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/pngjs": "^6.0.5",
+    "jszip": "^3.10.2",
+    "pngjs": "^7.0.0"
   }
 }

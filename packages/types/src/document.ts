@@ -4,9 +4,9 @@
  * @module document
  */
 
-import type { BlockNode } from './dsl/nodes'
-import type { BorderRule, DocxStyleRule, StyleSheet } from './style'
-import type { MaybePromise, UnitValue } from './utility'
+import type { BlockNode } from './dsl/nodes.js'
+import type { BorderRule, DocxStyleRule, StyleSheet } from './style.js'
+import type { MaybePromise, UnitValue } from './utility.js'
 
 /**
  * OOXML document properties shown in Word's File → Info panel.
