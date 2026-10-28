@@ -56,6 +56,15 @@ export function useDocxPlayground() {
   // Monaco editor initialisation
   // -------------------------------------------------------------------------
   onMounted(async () => {
+    const requestedExample = new URLSearchParams(window.location.search).get(
+      'example',
+    )
+    const requestedPreset = PRESETS.find(
+      preset => preset.id === requestedExample,
+    )
+    if (requestedPreset) {
+      loadPreset(requestedPreset)
+    }
     await nextTick()
 
     if (!editorContainer.value) {
@@ -132,6 +141,10 @@ export function useDocxPlayground() {
     } catch (error_) {
       editorError.value = String(error_)
       console.error('Monaco editor init failed:', error_)
+    }
+
+    if (requestedPreset) {
+      await run()
     }
   })
 

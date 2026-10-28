@@ -1,6 +1,10 @@
 import * as docxKit from 'docx-kit'
 import { describe, expect, it, vi } from 'vitest'
-import { COMPREHENSIVE_CODE, RICH_CONTENT_CODE } from '../constants/templates'
+import {
+  CHECKLIST_CODE,
+  COMPREHENSIVE_CODE,
+  RICH_CONTENT_CODE,
+} from '../constants/templates'
 import { executePlaygroundCode } from './playgroundRunner'
 import { prepareCode } from './prepareCode'
 
@@ -106,4 +110,10 @@ describe('playground runtime', () => {
       executePlaygroundCode(RICH_CONTENT_CODE),
     ).resolves.toBeInstanceOf(Blob)
   }, 20_000)
+
+  it('runs the complete checklist example', async () => {
+    await expect(executePlaygroundCode(CHECKLIST_CODE)).resolves.toBeInstanceOf(
+      Blob,
+    )
+  })
 })

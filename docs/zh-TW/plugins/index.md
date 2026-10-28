@@ -21,7 +21,7 @@ docx-kit 目前提供 **22 個內建外掛**，各自位於 `packages-plugins/` 
 | [頁碼](./page-number) | `@docxkit/plugin-page-number` | `pageNumber` | 目前頁或第 X 頁共 Y 頁的域 |
 | [屬性表](./property-table) | `@docxkit/plugin-property-table` | `propertyTable` | 鍵值中繼資料表格 |
 | [二維碼](./qrcode) | `@docxkit/plugin-qrcode` | `qrcode` | 根據文字或 URL 產生二維碼圖片 |
-| [工作清單](./checklist) | `@docxkit/plugin-checklist` | `checklist` | 分組 Word 原生核取方塊 |
+| [工作清單](./checklist) | `@docxkit/plugin-checklist` | `checklist` | 分組工作，支援圖形與 Word 原生核取方塊 |
 | [插圖](./figure) | `@docxkit/plugin-figure` | `figure` | 帶題注與來源的圖片 |
 | [指標卡](./metric-card) | `@docxkit/plugin-metric-card` | `metricCard` | 多欄指標摘要 |
 | [簽名區](./signature-block) | `@docxkit/plugin-signature-block` | `signatureBlock` | 審批與合同簽名網格 |

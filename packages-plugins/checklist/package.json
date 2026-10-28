@@ -2,7 +2,7 @@
   "name": "@docxkit/plugin-checklist",
   "type": "module",
   "version": "0.6.0",
-  "description": "Grouped checklists with native Word checkboxes — docx-kit plugin",
+  "description": "Grouped checklists with graphic and native Word checkboxes — docx-kit plugin",
   "keywords": [
     "docx",
     "docx-kit",

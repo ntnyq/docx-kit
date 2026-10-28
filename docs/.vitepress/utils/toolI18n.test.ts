@@ -34,6 +34,7 @@ describe('documentation tool language', () => {
     const theme = { id: 'ocean', name: 'My ocean theme' }
 
     expect(i18n.exampleLabel('Multi-Section')).toBe('多节文档')
+    expect(i18n.exampleLabel('Checklist')).toBe('任务清单')
     expect(i18n.styleTitle('classic', 'Classic')).toBe('经典公文')
     expect(i18n.layoutTitle('modern', 'Business report')).toBe('商务报告')
     expect(i18n.themeTitle(theme.id, theme.name)).toBe('海洋')
@@ -42,6 +43,7 @@ describe('documentation tool language', () => {
 
     language.value = 'zh-TW'
     expect(i18n.exampleLabel('Multi-Section')).toBe('多節文件')
+    expect(i18n.exampleLabel('Checklist')).toBe('工作清單')
     expect(i18n.styleTitle('academic', 'Academic')).toBe('學術論文')
     expect(i18n.layoutDescription('classic', '')).toContain('首行縮排')
     expect(i18n.exampleLabel('Custom example')).toBe('Custom example')

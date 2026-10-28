@@ -9,7 +9,7 @@
 
 import { ImageRun } from 'docx'
 import type { Buffer } from 'node:buffer'
-import type { IFloating, IImageOptions } from 'docx'
+import type { IFloating, IImageOptions, IRunPropertiesOptions } from 'docx'
 
 /**
  * Options for {@link createImageRun}.
@@ -48,6 +48,12 @@ export interface CreateImageRunOptions {
     data: string | ArrayBuffer | Buffer | Uint8Array
     type: ImageType
   }
+  /**
+   * Formatting of the image run. Numeric baseline positions use Word half-points.
+   */
+  run?: Omit<IRunPropertiesOptions, 'position'> & {
+    position?: number | IRunPropertiesOptions['position']
+  }
 }
 export interface ImageMetadata {
   type: ImageType
@@ -78,6 +84,7 @@ export function createImageRun(options: CreateImageRunOptions) {
     data: options.data,
     fallback: options.fallback,
     floating: options.floating,
+    run: options.run,
     type: options.type,
     altText: options.alt
       ? {

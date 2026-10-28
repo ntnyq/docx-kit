@@ -47,7 +47,7 @@
 | `@docxkit/plugin-page-number` | 頁碼域 |
 | `@docxkit/plugin-property-table` | 鍵值表格 |
 | `@docxkit/plugin-qrcode` | 二維碼 |
-| `@docxkit/plugin-checklist` | 分組 Word 原生核取方塊 |
+| `@docxkit/plugin-checklist` | 分組工作清單，支援圖形與 Word 原生核取方塊 |
 | `@docxkit/plugin-figure` | 帶題注與來源的圖片 |
 | `@docxkit/plugin-metric-card` | 多欄指標摘要 |
 | `@docxkit/plugin-signature-block` | 審批與簽名佈局 |

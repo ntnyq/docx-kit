@@ -26,6 +26,7 @@ const englishMessages = {
   emptyPreview: 'Click Run to generate a document.',
   emptyPreviewHint: 'Select an example above or write your own code.',
   exampleBasic: 'Basic',
+  exampleChecklist: 'Checklist',
   exampleComprehensive: 'Comprehensive',
   exampleMultiSection: 'Multi-Section',
   examplePlugins: 'Plugins',
@@ -127,6 +128,7 @@ const simplifiedMessages: ToolMessages = {
   emptyPreview: '点击「运行」生成文档。',
   emptyPreviewHint: '选择上方示例，或编写自己的代码。',
   exampleBasic: '基础示例',
+  exampleChecklist: '任务清单',
   exampleComprehensive: '综合示例',
   exampleMultiSection: '多节文档',
   examplePlugins: '插件',
@@ -217,6 +219,7 @@ const traditionalMessages: ToolMessages = {
   emptyPreview: '按一下「執行」產生文件。',
   emptyPreviewHint: '選擇上方範例，或撰寫自己的程式碼。',
   exampleBasic: '基本範例',
+  exampleChecklist: '工作清單',
   exampleComprehensive: '綜合範例',
   exampleMultiSection: '多節文件',
   examplePlugins: '外掛',
@@ -288,6 +291,7 @@ const messagesByLocale: Record<ToolLocale, ToolMessages> = {
 
 const exampleKeys: Record<string, ToolMessageKey> = {
   Basic: 'exampleBasic',
+  Checklist: 'exampleChecklist',
   Comprehensive: 'exampleComprehensive',
   'Multi-Section': 'exampleMultiSection',
   Plugins: 'examplePlugins',

@@ -47,7 +47,7 @@
 | `@docxkit/plugin-page-number` | 页码域 |
 | `@docxkit/plugin-property-table` | 键值表格 |
 | `@docxkit/plugin-qrcode` | 二维码 |
-| `@docxkit/plugin-checklist` | 分组 Word 原生复选框 |
+| `@docxkit/plugin-checklist` | 分组任务清单，支持图形与 Word 原生复选框 |
 | `@docxkit/plugin-figure` | 带题注与来源的图片 |
 | `@docxkit/plugin-metric-card` | 多列指标摘要 |
 | `@docxkit/plugin-signature-block` | 审批与签名布局 |

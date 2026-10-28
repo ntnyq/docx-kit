@@ -1,4 +1,5 @@
 import { unindent } from '@ntnyq/utils'
+import { CHECKLIST_BLOCK_CODE } from './checklist'
 
 /**
  * Plugins playground preset — showcases all 22 built-in plugins.
@@ -30,6 +31,7 @@ import { unindent } from '@ntnyq/utils'
 export const PLUGIN_CODE = unindent(`
   import {
     createDocx,
+    useTheme,
     badgePlugin,
     barcodePlugin,
     calloutPlugin,
@@ -56,6 +58,7 @@ export const PLUGIN_CODE = unindent(`
 
   // Register all built-in plugins (chain \`.use()\` for type-safe \`.plugin()\` calls)
   const doc = createDocx({
+    theme: useTheme('ocean'),
     page: { size: 'A4', margin: '20mm 25mm' },
     metadata: { title: 'Built-in Plugins Showcase', creator: 'docx-kit' },
   })
@@ -325,14 +328,7 @@ export const PLUGIN_CODE = unindent(`
 
   doc
     .h1('18. Checklist')
-    .plugin('checklist', {
-      title: 'Release tasks',
-      items: [
-        { text: 'Review changes', checked: true, owner: 'Alice', group: 'Before release' },
-        { text: 'Run acceptance tests', owner: 'Bob', note: 'Attach the test report', group: 'Before release' },
-        { text: 'Monitor errors', group: 'After release' },
-      ],
-    })
+    ${CHECKLIST_BLOCK_CODE.replaceAll('\n', '\n    ')}
     .h1('19. Figure')
     .plugin('figure', {
       data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',

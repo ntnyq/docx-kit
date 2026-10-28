@@ -21,7 +21,7 @@ docx-kit 当前提供 **22 个内置插件**，各自位于 `packages-plugins/` 
 | [页码](./page-number) | `@docxkit/plugin-page-number` | `pageNumber` | 当前页或第 X 页共 Y 页的域 |
 | [属性表](./property-table) | `@docxkit/plugin-property-table` | `propertyTable` | 键值元数据表格 |
 | [二维码](./qrcode) | `@docxkit/plugin-qrcode` | `qrcode` | 根据文字或 URL 生成二维码图片 |
-| [任务清单](./checklist) | `@docxkit/plugin-checklist` | `checklist` | 分组 Word 原生复选框 |
+| [任务清单](./checklist) | `@docxkit/plugin-checklist` | `checklist` | 分组任务，支持图形与 Word 原生复选框 |
 | [插图](./figure) | `@docxkit/plugin-figure` | `figure` | 带题注与来源的图片 |
 | [指标卡](./metric-card) | `@docxkit/plugin-metric-card` | `metricCard` | 多列指标摘要 |
 | [签名区](./signature-block) | `@docxkit/plugin-signature-block` | `signatureBlock` | 审批与合同签名网格 |
