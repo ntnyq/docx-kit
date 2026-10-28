@@ -1,5 +1,12 @@
 # docx-kit
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/public/brand/logo-dark.svg">
+    <img src="./docs/public/brand/logo-light.svg" alt="docx-kit" width="360" height="113">
+  </picture>
+</p>
+
 [![CI](https://github.com/ntnyq/docx-kit/workflows/CI/badge.svg)](https://github.com/ntnyq/docx-kit/actions)
 [![NPM VERSION](https://img.shields.io/npm/v/docx-kit.svg)](https://www.npmjs.com/package/docx-kit)
 [![NPM DOWNLOADS](https://img.shields.io/npm/dy/docx-kit.svg)](https://www.npmjs.com/package/docx-kit)

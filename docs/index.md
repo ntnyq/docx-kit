@@ -4,6 +4,9 @@ hero:
   name: Docx Kit
   text: CSS-like DOCX API Kit
   tagline: Type-safe, plugin-extensible Word document generation for Node.js & browser
+  image:
+    src: /brand/logo.svg
+    alt: Docx Kit
   actions:
     - theme: brand
       text: Get Started

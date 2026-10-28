@@ -4,6 +4,9 @@ hero:
   name: Docx Kit
   text: CSS 風格 DOCX API 工具包
   tagline: 面向 Node.js 與瀏覽器的型別安全、可外掛擴充 Word 文件生成方案
+  image:
+    src: /brand/logo.svg
+    alt: Docx Kit
   actions:
     - theme: brand
       text: 快速開始

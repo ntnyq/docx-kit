@@ -1,5 +1,19 @@
 /* docx-kit docs custom styles */
 
+html:root {
+  --vp-c-brand-1: #0f766e;
+  --vp-c-brand-2: #0d9488;
+  --vp-c-brand-3: #0f766e;
+  --vp-c-brand-soft: rgba(15, 118, 110, 0.14);
+}
+
+html.dark {
+  --vp-c-brand-1: #5eead4;
+  --vp-c-brand-2: #2dd4bf;
+  --vp-c-brand-3: #0f766e;
+  --vp-c-brand-soft: rgba(94, 234, 212, 0.14);
+}
+
 /* Limit home page features grid to 3 columns max to avoid cramped layout */
 @media (min-width: 960px) {
   .VPHomeFeatures .items {

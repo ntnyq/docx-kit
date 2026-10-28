@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">docx-kit</title>
+  <desc id="desc">A folded teal document with code brackets and modular content blocks.</desc>
+  <path fill="#0F766E" d="M34 8h42v22a10 10 0 0 0 10 10h22v64a16 16 0 0 1-16 16H34a14 14 0 0 1-14-14V22A14 14 0 0 1 34 8Z"/>
+  <path fill="#5EEAD4" d="m84 8 24 24H88a4 4 0 0 1-4-4V8Z"/>
+  <path stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="7" d="m50 52-12 12 12 12m28-24 12 12-12 12"/>
+  <rect width="28" height="7" x="38" y="92" fill="#FFF" rx="3.5"/>
+  <rect width="16" height="7" x="74" y="92" fill="#5EEAD4" rx="3.5"/>
+</svg>

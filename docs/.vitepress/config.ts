@@ -15,6 +15,9 @@ export default defineConfig({
   title: APP_TITLE,
   description:
     'CSS-like DOCX API Kit — Type-safe, plugin-extensible Word document generation',
+  head: [
+    ['link', { href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' }],
+  ],
   locales: {
     root: {
       label: 'English',
@@ -58,10 +61,10 @@ export default defineConfig({
   },
 
   themeConfig: {
+    logo: { alt: '', src: '/brand/logo.svg' },
     nav: navWithPrefix('', englishNav),
-    sidebar: buildEnglishSidebar(),
 
-    // logo: '',
+    sidebar: buildEnglishSidebar(),
     footer: {
       copyright: 'Copyright © ntnyq',
       message: 'Released under the MIT License.',
