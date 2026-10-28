@@ -1,5 +1,6 @@
 import { createPluginTestContext } from '@docxkit/pdk'
-import { Paragraph, Table } from 'docx'
+import { Document, Packer, Paragraph, Table } from 'docx'
+import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 import { signatureBlockPlugin } from '../src'
 
@@ -55,6 +56,43 @@ describe('signatureBlockPlugin', () => {
       createPluginTestContext(),
     )
     expect(result).toBeInstanceOf(Table)
+  })
+
+  it('exports a borderless signature grid with underlined names and a padded final row', async () => {
+    const table = signatureBlockPlugin().render(
+      {
+        columns: 2,
+        parties: [
+          { label: 'Author', name: 'Alice' },
+          { label: 'Reviewer', name: 'Bob' },
+          { label: 'Approver' },
+        ],
+      },
+      createPluginTestContext(),
+    )
+    if (!(table instanceof Table)) {
+      throw new TypeError('Expected a signature table')
+    }
+    const document = new Document({ sections: [{ children: [table] }] })
+    const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
+    const xml = await archive.file('word/document.xml')?.async('string')
+
+    expect(xml).toBeDefined()
+    for (const border of [
+      'top',
+      'left',
+      'bottom',
+      'right',
+      'insideH',
+      'insideV',
+    ]) {
+      expect(xml).toMatch(new RegExp(`<w:${border}[^>]*w:val="none"`))
+    }
+    expect(xml?.match(/<w:tr>/g)).toHaveLength(2)
+    expect(xml?.match(/<w:tc>/g)).toHaveLength(4)
+    expect(xml).toContain('<w:u w:val="single"/>')
+    expect(xml).toContain('Alice')
+    expect(xml).toContain('_____________________________')
   })
 
   it('renders an empty parties array', () => {

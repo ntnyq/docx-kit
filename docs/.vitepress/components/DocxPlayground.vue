@@ -192,6 +192,16 @@ onBeforeUnmount(() => {
             </button>
           </div>
         </div>
+        <p
+          v-if="resultBlob"
+          class="preview-notice"
+          role="note"
+        >
+          <strong>Preview limitations:</strong>
+          Page numbers and the table of contents may be incomplete. Page breaks
+          and page counts may differ from Word. Download the .docx file, open it
+          in Word, and update fields to check the final layout and page numbers.
+        </p>
         <div class="preview-content">
           <!-- Run error: blocks everything -->
           <div
@@ -397,6 +407,17 @@ onBeforeUnmount(() => {
   margin-top: 8px;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.preview-notice {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .preview-content {

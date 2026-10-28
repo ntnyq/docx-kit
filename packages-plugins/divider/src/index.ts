@@ -28,7 +28,8 @@ export function dividerPlugin() {
           border: {
             bottom: {
               color,
-              size: 6,
+              // A double border needs room for two strokes and their gap.
+              size: options.style === 'double' ? 18 : 6,
               space: 1,
               style,
             },

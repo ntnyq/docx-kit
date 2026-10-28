@@ -26,6 +26,7 @@ import {
   AlignmentType,
   Paragraph,
   Table,
+  TableBorders,
   TableCell,
   TableRow,
   TextRun,
@@ -177,6 +178,7 @@ export function signatureBlockPlugin() {
       })
 
       return new Table({
+        borders: TableBorders.NONE,
         rows,
         width: { size: 100, type: WidthType.PERCENTAGE },
         margins: {

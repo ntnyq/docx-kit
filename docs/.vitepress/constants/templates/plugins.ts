@@ -136,11 +136,11 @@ export const PLUGIN_CODE = unindent(`
     .p('Key-value pair table with styled cells.')
     .plugin('propertyTable', {
       items: [
-        { key: 'Library',      value: 'docx-kit v0.2' },
-        { key: 'Built on',     value: 'dolanmiu/docx v9.7' },
+        { key: 'Library',      value: 'docx-kit' },
+        { key: 'Built on',     value: 'dolanmiu/docx' },
         { key: 'License',      value: 'MIT' },
         { key: 'Platform',     value: 'Node.js & Browser' },
-        { key: 'Test Count',   value: '337+' },
+        { key: 'Output',       value: 'Word document (.docx)' },
       ],
       striped: true,
     })
@@ -202,7 +202,18 @@ export const PLUGIN_CODE = unindent(`
   // ════════════════════════════════════════════════════════════
   doc
     .section({
-      header: { default: { children: ['Built-in Plugins Showcase'] } },
+      header: {
+        default: {
+          children: [
+            'Built-in Plugins Showcase',
+            {
+              type: 'plugin',
+              name: 'watermark',
+              options: { text: 'CONFIDENTIAL', color: 'E0E0E0', fontSize: 48 },
+            },
+          ],
+        },
+      },
       footer: {
         default: {
           children: [
@@ -217,13 +228,6 @@ export const PLUGIN_CODE = unindent(`
     .h1('8. Watermark + Page Number')
     .p('This section has a header and a page-number footer.')
 
-    .plugin('watermark', {
-      text: 'CONFIDENTIAL',
-      color: 'E0E0E0',
-      fontSize: 48,
-    })
-
-    .p('')
     .p('The watermark text appears in the document header. The footer shows "Page X of Y" via the pageNumber plugin.')
 
   doc
