@@ -51,27 +51,36 @@ export interface CodeBlockOptions {
  * Highlight.js token → `TextRun` color mapping for common token types.
  */
 const TOKEN_COLORS: Record<string, string> = {
-  attr: 'D4D4D4',
-  built_in: '4EC9B0',
-  comment: '6A9955',
-  function: 'DCDCAA',
-  keyword: '569CD6',
-  literal: 'B5CEA8',
-  meta: '9B9B9B',
-  number: 'B5CEA8',
-  params: 'D4D4D4',
-  property: '9CDCFE',
-  regexp: 'D16969',
-  string: 'CE9178',
-  title: 'DCDCAA',
-  type: '4EC9B0',
-  variable: '9CDCFE',
+  attr: '334155',
+  built_in: '0F6B62',
+  comment: '52634B',
+  function: '795E26',
+  keyword: '245A96',
+  literal: '75529B',
+  meta: '667085',
+  number: '75529B',
+  params: '334155',
+  property: '285F7D',
+  regexp: '954B3C',
+  string: '944B32',
+  title: '795E26',
+  type: '0F6B62',
+  variable: '285F7D',
 }
 
 const CODE_BG = 'F5F5F5'
 const LINE_NO_COLOR = '999999'
-const MONO_FONT = 'Courier New'
-const FONT_SIZE = 16 // half-points → 8pt
+const MONO_FONT = 'Consolas'
+const FONT_SIZE = 18 // half-points → 9pt
+
+/**
+ * Print-friendly code surface and font resolved for the current document.
+ */
+interface CodeAppearance {
+  background: string
+  font: string
+  styles: PluginStyleAdapter
+}
 
 /**
  * Minimal interface for the highlight.js default export (optional peer dep).
@@ -89,7 +98,12 @@ export function codeBlockPlugin() {
   return definePlugin<'codeBlock', CodeBlockOptions>({
     name: 'codeBlock',
     async render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const { config } = context
+      const appearance = {
+        background: config.theme?.colors?.surface?.replace(/^#/, '') ?? CODE_BG,
+        font: config.theme?.fonts?.code?.split(',')[0].trim() ?? MONO_FONT,
+        styles: createPluginStyle(context.style),
+      }
       const lines = options.code.split('\n')
 
       // Try highlighting when a language is specified
@@ -104,18 +118,14 @@ export function codeBlockPlugin() {
             language: options.language,
           })
           const tokens = result.value || options.code
-          return tokensToParagraphs(
-            tokens,
-            pluginStyles,
-            options.showLineNumbers,
-          )
+          return tokensToParagraphs(tokens, appearance, options.showLineNumbers)
         } catch {
           // Fall through to plain rendering
         }
       }
 
       // Plain rendering
-      return linesToParagraphs(lines, pluginStyles, options.showLineNumbers)
+      return linesToParagraphs(lines, appearance, options.showLineNumbers)
     },
   })
 }
@@ -137,29 +147,30 @@ function decodeHighlightText(value: string): string {
  * background. Optionally prepends line numbers.
  *
  * @param lines - — Source code lines to render
- * @param styles - Resolved invocation style adapter
+ * @param appearance - Resolved document surface and monospace font
  * @param showLineNumbers - — Whether to prepend line numbers
  * @returns Array of Paragraph objects, one per line
  */
 function linesToParagraphs(
   lines: string[],
-  styles: PluginStyleAdapter,
+  appearance: CodeAppearance,
   showLineNumbers?: boolean,
 ): Paragraph[] {
   const maxDigits = showLineNumbers ? String(lines.length).length : 0
   return lines.map(
     (line, i) =>
       new Paragraph(
-        styles.paragraph({
-          shading: { fill: CODE_BG, type: ShadingType.CLEAR },
-          spacing: { after: 0, before: 0 },
+        appearance.styles.paragraph({
+          indent: { left: 160, right: 160 },
+          shading: { fill: appearance.background, type: ShadingType.CLEAR },
+          spacing: { after: 0, before: 0, line: 300 },
           children: [
             ...(showLineNumbers
               ? [
                   new TextRun(
-                    styles.text({
+                    appearance.styles.text({
                       color: LINE_NO_COLOR,
-                      font: MONO_FONT,
+                      font: appearance.font,
                       size: FONT_SIZE,
                       text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
                     }),
@@ -167,8 +178,8 @@ function linesToParagraphs(
                 ]
               : []),
             new TextRun(
-              styles.text({
-                font: MONO_FONT,
+              appearance.styles.text({
+                font: appearance.font,
                 size: FONT_SIZE,
                 text: line,
               }),
@@ -190,8 +201,9 @@ function linesToParagraphs(
  */
 function parseHighlightHtml(
   html: string,
-  styles: PluginStyleAdapter,
+  font: string,
   colorStack: (string | undefined)[],
+  styles: PluginStyleAdapter,
 ): TextRun[] {
   const results: TextRun[] = []
   const tokenRegex = /<span\b[^>]*>|<\/span>|[^<]+/g
@@ -203,7 +215,7 @@ function parseHighlightHtml(
       const tokenMatch = classMatch ? /hljs-([\w-]+)/.exec(classMatch[1]) : null
       colorStack.push(
         tokenMatch
-          ? (TOKEN_COLORS[tokenMatch[1]] ?? 'D4D4D4')
+          ? (TOKEN_COLORS[tokenMatch[1]] ?? '334155')
           : colorStack.at(-1),
       )
       continue
@@ -221,7 +233,7 @@ function parseHighlightHtml(
         new TextRun(
           styles.text({
             color: colorStack.at(-1),
-            font: MONO_FONT,
+            font,
             size: FONT_SIZE,
             text,
           }),
@@ -241,32 +253,38 @@ function parseHighlightHtml(
  * with syntax-colored TextRun children.
  *
  * @param html - — Highlighted HTML string from highlight.js
- * @param styles - Resolved invocation style adapter
+ * @param appearance - Resolved document surface and monospace font
  * @param showLineNumbers - — Whether to prepend line numbers
  * @returns Array of Paragraph objects, one per line
  */
 function tokensToParagraphs(
   html: string,
-  styles: PluginStyleAdapter,
+  appearance: CodeAppearance,
   showLineNumbers?: boolean,
 ): Paragraph[] {
-  const colorStack: (string | undefined)[] = [undefined]
   const lineStrings = html.split('\n')
   const maxDigits = showLineNumbers ? String(lineStrings.length).length : 0
+  const colorStack: (string | undefined)[] = [undefined]
 
   return lineStrings.map((lineHtml, i) => {
-    const runs = parseHighlightHtml(lineHtml, styles, colorStack)
+    const runs = parseHighlightHtml(
+      lineHtml,
+      appearance.font,
+      colorStack,
+      appearance.styles,
+    )
     return new Paragraph(
-      styles.paragraph({
-        shading: { fill: CODE_BG, type: ShadingType.CLEAR },
-        spacing: { after: 0, before: 0 },
+      appearance.styles.paragraph({
+        indent: { left: 160, right: 160 },
+        shading: { fill: appearance.background, type: ShadingType.CLEAR },
+        spacing: { after: 0, before: 0, line: 300 },
         children: [
           ...(showLineNumbers
             ? [
                 new TextRun(
-                  styles.text({
+                  appearance.styles.text({
                     color: LINE_NO_COLOR,
-                    font: MONO_FONT,
+                    font: appearance.font,
                     size: FONT_SIZE,
                     text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
                   }),

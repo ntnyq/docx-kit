@@ -37,7 +37,6 @@ import {
   TextRun,
   WidthType,
 } from 'docx'
-import type { IShadingAttributesProperties } from 'docx'
 
 /**
  * Per-column alignment hint.
@@ -48,16 +47,6 @@ export type ColAlign = 'center' | 'left' | 'right'
  * Value formatter identifier.
  */
 export type ColFormat = 'currency' | 'date' | 'number' | 'percent'
-
-const HEADER_SHADING: IShadingAttributesProperties = {
-  fill: '4472C4',
-  type: ShadingType.CLEAR,
-}
-
-const STRIPE_SHADING: IShadingAttributesProperties = {
-  fill: 'F2F2F2',
-  type: ShadingType.CLEAR,
-}
 
 /**
  * Options for the DataTable plugin.
@@ -102,7 +91,12 @@ export function dataTablePlugin() {
   return definePlugin<'dataTable', DataTableOptions>({
     name: 'dataTable',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
+      const colors = config.theme?.colors
+      const borderColor = colors?.border?.replace(/^#/, '') ?? 'D5D9DF'
+      const surface = colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
+      const headingColor = colors?.primary?.replace(/^#/, '') ?? '1B2A4A'
       const { align, bordered, data, format, labels, striped } = options
       if (!data.length) {
         return new Paragraph(
@@ -122,10 +116,10 @@ export function dataTablePlugin() {
       const displayedBordered = bordered !== false
       const borderOptions = displayedBordered
         ? {
-            bottom: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
-            left: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
-            right: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
-            top: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
+            bottom: { color: borderColor, size: 4, style: BorderStyle.SINGLE },
+            left: { color: borderColor, size: 4, style: BorderStyle.SINGLE },
+            right: { color: borderColor, size: 4, style: BorderStyle.SINGLE },
+            top: { color: borderColor, size: 4, style: BorderStyle.SINGLE },
           }
         : {}
 
@@ -134,16 +128,19 @@ export function dataTablePlugin() {
         const label = labels?.[col] ?? col
         return new TableCell(
           pluginStyles.cell({
-            shading: HEADER_SHADING,
+            shading: { fill: surface, type: ShadingType.CLEAR },
             children: [
               new Paragraph(
                 pluginStyles.paragraph({
-                  alignment: AlignmentType.CENTER,
+                  spacing: { after: 0, before: 0, line: 288 },
+                  alignment: alignmentToDocx(
+                    align?.[col] ?? inferAlignment(col, data),
+                  ),
                   children: [
                     new TextRun(
                       pluginStyles.text({
                         bold: true,
-                        color: 'FFFFFF',
+                        color: headingColor,
                         text: label,
                       }),
                     ),
@@ -155,7 +152,13 @@ export function dataTablePlugin() {
           }),
         )
       })
-      const rows = [new TableRow({ children: headerCells })]
+      const rows = [
+        new TableRow({
+          cantSplit: true,
+          children: headerCells,
+          tableHeader: true,
+        }),
+      ]
       const resolvedAlignments = new Map(
         columns.map(col => [col, align?.[col] ?? inferAlignment(col, data)]),
       )
@@ -168,20 +171,24 @@ export function dataTablePlugin() {
 
           return new TableCell(
             pluginStyles.cell({
-              shading: striped && i % 2 === 1 ? STRIPE_SHADING : undefined,
               children: [
                 new Paragraph(
                   pluginStyles.paragraph({
                     alignment: alignmentToDocx(colAlign),
                     children: [new TextRun(pluginStyles.text({ text: val }))],
+                    spacing: { after: 0, before: 0, line: 288 },
                   }),
                 ),
               ],
+              shading:
+                striped && i % 2 === 1
+                  ? { fill: surface, type: ShadingType.CLEAR }
+                  : undefined,
               ...(displayedBordered ? { borders: borderOptions } : {}),
             }),
           )
         })
-        rows.push(new TableRow({ children: cells }))
+        rows.push(new TableRow({ cantSplit: true, children: cells }))
       }
 
       return new Table({
@@ -189,10 +196,10 @@ export function dataTablePlugin() {
         rows,
         width: { size: 100, type: WidthType.PERCENTAGE },
         margins: {
-          bottom: 40,
-          left: 100,
-          right: 100,
-          top: 40,
+          bottom: 100,
+          left: 140,
+          right: 140,
+          top: 100,
         },
       })
     },

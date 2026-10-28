@@ -43,23 +43,23 @@ describe('minimalTheme', () => {
       expect(minimalTheme.colors?.accent).toBe('#2563eb')
       expect(minimalTheme.colors?.background).toBe('#ffffff')
       expect(minimalTheme.colors?.border).toBe('#e5e7eb')
-      expect(minimalTheme.colors?.danger).toBe('#dc2626')
-      expect(minimalTheme.colors?.info).toBe('#0ea5e9')
+      expect(minimalTheme.colors?.danger).toBe('#b91c1c')
+      expect(minimalTheme.colors?.info).toBe('#245a96')
       expect(minimalTheme.colors?.muted).toBe('#6b7280')
       expect(minimalTheme.colors?.primary).toBe('#111827')
       expect(minimalTheme.colors?.secondary).toBe('#374151')
-      expect(minimalTheme.colors?.success).toBe('#16a34a')
+      expect(minimalTheme.colors?.success).toBe('#2e7d32')
       expect(minimalTheme.colors?.surface).toBe('#f9fafb')
       expect(minimalTheme.colors?.text).toBe('#1f2937')
-      expect(minimalTheme.colors?.warning).toBe('#d97706')
+      expect(minimalTheme.colors?.warning).toBe('#9a6700')
     })
   })
 
   describe('fonts', () => {
     it('defines body, heading, and code font families', () => {
-      expect(minimalTheme.fonts?.body).toBe('Inter, Arial, sans-serif')
-      expect(minimalTheme.fonts?.heading).toBe('Inter, Arial, sans-serif')
-      expect(minimalTheme.fonts?.code).toBe('JetBrains Mono, monospace')
+      expect(minimalTheme.fonts?.body).toBe('Calibri')
+      expect(minimalTheme.fonts?.heading).toBe('Calibri')
+      expect(minimalTheme.fonts?.code).toBe('Consolas')
     })
   })
 
@@ -76,7 +76,7 @@ describe('minimalTheme', () => {
       expect(minimalTheme.fontSize?.sm).toBe(9)
       expect(minimalTheme.fontSize?.base).toBe(11)
       expect(minimalTheme.fontSize?.lg).toBe(14)
-      expect(minimalTheme.fontSize?.xl).toBe(18)
+      expect(minimalTheme.fontSize?.xl).toBe(24)
     })
 
     it('font sizes are in strictly increasing order', () => {

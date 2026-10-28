@@ -40,7 +40,22 @@ export function invoicePlugin() {
   return definePlugin<'invoice', InvoiceOptions>({
     name: 'invoice',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
+      const colors = config.theme?.colors
+      const border = {
+        color: colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+        size: 4,
+        style: BorderStyle.SINGLE,
+      }
+      const borders = {
+        bottom: border,
+        left: border,
+        right: border,
+        top: border,
+      }
+      const surface = colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
+      const primary = colors?.primary?.replace(/^#/, '') ?? '1B2A4A'
       validateInvoiceOptions(options)
 
       const currency = options.currency ?? ''
@@ -56,7 +71,12 @@ export function invoicePlugin() {
           spacing: { after: 180 },
           children: [
             new TextRun(
-              pluginStyles.text({ bold: true, size: 36, text: 'INVOICE' }),
+              pluginStyles.text({
+                bold: true,
+                color: primary,
+                size: 36,
+                text: 'Invoice',
+              }),
             ),
             new TextRun(
               pluginStyles.text({
@@ -84,40 +104,25 @@ export function invoicePlugin() {
       const itemRows = options.items.map(item => {
         const lineTotal = item.quantity * item.unitPrice
         return new TableRow({
+          cantSplit: true,
           children: [
             item.description,
             String(item.quantity),
             formatCurrency(item.unitPrice, currency),
             formatCurrency(lineTotal, currency),
           ].map(
-            value =>
+            (value, index) =>
               new TableCell(
                 pluginStyles.cell({
-                  borders: {
-                    bottom: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
-                    },
-                    left: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
-                    },
-                    right: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
-                    },
-                    top: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
-                    },
-                  },
+                  borders,
                   children: [
                     new Paragraph(
                       pluginStyles.paragraph({
+                        spacing: { after: 0, before: 0, line: 288 },
+                        alignment:
+                          index === 0
+                            ? AlignmentType.LEFT
+                            : AlignmentType.RIGHT,
                         children: [
                           new TextRun(pluginStyles.text({ text: value })),
                         ],
@@ -131,44 +136,31 @@ export function invoicePlugin() {
       })
 
       const table = new Table({
+        margins: { bottom: 100, left: 140, right: 140, top: 100 },
         width: { size: 100, type: WidthType.PERCENTAGE },
         rows: [
           new TableRow({
+            cantSplit: true,
+            tableHeader: true,
             children: ['Description', 'Qty', 'Unit Price', 'Amount'].map(
-              label =>
+              (label, index) =>
                 new TableCell(
                   pluginStyles.cell({
-                    shading: { fill: '4472C4', type: ShadingType.CLEAR },
-                    borders: {
-                      bottom: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                      left: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                      right: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                      top: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                    },
+                    borders,
+                    shading: { fill: surface, type: ShadingType.CLEAR },
                     children: [
                       new Paragraph(
                         pluginStyles.paragraph({
+                          spacing: { after: 0, before: 0, line: 288 },
+                          alignment:
+                            index === 0
+                              ? AlignmentType.LEFT
+                              : AlignmentType.RIGHT,
                           children: [
                             new TextRun(
                               pluginStyles.text({
                                 bold: true,
-                                color: 'FFFFFF',
+                                color: primary,
                                 text: label,
                               }),
                             ),

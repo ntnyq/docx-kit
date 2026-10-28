@@ -2,7 +2,7 @@
  * Callout plugin — colored info / warning / success / danger boxes.
  *
  * Renders a single `Paragraph` with a prominent left border, a tinted
- * background, an emoji icon, an optional bold title, and body text.
+ * background, an optional bold title, and body text.
  *
  * @module plugins/callout
  *
@@ -25,23 +25,19 @@ import { BorderStyle, Paragraph, ShadingType, TextRun } from 'docx'
 const CALLOUT_PRESETS = {
   danger: {
     bg: 'FCE4D6',
-    border: 'FF0000',
-    icon: '\u{26A0}\u{FE0F}',
+    border: 'B91C1C',
   },
   info: {
     bg: 'D6E4F0',
     border: '4472C4',
-    icon: '\u{2139}\u{FE0F}',
   },
   success: {
     bg: 'E2F0D9',
-    border: '70AD47',
-    icon: '\u{2705}',
+    border: '2E7D32',
   },
   warning: {
     bg: 'FFF2CC',
-    border: 'FFC000',
-    icon: '\u{26A0}\u{FE0F}',
+    border: '9A6700',
   },
 } as const
 
@@ -54,7 +50,7 @@ export interface CalloutOptions {
    */
   content: string
   /**
-   * Callout style — controls icon, color, and tone.
+   * Callout style — controls color and tone.
    */
   type: 'danger' | 'info' | 'success' | 'warning'
   /**
@@ -81,36 +77,48 @@ export function calloutPlugin() {
   return definePlugin<'callout', CalloutOptions>({
     name: 'callout',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
+      const colors = config.theme?.colors
+      const tone = (
+        colors?.[options.type] ?? CALLOUT_PRESETS[options.type].border
+      ).replace(/^#/, '')
       const preset = CALLOUT_PRESETS[options.type]
-      const runs: TextRun[] = [
-        new TextRun(pluginStyles.text({ text: `${preset.icon}  ` })),
-      ]
+      const runs: TextRun[] = []
 
       if (options.title) {
         runs.push(
           new TextRun(
-            pluginStyles.text({ bold: true, text: `${options.title}\n` }),
+            pluginStyles.text({ bold: true, color: tone, text: options.title }),
           ),
         )
       }
 
-      runs.push(new TextRun(pluginStyles.text({ text: options.content })))
+      runs.push(
+        new TextRun(
+          pluginStyles.text({
+            break: options.title ? 1 : undefined,
+            text: options.content,
+          }),
+        ),
+      )
 
       return new Paragraph(
         pluginStyles.paragraph({
           children: runs,
-          spacing: { after: 120, before: 120 },
+          indent: { left: 180, right: 120 },
+          keepLines: true,
+          spacing: { after: 180, before: 160, line: 336 },
           border: {
             left: {
-              color: preset.border,
-              size: 12,
+              color: tone,
+              size: 18,
               space: 8,
               style: BorderStyle.SINGLE,
             },
           },
           shading: {
-            fill: preset.bg,
+            fill: colors?.surface?.replace(/^#/, '') ?? preset.bg,
             type: ShadingType.CLEAR,
           },
         }),

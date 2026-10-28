@@ -42,7 +42,6 @@ export function compileHeading<TStyles extends StyleSheet>(
   return new Paragraph({
     ...paragraphStyle,
     heading: HEADING_MAP[node.level],
-    spacing: paragraphStyle.spacing ?? { after: 120, before: 240 },
     children: [
       new TextRun({
         text: node.text,

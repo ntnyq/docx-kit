@@ -40,18 +40,18 @@ describe('warmTheme', () => {
     })
 
     it('has correct earthy + amber color values', () => {
-      expect(warmTheme.colors?.accent).toBe('#d97706')
-      expect(warmTheme.colors?.background).toBe('#fffbeb')
-      expect(warmTheme.colors?.border).toBe('#fde68a')
+      expect(warmTheme.colors?.accent).toBe('#8b5e34')
+      expect(warmTheme.colors?.background).toBe('#ffffff')
+      expect(warmTheme.colors?.border).toBe('#ddd6ca')
       expect(warmTheme.colors?.danger).toBe('#b91c1c')
-      expect(warmTheme.colors?.info).toBe('#7c3aed')
+      expect(warmTheme.colors?.info).toBe('#6b6578')
       expect(warmTheme.colors?.muted).toBe('#78716c')
       expect(warmTheme.colors?.primary).toBe('#44403c')
       expect(warmTheme.colors?.secondary).toBe('#57534e')
       expect(warmTheme.colors?.success).toBe('#15803d')
-      expect(warmTheme.colors?.surface).toBe('#fef3c7')
+      expect(warmTheme.colors?.surface).toBe('#f6f3ee')
       expect(warmTheme.colors?.text).toBe('#292524')
-      expect(warmTheme.colors?.warning).toBe('#ea580c')
+      expect(warmTheme.colors?.warning).toBe('#a34c13')
     })
 
     it('uses warm brown family for primary/secondary/text', () => {
@@ -64,10 +64,10 @@ describe('warmTheme', () => {
   })
 
   describe('fonts', () => {
-    it('uses Garamond/Georgia serif for body and heading, monospace for code', () => {
-      expect(warmTheme.fonts?.body).toBe('Garamond, Georgia, serif')
-      expect(warmTheme.fonts?.heading).toBe('Garamond, Georgia, serif')
-      expect(warmTheme.fonts?.code).toBe('JetBrains Mono, monospace')
+    it('uses Georgia serif for body and heading, monospace for code', () => {
+      expect(warmTheme.fonts?.body).toBe('Georgia')
+      expect(warmTheme.fonts?.heading).toBe('Georgia')
+      expect(warmTheme.fonts?.code).toBe('Consolas')
     })
   })
 
@@ -77,7 +77,7 @@ describe('warmTheme', () => {
       expect(warmTheme.fontSize?.sm).toBe(10)
       expect(warmTheme.fontSize?.base).toBe(12)
       expect(warmTheme.fontSize?.lg).toBe(15)
-      expect(warmTheme.fontSize?.xl).toBe(19)
+      expect(warmTheme.fontSize?.xl).toBe(24)
     })
 
     it('font sizes are in strictly increasing order', () => {

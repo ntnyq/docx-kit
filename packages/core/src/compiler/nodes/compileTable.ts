@@ -6,6 +6,7 @@
 
 import { DocxKitError } from '@docxkit/types'
 import {
+  BorderStyle,
   Paragraph,
   ShadingType,
   Table,
@@ -84,6 +85,8 @@ export async function compileTable<
       styles: config.styles,
       theme: config.theme,
       base: {
+        backgroundColor: config.theme?.colors?.surface ?? '#F4F6F8',
+        fontWeight: 'bold',
         ...config.defaults?.text,
         ...config.defaults?.cell,
         ...tableStyle,
@@ -177,8 +180,10 @@ export async function compileTable<
                               string,
                               unknown
                             >) ?? {}),
-                            fill: 'F2F2F2',
                             type: ShadingType.CLEAR,
+                            fill:
+                              config.theme?.colors?.surface?.replace(/^#/, '')
+                              ?? 'F4F6F8',
                           },
                         }
                       : {}),
@@ -210,6 +215,12 @@ export async function compileTable<
     )),
   )
 
+  const defaultBorder = {
+    color: config.theme?.colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+    size: 4,
+    style: BorderStyle.SINGLE,
+  }
+
   return new Table({
     alignment: node.alignment,
     // Merged cells reduce the cell count, but not the underlying grid width.
@@ -222,7 +233,16 @@ export async function compileTable<
     visuallyRightToLeft: node.visuallyRightToLeft,
     borders:
       compileTableBorders(node.borders)
-      ?? (node.bordered === false ? TableBorders.NONE : undefined),
+      ?? (node.bordered === false
+        ? TableBorders.NONE
+        : {
+            bottom: defaultBorder,
+            insideHorizontal: defaultBorder,
+            insideVertical: defaultBorder,
+            left: defaultBorder,
+            right: defaultBorder,
+            top: defaultBorder,
+          }),
     width: compileColumnWidth(node.width) ?? {
       size: 100,
       type: WidthType.PERCENTAGE,

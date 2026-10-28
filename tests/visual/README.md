@@ -74,6 +74,21 @@ The ten fixtures still produce twelve pages. No new clipping or missing
 content was found. The existing page-count, nonblank-page, and 1% difference
 checks remain in place.
 
+### Baseline review: 2026-10-28
+
+All twelve pages were reviewed with the unchanged pinned renderer
+(`docx-kit-visual:2a5e50ea2b30`, LibreOffice 24.2.7.2) after the document-design
+refresh. Native Word defaults now carry body typography and heading hierarchy;
+unstyled runs preserve inherited bold and italic formatting. Tables use more
+comfortable cell padding, lighter borders, and neutral theme surfaces. Callouts
+use restrained semantic colors and text titles, and business plugins inherit
+the document font. Explicit fixture styles, including heading rules and custom
+table borders, remain visible.
+
+The ten fixtures still produce twelve pages, with no clipping, missing content,
+or unexpected blank pages. The new design-sample suite separately covers three
+layouts, three palettes, CJK typography, and common plugin output.
+
 To investigate a locally installed LibreOffice version, use:
 
 ```shell
@@ -86,6 +101,19 @@ only in this diagnostic mode. Native renders may differ from the pinned
 environment and cannot update the committed baselines.
 
 ## Microsoft Word release check
+
+The document-design samples can be generated separately after building:
+
+```shell
+pnpm --filter docs exec tsx ../scripts/visual-regression/generate-design-samples.mjs
+```
+
+This writes nine layout/theme combinations, three theme-only documents, and
+one plugin showcase to `output/document-design/`. Review the actual DOCX pages
+when changing document typography or plugin styling; browser screenshots alone
+do not verify Word pagination. Theme Studio uses the same sample builder.
+
+The design samples do not replace the pinned compatibility baselines above.
 
 LibreOffice regression is automated. Before a tagged release, open all
 generated files from `tmp/visual-regression/docx/` in a currently supported

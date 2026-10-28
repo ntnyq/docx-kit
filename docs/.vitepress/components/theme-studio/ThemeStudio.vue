@@ -7,14 +7,19 @@ import ThemeStudioHeader from './ThemeStudioHeader.vue'
 
 const {
   activeBaseTheme,
+  activeLayout,
+  downloadDocument,
   editableTheme,
   generatedSnippet,
   lastRenderedLabel,
+  layouts,
   loading,
   previewBlob,
   renderPreview,
   resetTheme,
+  selectedLayoutId,
   selectedThemeId,
+  selectLayout,
   selectTheme,
   setMetadata,
   setToken,
@@ -43,6 +48,23 @@ const accentColor = computed(
       :themes
     />
 
+    <nav
+      class="layout-options"
+      aria-label="Document layout"
+    >
+      <button
+        @click="selectLayout(layout.preset.id)"
+        v-for="layout in layouts"
+        :key="layout.preset.id"
+        :aria-pressed="selectedLayoutId === layout.preset.id"
+        type="button"
+        class="layout-option"
+      >
+        <strong>{{ layout.title }}</strong>
+        <span>{{ layout.description }}</span>
+      </button>
+    </nav>
+
     <div class="studio-workspace">
       <ThemeInspector
         @set-metadata="setMetadata($event.field, $event.value)"
@@ -56,9 +78,19 @@ const accentColor = computed(
         <header class="preview-header">
           <div class="preview-heading">
             <span class="preview-kicker">Document preview</span>
-            <strong class="preview-title">{{ editableTheme.name }}</strong>
+            <strong class="preview-title"
+              >{{ activeLayout.title }} · {{ editableTheme.name }}</strong
+            >
           </div>
 
+          <button
+            @click="downloadDocument"
+            :disabled="!previewBlob || loading || !!studioError"
+            class="download-button"
+            type="button"
+          >
+            Download Word
+          </button>
           <dl class="preview-summary">
             <div class="summary-item">
               <dt>Base</dt>
@@ -97,10 +129,58 @@ const accentColor = computed(
   color: var(--vp-c-text-1);
 }
 
+.layout-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--vp-c-bg);
+}
+
+.layout-option {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.layout-option strong {
+  font-size: 13px;
+}
+.layout-option span {
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.layout-option[aria-pressed='true'] {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+.layout-option:focus-visible,
+.download-button:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+.download-button {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.download-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .studio-workspace {
   display: grid;
   grid-template-columns: minmax(320px, 368px) minmax(0, 1fr);
-  height: calc(100vh - var(--vp-nav-height) - 73px);
+  height: calc(100vh - var(--vp-nav-height) - 175px);
   min-height: 600px;
   overflow: hidden;
   border-top: 1px solid var(--vp-c-divider);
@@ -180,6 +260,54 @@ const accentColor = computed(
 }
 
 @media (max-width: 960px) {
+  .layout-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--vp-c-bg);
+  }
+
+  .layout-option {
+    display: grid;
+    gap: 4px;
+    padding: 12px 16px;
+    border: 1px solid var(--vp-c-divider);
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .layout-option strong {
+    font-size: 13px;
+  }
+  .layout-option span {
+    color: var(--vp-c-text-2);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .layout-option[aria-pressed='true'] {
+    border-color: var(--vp-c-brand-1);
+    background: var(--vp-c-brand-soft);
+  }
+  .layout-option:focus-visible,
+  .download-button:focus-visible {
+    outline: 2px solid var(--vp-c-brand-1);
+    outline-offset: 2px;
+  }
+  .download-button {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    border: 1px solid var(--vp-c-divider);
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .download-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
   .studio-workspace {
     display: block;
     height: auto;
@@ -200,6 +328,10 @@ const accentColor = computed(
 }
 
 @media (max-width: 640px) {
+  .layout-options {
+    grid-template-columns: 1fr;
+  }
+
   .preview-header {
     align-items: flex-start;
     flex-direction: column;

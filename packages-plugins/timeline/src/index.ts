@@ -109,8 +109,14 @@ export function timelinePlugin() {
   return definePlugin<'timeline', TimelineOptions>({
     name: 'timeline',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
-      const { accentColor = '4472C4', events, layout = 'alternating' } = options
+      const colors = config.theme?.colors
+      const {
+        accentColor = colors?.accent?.replace(/^#/, '') ?? '2E75B6',
+        events,
+        layout = 'alternating',
+      } = options
 
       if (events.length === 0) {
         return new Paragraph(pluginStyles.paragraph({ text: '(No events)' }))
@@ -133,8 +139,7 @@ export function timelinePlugin() {
                   children: [
                     new TextRun(
                       pluginStyles.text({
-                        color: accentColor,
-                        font: 'Arial',
+                        color: accentColor.replace(/^#/, ''),
                         size: 24,
                         text: '\u{25CF}',
                       }),
@@ -155,7 +160,7 @@ export function timelinePlugin() {
               right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
               top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
               bottom: {
-                color: accentColor,
+                color: accentColor.replace(/^#/, ''),
                 size: 1,
                 style: BorderStyle.SINGLE,
               },
@@ -168,8 +173,7 @@ export function timelinePlugin() {
                     new TextRun(
                       pluginStyles.text({
                         bold: true,
-                        color: accentColor,
-                        font: 'Arial',
+                        color: accentColor.replace(/^#/, ''),
                         size: 22,
                         text: date,
                       }),
@@ -179,7 +183,7 @@ export function timelinePlugin() {
               ),
             ],
             shading: {
-              fill: 'F0F5FF',
+              fill: colors?.surface?.replace(/^#/, '') ?? 'F4F6F8',
               type: ShadingType.CLEAR,
             },
           }),
@@ -190,7 +194,6 @@ export function timelinePlugin() {
           new TextRun(
             pluginStyles.text({
               bold: true,
-              font: 'Arial',
               size: 24,
               text: title,
             }),
@@ -203,7 +206,6 @@ export function timelinePlugin() {
               pluginStyles.text({
                 break: 1,
                 color: '555555',
-                font: 'Arial',
                 size: 20,
                 text: description,
               }),
@@ -241,6 +243,7 @@ export function timelinePlugin() {
 
         if (isLeft) {
           return new TableRow({
+            cantSplit: true,
             children: [
               dateCell(event.date),
               connectorCell(),
@@ -250,6 +253,7 @@ export function timelinePlugin() {
         }
 
         return new TableRow({
+          cantSplit: true,
           children: [
             contentCell(event.title, event.description),
             connectorCell(),
@@ -273,10 +277,10 @@ export function timelinePlugin() {
           },
         },
         margins: {
-          bottom: 40,
+          bottom: 100,
           left: 100,
           right: 100,
-          top: 40,
+          top: 100,
         },
       })
     },

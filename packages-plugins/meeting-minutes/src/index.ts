@@ -37,19 +37,6 @@ import {
   TextRun,
   WidthType,
 } from 'docx'
-import type { IShadingAttributesProperties } from 'docx'
-
-const HEADER_SHADING: IShadingAttributesProperties = {
-  fill: '4472C4',
-  type: ShadingType.CLEAR,
-}
-
-const BORDER = {
-  bottom: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
-  left: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
-  right: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
-  top: { color: 'CCCCCC', size: 1, style: BorderStyle.SINGLE },
-}
 
 const AGENDA_COLUMNS = ['议题', '讨论', '决议', '负责人']
 
@@ -106,7 +93,22 @@ export function meetingMinutesPlugin() {
   return definePlugin<'meetingMinutes', MeetingMinutesOptions>({
     name: 'meetingMinutes',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
+      const colors = config.theme?.colors
+      const border = {
+        color: colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+        size: 4,
+        style: BorderStyle.SINGLE,
+      }
+      const borders = {
+        bottom: border,
+        left: border,
+        right: border,
+        top: border,
+      }
+      const surface = colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
+      const primary = colors?.primary?.replace(/^#/, '') ?? '1B2A4A'
       // Title
       const titlePara = new Paragraph(
         pluginStyles.paragraph({
@@ -146,17 +148,18 @@ export function meetingMinutesPlugin() {
         col =>
           new TableCell(
             pluginStyles.cell({
-              borders: BORDER,
-              shading: HEADER_SHADING,
+              borders,
+              shading: { fill: surface, type: ShadingType.CLEAR },
               children: [
                 new Paragraph(
                   pluginStyles.paragraph({
-                    alignment: AlignmentType.CENTER,
+                    alignment: AlignmentType.LEFT,
+                    spacing: { after: 0, before: 0, line: 288 },
                     children: [
                       new TextRun(
                         pluginStyles.text({
                           bold: true,
-                          color: 'FFFFFF',
+                          color: primary,
                           text: col,
                         }),
                       ),
@@ -180,7 +183,7 @@ export function meetingMinutesPlugin() {
           val =>
             new TableCell(
               pluginStyles.cell({
-                borders: BORDER,
+                borders,
                 children: [
                   new Paragraph(
                     pluginStyles.paragraph({
@@ -191,19 +194,29 @@ export function meetingMinutesPlugin() {
               }),
             ),
         )
-        return new TableRow({ children: cells })
+        return new TableRow({
+          cantSplit: true,
+          children: cells,
+        })
       })
 
-      const rows = [new TableRow({ children: headerCells }), ...agendaRows]
+      const rows = [
+        new TableRow({
+          cantSplit: true,
+          children: headerCells,
+          tableHeader: true,
+        }),
+        ...agendaRows,
+      ]
 
       const agendaTable = new Table({
         rows,
         width: { size: 100, type: WidthType.PERCENTAGE },
         margins: {
-          bottom: 40,
-          left: 100,
-          right: 100,
-          top: 40,
+          bottom: 100,
+          left: 140,
+          right: 140,
+          top: 100,
         },
       })
 

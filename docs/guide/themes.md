@@ -1,6 +1,6 @@
 # Themes
 
-Themes are **semantic design tokens** — colors, fonts, font sizes, and spacing scales — that can be referenced from your style rules via the `$category.key` syntax. They decouple _what styles you define_ from _what colors and fonts you use_.
+Themes are **semantic design tokens** — colors, fonts, font sizes, and spacing scales — that can be referenced from your style rules via the `$category.key` syntax. They decouple _what styles you define_ from _what colors and fonts you use_. Theme typography also supplies native Word defaults, so unstyled text and plugins inherit the document font automatically.
 
 ## What is a Theme?
 
@@ -28,11 +28,11 @@ interface DocxTheme {
 
 docx-kit ships with **3 built-in themes**:
 
-| Theme          | ID        | Palette                                | Best For                   | Fonts              |
-| -------------- | --------- | -------------------------------------- | -------------------------- | ------------------ |
-| `minimalTheme` | `minimal` | Clean grayscale + blue accent          | General business docs      | Inter / Arial      |
-| `oceanTheme`   | `ocean`   | Deep blue / teal with coral highlights | Reports, articles          | Georgia            |
-| `warmTheme`    | `warm`    | Earthy amber / terracotta              | Invitations, personal docs | Garamond / Georgia |
+| Theme          | ID        | Palette                             | Best For               | Fonts             |
+| -------------- | --------- | ----------------------------------- | ---------------------- | ----------------- |
+| `minimalTheme` | `minimal` | Clean grayscale + blue accent       | General business docs  | Calibri           |
+| `oceanTheme`   | `ocean`   | Navy / teal with pale gray surfaces | Reports, articles      | Cambria / Calibri |
+| `warmTheme`    | `warm`    | Warm gray / brown                   | Correspondence, essays | Georgia           |
 
 Helpers:
 
@@ -94,26 +94,30 @@ Each built-in theme provides 12 semantic color tokens:
 | ------------ | ---------------------- | --------- | --------- | --------- |
 | `primary`    | Headings, primary text | `#111827` | `#0f172a` | `#44403c` |
 | `secondary`  | Secondary text         | `#374151` | `#1e293b` | `#57534e` |
-| `accent`     | Highlight / link color | `#2563eb` | `#0d9488` | `#d97706` |
-| `success`    | Success state          | `#16a34a` | `#059669` | `#15803d` |
-| `warning`    | Warning state          | `#d97706` | `#f59e0b` | `#ea580c` |
-| `danger`     | Error state            | `#dc2626` | `#e11d48` | `#b91c1c` |
-| `info`       | Info state             | `#0ea5e9` | `#38bdf8` | `#7c3aed` |
+| `accent`     | Highlight / link color | `#2563eb` | `#0d9488` | `#8b5e34` |
+| `success`    | Success state          | `#2e7d32` | `#14765c` | `#15803d` |
+| `warning`    | Warning state          | `#9a6700` | `#946200` | `#a34c13` |
+| `danger`     | Error state            | `#b91c1c` | `#e11d48` | `#b91c1c` |
+| `info`       | Info state             | `#245a96` | `#24758a` | `#6b6578` |
 | `muted`      | Muted text             | `#6b7280` | `#64748b` | `#78716c` |
-| `background` | Page background        | `#ffffff` | `#f0fdfa` | `#fffbeb` |
-| `surface`    | Card / panel surface   | `#f9fafb` | `#ccfbf1` | `#fef3c7` |
+| `background` | Page background        | `#ffffff` | `#ffffff` | `#ffffff` |
+| `surface`    | Card / panel surface   | `#f9fafb` | `#f0f5f7` | `#f6f3ee` |
 | `text`       | Body text              | `#1f2937` | `#1e293b` | `#292524` |
-| `border`     | Border color           | `#e5e7eb` | `#99f6e4` | `#fde68a` |
+| `border`     | Border color           | `#e5e7eb` | `#cbd9df` | `#ddd6ca` |
 
 ### `$fonts.*` — Font Stacks
 
-Each built-in theme provides 3 font tokens:
+Each built-in theme provides body, heading, and code fonts, plus separate `bodyEastAsia` and `headingEastAsia` fonts for Chinese, Japanese, and Korean text. Word accepts one font per script; CSS fallback stacks are reduced to their first family.
 
-| Token     | `minimal`                   | `ocean`                     | `warm`                      |
-| --------- | --------------------------- | --------------------------- | --------------------------- |
-| `heading` | `Inter, Arial, sans-serif`  | `Georgia, serif`            | `Garamond, Georgia, serif`  |
-| `body`    | `Inter, Arial, sans-serif`  | `Georgia, serif`            | `Garamond, Georgia, serif`  |
-| `code`    | `JetBrains Mono, monospace` | `JetBrains Mono, monospace` | `JetBrains Mono, monospace` |
+| Token     | `minimal`  | `ocean`    | `warm`     |
+| --------- | ---------- | ---------- | ---------- |
+| `heading` | `Calibri`  | `Cambria`  | `Georgia`  |
+| `body`    | `Calibri`  | `Calibri`  | `Georgia`  |
+| `code`    | `Consolas` | `Consolas` | `Consolas` |
+
+`bodyEastAsia` and `headingEastAsia` use Microsoft YaHei in Minimal and Ocean.
+Warm pairs SimSun body text with SimHei headings. These are Word font names;
+the application opening the document chooses a substitute when a font is absent.
 
 ### `$fontSize.*` — Type Scale
 
@@ -125,7 +129,7 @@ Each built-in theme provides a 5-step scale (values in pt):
 | `sm`   | 9         | 10      | 10     |
 | `base` | 11        | 12      | 12     |
 | `lg`   | 14        | 16      | 15     |
-| `xl`   | 18        | 20      | 19     |
+| `xl`   | 24        | 26      | 24     |
 
 ### `$spacing.*` — Spacing Scale
 
@@ -227,7 +231,7 @@ defineStyles({
 
 ## Combining with Presets
 
-Presets define concrete style rules; themes define tokens. Pair them when you want a preset's typography combined with a theme's palette.
+Presets define concrete style rules; themes define tokens. Pair them when you want a preset's typography combined with a theme's palette. The modern preset uses primary and accent color tokens; classic and academic headings stay black. Preset font sizes, body fonts, and spacing take precedence over theme defaults.
 
 ```ts
 import { createDocx, modernPreset, useTheme, defineStyles } from 'docx-kit'
@@ -245,6 +249,10 @@ const doc = createDocx({
   },
 })
 ```
+
+## Preview common Word layouts
+
+[Theme Studio](/theme-studio) offers business report, Chinese formal, and academic layouts. Each layout includes representative content and styled tables. The studio explicitly binds the layout's fonts, main type sizes, and heading spacing to the editable theme tokens; the Export tab includes that configuration. Use **Download Word** to save the same file shown in the preview. The preview preserves the exported page margins; installed fonts and the Word layout engine may still differ from browser rendering.
 
 ## Next Steps
 

@@ -59,7 +59,7 @@ export interface CoverPageOptions {
   organization?: string
   /**
    * Show a decorative horizontal rule between title and author.
-   * @default true
+   * @default false
    */
   showRule?: boolean
   /**
@@ -91,20 +91,23 @@ export function coverPagePlugin() {
   return definePlugin<'coverPage', CoverPageOptions>({
     name: 'coverPage',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
+      const colors = config.theme?.colors
       const alignment = options.alignment ?? AlignmentType.CENTER
-      const showRule = options.showRule !== false
+      const showRule = options.showRule === true
 
       const titlePara = new Paragraph(
         pluginStyles.paragraph({
           alignment,
-          spacing: { after: 200 },
+          keepNext: true,
+          spacing: { after: 240, before: 1800 },
+          style: 'Title',
           children: [
             new TextRun(
               pluginStyles.text({
                 bold: true,
-                font: 'Arial',
-                size: 56, // 28pt
+                size: 64, // 32pt
                 text: options.title,
               }),
             ),
@@ -112,7 +115,7 @@ export function coverPagePlugin() {
           ...(options.backgroundColor
             ? {
                 shading: {
-                  fill: options.backgroundColor,
+                  fill: options.backgroundColor.replace(/^#/, ''),
                   type: ShadingType.CLEAR,
                 },
               }
@@ -121,9 +124,6 @@ export function coverPagePlugin() {
       )
 
       return [
-        new Paragraph(
-          pluginStyles.paragraph({ children: [], spacing: { before: 2400 } }),
-        ),
         titlePara,
         ...(options.subtitle
           ? [
@@ -134,9 +134,8 @@ export function coverPagePlugin() {
                   children: [
                     new TextRun(
                       pluginStyles.text({
-                        color: '555555',
-                        font: 'Arial',
-                        size: 32,
+                        color: colors?.muted?.replace(/^#/, '') ?? '666666',
+                        size: 28,
                         text: options.subtitle,
                       }),
                     ),
@@ -154,7 +153,7 @@ export function coverPagePlugin() {
                   spacing: { after: 400 },
                   border: {
                     bottom: {
-                      color: '4472C4',
+                      color: colors?.accent?.replace(/^#/, '') ?? '2E75B6',
                       size: 6,
                       space: 1,
                       style: BorderStyle.SINGLE,
@@ -173,7 +172,6 @@ export function coverPagePlugin() {
                   children: [
                     new TextRun(
                       pluginStyles.text({
-                        font: 'Arial',
                         size: 28,
                         text: options.author,
                       }),
@@ -193,7 +191,6 @@ export function coverPagePlugin() {
                     new TextRun(
                       pluginStyles.text({
                         color: '333333',
-                        font: 'Arial',
                         size: 24,
                         text: options.organization,
                       }),
@@ -213,7 +210,6 @@ export function coverPagePlugin() {
                     new TextRun(
                       pluginStyles.text({
                         color: '777777',
-                        font: 'Arial',
                         size: 24,
                         text: options.date,
                       }),

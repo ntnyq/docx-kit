@@ -34,7 +34,22 @@ export function changelogPlugin() {
   return definePlugin<'changelog', ChangelogOptions>({
     name: 'changelog',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
+      const colors = config.theme?.colors
+      const border = {
+        color: colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+        size: 4,
+        style: BorderStyle.SINGLE,
+      }
+      const borders = {
+        bottom: border,
+        left: border,
+        right: border,
+        top: border,
+      }
+      const surface = colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
+      const primary = colors?.primary?.replace(/^#/, '') ?? '1B2A4A'
       const title = new Paragraph(
         pluginStyles.paragraph({
           spacing: { after: 180 },
@@ -67,25 +82,14 @@ export function changelogPlugin() {
       }
 
       const header = new TableRow({
+        cantSplit: true,
+        tableHeader: true,
         children: ['Version', 'Date', 'Type', 'Changes'].map(
           label =>
             new TableCell(
               pluginStyles.cell({
-                shading: { fill: '4472C4', type: ShadingType.CLEAR },
-                borders: {
-                  left: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-                  top: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-                  bottom: {
-                    color: 'D9D9D9',
-                    size: 1,
-                    style: BorderStyle.SINGLE,
-                  },
-                  right: {
-                    color: 'D9D9D9',
-                    size: 1,
-                    style: BorderStyle.SINGLE,
-                  },
-                },
+                borders,
+                shading: { fill: surface, type: ShadingType.CLEAR },
                 children: [
                   new Paragraph(
                     pluginStyles.paragraph({
@@ -93,7 +97,7 @@ export function changelogPlugin() {
                         new TextRun(
                           pluginStyles.text({
                             bold: true,
-                            color: 'FFFFFF',
+                            color: primary,
                             text: label,
                           }),
                         ),
@@ -109,6 +113,7 @@ export function changelogPlugin() {
       const rows = options.entries.map(
         entry =>
           new TableRow({
+            cantSplit: true,
             children: [
               entry.version,
               entry.date,
@@ -118,28 +123,7 @@ export function changelogPlugin() {
               (value, index) =>
                 new TableCell(
                   pluginStyles.cell({
-                    borders: {
-                      bottom: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                      left: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                      right: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                      top: {
-                        color: 'D9D9D9',
-                        size: 1,
-                        style: BorderStyle.SINGLE,
-                      },
-                    },
+                    borders,
                     children: [
                       new Paragraph(
                         pluginStyles.paragraph({
@@ -165,6 +149,7 @@ export function changelogPlugin() {
       return [
         title,
         new Table({
+          margins: { bottom: 100, left: 140, right: 140, top: 100 },
           rows: [header, ...rows],
           width: { size: 100, type: WidthType.PERCENTAGE },
         }),

@@ -139,7 +139,7 @@ interface ChangelogEntry {
 ```ts
 interface CodeBlockOptions {
   code: string
-  language?: string           // requires highlight.js peer dep
+  language?: string // requires highlight.js peer dep
   showLineNumbers?: boolean
 }
 ```
@@ -155,7 +155,7 @@ interface CoverPageOptions {
   organization?: string
   backgroundColor?: string
   alignment?: 'center' | 'left' | 'right'
-  showRule?: boolean
+  showRule?: boolean // default: false; optional decorative rule
 }
 ```
 
@@ -164,9 +164,9 @@ interface CoverPageOptions {
 ```ts
 interface DataTableOptions {
   data: Record<string, unknown>[]
-  labels?: Record<string, string>   // human-readable column labels
+  labels?: Record<string, string> // human-readable column labels
   format?: Record<string, ColFormat> // per-column formatting
-  align?: Record<string, ColAlign>   // per-column alignment
+  align?: Record<string, ColAlign> // per-column alignment
   bordered?: boolean
   striped?: boolean
 }
@@ -190,11 +190,11 @@ interface DividerOptions {
 
 ```ts
 interface EChartsPluginOptions {
-  option: EChartsOption         // full ECharts option object
-  width?: number                // default: 640
-  height?: number               // default: 360
-  renderer?: 'canvas' | 'svg'   // default: 'canvas'
-  imageType?: 'png' | 'svg'     // default: 'png'
+  option: EChartsOption // full ECharts option object
+  width?: number // default: 640
+  height?: number // default: 360
+  renderer?: 'canvas' | 'svg' // default: 'canvas'
+  imageType?: 'png' | 'svg' // default: 'png'
   caption?: string
 }
 ```
@@ -265,8 +265,8 @@ interface AgendaItem {
 ```ts
 interface PageNumberOptions {
   alignment?: 'left' | 'center' | 'right'
-  fontSize?: number             // half-points, default: 20 (10pt)
-  showTotal?: boolean           // "Page X of Y" when true
+  fontSize?: number // half-points, default: 20 (10pt)
+  showTotal?: boolean // "Page X of Y" when true
 }
 ```
 
@@ -275,8 +275,8 @@ interface PageNumberOptions {
 ```ts
 interface PropertyTableOptions {
   items: PropertyItem[]
-  keyBold?: boolean             // default: true
-  striped?: boolean             // default: true
+  keyBold?: boolean // default: true
+  striped?: boolean // default: true
 }
 
 interface PropertyItem {
@@ -290,9 +290,9 @@ interface PropertyItem {
 ```ts
 interface QRCodePluginOptions {
   text: string
-  size?: number                 // default: 128
+  size?: number // default: 128
   errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H'
-  margin?: number               // default: 1
+  margin?: number // default: 1
   caption?: string
 }
 ```
@@ -304,7 +304,7 @@ interface QRCodePluginOptions {
 ```ts
 interface SignatureBlockOptions {
   parties: SignatureParty[]
-  columns?: number              // default: 2
+  columns?: number // default: 2
 }
 
 interface SignatureParty {
@@ -320,7 +320,7 @@ interface SignatureParty {
 interface TimelineOptions {
   events: TimelineEvent[]
   layout?: 'alternating' | 'left' | 'right'
-  accentColor?: string          // default: '4472C4'
+  accentColor?: string // default: active theme accent, otherwise '2E75B6'
 }
 
 interface TimelineEvent {
@@ -334,8 +334,8 @@ interface TimelineEvent {
 
 ```ts
 interface TocOptions {
-  maxLevel?: number             // clamped to 1–9, default: 3
-  title?: string                // default: 'Contents'
+  maxLevel?: number // clamped to 1–9, default: 3
+  title?: string // default: 'Contents'
 }
 ```
 
@@ -344,8 +344,8 @@ interface TocOptions {
 ```ts
 interface WatermarkOptions {
   text: string
-  color?: string               // hex without #, default: 'BFBFBF'
-  fontSize?: number            // half-points, default: 48 (24pt)
+  color?: string // hex without #, default: 'BFBFBF'
+  fontSize?: number // half-points, default: 48 (24pt)
   alignment?: 'left' | 'center' | 'right'
 }
 ```
@@ -354,24 +354,24 @@ interface WatermarkOptions {
 
 ## Plugin Quick Reference
 
-| Plugin | Node Name | Output | Async? | Peer Deps |
-|---|---|---|---|---|
-| `badgePlugin` | `badge` | Paragraph | No | — |
-| `barcodePlugin` | `barcode` | Paragraph(s) | Yes | `bwip-js` |
-| `calloutPlugin` | `callout` | Paragraph | No | — |
-| `changelogPlugin` | `changelog` | [Paragraph, Table] | No | — |
-| `codeBlockPlugin` | `codeBlock` | Paragraph[] | Yes | `highlight.js` (optional) |
-| `coverPagePlugin` | `coverPage` | Paragraph[] | No | — |
-| `dataTablePlugin` | `dataTable` | Table | No | — |
-| `dividerPlugin` | `divider` | Paragraph | No | — |
-| `echartsPlugin` | `echarts` | Paragraph(s) | Yes | `echarts` |
-| `invoicePlugin` | `invoice` | Paragraph/Table[] | No | — |
-| `letterheadPlugin` | `letterhead` | Paragraph[] | No | — |
-| `meetingMinutesPlugin` | `meetingMinutes` | [H1, P, Table] | No | — |
-| `pageNumberPlugin` | `pageNumber` | Paragraph | No | — |
-| `propertyTablePlugin` | `propertyTable` | Table | No | — |
-| `qrcodePlugin` | `qrcode` | Paragraph(s) | Yes | `qrcode` |
-| `signatureBlockPlugin` | `signatureBlock` | Table | No | — |
-| `timelinePlugin` | `timeline` | Table | No | — |
-| `tocPlugin` | `toc` | [Paragraph, TableOfContents] | No | — |
-| `watermarkPlugin` | `watermark` | Paragraph | No | — |
+| Plugin                 | Node Name        | Output                       | Async? | Peer Deps                 |
+| ---------------------- | ---------------- | ---------------------------- | ------ | ------------------------- |
+| `badgePlugin`          | `badge`          | Paragraph                    | No     | —                         |
+| `barcodePlugin`        | `barcode`        | Paragraph(s)                 | Yes    | `bwip-js`                 |
+| `calloutPlugin`        | `callout`        | Paragraph                    | No     | —                         |
+| `changelogPlugin`      | `changelog`      | [Paragraph, Table]           | No     | —                         |
+| `codeBlockPlugin`      | `codeBlock`      | Paragraph[]                  | Yes    | `highlight.js` (optional) |
+| `coverPagePlugin`      | `coverPage`      | Paragraph[]                  | No     | —                         |
+| `dataTablePlugin`      | `dataTable`      | Table                        | No     | —                         |
+| `dividerPlugin`        | `divider`        | Paragraph                    | No     | —                         |
+| `echartsPlugin`        | `echarts`        | Paragraph(s)                 | Yes    | `echarts`                 |
+| `invoicePlugin`        | `invoice`        | Paragraph/Table[]            | No     | —                         |
+| `letterheadPlugin`     | `letterhead`     | Paragraph[]                  | No     | —                         |
+| `meetingMinutesPlugin` | `meetingMinutes` | [H1, P, Table]               | No     | —                         |
+| `pageNumberPlugin`     | `pageNumber`     | Paragraph                    | No     | —                         |
+| `propertyTablePlugin`  | `propertyTable`  | Table                        | No     | —                         |
+| `qrcodePlugin`         | `qrcode`         | Paragraph(s)                 | Yes    | `qrcode`                  |
+| `signatureBlockPlugin` | `signatureBlock` | Table                        | No     | —                         |
+| `timelinePlugin`       | `timeline`       | Table                        | No     | —                         |
+| `tocPlugin`            | `toc`            | [Paragraph, TableOfContents] | No     | —                         |
+| `watermarkPlugin`      | `watermark`      | Paragraph                    | No     | —                         |

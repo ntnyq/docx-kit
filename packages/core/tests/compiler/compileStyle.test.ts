@@ -80,7 +80,7 @@ describe('compileTextStyle', () => {
   it('returns empty-ish object for empty style', () => {
     const result = compileTextStyle({})
     expect(result.size).toBeUndefined()
-    expect(result.bold).toBe(false)
+    expect(result.bold).toBeUndefined()
     expect(result.color).toBeUndefined()
   })
 })

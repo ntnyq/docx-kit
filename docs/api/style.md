@@ -15,6 +15,7 @@ interface DocxStyleRule {
   bold?: boolean
   italic?: boolean
   fontFamily?: LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>
+  fontFamilyEastAsia?: string // independent Chinese, Japanese, and Korean font
   color?: string | HexColor
   backgroundColor?: string | HexColor
   highlight?: HighlightColor
@@ -75,19 +76,29 @@ interface DocxStyleRule {
 
 ```ts
 type FontWeight =
-  | 'bold'
-  | 'normal'
-  | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
+  'bold' | 'normal' | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
 ```
 
 ## `HighlightColor`
 
 ```ts
 type HighlightColor =
-  | 'black' | 'blue' | 'cyan' | 'darkBlue' | 'darkCyan'
-  | 'darkGray' | 'darkGreen' | 'darkMagenta' | 'darkRed'
-  | 'darkYellow' | 'green' | 'magenta' | 'none' | 'red'
-  | 'white' | 'yellow'
+  | 'black'
+  | 'blue'
+  | 'cyan'
+  | 'darkBlue'
+  | 'darkCyan'
+  | 'darkGray'
+  | 'darkGreen'
+  | 'darkMagenta'
+  | 'darkRed'
+  | 'darkYellow'
+  | 'green'
+  | 'magenta'
+  | 'none'
+  | 'red'
+  | 'white'
+  | 'yellow'
 ```
 
 ## `TextAlign`
@@ -101,8 +112,16 @@ type TextAlign = 'left' | 'center' | 'right' | 'justify'
 ```ts
 interface TabStopRule {
   position: UnitValue
-  type: 'bar' | 'center' | 'clear' | 'decimal' | 'end'
-    | 'left' | 'num' | 'right' | 'start'
+  type:
+    | 'bar'
+    | 'center'
+    | 'clear'
+    | 'decimal'
+    | 'end'
+    | 'left'
+    | 'num'
+    | 'right'
+    | 'start'
   leader?: 'dot' | 'hyphen' | 'middleDot' | 'none' | 'underscore'
 }
 ```
@@ -162,16 +181,16 @@ const styles = defineStyles({
     color: '#333',
   },
   body: {
-    extends: 'baseText',       // inherits fontSize, fontFamily, color
-    lineHeight: 1.5,             // override
+    extends: 'baseText', // inherits fontSize, fontFamily, color
+    lineHeight: 1.5, // override
   },
   h2: {
-    extends: 'body',            // 3-level chain: h2 → body → baseText
+    extends: 'body', // 3-level chain: h2 → body → baseText
     fontSize: 18,
     fontWeight: 'bold',
   },
   warning: {
-    extends: ['baseText', 'callout'],  // multiple inheritance
+    extends: ['baseText', 'callout'], // multiple inheritance
     color: '#92400e',
   },
 })
@@ -208,19 +227,19 @@ function defineStyles<T extends Record<string, StyleSheetEntry>>(
 // Usage
 const styles = defineStyles({
   accent: { color: '#2563eb', fontWeight: 'bold' },
-  muted:  { color: '#6b7280', fontSize: 10 },
+  muted: { color: '#6b7280', fontSize: 10 },
 })
 // → styles.accent is { color: '#2563eb'; fontWeight: 'bold' }
 ```
 
 ## Style Properties Reference
 
-| Category | Properties |
-|---|---|
-| **Text** | `fontFamily`, `fontSize`, `fontWeight`, `fontStyle`, `bold`, `italic`, `color`, `highlight`, `underline`, `strike`, `doubleStrike`, `allCaps`, `smallCaps`, `subScript`, `superScript`, `rightToLeft`, `emboss`, `imprint`, `backgroundColor`, `characterSpacing`, `letterSpacing` |
-| **Spacing** | `lineHeight`, `keepLines`, `keepNext`, `pageBreakBefore`, `widowControl` |
-| **Margins** | `margin`, `marginTop`, `marginRight`, `marginBottom`, `marginLeft` |
-| **Alignment** | `textAlign`, `textIndent`, `verticalAlign`, `outlineLevel`, `tabStops` |
-| **Borders** | `border`, `borderTop`, `borderRight`, `borderBottom`, `borderLeft` |
-| **Size** | `width`, `height` |
-| **Escape** | `docx` — merge directly into docxjs options |
+| Category      | Properties                                                                                                                                                                                                                                                                                               |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Text**      | `fontFamily`, `fontFamilyEastAsia`, `fontSize`, `fontWeight`, `fontStyle`, `bold`, `italic`, `color`, `highlight`, `underline`, `strike`, `doubleStrike`, `allCaps`, `smallCaps`, `subScript`, `superScript`, `rightToLeft`, `emboss`, `imprint`, `backgroundColor`, `characterSpacing`, `letterSpacing` |
+| **Spacing**   | `lineHeight`, `keepLines`, `keepNext`, `pageBreakBefore`, `widowControl`                                                                                                                                                                                                                                 |
+| **Margins**   | `margin`, `marginTop`, `marginRight`, `marginBottom`, `marginLeft`                                                                                                                                                                                                                                       |
+| **Alignment** | `textAlign`, `textIndent`, `verticalAlign`, `outlineLevel`, `tabStops`                                                                                                                                                                                                                                   |
+| **Borders**   | `border`, `borderTop`, `borderRight`, `borderBottom`, `borderLeft`                                                                                                                                                                                                                                       |
+| **Size**      | `width`, `height`                                                                                                                                                                                                                                                                                        |
+| **Escape**    | `docx` — merge directly into docxjs options                                                                                                                                                                                                                                                              |

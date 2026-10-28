@@ -19,6 +19,7 @@ export function badgePlugin() {
   return definePlugin<'badge', BadgeOptions>({
     name: 'badge',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
       const preset =
         typeof options.color === 'string' && options.color in BADGE_PRESETS
@@ -26,10 +27,16 @@ export function badgePlugin() {
           : undefined
 
       const foreground =
-        preset?.foreground
+        (preset && options.color
+          ? config.theme?.colors?.[options.color]?.replace(/^#/, '')
+          : undefined)
+        ?? preset?.foreground
         ?? (options.color && !preset ? options.color : '444444')
       const background =
-        options.backgroundColor ?? preset?.background ?? 'EDEDED'
+        options.backgroundColor?.replace(/^#/, '')
+        ?? config.theme?.colors?.surface?.replace(/^#/, '')
+        ?? preset?.background
+        ?? 'EDEDED'
 
       return new Paragraph(
         pluginStyles.paragraph({
@@ -39,15 +46,12 @@ export function badgePlugin() {
             new TextRun(
               pluginStyles.text({
                 bold: true,
-                color: foreground,
+                color: foreground.replace(/^#/, ''),
+                shading: { fill: background, type: ShadingType.CLEAR },
                 text: ` ${options.text} `,
               }),
             ),
           ],
-          shading: {
-            fill: background,
-            type: ShadingType.CLEAR,
-          },
         }),
       )
     },

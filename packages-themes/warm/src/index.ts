@@ -1,5 +1,5 @@
 /**
- * Warm theme — earthy tones with amber and terracotta accents.
+ * Warm theme — earthy tones for correspondence and editorial documents.
  *
  * @module themes/warm
  */
@@ -7,50 +7,51 @@
 import type { DocxTheme } from '@docxkit/core'
 
 /**
- * Warm theme — earthy tones with amber and terracotta accents.
+ * Warm theme — earthy tones for correspondence and editorial documents.
  *
- * Uses Garamond/Georgia serif fonts and warm color palette
- * (amber, terracotta, warm gray) suitable for invitations
- * and personal correspondence.
+ * Uses Georgia with Song/Hei East Asian fonts and a quiet warm-gray palette
+ * suitable for correspondence and editorial documents on white paper.
  *
  * @remarks
  * - `colors` — 12 semantic color tokens (primary, accent, success, etc.)
  * - `fonts` — body/heading/code font stacks
  * - `fontSize` — 5-step type scale (xs/sm/base/lg/xl)
- * - `spacing` — 5-step spacing scale (xs/sm/md/lg/xl) in half-points
+ * - `spacing` — 5-step spacing scale (xs/sm/md/lg/xl) in points
  */
 export const warmTheme: DocxTheme & {
   description: string
   id: string
   name: string
 } = {
-  description: 'Earthy tones with amber and terracotta accents.',
+  description: 'Earthy tones for correspondence and editorial documents.',
   id: 'warm',
   name: 'Warm',
   colors: {
-    accent: '#d97706',
-    background: '#fffbeb',
-    border: '#fde68a',
+    accent: '#8b5e34',
+    background: '#ffffff',
+    border: '#ddd6ca',
     danger: '#b91c1c',
-    info: '#7c3aed',
+    info: '#6b6578',
     muted: '#78716c',
     primary: '#44403c',
     secondary: '#57534e',
     success: '#15803d',
-    surface: '#fef3c7',
+    surface: '#f6f3ee',
     text: '#292524',
-    warning: '#ea580c',
+    warning: '#a34c13',
   },
   fonts: {
-    body: 'Garamond, Georgia, serif',
-    code: 'JetBrains Mono, monospace',
-    heading: 'Garamond, Georgia, serif',
+    body: 'Georgia',
+    bodyEastAsia: 'SimSun',
+    code: 'Consolas',
+    heading: 'Georgia',
+    headingEastAsia: 'SimHei',
   },
   fontSize: {
     base: 12,
     lg: 15,
     sm: 10,
-    xl: 19,
+    xl: 24,
     xs: 8,
   },
   spacing: {

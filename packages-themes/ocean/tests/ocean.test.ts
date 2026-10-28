@@ -41,33 +41,33 @@ describe('oceanTheme', () => {
 
     it('has correct deep blue + teal color values', () => {
       expect(oceanTheme.colors?.accent).toBe('#0d9488')
-      expect(oceanTheme.colors?.background).toBe('#f0fdfa')
-      expect(oceanTheme.colors?.border).toBe('#99f6e4')
+      expect(oceanTheme.colors?.background).toBe('#ffffff')
+      expect(oceanTheme.colors?.border).toBe('#cbd9df')
       expect(oceanTheme.colors?.danger).toBe('#e11d48')
-      expect(oceanTheme.colors?.info).toBe('#38bdf8')
+      expect(oceanTheme.colors?.info).toBe('#24758a')
       expect(oceanTheme.colors?.muted).toBe('#64748b')
       expect(oceanTheme.colors?.primary).toBe('#0f172a')
       expect(oceanTheme.colors?.secondary).toBe('#1e293b')
-      expect(oceanTheme.colors?.success).toBe('#059669')
-      expect(oceanTheme.colors?.surface).toBe('#ccfbf1')
+      expect(oceanTheme.colors?.success).toBe('#14765c')
+      expect(oceanTheme.colors?.surface).toBe('#f0f5f7')
       expect(oceanTheme.colors?.text).toBe('#1e293b')
-      expect(oceanTheme.colors?.warning).toBe('#f59e0b')
+      expect(oceanTheme.colors?.warning).toBe('#946200')
     })
 
-    it('uses a teal family for accent/border/surface correlated colors', () => {
+    it('uses a teal accents with muted print surfaces', () => {
       const { accent = '', border = '', surface = '' } = oceanTheme.colors ?? {}
-      // All are teal/mint-toned greens/blues
+      // Teal accents pair with a quiet border and surface
       expect(accent).toBe('#0d9488')
-      expect(border).toBe('#99f6e4')
-      expect(surface).toBe('#ccfbf1')
+      expect(border).toBe('#cbd9df')
+      expect(surface).toBe('#f0f5f7')
     })
   })
 
   describe('fonts', () => {
-    it('uses Georgia serif for body and heading, monospace for code', () => {
-      expect(oceanTheme.fonts?.body).toBe('Georgia, serif')
-      expect(oceanTheme.fonts?.heading).toBe('Georgia, serif')
-      expect(oceanTheme.fonts?.code).toBe('JetBrains Mono, monospace')
+    it('uses Calibri body and Cambria headings, monospace for code', () => {
+      expect(oceanTheme.fonts?.body).toBe('Calibri')
+      expect(oceanTheme.fonts?.heading).toBe('Cambria')
+      expect(oceanTheme.fonts?.code).toBe('Consolas')
     })
   })
 
@@ -77,7 +77,7 @@ describe('oceanTheme', () => {
       expect(oceanTheme.fontSize?.sm).toBe(10)
       expect(oceanTheme.fontSize?.base).toBe(12)
       expect(oceanTheme.fontSize?.lg).toBe(16)
-      expect(oceanTheme.fontSize?.xl).toBe(20)
+      expect(oceanTheme.fontSize?.xl).toBe(26)
     })
 
     it('font sizes are in strictly increasing order', () => {

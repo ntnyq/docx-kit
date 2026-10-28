@@ -1,6 +1,5 @@
 /**
- * Classic preset — formal, official-document style inspired by
- * Chinese government document standards (GB/T 9704).
+ * Classic preset — formal, official-document style for Chinese reports and official correspondence.
  *
  * Characteristics:
  * - Black headings in SimHei / KaiTi
@@ -14,8 +13,7 @@
 import type { DocxPreset } from '@docxkit/core'
 
 /**
- * Classic preset — formal, official-document style inspired by
- * Chinese government document standards (GB/T 9704).
+ * Classic preset — formal, official-document style for Chinese reports and official correspondence.
  *
  * Uses black SimHei/KaiTi headings, SimSun body text with
  * two-character first-line indent, and 1.5× line height.
@@ -31,6 +29,7 @@ export const classicPreset: DocxPreset = {
   id: 'classic',
   name: 'Classic',
   config: {
+    page: { margin: '25mm 28mm', size: 'A4' },
     defaults: {
       image: {
         marginBottom: 8,
@@ -39,6 +38,103 @@ export const classicPreset: DocxPreset = {
       },
       paragraph: {
         fontFamily: 'SimSun',
+        fontFamilyEastAsia: 'SimSun',
+        fontSize: 14,
+        lineHeight: 1.5,
+        marginBottom: 6,
+        marginTop: 0,
+        textIndent: '28pt',
+      },
+      text: {
+        color: '$colors.text',
+        fontFamily: 'SimSun',
+        fontFamilyEastAsia: 'SimSun',
+        fontSize: 14,
+      },
+    },
+    styles: {
+      h1: {
+        color: '#000000',
+        fontFamily: 'SimHei',
+        fontFamilyEastAsia: 'SimHei',
+        fontSize: 22,
+        fontWeight: 'bold',
+        keepLines: true,
+        keepNext: true,
+        lineHeight: 1.5,
+        marginBottom: 12,
+        marginTop: 20,
+        textAlign: 'center',
+        textIndent: 0,
+      },
+      h2: {
+        color: '#000000',
+        fontFamily: 'SimHei',
+        fontFamilyEastAsia: 'SimHei',
+        fontSize: 16,
+        fontWeight: 'bold',
+        keepLines: true,
+        keepNext: true,
+        lineHeight: 1.5,
+        marginBottom: 8,
+        marginTop: 16,
+        textIndent: 0,
+      },
+      h3: {
+        color: '#000000',
+        fontFamily: 'KaiTi',
+        fontFamilyEastAsia: 'KaiTi',
+        fontSize: 16,
+        fontWeight: 'bold',
+        keepLines: true,
+        keepNext: true,
+        lineHeight: 1.5,
+        marginBottom: 6,
+        marginTop: 12,
+        textIndent: 0,
+      },
+      h4: {
+        color: '#000000',
+        fontFamily: 'KaiTi',
+        fontFamilyEastAsia: 'KaiTi',
+        fontSize: 14,
+        fontWeight: 'bold',
+        keepLines: true,
+        keepNext: true,
+        lineHeight: 1.4,
+        marginBottom: 5,
+        marginTop: 10,
+        textIndent: 0,
+      },
+      h5: {
+        color: '#000000',
+        fontFamily: 'SimSun',
+        fontFamilyEastAsia: 'SimSun',
+        fontSize: 14,
+        fontWeight: 'bold',
+        keepLines: true,
+        keepNext: true,
+        lineHeight: 1.4,
+        marginBottom: 4,
+        marginTop: 8,
+        textIndent: 0,
+      },
+      h6: {
+        color: '#000000',
+        fontFamily: 'SimSun',
+        fontFamilyEastAsia: 'SimSun',
+        fontSize: 12,
+        fontWeight: 'bold',
+        keepLines: true,
+        keepNext: true,
+        lineHeight: 1.4,
+        marginBottom: 4,
+        marginTop: 8,
+        textIndent: 0,
+      },
+      p: {
+        fontFamily: 'SimSun',
+        fontFamilyEastAsia: 'SimSun',
         fontSize: 14,
         lineHeight: 1.5,
         marginBottom: 6,
@@ -46,69 +142,14 @@ export const classicPreset: DocxPreset = {
         textIndent: '28pt',
       },
     },
-    styles: {
-      h1: {
-        color: '#000000',
-        fontFamily: 'SimHei',
-        fontSize: 22,
-        fontWeight: 'bold',
-        lineHeight: 1.5,
-        marginBottom: 12,
-        marginTop: 20,
-        textAlign: 'center',
-      },
-      h2: {
-        color: '#000000',
-        fontFamily: 'SimHei',
-        fontSize: 16,
-        fontWeight: 'bold',
-        lineHeight: 1.5,
-        marginBottom: 8,
-        marginTop: 16,
-      },
-      h3: {
-        color: '#000000',
-        fontFamily: 'KaiTi',
-        fontSize: 16,
-        fontWeight: 'bold',
-        lineHeight: 1.5,
-        marginBottom: 6,
-        marginTop: 12,
-      },
-      h4: {
-        color: '#000000',
-        fontFamily: 'KaiTi',
-        fontSize: 14,
-        fontWeight: 'bold',
-        lineHeight: 1.4,
-        marginBottom: 5,
-        marginTop: 10,
-      },
-      h5: {
-        color: '#000000',
-        fontFamily: 'SimSun',
-        fontSize: 14,
-        fontWeight: 'bold',
-        lineHeight: 1.4,
-        marginBottom: 4,
-        marginTop: 8,
-      },
-      h6: {
-        color: '#000000',
-        fontFamily: 'SimSun',
-        fontSize: 12,
-        fontWeight: 'bold',
-        lineHeight: 1.4,
-        marginBottom: 4,
-        marginTop: 8,
-      },
-      p: {
-        fontFamily: 'SimSun',
-        fontSize: 14,
-        lineHeight: 1.5,
-        marginBottom: 6,
-        marginTop: 0,
-        textIndent: '28pt',
+    theme: {
+      colors: {
+        accent: '#333333',
+        border: '#d5d9df',
+        muted: '#666666',
+        primary: '#000000',
+        surface: '#f4f6f8',
+        text: '#252525',
       },
     },
   },

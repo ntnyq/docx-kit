@@ -22,6 +22,7 @@ import {
 } from 'docx'
 import { compileNode } from './compileNode'
 import { compileBorderRule } from './compileStyle'
+import { compileDocumentStyles } from './documentStyles'
 import { compileParagraph } from './nodes/compileParagraph'
 import { CompilationSession } from './numbers'
 import { parseShorthandTwip, toTwip } from './units'
@@ -187,6 +188,7 @@ export async function compileDocument<TStyles extends StyleSheet>(
     footnotes,
     keywords: options.config.metadata?.keywords?.join(', '),
     lastModifiedBy: options.config.metadata?.lastModifiedBy,
+    styles: compileDocumentStyles(options.config),
     subject: options.config.metadata?.subject,
     title: options.config.metadata?.title,
     customProperties: Object.entries(

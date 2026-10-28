@@ -14,6 +14,7 @@ export function letterheadPlugin() {
   return definePlugin<'letterhead', LetterheadOptions>({
     name: 'letterhead',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
       const contact = [options.phone, options.email, options.website]
         .filter(Boolean)
@@ -82,10 +83,11 @@ export function letterheadPlugin() {
             spacing: { after: 220 },
             border: {
               bottom: {
-                color: '4472C4',
                 size: 6,
                 space: 1,
                 style: BorderStyle.SINGLE,
+                color:
+                  config.theme?.colors?.accent?.replace(/^#/, '') ?? '2E75B6',
               },
             },
           }),

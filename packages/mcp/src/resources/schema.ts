@@ -47,6 +47,7 @@ export const docxSchemaResource = {
           borderTop: { type: 'string' },
           color: { type: 'string' },
           fontFamily: { type: 'string' },
+          fontFamilyEastAsia: { type: 'string' },
           fontSize: { type: 'number' },
           fontWeight: { enum: ['bold', 'normal', 'semibold'], type: 'string' },
           lineHeight: { type: 'number' },

@@ -357,6 +357,10 @@ export interface TextStyleRule {
    */
   fontFamily?: StyleToken<LiteralUnion<'Arial' | 'Calibri' | 'Times New Roman'>>
   /**
+   * Font family for Chinese, Japanese, and Korean characters in Word.
+   */
+  fontFamilyEastAsia?: StyleToken<string>
+  /**
    * Font size (bare number = pt).
    */
   fontSize?: UnitValue

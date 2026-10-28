@@ -1,7 +1,7 @@
 /**
  * Property Table plugin — renders key-value pairs as a styled 2-column table.
  *
- * The key column is right-aligned with gray background; the value column
+ * The key column is left-aligned with gray background; the value column
  * is left-aligned.  Ideal for config tables, parameter docs, and spec sheets.
  *
  * @module plugins/property-table
@@ -24,6 +24,7 @@
 import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
+  BorderStyle,
   Paragraph,
   ShadingType,
   Table,
@@ -32,17 +33,6 @@ import {
   TextRun,
   WidthType,
 } from 'docx'
-import type { IShadingAttributesProperties } from 'docx'
-
-const KEY_SHADING: IShadingAttributesProperties = {
-  fill: 'F2F2F2',
-  type: ShadingType.CLEAR,
-}
-
-const VALUE_SHADING: IShadingAttributesProperties = {
-  fill: 'F2F2F2',
-  type: ShadingType.CLEAR,
-}
 
 /**
  * A single key-value pair.
@@ -81,13 +71,22 @@ export function propertyTablePlugin() {
   return definePlugin<'propertyTable', PropertyTableOptions>({
     name: 'propertyTable',
     render(options, context) {
+      const { config } = context
       const pluginStyles = createPluginStyle(context.style)
+      const surface =
+        config.theme?.colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
+      const border = {
+        color: config.theme?.colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+        size: 4,
+        style: BorderStyle.SINGLE,
+      }
       const { items, keyBold = true, striped = true } = options
 
       if (!items.length) {
         return new Paragraph(
           pluginStyles.paragraph({
             alignment: AlignmentType.CENTER,
+            spacing: { after: 0, before: 0, line: 288 },
             children: [
               new TextRun(
                 pluginStyles.text({ color: '999999', text: '(no items)' }),
@@ -99,19 +98,24 @@ export function propertyTablePlugin() {
 
       const rows = items.map((item, i) => {
         const isEven = i % 2 === 1
-        const cellShading = striped && isEven ? VALUE_SHADING : undefined
-        const keyShading = striped && isEven ? KEY_SHADING : undefined
+        const cellShading =
+          striped && isEven
+            ? { fill: surface, type: ShadingType.CLEAR }
+            : undefined
+        const keyShading = { fill: surface, type: ShadingType.CLEAR }
 
         return new TableRow({
+          cantSplit: true,
           children: [
             new TableCell(
               pluginStyles.cell({
                 shading: keyShading,
-                width: { size: 3500, type: WidthType.DXA },
+                width: { size: 30, type: WidthType.PERCENTAGE },
                 children: [
                   new Paragraph(
                     pluginStyles.paragraph({
-                      alignment: AlignmentType.RIGHT,
+                      alignment: AlignmentType.LEFT,
+                      spacing: { after: 0, before: 0, line: 288 },
                       children: [
                         new TextRun(
                           pluginStyles.text({
@@ -131,6 +135,7 @@ export function propertyTablePlugin() {
                 children: [
                   new Paragraph(
                     pluginStyles.paragraph({
+                      spacing: { after: 0, before: 0, line: 288 },
                       children: [
                         new TextRun(pluginStyles.text({ text: item.value })),
                       ],
@@ -146,11 +151,19 @@ export function propertyTablePlugin() {
       return new Table({
         rows,
         width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+          bottom: border,
+          insideHorizontal: border,
+          insideVertical: border,
+          left: border,
+          right: border,
+          top: border,
+        },
         margins: {
-          bottom: 40,
-          left: 100,
-          right: 100,
-          top: 40,
+          bottom: 100,
+          left: 140,
+          right: 140,
+          top: 100,
         },
       })
     },

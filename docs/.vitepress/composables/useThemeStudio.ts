@@ -1,4 +1,5 @@
-import { createDocx, defineStyles, THEME_LIST } from 'docx-kit'
+import { THEME_LIST } from 'docx-kit'
+import { saveAs } from 'tinysaver'
 import {
   computed,
   onBeforeUnmount,
@@ -13,63 +14,27 @@ import {
   toDocxTheme,
   updateThemeToken,
 } from '../utils'
+import {
+  createThemeSample,
+  createThemeSampleConfig,
+  DOCUMENT_LAYOUTS,
+} from '../utils/documentSamples'
 import type {
   BuiltinTheme,
   EditableTheme,
   EditableThemeCategory,
 } from '../utils'
 
-const THEME_STUDIO_STYLES = defineStyles({
-  body: {
-    color: '$colors.text',
-    fontFamily: '$fonts.body',
-    fontSize: '$fontSize.base',
-    lineHeight: 1.5,
-  },
-  callout: {
-    backgroundColor: '$colors.surface',
-    color: '$colors.primary',
-    padding: '$spacing.sm',
-    border: {
-      color: '$colors.border',
-      style: 'single',
-      width: 1,
-    },
-  },
-  caption: {
-    color: '$colors.muted',
-    fontSize: '$fontSize.sm',
-    marginBottom: '$spacing.sm',
-  },
-  footer: {
-    color: '$colors.muted',
-    fontFamily: '$fonts.code',
-    fontSize: '$fontSize.sm',
-    marginTop: '$spacing.lg',
-    textAlign: 'center',
-  },
-  sectionTitle: {
-    color: '$colors.primary',
-    fontFamily: '$fonts.heading',
-    fontSize: '$fontSize.lg',
-    fontWeight: 'bold',
-    marginBottom: '$spacing.sm',
-    marginTop: '$spacing.md',
-  },
-  title: {
-    color: '$colors.primary',
-    fontFamily: '$fonts.heading',
-    fontSize: '$fontSize.xl',
-    fontWeight: 'bold',
-    marginBottom: '$spacing.sm',
-    textAlign: 'center',
-  },
-})
-
 const BUILTIN_THEMES = THEME_LIST as readonly BuiltinTheme[]
 const BASE_THEME = BUILTIN_THEMES[0]!
 
 export function useThemeStudio() {
+  const selectedLayoutId = shallowRef('modern')
+  const activeLayout = computed(
+    () =>
+      DOCUMENT_LAYOUTS.find(item => item.preset.id === selectedLayoutId.value)
+      ?? DOCUMENT_LAYOUTS[0],
+  )
   const selectedThemeId = shallowRef(BASE_THEME.id)
   const editableTheme = ref<EditableTheme>(cloneThemeForEditing(BASE_THEME))
   const previewBlob = shallowRef<Blob | null>(null)
@@ -97,29 +62,39 @@ export function useThemeStudio() {
 
   const generatedSnippet = computed(() => {
     const themeModule = serializeThemeToSnippet(editableTheme.value)
+    const { theme: _, ...config } = createThemeSampleConfig(
+      selectedLayoutId.value,
+      toDocxTheme(editableTheme.value),
+    )
+    const configBody = JSON.stringify(config, null, 2).slice(1, -1).trimEnd()
 
     return [
       themeModule,
-      "import { createDocx, defineStyles } from 'docx-kit'",
-      '',
-      'const styles = defineStyles({',
-      '  title: {',
-      "    color: '$colors.primary',",
-      "    fontFamily: '$fonts.heading',",
-      "    fontSize: '$fontSize.xl',",
-      "    marginBottom: '$spacing.md',",
-      '  },',
-      '})',
+      "import { createDocx } from 'docx-kit'",
       '',
       'const doc = createDocx({',
+      `${configBody},`,
       '  theme: customTheme,',
-      '  styles,',
-      "  page: { size: 'A4', margin: '18mm 20mm' },",
       '})',
       '',
-      "doc.h1('Brand document', { className: 'title' }).toBlob()",
+      "doc.h1('Quarterly report').p('Summary of this quarter.').toBlob()",
     ].join('\n')
   })
+
+  function selectLayout(layoutId: string) {
+    if (DOCUMENT_LAYOUTS.some(item => item.preset.id === layoutId)) {
+      selectedLayoutId.value = layoutId
+    }
+  }
+
+  async function downloadDocument() {
+    if (previewBlob.value && !loading.value) {
+      await saveAs(
+        previewBlob.value,
+        `${selectedLayoutId.value}-${editableTheme.value.id}.docx`,
+      )
+    }
+  }
 
   function selectTheme(themeId: string) {
     const nextTheme =
@@ -163,6 +138,9 @@ export function useThemeStudio() {
       clearTimeout(renderTimer)
     }
 
+    renderToken++
+    loading.value = true
+
     renderTimer = setTimeout(() => {
       renderPreview()
     }, 220)
@@ -175,67 +153,7 @@ export function useThemeStudio() {
 
     try {
       const theme = toDocxTheme(editableTheme.value)
-      const doc = createDocx({
-        page: { margin: '18mm 20mm', size: 'A4' },
-        styles: THEME_STUDIO_STYLES,
-        theme,
-      })
-
-      doc
-        .h1(editableTheme.value.name, { className: 'title' })
-        .p(
-          editableTheme.value.description
-            || activeBaseTheme.value.description
-            || 'Theme preview for branded document design.',
-          {
-            className: 'caption',
-          },
-        )
-        .p(
-          'Theme tokens in docx-kit let one palette drive headings, body copy, surfaces, and spacing rhythm across an entire document.',
-          {
-            className: 'body',
-          },
-        )
-        .h2('Section Hierarchy', { className: 'sectionTitle' })
-        .p(
-          'This sample emphasizes heading hierarchy, readable body text, and restrained footer metadata so you can judge whether the theme feels editorial, corporate, or product-driven.',
-          {
-            className: 'body',
-          },
-        )
-        .p(
-          'Callout: preview this theme against structured content before you commit it to a preset or package.',
-          {
-            className: 'callout',
-          },
-        )
-        .table({
-          columns: [
-            { key: 'token', title: 'Token' },
-            { key: 'value', title: 'Example Value' },
-          ],
-          data: [
-            {
-              token: 'colors.primary',
-              value: editableTheme.value.colors.primary ?? 'n/a',
-            },
-            {
-              token: 'fonts.heading',
-              value: editableTheme.value.fonts.heading ?? 'n/a',
-            },
-            {
-              token: 'spacing.md',
-              value: String(editableTheme.value.spacing.md ?? 'n/a'),
-            },
-          ],
-        })
-        .p(
-          `Rendered from base theme "${activeBaseTheme.value.name}" with live token overrides.`,
-          {
-            className: 'footer',
-          },
-        )
+      const doc = createThemeSample(selectedLayoutId.value, theme)
 
       const blob = await doc.toBlob()
       if (token !== renderToken) {
@@ -263,7 +181,7 @@ export function useThemeStudio() {
   }
 
   watch(
-    editableTheme,
+    [editableTheme, selectedLayoutId],
     () => {
       scheduleRender()
     },
@@ -277,6 +195,7 @@ export function useThemeStudio() {
 
   onBeforeUnmount(() => {
     mounted = false
+    renderToken++
     if (renderTimer) {
       clearTimeout(renderTimer)
       renderTimer = null
@@ -285,14 +204,19 @@ export function useThemeStudio() {
 
   return {
     activeBaseTheme,
+    activeLayout,
+    downloadDocument,
     editableTheme,
     generatedSnippet,
     lastRenderedLabel,
+    layouts: DOCUMENT_LAYOUTS,
     loading,
     previewBlob,
     renderPreview,
     resetTheme,
+    selectedLayoutId,
     selectedThemeId,
+    selectLayout,
     selectTheme,
     setMetadata,
     setToken,

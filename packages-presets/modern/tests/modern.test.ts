@@ -34,8 +34,8 @@ describe('modernPreset', () => {
       expect(modernPreset.config?.defaults?.paragraph?.fontSize).toBe(11)
     })
 
-    it('sets lineHeight to 1.5', () => {
-      expect(modernPreset.config?.defaults?.paragraph?.lineHeight).toBe(1.5)
+    it('sets lineHeight to 1.35', () => {
+      expect(modernPreset.config?.defaults?.paragraph?.lineHeight).toBe(1.35)
     })
 
     it('has no textIndent (modern flush-left style)', () => {
@@ -62,45 +62,42 @@ describe('modernPreset', () => {
       expect(styles?.p).toBeDefined()
     })
 
-    it('h1 is dark navy (#1B2A4A), Calibri bold at 26pt', () => {
+    it('h1 is dark navy (#1B2A4A), Calibri bold at 24pt', () => {
       const h1 = modernPreset.config?.styles?.h1
-      expect(h1?.color).toBe('#1B2A4A')
+      expect(h1?.color).toBe('$colors.primary')
       expect(h1?.fontFamily).toBe('Calibri')
-      expect(h1?.fontSize).toBe(26)
+      expect(h1?.fontSize).toBe(24)
       expect(h1?.fontWeight).toBe('bold')
     })
 
-    it('h1 has a blue bottom border', () => {
-      const border = modernPreset.config?.styles?.h1?.borderBottom
-      expect(border).toBeDefined()
-      expect(border?.color).toBe('#2E75B6')
-      expect(border?.style).toBe('single')
-      expect(border?.width).toBe('1.5pt')
+    it('separates the title with whitespace', () => {
+      expect(modernPreset.config.styles?.h1?.borderBottom).toBeUndefined()
+      expect(modernPreset.config.styles?.h1?.marginBottom).toBe(12)
     })
 
     it('h2 and h3 use blue (#2E75B6)', () => {
-      expect(modernPreset.config?.styles?.h2?.color).toBe('#2E75B6')
-      expect(modernPreset.config?.styles?.h3?.color).toBe('#2E75B6')
+      expect(modernPreset.config?.styles?.h2?.color).toBe('$colors.accent')
+      expect(modernPreset.config?.styles?.h3?.color).toBe('$colors.accent')
     })
 
-    it('h2 is 20pt Calibri bold', () => {
+    it('h2 is 16pt Calibri bold', () => {
       const h2 = modernPreset.config?.styles?.h2
       expect(h2?.fontFamily).toBe('Calibri')
-      expect(h2?.fontSize).toBe(20)
+      expect(h2?.fontSize).toBe(16)
       expect(h2?.fontWeight).toBe('bold')
     })
 
-    it('h3 is 16pt Calibri bold', () => {
+    it('h3 is 13pt Calibri bold', () => {
       const h3 = modernPreset.config?.styles?.h3
       expect(h3?.fontFamily).toBe('Calibri')
-      expect(h3?.fontSize).toBe(16)
+      expect(h3?.fontSize).toBe(13)
       expect(h3?.fontWeight).toBe('bold')
     })
 
-    it('h4 is #404040, 14pt bold', () => {
+    it('h4 is #404040, 12pt bold', () => {
       const h4 = modernPreset.config?.styles?.h4
       expect(h4?.color).toBe('#404040')
-      expect(h4?.fontSize).toBe(14)
+      expect(h4?.fontSize).toBe(12)
       expect(h4?.fontWeight).toBe('bold')
     })
 
@@ -125,11 +122,11 @@ describe('modernPreset', () => {
       }
     })
 
-    it('p is 11pt Calibri with 1.5 line height and no indent', () => {
+    it('p is 11pt Calibri with 1.35 line height and no indent', () => {
       const p = modernPreset.config?.styles?.p
       expect(p?.fontFamily).toBe('Calibri')
       expect(p?.fontSize).toBe(11)
-      expect(p?.lineHeight).toBe(1.5)
+      expect(p?.lineHeight).toBe(1.35)
       expect(p?.textIndent).toBeUndefined()
     })
   })

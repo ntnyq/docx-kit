@@ -78,7 +78,7 @@ export function compileBorderRule(rule: NonNullable<DocxStyleRule['border']>) {
  * Compile a `DocxStyleRule` into `docx` table cell options
  * (vertical alignment, margins, shading).
  *
- * Applies sensible default cell padding (5 pt left/right, 2 pt top/bottom)
+ * Applies sensible default cell padding (7 pt left/right, 4 pt top/bottom)
  * when no margins are explicitly set.
  *
  * @param style - — The resolved style rule
@@ -94,7 +94,7 @@ export function compileCellStyle(style: CellStyleRule) {
   const shorthand =
     style.margin == null ? undefined : parseShorthandTwip(style.margin)
 
-  // Default cell padding: 100 twips (5 pt) left/right, 0 top/bottom.
+  // Default cell padding: 7 pt left/right and 4 pt top/bottom.
   // These are overridden when any margin value is explicitly provided.
   const bottom = toTwip(style.marginBottom) ?? shorthand?.bottom
   const left = toTwip(style.marginLeft) ?? shorthand?.left
@@ -115,10 +115,10 @@ export function compileCellStyle(style: CellStyleRule) {
           top: top ?? 0,
         }
       : {
-          bottom: 0,
-          left: 100,
-          right: 100,
-          top: 0,
+          bottom: 80,
+          left: 140,
+          right: 140,
+          top: 80,
         },
     shading:
       style.backgroundColor == null
@@ -239,10 +239,8 @@ export function compileTextStyle(style: TextStyleRule) {
     color: normalizeColor(style.color),
     doubleStrike: style.doubleStrike,
     emboss: style.emboss,
-    font: normalizeFontFamily(style.fontFamily),
     highlight: compileHighlight(style.highlight),
     imprint: style.imprint,
-    italics: style.italic ?? style.fontStyle === 'italic',
     rightToLeft: style.rightToLeft,
     size: toPtHalf(style.fontSize),
     smallCaps: style.smallCaps,
@@ -251,11 +249,24 @@ export function compileTextStyle(style: TextStyleRule) {
     superScript: style.superScript,
     bold:
       style.bold
-      ?? (style.fontWeight === 'bold' || Number(style.fontWeight) >= 600),
+      ?? (style.fontWeight == null
+        ? undefined
+        : style.fontWeight === 'bold' || Number(style.fontWeight) >= 600),
     characterSpacing:
       style.letterSpacing == null
         ? style.characterSpacing
         : toTwip(style.letterSpacing),
+    font: style.fontFamilyEastAsia
+      ? {
+          ascii: normalizeFontFamily(style.fontFamily),
+          cs: normalizeFontFamily(style.fontFamily),
+          eastAsia: normalizeFontFamily(style.fontFamilyEastAsia),
+          hAnsi: normalizeFontFamily(style.fontFamily),
+        }
+      : normalizeFontFamily(style.fontFamily),
+    italics:
+      style.italic
+      ?? (style.fontStyle == null ? undefined : style.fontStyle === 'italic'),
     shading:
       style.backgroundColor == null
         ? undefined

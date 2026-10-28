@@ -178,7 +178,6 @@ onBeforeUnmount(() => {
 
 .preview-renderer :deep(section.docxkit-theme-preview) {
   margin: 0 auto 24px;
-  padding: 42px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: #fff;
   box-shadow:
@@ -334,10 +333,6 @@ onBeforeUnmount(() => {
 @media (max-width: 640px) {
   .preview-renderer {
     padding: 16px;
-  }
-
-  .preview-renderer :deep(section.docxkit-theme-preview) {
-    padding: 24px;
   }
 
   .preview-state {

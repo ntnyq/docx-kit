@@ -8,10 +8,10 @@ A preset is a frozen `DocxPreset` object with this shape:
 
 ```ts
 interface DocxPreset {
-  id: string              // e.g. 'modern'
-  name: string            // e.g. 'Modern'
+  id: string // e.g. 'modern'
+  name: string // e.g. 'Modern'
   description: string
-  config: DocxKitConfig   // styles + defaults + theme
+  config: DocxKitConfig // styles + defaults + theme
 }
 ```
 
@@ -21,16 +21,22 @@ Presets cover the `styles` and `defaults` fields of a `DocxKitConfig`. You typic
 
 docx-kit ships with **3 built-in presets**:
 
-| Preset | ID | Best For | Font |
-|---|---|---|---|
-| `classicPreset` | `classic` | Official documents (gov-doc, GB/T 9704) | SimHei / SimSun |
-| `modernPreset` | `modern` | Business reports, professional documents | Calibri |
-| `academicPreset` | `academic` | Academic papers, theses | Times New Roman |
+| Preset           | ID         | Best For                                 | Font            |
+| ---------------- | ---------- | ---------------------------------------- | --------------- |
+| `classicPreset`  | `classic`  | Chinese reports and correspondence  | SimHei / SimSun |
+| `modernPreset`   | `modern`   | Business reports, professional documents | Calibri         |
+| `academicPreset` | `academic` | Academic papers, theses                  | Times New Roman |
 
 You can also use the `usePreset(id)` helper to look one up by ID, or `PRESET_LIST` to iterate all built-ins.
 
 ```ts
-import { usePreset, PRESET_LIST, classicPreset, modernPreset, academicPreset } from 'docx-kit'
+import {
+  usePreset,
+  PRESET_LIST,
+  classicPreset,
+  modernPreset,
+  academicPreset,
+} from 'docx-kit'
 
 // All three are exported by name:
 const modern = modernPreset
@@ -38,7 +44,7 @@ const classic = classicPreset
 const academic = academicPreset
 
 // Or look up by ID:
-const found = usePreset('modern')   // returns DocxPreset | undefined
+const found = usePreset('modern') // returns DocxPreset | undefined
 
 // Or iterate all built-ins:
 for (const p of PRESET_LIST) {
@@ -64,7 +70,7 @@ doc
 await doc.save('report.docx')
 ```
 
-That's it — your document will use Calibri throughout, navy/blue headings with a 1.5pt blue underline under h1, generous 1.5× line height, and centered images with 10pt vertical margins.
+That's it — your document will use Calibri throughout, navy/blue headings separated by whitespace, comfortable 1.35× line height, and centered images with 10pt vertical margins.
 
 ## Merging a Preset with Custom Config
 
@@ -90,7 +96,7 @@ const doc = createDocx({
 
 ### `classicPreset` — Official Document Style
 
-Inspired by Chinese government document standards (GB/T 9704).
+A formal Chinese layout for reports, notices, and correspondence.
 
 ```ts
 import { createDocx, classicPreset } from 'docx-kit'
@@ -104,14 +110,14 @@ doc
   .p('以习近平新时代中国特色社会主义思想为指导……')
 ```
 
-| Property | Value |
-|---|---|
-| `h1` font | SimHei, 22pt, bold, centered |
-| `h2` font | SimHei, 16pt, bold |
-| `h3` font | KaiTi, 16pt, bold |
-| Body font | SimSun, 14pt, 1.5× line height |
+| Property  | Value                            |
+| --------- | -------------------------------- |
+| `h1` font | SimHei, 22pt, bold, centered     |
+| `h2` font | SimHei, 16pt, bold               |
+| `h3` font | KaiTi, 16pt, bold                |
+| Body font | SimSun, 14pt, 1.5× line height   |
 | Paragraph | 28pt first-line indent (2 chars) |
-| Image | Centered, 8pt vertical margin |
+| Image     | Centered, 8pt vertical margin    |
 
 ### `modernPreset` — Business Style
 
@@ -128,13 +134,13 @@ doc
   .p('Revenue exceeded projections by 12%.')
 ```
 
-| Property | Value |
-|---|---|
-| `h1` font | Calibri, 26pt, bold, navy `#1B2A4A`, 1.5pt blue underline |
-| `h2` font | Calibri, 20pt, bold, blue `#2E75B6` |
-| `h3` font | Calibri, 16pt, bold, blue `#2E75B6` |
-| Body font | Calibri, 11pt, 1.5× line height |
-| Image | Centered, 10pt vertical margin |
+| Property  | Value                                    |
+| --------- | ---------------------------------------- |
+| `h1` font | Calibri, 24pt, bold, primary theme color |
+| `h2` font | Calibri, 16pt, bold, accent theme color  |
+| `h3` font | Calibri, 13pt, bold, accent theme color  |
+| Body font | Calibri, 11pt, 1.35× line height         |
+| Image     | Centered, 10pt vertical margin           |
 
 ### `academicPreset` — Academic / Thesis Style
 
@@ -152,18 +158,18 @@ doc
   .p('The field of …')
 ```
 
-| Property | Value |
-|---|---|
-| `h1` font | Times New Roman, 16pt, bold, centered |
-| `h2` font | Times New Roman, 14pt, bold |
-| `h4` font | Times New Roman, 12pt, bold + italic |
+| Property  | Value                                               |
+| --------- | --------------------------------------------------- |
+| `h1` font | Times New Roman, 16pt, bold, centered               |
+| `h2` font | Times New Roman, 14pt, bold                         |
+| `h4` font | Times New Roman, 12pt, bold + italic                |
 | Body font | Times New Roman, 12pt, **double-spaced**, justified |
-| Paragraph | 24pt first-line indent (2 chars) |
-| Image | Centered, 12pt vertical margin |
+| Paragraph | 24pt first-line indent (2 chars)                    |
+| Image     | Centered, 12pt vertical margin                      |
 
 ## Combining with Themes
 
-Presets and themes are orthogonal. Presets define *style rules* (h1 color, font size, etc.); themes define *design tokens* (palette, font stacks, scale) that styles can reference via `$category.key` syntax.
+Presets and themes are orthogonal. Presets define _style rules_ (h1 color, font size, etc.); themes define _design tokens_ (palette, font stacks, scale) that styles can reference via `$category.key` syntax.
 
 ```ts
 import { createDocx, modernPreset, useTheme } from 'docx-kit'
@@ -185,3 +191,9 @@ See [Themes](/guide/themes) for more.
 - [Styling](/guide/styling) — Master the style system
 - [Examples: Modern Preset](/examples/preset-modern) — Full business-report example
 - [Examples: Academic Preset](/examples/preset-academic) — Full thesis-style example
+
+## Page layout and Word editing
+
+All built-in presets use A4 pages. Modern uses 22 mm vertical and 24 mm horizontal margins; classic uses 25 mm vertical and 28 mm horizontal margins; academic uses 25.4 mm margins. Headings stay with the following paragraph and reset first-line indentation. Body indentation does not leak into plugin tables or captions.
+
+Native Word document defaults and heading styles preserve the typography when editing the exported file. Latin and East Asian fonts are configured independently through `fontFamily` and `fontFamilyEastAsia`. Fonts must be available on the machine opening the document, or Word will substitute them.
