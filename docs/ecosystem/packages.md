@@ -9,6 +9,7 @@ This page is the package-level map of the current docx-kit monorepo. It compleme
 | `docx-kit` | Umbrella package | Default choice for app developers who want one import surface |
 | `@docxkit/core` | Core builder, compiler, DSL, styles, utilities | Use when you want the minimal runtime or are building advanced integrations |
 | `@docxkit/types` | Shared type definitions | Use in packages or apps that only need types |
+| `@docxkit/markdown` | Markdown to document DSL | Reuse document styles, themes and plugins with Markdown input |
 | `@docxkit/renderer` | Browser preview rendering | Use when you need in-browser `.docx` preview or Office Online embedding |
 
 ## Extensibility And Tooling

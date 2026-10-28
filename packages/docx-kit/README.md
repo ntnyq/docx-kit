@@ -22,3 +22,14 @@ const docx = createDocx()
 // Use built-in plugins
 import { calloutPlugin, codeBlockPlugin } from 'docx-kit'
 ```
+
+## Markdown
+
+```ts
+import { markdownToNodes } from 'docx-kit/markdown'
+
+const content = markdownToNodes('# Report\n\nHello **world**.')
+```
+
+Pass the nodes to `builder.add()` or use them as schema content. Code blocks
+reuse the existing `codeBlock` plugin; register `codeBlockPlugin()` when needed.

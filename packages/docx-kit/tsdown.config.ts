@@ -4,7 +4,7 @@ export default defineConfig([
   {
     clean: true,
     dts: true,
-    entry: ['src/ai.ts', 'src/loader.ts', 'src/pdk.ts'],
+    entry: ['src/ai.ts', 'src/loader.ts', 'src/markdown.ts', 'src/pdk.ts'],
     platform: 'neutral',
   },
   {

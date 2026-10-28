@@ -132,6 +132,7 @@ const expectedExports = [
   ['docx-kit/loader', 'createPluginLoader'],
   ['docx-kit/loader/browser', 'loadUrlPlugin'],
   ['docx-kit/loader/node', 'loadNpmPlugin'],
+  ['docx-kit/markdown', 'markdownToNodes'],
   ['docx-kit/mcp', 'TOOL_DEFINITIONS'],
   ['docx-kit/node', 'saveDocument'],
   ['docx-kit/pdk', 'createPluginTestContext'],
@@ -165,6 +166,7 @@ if (output.length < 4 || output[0] !== 0x50 || output[1] !== 0x4b) {
 import { createDocx } from 'docx-kit'
 import { loadUrlPlugin } from 'docx-kit/loader/browser'
 import { loadNpmPlugin } from 'docx-kit/loader/node'
+import { markdownToNodes, type MarkdownOptions } from 'docx-kit/markdown'
 import { createDocxKitServer, TOOL_DEFINITIONS } from 'docx-kit/mcp'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import {
@@ -186,6 +188,10 @@ void [
 ]
 
 void createNodeDocx().save('consumer-smoke.docx')
+const markdownOptions: MarkdownOptions = { gfm: true }
+for (const node of markdownToNodes('# Markdown consumer', markdownOptions)) {
+  createDocx().add(node)
+}
 
 const server = await createDocxKitServer()
 const [transport] = InMemoryTransport.createLinkedPair()

@@ -758,6 +758,9 @@ importers:
       '@docxkit/loader':
         specifier: workspace:*
         version: link:../loader
+      '@docxkit/markdown':
+        specifier: workspace:*
+        version: link:../markdown
       '@docxkit/mcp':
         specifier: workspace:*
         version: link:../mcp
@@ -866,6 +869,18 @@ importers:
       docx:
         specifier: ^9.7.1
         version: 9.15.0
+
+  packages/markdown:
+    dependencies:
+      '@docxkit/types':
+        specifier: workspace:*
+        version: link:../types
+      entities:
+        specifier: ^8.1.0
+        version: 8.1.0
+      marked:
+        specifier: ^18.1.2
+        version: 18.1.2
 
   packages/mcp:
     dependencies:
@@ -3485,6 +3500,11 @@ packages:
   marked@14.0.0:
     resolution: {integrity: sha512-uIj4+faQ+MgHgwUW1l2PsPglZLOLOT1uErt06dAPtx2kjteLAkbsd/0FiYg/MGS+i7ZKLb7w2WClxHkzOOuryQ==}
     engines: {node: '>= 18'}
+    hasBin: true
+
+  marked@18.1.2:
+    resolution: {integrity: sha512-DfOnvLAQ6WYeWxWO1u4RyFOeqyHup6dks5PPqnoFiooU7ipRvidO/2j8plhAHIiZg574E9ZlzSjUiPMLAzFkgg==}
+    engines: {node: '>= 20'}
     hasBin: true
 
   math-intrinsics@1.1.0:
@@ -6833,6 +6853,8 @@ snapshots:
   markdown-table@3.0.4: {}
 
   marked@14.0.0: {}
+
+  marked@18.1.2: {}
 
   math-intrinsics@1.1.0: {}
 

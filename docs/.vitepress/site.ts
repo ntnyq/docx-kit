@@ -98,6 +98,7 @@ export const guideLinks: LinkItem[] = [
   { link: '/guide/preview', text: 'Browser Preview' },
   { link: '/guide/plugins', text: 'Plugins' },
   { link: '/guide/json-dsl', text: 'JSON DSL (renderDocx)' },
+  { link: '/guide/markdown', text: 'Markdown' },
   { link: '/guide/platforms', text: 'Node.js & Browser' },
   { link: '/guide/errors', text: 'Error Handling' },
   { link: '/guide/plugin-security', text: 'Plugin Security' },

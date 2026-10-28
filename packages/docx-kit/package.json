@@ -53,6 +53,10 @@
       "types": "./dist/loader-node.d.ts",
       "default": "./dist/loader-node.js"
     },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "default": "./dist/markdown.js"
+    },
     "./mcp": {
       "types": "./dist/mcp.d.ts",
       "default": "./dist/mcp.js"
@@ -90,6 +94,7 @@
     "@docxkit/ai": "workspace:*",
     "@docxkit/core": "workspace:*",
     "@docxkit/loader": "workspace:*",
+    "@docxkit/markdown": "workspace:*",
     "@docxkit/mcp": "workspace:*",
     "@docxkit/pdk": "workspace:*",
     "@docxkit/plugin-badge": "workspace:*",

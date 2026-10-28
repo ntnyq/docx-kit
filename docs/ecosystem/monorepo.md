@@ -12,6 +12,7 @@ docx-kit/
 │   ├── create-plugin/
 │   ├── docx-kit/
 │   ├── loader/
+│   ├── markdown/
 │   ├── mcp/
 │   ├── pdk/
 │   ├── registry/
@@ -55,7 +56,7 @@ docx-kit/
 
 | Scope               | Count | Notes                                                        |
 | ------------------- | ----- | ------------------------------------------------------------ |
-| `packages/`         | 10    | Runtime, tooling, AI, renderer, and shared types             |
+| `packages/`         | 11    | Runtime, tooling, AI, renderer, Markdown, and shared types   |
 | `packages-plugins/` | 22    | Every built-in plugin has its own package, tests, and README |
 | `packages-presets/` | 3     | Style presets for common document families                   |
 | `packages-themes/`  | 3     | Token-based themes for color systems                         |

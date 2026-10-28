@@ -139,7 +139,7 @@ export async function compileNumberedList<TStyles extends StyleSheet>(
       alignment: AlignmentType.LEFT,
       format,
       level,
-      start: level === 0 ? (node.start ?? 1) : 1,
+      start: level === normalizeListLevel(node.level) ? (node.start ?? 1) : 1,
       style: createLevelStyle(level),
       text: `${Array.from({ length: level + 1 }, (__, index) => `%${index + 1}`).join('.')}.`,
     })),

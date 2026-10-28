@@ -32,6 +32,7 @@ Built on [docx](https://github.com/dolanmiu/docx).
 - **Style presets** — `classic` (gov-doc), `modern` (business), `academic` (thesis)
 - **Themes** — `minimal`, `ocean`, `warm` with token system (`$colors.primary`)
 - **JSON DSL** — `renderDocx()` for AI/LLM-driven document generation
+- **Markdown** — Convert Markdown to the existing DSL with `docx-kit/markdown`, reusing styles and plugins
 - **AI templates & MCP server** — `report`, `invoice`, `resume`, `letter` + MCP tools
 - **Cross-platform** — Node.js (`save()`) & browser (`toBlob()`)
 - **Browser preview** — Render `.docx` files in the browser with `@docxkit/renderer`
