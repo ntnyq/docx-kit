@@ -14,6 +14,7 @@ import {
 } from 'docx-preview'
 import { createPreviewError, PREVIEW_ERROR_CODES } from './errors'
 import { normalizeDocxInput } from './normalize'
+import { preparePageFields, resolvePageFields } from './page-fields'
 import { trackDocumentResources } from './resources'
 import { sanitizePreviewNode } from './sanitize'
 import type { DocxInput, DocxPreviewOptions } from './types'
@@ -85,8 +86,10 @@ export async function renderDocxPreview(
   try {
     const document: unknown = await parseAsync(blob, renderOptions)
     dispose = trackDocumentResources(document)
+    preparePageFields(document)
     const nodes = await renderDocument(document, renderOptions)
     container.replaceChildren(...nodes)
+    resolvePageFields(container, renderOptions.className)
     return dispose
   } catch (error) {
     dispose?.()

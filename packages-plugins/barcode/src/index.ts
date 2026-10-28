@@ -112,6 +112,7 @@ interface BarcodeRenderOptions {
   scale: number
   text: string
   textxalign: 'center'
+  textyoffset: number
   textcolor?: string
 }
 
@@ -219,6 +220,8 @@ async function renderBarcode(
     scale: options.scale ?? 3,
     text: options.text,
     textxalign: 'center',
+    // BWIPP offsets are in points; negative values move text below the bars.
+    textyoffset: -3,
     ...(options.textColor
       ? { textcolor: normalizeColor(options.textColor) }
       : {}),

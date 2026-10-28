@@ -46,6 +46,7 @@ describe('barcodePlugin', () => {
       scale: 3,
       text: 'DOCX-KIT-2026',
       textxalign: 'center',
+      textyoffset: -3,
     })
   })
 
@@ -82,6 +83,7 @@ describe('barcodePlugin', () => {
       text: '5901234123457',
       textcolor: 'DC2626',
       textxalign: 'center',
+      textyoffset: -3,
     })
   })
 
