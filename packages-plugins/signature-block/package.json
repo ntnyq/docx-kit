@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/plugin-signature-block",
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Signature grid for contracts — docx-kit plugin",
   "keywords": [
     "docx",
