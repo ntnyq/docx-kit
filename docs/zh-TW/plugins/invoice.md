@@ -1,29 +1,67 @@
-# Invoice
+# 發票（Invoice）
 
-生成發票區塊，自動計算小計、稅額與總計。
+建置包含開票方、收票方資訊、明細、小計、稅額與總額的發票章節。
+
+## 匯入
+
+```ts
+import { invoicePlugin, type InvoiceOptions } from 'docx-kit'
+```
 
 ## 選項
 
-| 選項 | 類型 | 說明 |
-| --- | --- | --- |
-| `invoiceNumber` | `string` | 發票號碼 |
-| `date` | `string` | 開立日期 |
-| `dueDate` | `string` | 到期日 |
-| `from` | `InvoiceParty` | 開票方 |
-| `to` | `InvoiceParty` | 收票方 |
-| `items` | `InvoiceLineItem[]` | 明細列 |
-| `currency` | `string` | 幣別前綴 |
-| `taxRate` | `number` | `0..1` 之間的稅率 |
-| `notes` | `string` | 備註 |
+| 選項 | 型別 | 預設值 | 說明 |
+| --- | --- | --- | --- |
+| `invoiceNumber` | `string` | 必填 | 發票標識符 |
+| `date` | `string` | 必填 | 開票日期 |
+| `from` | `InvoiceParty` | 必填 | 開票方資訊 |
+| `to` | `InvoiceParty` | 必填 | 收票方資訊 |
+| `items` | `InvoiceLineItem[]` | 必填 | 發票明細 |
+| `currency` | `string` | `''` | 貨幣前綴，如 `USD` 或 `CNY` |
+| `dueDate` | `string` | — | 可選到期日 |
+| `notes` | `string` | — | 可選備註段落 |
+| `taxRate` | `number` | `0` | `0` 到 `1` 之間的稅率 |
 
-## 用法
+`InvoiceParty`:
+
+| 欄位 | 型別 | 說明 |
+| --- | --- | --- |
+| `name` | `string` | 顯示名稱 |
+| `address` | `string` | 可選地址行 |
+| `email` | `string` | 可選電子郵件 |
+
+`InvoiceLineItem`:
+
+| 欄位 | 型別 | 說明 |
+| --- | --- | --- |
+| `description` | `string` | 條目名稱 |
+| `quantity` | `number` | 正數量 |
+| `unitPrice` | `number` | 非負單價 |
+
+## 範例
 
 ```ts
-createDocx().use(invoicePlugin()).plugin('invoice', {
-  invoiceNumber: 'INV-001',
-  date: '2026-06-14',
-  from: { name: 'Acme Corp' },
-  to: { name: 'Client Inc' },
-  items: [{ description: 'Service', quantity: 1, unitPrice: 5000 }],
-})
+import { createDocx, invoicePlugin } from 'docx-kit'
+
+const doc = createDocx()
+  .use(invoicePlugin())
+  .plugin('invoice', {
+    invoiceNumber: 'INV-2026-001',
+    date: '2026-06-14',
+    dueDate: '2026-06-30',
+    currency: 'USD',
+    taxRate: 0.13,
+    from: { name: 'Acme Corp', email: 'billing@acme.com' },
+    to: { name: 'Client Inc', email: 'finance@client.com' },
+    items: [
+      { description: 'Implementation', quantity: 1, unitPrice: 5000 },
+      { description: 'Support', quantity: 10, unitPrice: 120 },
+    ],
+  })
 ```
+
+## 驗證規則
+
+- `quantity` 必須是正有限數。
+- `unitPrice` 必須是非負有限數。
+- 提供 `taxRate` 時，必須在閉區間 `0..1` 內。

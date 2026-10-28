@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useToolI18n } from '../../composables/useToolI18n'
 import type { EditableThemeCategory } from '../../utils'
 
 interface Props {
@@ -10,7 +11,6 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
 const emit = defineEmits<{
   updateToken: [
     payload: {
@@ -20,6 +20,8 @@ const emit = defineEmits<{
     },
   ]
 }>()
+
+const { formatMessage } = useToolI18n()
 
 const orderedTokens = computed(() =>
   Object.entries(props.tokens).sort(([left], [right]) =>
@@ -65,7 +67,7 @@ function toColorInputValue(value: number | string) {
             emitTokenUpdate(key, ($event.target as HTMLInputElement).value)
           "
           v-if="category === 'colors'"
-          :aria-label="`Choose ${key} color`"
+          :aria-label="formatMessage('chooseColor', { key })"
           :value="toColorInputValue(value)"
           class="token-color"
           type="color"

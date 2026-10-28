@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue'
 import { useThemeStudio } from '../../composables/useThemeStudio'
+import { useToolI18n } from '../../composables/useToolI18n'
 import ThemeInspector from './ThemeInspector.vue'
 import ThemePreviewPane from './ThemePreviewPane.vue'
 import ThemeStudioHeader from './ThemeStudioHeader.vue'
@@ -25,6 +26,8 @@ const {
   studioError,
   themes,
 } = useThemeStudio()
+
+const { layoutTitle, messages } = useToolI18n()
 
 const isInspectorVisible = shallowRef(true)
 const previewZoom = shallowRef<'fit' | number>('fit')
@@ -75,21 +78,26 @@ const accentColor = computed(
             class="preview-button inspector-toggle"
             type="button"
           >
-            {{ isInspectorVisible ? 'Hide inspector' : 'Show inspector' }}
+            {{
+              isInspectorVisible
+                ? messages.hideInspector
+                : messages.showInspector
+            }}
           </button>
           <div class="preview-heading">
             <strong class="preview-title"
-              >{{ activeLayout.title }} · {{ editableTheme.name }}</strong
+              >{{ layoutTitle(activeLayout.preset.id, activeLayout.title) }} ·
+              {{ editableTheme.name }}</strong
             >
           </div>
 
           <label class="zoom-field">
-            <span class="visually-hidden">Preview zoom</span>
+            <span class="visually-hidden">{{ messages.previewZoom }}</span>
             <select
               v-model="previewZoom"
               class="zoom-select"
             >
-              <option value="fit">Fit width</option>
+              <option value="fit">{{ messages.fitWidth }}</option>
               <option :value="0.75">75%</option>
               <option :value="1">100%</option>
               <option :value="1.25">125%</option>
@@ -101,7 +109,7 @@ const accentColor = computed(
             class="preview-button download-button"
             type="button"
           >
-            Download Word
+            {{ messages.downloadWord }}
           </button>
         </header>
 

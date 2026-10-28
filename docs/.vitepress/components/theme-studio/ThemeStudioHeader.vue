@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useToolI18n } from '../../composables/useToolI18n'
 import type { BuiltinTheme } from '../../utils'
 
 interface Props {
@@ -28,6 +29,9 @@ const emit = defineEmits<{
   selectLayout: [layoutId: string]
   selectTheme: [themeId: string]
 }>()
+
+const { formatMessage, layoutDescription, layoutTitle, messages, themeTitle } =
+  useToolI18n()
 </script>
 
 <template>
@@ -41,7 +45,7 @@ const emit = defineEmits<{
         <span class="studio-mark-line studio-mark-line-short" />
       </span>
       <div class="studio-heading">
-        <h1 class="studio-title">Theme Studio</h1>
+        <h1 class="studio-title">{{ messages.studioTitle }}</h1>
       </div>
     </div>
 
@@ -59,15 +63,15 @@ const emit = defineEmits<{
         />
         {{
           loading
-            ? 'Rendering'
+            ? messages.rendering
             : lastRenderedLabel
-              ? `Updated ${lastRenderedLabel}`
-              : 'Preview pending'
+              ? formatMessage('updatedAt', { time: lastRenderedLabel })
+              : messages.previewPending
         }}
       </span>
 
       <label class="theme-select-field layout-select-field">
-        <span class="visually-hidden">Document layout</span>
+        <span class="visually-hidden">{{ messages.documentLayout }}</span>
         <select
           @change="
             emit('selectLayout', ($event.target as HTMLSelectElement).value)
@@ -79,14 +83,14 @@ const emit = defineEmits<{
             v-for="layout in layouts"
             :key="layout.preset.id"
             :value="layout.preset.id"
-            :title="layout.description"
+            :title="layoutDescription(layout.preset.id, layout.description)"
           >
-            {{ layout.title }}
+            {{ layoutTitle(layout.preset.id, layout.title) }}
           </option>
         </select>
       </label>
       <label class="theme-select-field">
-        <span class="visually-hidden">Base theme</span>
+        <span class="visually-hidden">{{ messages.baseTheme }}</span>
         <select
           @change="
             emit('selectTheme', ($event.target as HTMLSelectElement).value)
@@ -99,7 +103,7 @@ const emit = defineEmits<{
             :key="theme.id"
             :value="theme.id"
           >
-            {{ theme.name }}
+            {{ themeTitle(theme.id, theme.name) }}
           </option>
         </select>
       </label>
@@ -109,7 +113,7 @@ const emit = defineEmits<{
         class="studio-button studio-button-secondary"
         type="button"
       >
-        Reset
+        {{ messages.reset }}
       </button>
 
       <button
@@ -118,7 +122,7 @@ const emit = defineEmits<{
         class="studio-button studio-button-primary"
         type="button"
       >
-        {{ loading ? 'Rendering…' : 'Render preview' }}
+        {{ loading ? messages.renderingPreview : messages.renderPreview }}
       </button>
     </div>
   </header>

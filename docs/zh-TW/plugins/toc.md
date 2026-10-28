@@ -1,21 +1,31 @@
-# TOC
+# 目錄（Table of Contents）
 
-插入 Word 原生目錄欄位。
+插入根據標題層級產生的 Word 目錄域。
+
+## 匯入
+
+```ts
+import { tocPlugin, type TocOptions } from 'docx-kit'
+```
 
 ## 選項
 
-| 選項 | 類型 | 說明 |
-| --- | --- | --- |
-| `title` | `string` | 目錄標題 |
-| `maxLevel` | `number` | 最大標題層級，範圍 `1..9` |
+| 選項 | 型別 | 預設值 | 說明 |
+| --- | --- | --- | --- |
+| `title` | `string` | `'Contents'` | 可見章節標題 |
+| `maxLevel` | `number` | `3` | 納入目錄的最大標題層級，限制在 `1..9` |
 
-## 用法
+## 範例
 
 ```ts
-createDocx().use(tocPlugin()).plugin('toc', {
-  title: '目錄',
-  maxLevel: 3,
-})
+import { createDocx, tocPlugin } from 'docx-kit'
+
+const doc = createDocx()
+  .use(tocPlugin())
+  .plugin('toc', { title: 'Document Contents', maxLevel: 4 })
 ```
 
-文件在 Word 中開啟後，通常需要更新欄位才能顯示最終頁碼。
+## 說明
+
+- 外掛輸出真正的 DOCX 目錄域，而非靜態文字快照。
+- Microsoft Word 打開檔案後可能提示更新域。

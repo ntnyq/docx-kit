@@ -1,20 +1,35 @@
-# Badge
+# 徽章（Badge）
 
-用來生成 `DRAFT`、`APPROVED` 這類短狀態標籤。
+呈現 `DRAFT`、`APPROVED`、`INTERNAL` 等簡短狀態標籤。
+
+## 匯入
+
+```ts
+import { badgePlugin, type BadgeOptions } from 'docx-kit'
+```
 
 ## 選項
 
-| 選項 | 類型 | 說明 |
-| --- | --- | --- |
-| `text` | `string` | 標籤文字，必填 |
-| `color` | `string \| 'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger'` | 預設語意色或自訂文字顏色 |
-| `backgroundColor` | `string` | 自訂背景色 |
+| 選項 | 型別 | 預設值 | 說明 |
+| --- | --- | --- | --- |
+| `text` | `string` | 必填 | 徽章文字 |
+| `color` | `string \| 'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger'` | `'neutral'` | 預設色調名稱或自訂文字顏色 |
+| `backgroundColor` | `string` | 由預設決定 | 自訂徽章背景色 |
 
-## 用法
+## 範例
 
 ```ts
-createDocx().use(badgePlugin()).plugin('badge', {
-  text: 'DRAFT',
-  color: 'warning',
-})
+import { badgePlugin, createDocx } from 'docx-kit'
+
+const doc = createDocx()
+  .use(badgePlugin())
+  .plugin('badge', {
+    text: 'DRAFT',
+    color: 'warning',
+  })
 ```
+
+## 說明
+
+- 預設提供配套的前景色與背景色。
+- 自訂 `color` 若不屬於預設名稱，會按字面文字顏色處理。

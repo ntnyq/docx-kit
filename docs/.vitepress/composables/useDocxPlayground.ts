@@ -6,6 +6,7 @@ import { useData } from 'vitepress'
 import { nextTick, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
 import { DEFAULT_CODE, PRESETS } from '../constants/templates'
 import { executePlaygroundCode } from '../utils'
+import { useToolI18n } from './useToolI18n'
 import type { DocxKitConfig, DocxPreset } from 'docx-kit'
 import type * as Monaco from 'monaco-editor/editor/editor.api'
 import type { Preset } from '../constants/templates'
@@ -30,6 +31,7 @@ export function useDocxPlayground() {
   // VitePress color mode
   // -------------------------------------------------------------------------
   const { isDark } = useData()
+  const { messages } = useToolI18n()
 
   // -------------------------------------------------------------------------
   // Reactive state
@@ -57,7 +59,7 @@ export function useDocxPlayground() {
     await nextTick()
 
     if (!editorContainer.value) {
-      editorError.value = 'Editor container not found'
+      editorError.value = messages.value.editorMissing
       return
     }
 
@@ -106,6 +108,7 @@ export function useDocxPlayground() {
       }
 
       editorInstance = monaco.editor.create(editorContainer.value, {
+        ariaLabel: messages.value.editorAriaLabel,
         automaticLayout: true,
         fontSize: 13,
         lineNumbers: 'on',
@@ -140,6 +143,10 @@ export function useDocxPlayground() {
         editorInstance.setValue(newValue)
       }
     }
+  })
+
+  watch(messages, value => {
+    editorInstance?.updateOptions({ ariaLabel: value.editorAriaLabel })
   })
 
   // Sync VitePress color mode → Monaco theme.

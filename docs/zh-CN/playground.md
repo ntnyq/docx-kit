@@ -1,7 +1,15 @@
-# Playground
+---
+layout: page
+outline: false
+aside: false
+sidebar: false
+footer: false
+pageClass: page-playground
+title: Playground
+---
 
-在线 Playground 仍沿用英文界面，但文档结构、导航与插件说明已提供简体中文入口。
+<script lang="ts" setup>
+import DocxPlayground from '../.vitepress/components/DocxPlayground.vue'
+</script>
 
-- 英文入口：[/playground](/playground)
-- 插件说明：[/zh-CN/plugins/](/zh-CN/plugins/)
-- 包总览：[/zh-CN/ecosystem/packages](/zh-CN/ecosystem/packages)
+<DocxPlayground />

@@ -10,6 +10,14 @@ import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
 import TSWorker from 'monaco-editor/language/typescript/ts.worker?worker'
 import * as typescript from 'monaco-editor/languages/features/typescript/register'
 
+// TypeScript's lazy worker entry also loads editor contributions. Register their
+// services before the first model initializes Monaco's singleton container;
+// otherwise a later editor mount cannot resolve these late-added services.
+import 'monaco-editor/features/codeAction/register'
+import 'monaco-editor/features/codelens/register'
+import 'monaco-editor/features/dropOrPasteInto/register'
+import 'monaco-editor/features/inlayHints/register'
+import 'monaco-editor/features/suggest/register'
 // Syntax highlighting is registered separately from TypeScript language services.
 import 'monaco-editor/languages/definitions/typescript/register'
 

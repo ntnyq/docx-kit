@@ -1,37 +1,50 @@
-# Figure
+# 插圖（Figure）
 
-組合圖片、圖說和來源，重用核心圖片編譯器。
+組合行內圖片、可選題注與可選來源，使用核心圖片編譯器處理格式檢測、尺寸、替代文字和圖片解析。
+
+## 匯入
+
+```ts
+import { figurePlugin, type FigureOptions } from 'docx-kit'
+```
+
+獨立套件 `@docxkit/plugin-figure` 匯出相同工廠函式與型別。
 
 ## 選項
 
-| 選項 | 型別 | 說明 |
-| --- | --- | --- |
-| `data` | `string \| Uint8Array \| ArrayBuffer \| Blob` | 必填；支援位元組、Blob、data URL、base64 或已設定解析器的路徑 |
-| `caption` | `string` | 可選圖說，按原文輸出 |
-| `source` | `string` | 可選來源，顯示在圖說下方，不自動添加前綴 |
-| `alt` | `string` | 圖片替代文字 |
-| `width` / `height` | `UnitValue` | 數字以像素處理；支援 CSS 長度單位，只傳一邊會保持比例 |
-| `imageType` | `'bmp' \| 'gif' \| 'jpeg' \| 'jpg' \| 'png'` | 預設自動偵測 |
-| `alignment` | `'center' \| 'left' \| 'right'` | 圖片、圖說與來源對齊，預設置中 |
+| 選項 | 型別 | 預設值 | 說明 |
+| --- | --- | --- | --- |
+| `data` | `string \| Uint8Array \| ArrayBuffer \| Blob` | 必填 | 圖片位元組、Blob、data URL、原始 base64 或已解析路徑 |
+| `caption` | `string` | — | 圖片下方的原樣題注 |
+| `source` | `string` | — | 題注下方的原樣來源，不添加前綴 |
+| `alt` | `string` | — | 無障礙圖片描述 |
+| `width` | `UnitValue` | 原始寬度 | 純數字按像素處理，支援 CSS 長度單位 |
+| `height` | `UnitValue` | 原始高度 | 僅提供一個維度時保持寬高比 |
+| `imageType` | `'bmp' \| 'gif' \| 'jpeg' \| 'jpg' \| 'png'` | 自動檢測 | 顯式圖片格式提示 |
+| `alignment` | `'center' \| 'left' \| 'right'` | `'center'` | 圖片、題注與來源的對齊方式 |
 
-未傳入尺寸時使用圖片原始尺寸；無法讀取時退回 300 × 180 像素及其比例。兩邊都傳入時使用指定尺寸。圖說和來源均為可選，不產生多餘空段落。
+同時提供寬高時直接使用指定尺寸。無法讀取原始尺寸時，核心圖片編譯器採用 300 × 180 像素的備援尺寸與寬高比。省略題注和來源不會產生額外段落。
 
-瀏覽器從 `docx-kit` 匯入，傳入位元組、Blob 或 data URL，並用 `.toBlob()` 匯出。本機路徑需要 `docx-kit/node` 或 `config.resolveImage`，URL 也需要明確解析器，不會自動下載。圖片與後續圖說、來源預設盡量保持同頁，呼叫樣式可以覆寫對齊等設定。來源使用主題 `muted` 色彩。
-
-首版不產生自動編號、Word 序列欄位或交互參照，需要的編號請寫入 `caption`。
-
-獨立套件：`@docxkit/plugin-figure`，匯出 `figurePlugin`、`FigureOptions`。主套件 `docx-kit` 和 `docx-kit/node` 同樣匯出。
-
-## 用法
+## 範例
 
 ```ts
 import { createDocx, figurePlugin } from 'docx-kit/node'
 
-await createDocx().use(figurePlugin()).plugin('figure', {
-  data: './architecture.png',
-  width: '12cm',
-  alt: '服務及其相依關係',
-  caption: '圖 1. 服務架構',
-  source: '來源：工程團隊',
-}).save('architecture.docx')
+await createDocx()
+  .use(figurePlugin())
+  .plugin('figure', {
+    data: './architecture.png',
+    width: '12cm',
+    alt: 'Services and their dependencies',
+    caption: 'Figure 1. Service architecture',
+    source: 'Source: Engineering team',
+    alignment: 'center',
+  })
+  .save('architecture.docx')
 ```
+
+瀏覽器中從 `docx-kit` 匯入，提供位元組、Blob 或 data URL，透過 `.toBlob()` 匯出。本地路徑需要 `docx-kit/node` 或顯式 `config.resolveImage` 適配器。URL 也需要顯式解析器，外掛不會自動獲取。詳見[圖片](/zh-TW/guide/images)。
+
+圖片與題注段落在後面存在題注或來源時，會請求與下一段保持同頁。呼叫樣式可以覆蓋此行為和預設對齊方式。來源使用主題的 `muted` 顏色。
+
+題注按輸入原樣呈現。自動編號、Word 序列域和交叉引用不在目前外掛範圍內。

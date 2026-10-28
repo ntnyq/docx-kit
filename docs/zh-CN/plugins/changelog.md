@@ -1,22 +1,46 @@
-# Changelog
+# 更新日志（Changelog）
 
-输出版本变更表，适合 release notes 或发布记录。
+生成包含标题与四列版本表格的发布说明章节。
+
+## 导入
+
+```ts
+import { changelogPlugin, type ChangelogOptions } from 'docx-kit'
+```
 
 ## 选项
 
-| 选项 | 类型 | 说明 |
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `entries` | `ChangelogEntry[]` | 必填 | 版本记录列表 |
+| `title` | `string` | `'Changelog'` | 表格上方的标题 |
+
+`ChangelogEntry` 字段：
+
+| 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| `title` | `string` | 标题，默认 `Changelog` |
-| `entries` | `ChangelogEntry[]` | 版本条目数组 |
+| `version` | `string` | 版本标签 |
+| `date` | `string` | 发布日期 |
+| `type` | `'added' \| 'changed' \| 'fixed' \| 'removed'` | 带有独立高亮颜色的记录分类 |
+| `changes` | `string` | 可读的变更摘要 |
 
-`ChangelogEntry` 包含 `version`、`date`、`type`、`changes` 四个字段，`type` 支持 `added`、`changed`、`fixed`、`removed`。
-
-## 用法
+## 示例
 
 ```ts
-createDocx().use(changelogPlugin()).plugin('changelog', {
-  entries: [
-    { version: '1.0.0', date: '2026-06-14', type: 'added', changes: '新增中文文档。' },
-  ],
-})
+import { changelogPlugin, createDocx } from 'docx-kit'
+
+const doc = createDocx()
+  .use(changelogPlugin())
+  .plugin('changelog', {
+    title: 'Release Notes',
+    entries: [
+      { version: '1.4.0', date: '2026-06-14', type: 'added', changes: 'Added zh-TW docs locale.' },
+      { version: '1.4.1', date: '2026-06-15', type: 'fixed', changes: 'Corrected plugin sidebar links.' },
+    ],
+  })
 ```
+
+## 说明
+
+- `entries` 为空时仍渲染标题，并显示居中的 `(no entries)` 占位内容。
+- 适合发布说明、迁移日志或合规变更历史。

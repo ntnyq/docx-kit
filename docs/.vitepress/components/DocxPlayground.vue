@@ -7,6 +7,7 @@ import {
   watch,
 } from 'vue'
 import { useDocxPlayground } from '../composables/useDocxPlayground'
+import { useToolI18n } from '../composables/useToolI18n'
 import type { DocxPreview } from '@docxkit/renderer'
 
 const {
@@ -25,6 +26,8 @@ const {
   selectStylePreset,
   stylePresets,
 } = useDocxPlayground()
+
+const { exampleLabel, messages, styleDescription, styleTitle } = useToolI18n()
 
 // ---------- Preview renderer ----------
 const previewContainer = useTemplateRef<HTMLElement>('previewContainer')
@@ -105,38 +108,38 @@ onBeforeUnmount(() => {
     <div class="playground-container">
       <div class="editor-panel">
         <div class="panel-header">
-          <span class="panel-title">Code Editor</span>
+          <span class="panel-title">{{ messages.editorTitle }}</span>
           <div class="panel-actions">
             <!-- Style preset selector -->
             <div class="style-preset-bar">
-              <span class="style-preset-label">Style:</span>
+              <span class="style-preset-label">{{ messages.styleLabel }}</span>
               <button
                 @click="selectStylePreset(null)"
                 :class="{ active: activeStylePreset === null }"
                 class="style-preset-btn"
                 type="button"
               >
-                None
+                {{ messages.none }}
               </button>
               <button
                 @click="selectStylePreset(sp)"
                 v-for="sp in stylePresets"
                 :key="sp.id"
                 :class="{ active: activeStylePreset?.id === sp.id }"
-                :title="sp.description"
+                :title="styleDescription(sp.id, sp.description ?? '')"
                 class="style-preset-btn"
                 type="button"
               >
-                {{ sp.name }}
+                {{ styleTitle(sp.id, sp.name) }}
               </button>
             </div>
             <button
               @click="resetCode"
+              :title="messages.resetCodeTitle"
               class="btn btn-ghost"
-              title="Reset to default example"
               type="button"
             >
-              Reset
+              {{ messages.reset }}
             </button>
             <button
               @click="run"
@@ -144,7 +147,7 @@ onBeforeUnmount(() => {
               class="btn btn-primary"
               type="button"
             >
-              {{ loading ? 'Running...' : '▶ Run' }}
+              {{ loading ? messages.running : messages.run }}
             </button>
           </div>
         </div>
@@ -159,7 +162,7 @@ onBeforeUnmount(() => {
             class="preset-tab"
             type="button"
           >
-            {{ preset.label }}
+            {{ exampleLabel(preset.label) }}
           </button>
         </div>
 
@@ -167,7 +170,7 @@ onBeforeUnmount(() => {
           v-if="editorError"
           class="editor-error"
         >
-          <strong>Editor Error:</strong>
+          <strong>{{ messages.editorError }}</strong>
           <pre>{{ editorError }}</pre>
         </div>
         <div
@@ -179,16 +182,16 @@ onBeforeUnmount(() => {
 
       <div class="preview-panel">
         <div class="panel-header">
-          <span class="panel-title">Preview</span>
+          <span class="panel-title">{{ messages.previewTitle }}</span>
           <div class="panel-actions">
             <button
               @click="download"
               :disabled="!resultBlob"
+              :title="messages.downloadTitle"
               class="btn btn-success"
-              title="Download .docx file"
               type="button"
             >
-              ⤓ Download
+              {{ messages.download }}
             </button>
           </div>
         </div>
@@ -197,10 +200,8 @@ onBeforeUnmount(() => {
           class="preview-notice"
           role="note"
         >
-          <strong>Preview limitations:</strong>
-          Page numbers and the table of contents may be incomplete. Page breaks
-          and page counts may differ from Word. Download the .docx file, open it
-          in Word, and update fields to check the final layout and page numbers.
+          <strong>{{ messages.previewLimitationsTitle }}</strong>
+          {{ messages.previewLimitations }}
         </p>
         <div class="preview-content">
           <!-- Run error: blocks everything -->
@@ -208,7 +209,7 @@ onBeforeUnmount(() => {
             v-if="playgroundError"
             class="error-box"
           >
-            <strong>Run Error:</strong>
+            <strong>{{ messages.runError }}</strong>
             <pre>{{ playgroundError }}</pre>
           </div>
 
@@ -228,7 +229,7 @@ onBeforeUnmount(() => {
               class="preview-overlay loading-overlay"
             >
               <div class="spinner" />
-              <p>Rendering preview…</p>
+              <p>{{ messages.renderingPreview }}</p>
             </div>
 
             <!-- Preview error overlay -->
@@ -236,10 +237,10 @@ onBeforeUnmount(() => {
               v-if="previewError"
               class="preview-overlay error-overlay"
             >
-              <strong>Preview Error</strong>
+              <strong>{{ messages.previewError }}</strong>
               <pre>{{ previewError }}</pre>
               <p class="hint">
-                You can still download the .docx file using the button above.
+                {{ messages.downloadAfterError }}
               </p>
             </div>
           </div>
@@ -250,8 +251,8 @@ onBeforeUnmount(() => {
             class="placeholder"
           >
             <div class="placeholder-icon">&#128196;</div>
-            <p>Click <strong>Run</strong> to generate a document.</p>
-            <p class="hint">Select an example above or write your own code.</p>
+            <p>{{ messages.emptyPreview }}</p>
+            <p class="hint">{{ messages.emptyPreviewHint }}</p>
           </div>
         </div>
       </div>
@@ -287,6 +288,8 @@ onBeforeUnmount(() => {
 
 .panel-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
@@ -303,6 +306,8 @@ onBeforeUnmount(() => {
 
 .panel-actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
 }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, shallowRef } from 'vue'
+import { useToolI18n } from '../../composables/useToolI18n'
 import ThemeTokenGroup from './ThemeTokenGroup.vue'
 import type { EditableTheme, EditableThemeCategory } from '../../utils'
 
@@ -28,24 +29,30 @@ const emit = defineEmits<{
 
 type InspectorPanel = 'colors' | 'export' | 'spacing' | 'typography'
 
+const { messages } = useToolI18n()
+
 const activePanel = shallowRef<InspectorPanel>('colors')
-const copyState = shallowRef<'copied' | 'idle'>('idle')
+const copyState = shallowRef<'copied' | 'failed' | 'idle'>('idle')
 let copyTimer: ReturnType<typeof setTimeout> | null = null
 
-const panels: { id: InspectorPanel; label: string }[] = [
-  { id: 'colors', label: 'Colors' },
-  { id: 'typography', label: 'Type' },
-  { id: 'spacing', label: 'Spacing' },
-  { id: 'export', label: 'Export' },
-]
+const panels = computed<{ id: InspectorPanel; label: string }[]>(() => [
+  { id: 'colors', label: messages.value.colors },
+  { id: 'typography', label: messages.value.typography },
+  { id: 'spacing', label: messages.value.spacing },
+  { id: 'export', label: messages.value.export },
+])
 
 async function copySnippet() {
-  if (typeof navigator === 'undefined' || !navigator.clipboard) {
-    return
+  try {
+    if (typeof navigator === 'undefined' || !navigator.clipboard) {
+      copyState.value = 'failed'
+    } else {
+      await navigator.clipboard.writeText(props.generatedSnippet)
+      copyState.value = 'copied'
+    }
+  } catch {
+    copyState.value = 'failed'
   }
-
-  await navigator.clipboard.writeText(props.generatedSnippet)
-  copyState.value = 'copied'
 
   if (copyTimer) {
     clearTimeout(copyTimer)
@@ -66,11 +73,11 @@ onBeforeUnmount(() => {
 <template>
   <aside class="theme-inspector">
     <details class="inspector-section identity-section">
-      <summary class="identity-summary">Theme details</summary>
+      <summary class="identity-summary">{{ messages.themeDetails }}</summary>
 
       <div class="field-stack">
         <label class="studio-field">
-          <span class="field-label">Name</span>
+          <span class="field-label">{{ messages.name }}</span>
           <input
             @input="
               emit('setMetadata', {
@@ -85,7 +92,7 @@ onBeforeUnmount(() => {
         </label>
 
         <label class="studio-field">
-          <span class="field-label">Description</span>
+          <span class="field-label">{{ messages.description }}</span>
           <textarea
             @input="
               emit('setMetadata', {
@@ -104,13 +111,13 @@ onBeforeUnmount(() => {
     <section class="inspector-section inspector-section-grow">
       <header class="section-header">
         <div>
-          <h2 class="section-title">Design tokens</h2>
+          <h2 class="section-title">{{ messages.designTokens }}</h2>
         </div>
-        <p class="section-description">Changes render automatically.</p>
+        <p class="section-description">{{ messages.autoRender }}</p>
       </header>
 
       <div
-        aria-label="Token categories"
+        :aria-label="messages.tokenCategories"
         class="inspector-tabs"
         role="group"
       >
@@ -132,9 +139,9 @@ onBeforeUnmount(() => {
           @update-token="emit('updateToken', $event)"
           v-show="activePanel === 'colors'"
           :tokens="editableTheme.colors"
+          :description="messages.colorDescription"
+          :title="messages.colorSystem"
           category="colors"
-          description="Semantic colors used across text, borders, surfaces, and feedback."
-          title="Color system"
         />
 
         <div
@@ -144,16 +151,16 @@ onBeforeUnmount(() => {
           <ThemeTokenGroup
             @update-token="emit('updateToken', $event)"
             :tokens="editableTheme.fonts"
+            :description="messages.fontDescription"
+            :title="messages.fontRoles"
             category="fonts"
-            description="Font families for document roles."
-            title="Font roles"
           />
           <ThemeTokenGroup
             @update-token="emit('updateToken', $event)"
             :tokens="editableTheme.fontSize"
+            :description="messages.typeDescription"
+            :title="messages.typeScale"
             category="fontSize"
-            description="The type scale used by styles."
-            title="Type scale"
           />
         </div>
 
@@ -161,9 +168,9 @@ onBeforeUnmount(() => {
           @update-token="emit('updateToken', $event)"
           v-show="activePanel === 'spacing'"
           :tokens="editableTheme.spacing"
+          :description="messages.spacingDescription"
+          :title="messages.spacingScale"
           category="spacing"
-          description="Spacing values for document rhythm."
-          title="Spacing scale"
         />
 
         <div
@@ -172,9 +179,9 @@ onBeforeUnmount(() => {
         >
           <div class="export-header">
             <div>
-              <h3 class="export-title">Starter code</h3>
+              <h3 class="export-title">{{ messages.starterCode }}</h3>
               <p class="export-description">
-                Copy this theme into your project.
+                {{ messages.starterDescription }}
               </p>
             </div>
             <button
@@ -182,9 +189,15 @@ onBeforeUnmount(() => {
               class="copy-button"
               type="button"
             >
-              {{ copyState === 'copied' ? 'Copied' : 'Copy' }}
+              {{ copyState === 'copied' ? messages.copied : messages.copy }}
             </button>
           </div>
+          <p
+            v-if="copyState === 'failed'"
+            role="status"
+          >
+            {{ messages.copyFailed }}
+          </p>
           <pre class="snippet-block"><code>{{ generatedSnippet }}</code></pre>
         </div>
       </div>

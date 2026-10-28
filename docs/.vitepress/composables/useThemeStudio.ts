@@ -19,6 +19,7 @@ import {
   createThemeSampleConfig,
   DOCUMENT_LAYOUTS,
 } from '../utils/documentSamples'
+import { useToolI18n } from './useToolI18n'
 import type {
   BuiltinTheme,
   EditableTheme,
@@ -29,6 +30,7 @@ const BUILTIN_THEMES = THEME_LIST as readonly BuiltinTheme[]
 const BASE_THEME = BUILTIN_THEMES[0]!
 
 export function useThemeStudio() {
+  const { locale } = useToolI18n()
   const selectedLayoutId = shallowRef('modern')
   const activeLayout = computed(
     () =>
@@ -40,7 +42,16 @@ export function useThemeStudio() {
   const previewBlob = shallowRef<Blob | null>(null)
   const loading = shallowRef(false)
   const studioError = shallowRef('')
-  const lastRenderedLabel = shallowRef('')
+  const lastRenderedAt = shallowRef<Date | null>(null)
+  const lastRenderedLabel = computed(() =>
+    lastRenderedAt.value
+      ? new Intl.DateTimeFormat(locale.value, {
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+        }).format(lastRenderedAt.value)
+      : '',
+  )
 
   let renderTimer: ReturnType<typeof setTimeout> | null = null
   let renderToken = 0
@@ -161,11 +172,7 @@ export function useThemeStudio() {
       }
 
       previewBlob.value = blob
-      lastRenderedLabel.value = new Intl.DateTimeFormat('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-      }).format(new Date())
+      lastRenderedAt.value = new Date()
     } catch (error) {
       if (token !== renderToken) {
         return

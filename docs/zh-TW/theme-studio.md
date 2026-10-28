@@ -1,7 +1,15 @@
-# Theme Studio
+---
+layout: page
+outline: false
+aside: false
+sidebar: false
+footer: false
+pageClass: page-theme-studio
+title: 主題工作室
+---
 
-Theme Studio 使用英文介面，並已從程式碼 Playground 拆分為獨立工具。
+<script lang="ts" setup>
+import ThemeStudio from '../.vitepress/components/theme-studio/ThemeStudio.vue'
+</script>
 
-- Theme Studio：[/theme-studio](/theme-studio)
-- 程式碼 Playground：[/playground](/playground)
-- 主題指南：[/guide/themes](/guide/themes)
+<ThemeStudio />

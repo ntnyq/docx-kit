@@ -9,6 +9,7 @@ import {
   useTemplateRef,
   watch,
 } from 'vue'
+import { useToolI18n } from '../../composables/useToolI18n'
 import type { DocxPreview } from 'docx-kit'
 
 interface Props {
@@ -23,6 +24,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { messages } = useToolI18n()
 
 const previewContainer = useTemplateRef<HTMLElement>('previewContainer')
 const previewShell = useTemplateRef<HTMLElement>('previewShell')
@@ -111,7 +113,7 @@ onBeforeUnmount(() => {
   <section
     ref="previewShell"
     :style="{ '--theme-preview-accent': accentColor }"
-    aria-label="Document preview"
+    :aria-label="messages.documentPreview"
     tabindex="0"
     class="preview-shell"
   >
@@ -126,7 +128,7 @@ onBeforeUnmount(() => {
         !
       </span>
       <div class="state-copy">
-        <p class="state-title">Theme generation failed</p>
+        <p class="state-title">{{ messages.generationFailed }}</p>
         <pre class="preview-error">{{ error }}</pre>
       </div>
     </div>
@@ -137,9 +139,9 @@ onBeforeUnmount(() => {
     >
       <div class="preview-spinner" />
       <div class="state-copy">
-        <p class="state-title">Building preview</p>
+        <p class="state-title">{{ messages.buildingPreview }}</p>
         <p class="state-description">
-          Resolving tokens and generating the DOCX…
+          {{ messages.buildingDescription }}
         </p>
       </div>
     </div>
@@ -161,7 +163,7 @@ onBeforeUnmount(() => {
         class="preview-progress"
       >
         <div class="preview-spinner preview-spinner-small" />
-        Refreshing preview…
+        {{ messages.refreshingPreview }}
       </div>
 
       <div
@@ -175,7 +177,7 @@ onBeforeUnmount(() => {
           !
         </span>
         <div class="state-copy">
-          <p class="state-title">Preview render failed</p>
+          <p class="state-title">{{ messages.previewRenderFailed }}</p>
           <pre class="preview-error">{{ renderError }}</pre>
         </div>
       </div>
@@ -190,9 +192,9 @@ onBeforeUnmount(() => {
         class="state-icon"
       />
       <div class="state-copy">
-        <p class="state-title">No preview yet</p>
+        <p class="state-title">{{ messages.noPreview }}</p>
         <p class="state-description">
-          Render the theme to inspect the generated document.
+          {{ messages.renderThemeHint }}
         </p>
       </div>
     </div>
