@@ -11,6 +11,7 @@ docx-kit/
 │   ├── core/
 │   ├── create-plugin/
 │   ├── docx-kit/
+│   ├── errors/
 │   ├── loader/
 │   ├── markdown/
 │   ├── mcp/
@@ -56,7 +57,7 @@ docx-kit/
 
 | 范围 | 数量 | 说明 |
 | ------------------- | ----- | ------------------------------------------------------------ |
-| `packages/` | 11 | 运行时、工具、AI、渲染器、Markdown 与共享类型 |
+| `packages/` | 12 | 运行时、工具、AI、渲染器、Markdown 与共享类型 |
 | `packages-plugins/` | 22 | 每个内置插件都有独立的包、测试与 README |
 | `packages-presets/` | 3 | 常见文档类型的样式预设 |
 | `packages-themes/` | 3 | 基于令牌的配色主题 |
@@ -74,6 +75,7 @@ docx-kit/
 | `@docxkit/mcp` | 面向 AI Agent 集成的 MCP 服务端 |
 | `@docxkit/create-plugin` | 插件脚手架 CLI |
 | `@docxkit/renderer` | 浏览器端 `.docx` 预览 |
+| `@docxkit/errors` | 共享错误类与错误码 |
 | `@docxkit/types` | 共享的文档、样式、插件与工具类型 |
 
 [包总览](/zh-CN/ecosystem/packages)提供各个包的详细使用建议。

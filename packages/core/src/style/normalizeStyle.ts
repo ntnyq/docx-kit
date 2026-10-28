@@ -7,7 +7,7 @@
  * @module style/normalizeStyle
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import { resolveThemeTokens } from './theme'
 import type {
   DocxStyleRule,

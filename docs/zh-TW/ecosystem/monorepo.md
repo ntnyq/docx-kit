@@ -11,6 +11,7 @@ docx-kit/
 │   ├── core/
 │   ├── create-plugin/
 │   ├── docx-kit/
+│   ├── errors/
 │   ├── loader/
 │   ├── markdown/
 │   ├── mcp/
@@ -56,7 +57,7 @@ docx-kit/
 
 | 範圍 | 數量 | 說明 |
 | ------------------- | ----- | ------------------------------------------------------------ |
-| `packages/` | 11 | 執行階段、工具、AI、呈現器、Markdown 與共享型別 |
+| `packages/` | 12 | 執行階段、工具、AI、呈現器、Markdown 與共享型別 |
 | `packages-plugins/` | 22 | 每個內建外掛都有獨立的套件、測試與 README |
 | `packages-presets/` | 3 | 常見文件型別的樣式預設 |
 | `packages-themes/` | 3 | 基於令牌的配色主題 |
@@ -74,6 +75,7 @@ docx-kit/
 | `@docxkit/mcp` | 面向 AI Agent 整合的 MCP 伺服器端 |
 | `@docxkit/create-plugin` | 外掛鷹架 CLI |
 | `@docxkit/renderer` | 瀏覽器端 `.docx` 預覽 |
+| `@docxkit/errors` | 共用錯誤類別與錯誤碼 |
 | `@docxkit/types` | 共享的文件、樣式、外掛與工具型別 |
 
 [套件總覽](/zh-TW/ecosystem/packages)提供各個包的詳細使用建議。

@@ -109,6 +109,9 @@ try {
         type: 'module',
         dependencies: {
           ...externalPeers,
+          '@docxkit/core': overrides['@docxkit/core'],
+          '@docxkit/errors': overrides['@docxkit/errors'],
+          '@docxkit/types': overrides['@docxkit/types'],
           'docx-kit': overrides['docx-kit'],
         },
       },
@@ -134,6 +137,13 @@ try {
 import { join } from 'node:path'
 
 const expectedExports = [
+  ['@docxkit/core', 'definePlugin'],
+  ['@docxkit/core', 'defineStyles'],
+  ['@docxkit/core', 'inlineImg'],
+  ['@docxkit/core', 'span'],
+  ['@docxkit/errors', 'DocxKitError'],
+  ['@docxkit/errors', 'ERROR_CODES'],
+  ['docx-kit', 'defineStyles'],
   ['docx-kit', 'createDocx'],
   ['docx-kit/ai', 'buildPrompt'],
   ['docx-kit/browser', 'createDocx'],
@@ -154,6 +164,21 @@ for (const [specifier, exportName] of expectedExports) {
   }
 }
 
+const { DocxKitError } = await import('@docxkit/errors')
+for (const specifier of ['@docxkit/core', 'docx-kit', 'docx-kit/browser']) {
+  const module = await import(specifier)
+  if (module.DocxKitError !== DocxKitError) {
+    throw new Error(\`Duplicated error class in \${specifier}\`)
+  }
+}
+
+try {
+  await import('@docxkit/types')
+  throw new Error('@docxkit/types must not have a runtime entry point')
+} catch (error) {
+  if (error.code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') throw error
+}
+
 const nodeModule = await import('docx-kit/node')
 const outputPath = join(import.meta.dirname, 'consumer-smoke.docx')
 await nodeModule
@@ -171,7 +196,8 @@ if (output.length < 4 || output[0] !== 0x50 || output[1] !== 0x4b) {
   writeFileSync(
     join(temporaryRoot, 'smoke.ts'),
     `import { buildPrompt } from 'docx-kit/ai'
-import { createDocx } from 'docx-kit'
+import { createDocx, definePlugin, defineStyles, inlineImg, span } from 'docx-kit'
+import { DocxKitError, ERROR_CODES, type ErrorCode } from '@docxkit/errors'
 import { loadUrlPlugin } from 'docx-kit/loader/browser'
 import { loadNpmPlugin } from 'docx-kit/loader/node'
 import { markdownToNodes, type MarkdownOptions } from 'docx-kit/markdown'
@@ -195,6 +221,12 @@ void [
   TOOL_DEFINITIONS,
 ]
 
+const styles = defineStyles({ body: { fontSize: '12pt' } })
+const text = span('Runtime helpers', { bold: true })
+const plugin = definePlugin({ name: 'consumer', render: () => [text] })
+const code: ErrorCode = ERROR_CODES.EXPORT_FAILED
+void [styles, plugin, inlineImg, new DocxKitError(code, 'Consumer error')]
+
 void createNodeDocx().save('consumer-smoke.docx')
 const markdownOptions: MarkdownOptions = { gfm: true }
 for (const node of markdownToNodes('# Markdown consumer', markdownOptions)) {
@@ -207,7 +239,6 @@ await server.connect(transport)
 await server.close()
 `,
   )
-
   run(
     'pnpm',
     ['install', '--ignore-scripts', '--no-frozen-lockfile'],
@@ -233,7 +264,7 @@ await server.close()
 
   succeeded = true
   console.log(
-    'Packed docx-kit passed runtime import and TypeScript consumer checks.',
+    'Packed packages passed runtime imports and TypeScript consumer checks.',
   )
 } finally {
   if (succeeded || process.env.DOCX_KIT_KEEP_SMOKE_TEMP !== '1') {

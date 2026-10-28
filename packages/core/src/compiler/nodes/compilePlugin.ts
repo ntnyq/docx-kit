@@ -4,7 +4,7 @@
  * @module compiler/nodes/compilePlugin
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
 import { compileNode } from '../compileNode'

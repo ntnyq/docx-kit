@@ -9,28 +9,25 @@
 
 // ---------- Cross-platform utilities ----------
 export { createImageRun } from './utils/image'
+// ---------- DSL and definition helpers ----------
+export { inlineImg, span } from './dsl/helpers'
 // ---------- Builder ----------
 export { DocxBuilder } from './builder/DocxBuilder'
+export { defineStyles } from './style/defineStyles'
+
 export { validateManifest } from './loader/manifest'
+
+export { definePlugin } from './builder/definePlugin'
 export { dataUrlToUint8Array } from './utils/dataUrl'
 
 export { createPluginStyle } from './style/pluginStyle'
-
 export { createDocx, renderDocx } from './builder/createDocx'
 // ---------- Loader ----------
 export { createPluginLoader, PluginLoader } from './loader/PluginLoader'
 
-// ---------- Re-exports from @docxkit/types ----------
-// Value exports
-export {
-  definePlugin,
-  defineStyles,
-  DocxKitError,
-  ERROR_CODES,
-  inlineImg,
-  span,
-  type ErrorCode,
-} from '@docxkit/types'
+// ---------- Shared errors ----------
+export { DocxKitError, ERROR_CODES, type ErrorCode } from '@docxkit/errors'
+
 export type { PluginManifest } from './loader/manifest'
 // ---------- Compiler internals (for plugin authors) ----------
 export type { CompilationSession } from './compiler/numbers'

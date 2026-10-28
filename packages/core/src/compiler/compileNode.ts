@@ -8,7 +8,7 @@
  * @module compiler/compileNode
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import { ColumnBreak, PageBreak, Paragraph } from 'docx'
 import { compileHeading } from './nodes/compileHeading'
 import { compileHyperlink } from './nodes/compileHyperlink'

@@ -33,6 +33,7 @@
     "dev": "tsdown --watch"
   },
   "dependencies": {
+    "@docxkit/errors": "workspace:*",
     "@docxkit/types": "workspace:*",
     "docx": "^9.15.0",
     "verkit": "^0.5.0"

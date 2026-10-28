@@ -1,5 +1,5 @@
-import { definePlugin } from '@docxkit/types'
 import { describe, expect, it } from 'vitest'
+import { definePlugin } from '../src/index'
 
 describe('definePlugin', () => {
   it('returns the same plugin object', () => {

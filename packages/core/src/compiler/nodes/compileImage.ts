@@ -4,7 +4,7 @@
  * @module compiler/nodes/compileImage
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import { Paragraph, TextWrappingSide, TextWrappingType } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'

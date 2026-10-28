@@ -1,21 +1,11 @@
 /**
  * `@docxkit/types` — Shared type definitions for docx-kit monorepo.
  *
- * This package exports all shared types, utility types, and
- * type-level helper functions used across `@docxkit/*` packages.
+ * This package exports shared type definitions and utility types only.
+ * Runtime helpers live in `@docxkit/core`; errors live in `@docxkit/errors`.
  *
  * @packageDocumentation
  */
-
-export { defineStyles } from './style'
-
-export { definePlugin } from './plugin'
-
-// ---------- DSL helpers (runtime) ----------
-export { inlineImg, span } from './dsl/helpers'
-
-// ---------- Errors (runtime) ----------
-export { DocxKitError, ERROR_CODES, type ErrorCode } from './errors'
 
 // ---------- Plugin types ----------
 export type {

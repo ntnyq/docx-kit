@@ -11,7 +11,7 @@
  * @module compiler/compileDocument
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import {
   Column,
   Document,

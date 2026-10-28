@@ -4,7 +4,7 @@
  * @module compiler/nodes/compileTable
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import {
   BorderStyle,
   Paragraph,

@@ -1,5 +1,9 @@
 # API 参考
 
+`@docxkit/types` 仅发布声明文件，必须使用 `import type`，不提供 JavaScript 入口。`defineStyles`、`definePlugin`、`span` 和 `inlineImg` 从 `@docxkit/core` 或 `docx-kit` 导入。`DocxKitError`、`ERROR_CODES` 及 `ErrorCode` 类型由 `@docxkit/errors` 提供，`@docxkit/core` 和 `docx-kit` 也会重新导出它们。
+
+迁移旧引用时，文档、样式和插件类型继续从 `@docxkit/types` 导入，运行时引用改为上述包。`ErrorCode` 随 `ERROR_CODES` 一起迁到 `@docxkit/errors`。
+
 docx-kit 的类型系统按功能划分。选择以下章节查看详细类型定义。
 
 | 章节 | 内容 |

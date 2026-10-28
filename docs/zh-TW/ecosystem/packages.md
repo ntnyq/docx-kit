@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | `docx-kit` | 整合套件 | 希望統一匯入 API 的應用開發者的預設選擇 |
 | `@docxkit/core` | 核心建構器、編譯器、DSL、樣式與工具 | 需要精簡執行階段或建置高級整合 |
+| `@docxkit/errors` | 共用錯誤類別與錯誤碼 | 處理產生與預覽錯誤，無需引入核心引擎 |
 | `@docxkit/types` | 共享型別定義 | 僅需要型別的套件或應用 |
 | `@docxkit/markdown` | 將 Markdown 轉換為文件 DSL | 使用 Markdown 輸入重用文件樣式、主題與外掛 |
 | `@docxkit/renderer` | 瀏覽器預覽呈現 | 需要瀏覽器內 `.docx` 預覽或嵌入 Office Online |

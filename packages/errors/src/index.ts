@@ -1,5 +1,5 @@
 /**
- * Error handling types and classes for docx-kit.
+ * `@docxkit/errors` — Shared error codes and error class for docx-kit.
  *
  * @module errors
  */

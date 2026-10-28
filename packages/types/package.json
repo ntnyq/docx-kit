@@ -2,7 +2,7 @@
   "name": "@docxkit/types",
   "type": "module",
   "version": "0.6.0",
-  "description": "Shared type definitions and utility types for docx-kit monorepo packages.",
+  "description": "Shared type definitions and utility types for docx-kit monorepo packages (no runtime exports).",
   "keywords": [
     "docx",
     "docx-kit",
@@ -21,12 +21,9 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/index.d.ts"
     }
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist/"
@@ -34,10 +31,8 @@
   "publishConfig": {
     "access": "public"
   },
+  "sideEffects": false,
   "scripts": {
-    "build": "rm -rf dist && tsdown && tsc -p tsconfig.json"
-  },
-  "devDependencies": {
-    "tsdown": "^0.23.3"
+    "build": "rm -rf dist && tsc -p tsconfig.json"
   }
 }

@@ -8,7 +8,7 @@
  * @module renderer/pack
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import { Packer } from 'docx'
 import type { Document } from 'docx'
 

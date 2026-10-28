@@ -1,8 +1,8 @@
 /**
  * `@docxkit/renderer` — Error codes and factory.
  *
- * Renderer-local error codes. Cannot extend `@docxkit/core`'s `ERROR_CODES`
- * because the dependency direction is renderer → core, never the reverse.
+ * Renderer-local error codes extend the shared error model from
+ * `@docxkit/errors` without depending on the document generation engine.
  *
  * All errors are `DocxKitError` instances so consumers can use a single
  * error class across the entire docx-kit ecosystem.
@@ -10,7 +10,7 @@
  * @module renderer/errors
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 
 /**
  * Renderer-specific error codes.

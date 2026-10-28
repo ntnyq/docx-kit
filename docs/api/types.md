@@ -1,5 +1,9 @@
 # API Reference
 
+`@docxkit/types` publishes declaration files only and must be consumed with `import type`. It has no JavaScript entry point. Import `defineStyles`, `definePlugin`, `span`, and `inlineImg` from `@docxkit/core` or `docx-kit`. Import `DocxKitError`, `ERROR_CODES`, and the `ErrorCode` type from `@docxkit/errors`; `@docxkit/core` and `docx-kit` also re-export them.
+
+When migrating older imports, keep document, style, and plugin types in `@docxkit/types`, and move runtime imports to the packages above. `ErrorCode` moves with `ERROR_CODES` to `@docxkit/errors`.
+
 docx-kit's type system is organized by functional domain. Choose a section below for detailed type definitions.
 
 | Section | Content |

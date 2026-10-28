@@ -4,7 +4,7 @@
  * @module compiler/nodes/compileInline
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import { TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import {

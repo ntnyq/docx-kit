@@ -714,6 +714,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@docxkit/errors':
+        specifier: workspace:*
+        version: link:../errors
       '@docxkit/types':
         specifier: workspace:*
         version: link:../types
@@ -861,6 +864,8 @@ importers:
         specifier: ^9.7.1
         version: 9.15.0
 
+  packages/errors: {}
+
   packages/loader:
     dependencies:
       '@docxkit/core':
@@ -984,9 +989,9 @@ importers:
 
   packages/renderer:
     dependencies:
-      '@docxkit/types':
+      '@docxkit/errors':
         specifier: workspace:*
-        version: link:../types
+        version: link:../errors
       docx-preview:
         specifier: 0.4.1
         version: 0.4.1
@@ -994,15 +999,14 @@ importers:
         specifier: ^3.10.2
         version: 3.10.2
     devDependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../core
       happy-dom:
         specifier: ^21.0.4
         version: 21.0.4
 
-  packages/types:
-    devDependencies:
-      tsdown:
-        specifier: ^0.23.3
-        version: 0.23.3(tsx@4.23.15)(typescript@6.0.3)
+  packages/types: {}
 
 packages:
 

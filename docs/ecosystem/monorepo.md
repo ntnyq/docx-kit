@@ -11,6 +11,7 @@ docx-kit/
 │   ├── core/
 │   ├── create-plugin/
 │   ├── docx-kit/
+│   ├── errors/
 │   ├── loader/
 │   ├── markdown/
 │   ├── mcp/
@@ -56,7 +57,7 @@ docx-kit/
 
 | Scope               | Count | Notes                                                        |
 | ------------------- | ----- | ------------------------------------------------------------ |
-| `packages/`         | 11    | Runtime, tooling, AI, renderer, Markdown, and shared types   |
+| `packages/`         | 12    | Runtime, tooling, AI, renderer, Markdown, and shared types   |
 | `packages-plugins/` | 22    | Every built-in plugin has its own package, tests, and README |
 | `packages-presets/` | 3     | Style presets for common document families                   |
 | `packages-themes/`  | 3     | Token-based themes for color systems                         |
@@ -74,6 +75,7 @@ docx-kit/
 | `@docxkit/mcp`           | MCP server for AI-agent integration                 |
 | `@docxkit/create-plugin` | Plugin scaffolding CLI                              |
 | `@docxkit/renderer`      | Browser-side `.docx` preview                        |
+| `@docxkit/errors` | Shared error class and error codes |
 | `@docxkit/types`         | Shared document, style, plugin, and utility types   |
 
 The [Package Catalog](/ecosystem/packages) page expands each package with usage guidance.

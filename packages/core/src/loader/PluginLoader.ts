@@ -8,7 +8,7 @@
  * @module loader/PluginLoader
  */
 
-import { DocxKitError } from '@docxkit/types'
+import { DocxKitError } from '@docxkit/errors'
 import { isValid, isValidRange, satisfies } from 'verkit'
 import { validateManifest } from './manifest'
 import type { DocxPlugin, MaybePromise } from '@docxkit/types'

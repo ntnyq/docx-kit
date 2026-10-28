@@ -7,8 +7,7 @@
  * @module dsl/helpers
  */
 
-import type { DocxStyleRule } from '../style'
-import type { ImageNode, TextNode } from './nodes'
+import type { DocxStyleRule, ImageNode, TextNode } from '@docxkit/types'
 
 /**
  * Create an inline image node for use in paragraph children.

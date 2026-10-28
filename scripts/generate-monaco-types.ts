@@ -37,6 +37,7 @@ const HEADER = [
 const WORKSPACE_MODULES = [
   ['docx-kit', 'packages/docx-kit/dist/browser.d.ts'],
   ['@docxkit/core', 'packages/core/dist/index.d.ts'],
+  ['@docxkit/errors', 'packages/errors/dist/index.d.ts'],
   ['@docxkit/plugin-badge', 'packages-plugins/badge/dist/index.d.ts'],
   ['@docxkit/plugin-checklist', 'packages-plugins/checklist/dist/index.d.ts'],
   ['@docxkit/plugin-figure', 'packages-plugins/figure/dist/index.d.ts'],
