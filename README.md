@@ -1,5 +1,3 @@
-# docx-kit
-
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./docs/public/brand/logo-dark.svg">
@@ -7,14 +5,18 @@
   </picture>
 </p>
 
-[![CI](https://github.com/ntnyq/docx-kit/workflows/CI/badge.svg)](https://github.com/ntnyq/docx-kit/actions)
-[![NPM VERSION](https://img.shields.io/npm/v/docx-kit.svg)](https://www.npmjs.com/package/docx-kit)
-[![NPM DOWNLOADS](https://img.shields.io/npm/dy/docx-kit.svg)](https://www.npmjs.com/package/docx-kit)
-[![LICENSE](https://img.shields.io/github/license/ntnyq/docx-kit.svg)](https://github.com/ntnyq/docx-kit/blob/main/LICENSE)
+<p align="center">
+  <a href="https://github.com/ntnyq/docx-kit/actions"><img src="https://github.com/ntnyq/docx-kit/workflows/CI/badge.svg" alt="CI"></a>
+  <a href="https://www.npmjs.com/package/docx-kit"><img src="https://img.shields.io/npm/v/docx-kit.svg" alt="NPM VERSION"></a>
+  <a href="https://www.npmjs.com/package/docx-kit"><img src="https://img.shields.io/npm/dy/docx-kit.svg" alt="NPM DOWNLOADS"></a>
+  <a href="https://github.com/ntnyq/docx-kit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ntnyq/docx-kit.svg" alt="LICENSE"></a>
+</p>
+
+<p align="center">
+  English | <a href="./README.zh-CN.md">简体中文</a>
+</p>
 
 **CSS-like DOCX API Kit** — Type-safe, plugin-extensible Word document generation for Node.js & browser.
-
-Built on [docx](https://github.com/dolanmiu/docx).
 
 ---
 
@@ -82,7 +84,30 @@ await doc.save('output.docx') // Node.js entry
 
 ## Plugins
 
-22 built-in plugins: Badge, Barcode, Callout, Changelog, Checklist, Code Block, Cover Page, Data Table, Divider, ECharts, Figure, Invoice, Letterhead, Meeting Minutes, Metric Card, Page Number, Property Table, QR Code, Signature Block, Timeline, TOC, Watermark.
+22 built-in plugins:
+
+- [Badge](https://docx-kit.ntnyq.dev/plugins/badge)
+- [Barcode](https://docx-kit.ntnyq.dev/plugins/barcode)
+- [Callout](https://docx-kit.ntnyq.dev/plugins/callout)
+- [Changelog](https://docx-kit.ntnyq.dev/plugins/changelog)
+- [Checklist](https://docx-kit.ntnyq.dev/plugins/checklist)
+- [Code Block](https://docx-kit.ntnyq.dev/plugins/code-block)
+- [Cover Page](https://docx-kit.ntnyq.dev/plugins/cover-page)
+- [Data Table](https://docx-kit.ntnyq.dev/plugins/data-table)
+- [Divider](https://docx-kit.ntnyq.dev/plugins/divider)
+- [ECharts](https://docx-kit.ntnyq.dev/plugins/echarts)
+- [Figure](https://docx-kit.ntnyq.dev/plugins/figure)
+- [Invoice](https://docx-kit.ntnyq.dev/plugins/invoice)
+- [Letterhead](https://docx-kit.ntnyq.dev/plugins/letterhead)
+- [Meeting Minutes](https://docx-kit.ntnyq.dev/plugins/meeting-minutes)
+- [Metric Card](https://docx-kit.ntnyq.dev/plugins/metric-card)
+- [Page Number](https://docx-kit.ntnyq.dev/plugins/page-number)
+- [Property Table](https://docx-kit.ntnyq.dev/plugins/property-table)
+- [QR Code](https://docx-kit.ntnyq.dev/plugins/qrcode)
+- [Signature Block](https://docx-kit.ntnyq.dev/plugins/signature-block)
+- [Timeline](https://docx-kit.ntnyq.dev/plugins/timeline)
+- [TOC](https://docx-kit.ntnyq.dev/plugins/toc)
+- [Watermark](https://docx-kit.ntnyq.dev/plugins/watermark)
 
 → [Plugin Documentation](https://docx-kit.ntnyq.dev/plugins/)
 
@@ -91,6 +116,10 @@ await doc.save('output.docx') // Node.js entry
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the toolchain, test matrix, visual
 regression, and performance workflow. Report suspected vulnerabilities
 privately by following [SECURITY.md](./SECURITY.md).
+
+## Credits
+
+This project is built on [docx](https://github.com/dolanmiu/docx).
 
 ## License
 
