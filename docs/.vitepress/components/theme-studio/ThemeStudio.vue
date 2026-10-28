@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, shallowRef } from 'vue'
 import { useThemeStudio } from '../../composables/useThemeStudio'
 import ThemeInspector from './ThemeInspector.vue'
 import ThemePreviewPane from './ThemePreviewPane.vue'
 import ThemeStudioHeader from './ThemeStudioHeader.vue'
 
 const {
-  activeBaseTheme,
   activeLayout,
   downloadDocument,
   editableTheme,
@@ -25,8 +24,10 @@ const {
   setToken,
   studioError,
   themes,
-  themeStats,
 } = useThemeStudio()
+
+const isInspectorVisible = shallowRef(true)
+const previewZoom = shallowRef<'fit' | number>('fit')
 
 const accentColor = computed(
   () =>
@@ -42,73 +43,66 @@ const accentColor = computed(
       @render="renderPreview"
       @reset="resetTheme"
       @select-theme="selectTheme"
+      @select-layout="selectLayout"
+      :layouts
+      :selected-layout-id
       :last-rendered-label
       :loading
       :selected-theme-id
       :themes
     />
 
-    <nav
-      class="layout-options"
-      aria-label="Document layout"
+    <div
+      :class="{ 'inspector-hidden': !isInspectorVisible }"
+      class="studio-workspace"
     >
-      <button
-        @click="selectLayout(layout.preset.id)"
-        v-for="layout in layouts"
-        :key="layout.preset.id"
-        :aria-pressed="selectedLayoutId === layout.preset.id"
-        type="button"
-        class="layout-option"
-      >
-        <strong>{{ layout.title }}</strong>
-        <span>{{ layout.description }}</span>
-      </button>
-    </nav>
-
-    <div class="studio-workspace">
       <ThemeInspector
         @set-metadata="setMetadata($event.field, $event.value)"
         @update-token="setToken($event.category, $event.key, $event.value)"
+        v-show="isInspectorVisible"
         :editable-theme
         :generated-snippet
+        id="theme-inspector"
         class="studio-inspector"
       />
 
       <main class="studio-preview">
         <header class="preview-header">
+          <button
+            @click="isInspectorVisible = !isInspectorVisible"
+            :aria-expanded="isInspectorVisible"
+            aria-controls="theme-inspector"
+            class="preview-button inspector-toggle"
+            type="button"
+          >
+            {{ isInspectorVisible ? 'Hide inspector' : 'Show inspector' }}
+          </button>
           <div class="preview-heading">
-            <span class="preview-kicker">Document preview</span>
             <strong class="preview-title"
               >{{ activeLayout.title }} · {{ editableTheme.name }}</strong
             >
           </div>
 
+          <label class="zoom-field">
+            <span class="visually-hidden">Preview zoom</span>
+            <select
+              v-model="previewZoom"
+              class="zoom-select"
+            >
+              <option value="fit">Fit width</option>
+              <option :value="0.75">75%</option>
+              <option :value="1">100%</option>
+              <option :value="1.25">125%</option>
+            </select>
+          </label>
           <button
             @click="downloadDocument"
             :disabled="!previewBlob || loading || !!studioError"
-            class="download-button"
+            class="preview-button download-button"
             type="button"
           >
             Download Word
           </button>
-          <dl class="preview-summary">
-            <div class="summary-item">
-              <dt>Base</dt>
-              <dd>{{ activeBaseTheme.name }}</dd>
-            </div>
-            <div class="summary-item">
-              <dt>Palette</dt>
-              <dd>{{ themeStats.colorCount }}</dd>
-            </div>
-            <div class="summary-item">
-              <dt>Type roles</dt>
-              <dd>{{ themeStats.fontCount }}</dd>
-            </div>
-            <div class="summary-item">
-              <dt>Scale</dt>
-              <dd>{{ themeStats.scaleCount }}</dd>
-            </div>
-          </dl>
         </header>
 
         <ThemePreviewPane
@@ -116,6 +110,7 @@ const accentColor = computed(
           :blob="previewBlob"
           :error="studioError"
           :loading
+          :zoom="previewZoom"
         />
       </main>
     </div>
@@ -124,230 +119,142 @@ const accentColor = computed(
 
 <style scoped>
 .theme-studio {
-  min-height: calc(100vh - var(--vp-nav-height));
+  display: flex;
+  height: calc(100dvh - var(--vp-nav-height));
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
 }
 
-.layout-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  padding: 12px 20px;
-  background: var(--vp-c-bg);
-}
-
-.layout-option {
-  display: grid;
-  gap: 4px;
-  padding: 12px 16px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.layout-option strong {
-  font-size: 13px;
-}
-.layout-option span {
-  color: var(--vp-c-text-2);
-  font-size: 12px;
-  line-height: 1.5;
-}
-.layout-option[aria-pressed='true'] {
-  border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
-}
-.layout-option:focus-visible,
-.download-button:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 2px;
-}
-.download-button {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 5px;
-  font-size: 12px;
-  cursor: pointer;
-}
-.download-button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
 .studio-workspace {
   display: grid;
-  grid-template-columns: minmax(320px, 368px) minmax(0, 1fr);
-  height: calc(100vh - var(--vp-nav-height) - 175px);
-  min-height: 600px;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
   border-top: 1px solid var(--vp-c-divider);
 }
 
+.studio-workspace.inspector-hidden {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .studio-inspector {
   min-width: 0;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   border-right: 1px solid var(--vp-c-divider);
 }
 
 .studio-preview {
   display: flex;
   min-width: 0;
+  min-height: 0;
   flex-direction: column;
+  overflow: hidden;
   background: var(--vp-c-bg-alt);
 }
 
 .preview-header {
   display: flex;
-  min-height: 64px;
+  min-height: 48px;
   flex: 0 0 auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 10px 20px;
+  gap: 10px;
+  padding: 8px 16px;
   border-bottom: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg);
 }
 
 .preview-heading {
-  display: grid;
   min-width: 0;
-  gap: 2px;
-}
-
-.preview-kicker {
-  color: var(--vp-c-text-3);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.preview-title {
+  flex: 1;
   overflow: hidden;
-  color: var(--vp-c-text-1);
-  font-size: 14px;
-  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.preview-summary {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin: 0;
-}
-
-.summary-item {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 6px;
-  margin: 0;
+.preview-title {
   font-size: 12px;
-}
-
-.summary-item dt {
-  color: var(--vp-c-text-3);
-}
-
-.summary-item dd {
-  margin: 0;
-  color: var(--vp-c-text-2);
   font-weight: 600;
 }
 
+.preview-button,
+.zoom-select {
+  height: 30px;
+  flex-shrink: 0;
+  padding: 0 9px;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 5px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.preview-button:hover:not(:disabled) {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+.preview-button:focus-visible,
+.zoom-select:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
+.download-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.zoom-select {
+  padding-right: 24px;
+  appearance: auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media (max-width: 960px) {
-  .layout-options {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    padding: 12px 20px;
-    background: var(--vp-c-bg);
+  .preview-heading {
+    display: none;
   }
 
-  .layout-option {
-    display: grid;
-    gap: 4px;
-    padding: 12px 16px;
-    border: 1px solid var(--vp-c-divider);
-    border-radius: 6px;
-    text-align: left;
-    cursor: pointer;
-  }
-
-  .layout-option strong {
-    font-size: 13px;
-  }
-  .layout-option span {
-    color: var(--vp-c-text-2);
-    font-size: 12px;
-    line-height: 1.5;
-  }
-  .layout-option[aria-pressed='true'] {
-    border-color: var(--vp-c-brand-1);
-    background: var(--vp-c-brand-soft);
-  }
-  .layout-option:focus-visible,
-  .download-button:focus-visible {
-    outline: 2px solid var(--vp-c-brand-1);
-    outline-offset: 2px;
-  }
-  .download-button {
-    flex-shrink: 0;
-    padding: 6px 12px;
-    border: 1px solid var(--vp-c-divider);
-    border-radius: 5px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  .download-button:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-
-  .studio-workspace {
-    display: block;
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-  }
-
-  .studio-inspector {
-    max-height: none;
-    overflow: visible;
-    border-right: 0;
-    border-bottom: 1px solid var(--vp-c-divider);
-  }
-
-  .studio-preview {
-    min-height: 680px;
+  .zoom-field {
+    margin-left: auto;
   }
 }
 
 @media (max-width: 640px) {
-  .layout-options {
-    grid-template-columns: 1fr;
+  .studio-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 2fr);
+  }
+
+  .studio-workspace.inspector-hidden {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .studio-inspector {
+    border-right: 0;
+    border-bottom: 1px solid var(--vp-c-divider);
   }
 
   .preview-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px 16px;
-  }
-
-  .preview-summary {
-    width: 100%;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .summary-item {
-    display: grid;
-    gap: 2px;
+    gap: 6px;
+    padding: 8px;
   }
 }
 </style>

@@ -358,7 +358,7 @@ interface WatermarkOptions {
 | ---------------------- | ---------------- | ---------------------------- | ------ | ------------------------- |
 | `badgePlugin`          | `badge`          | Paragraph                    | No     | —                         |
 | `barcodePlugin`        | `barcode`        | Paragraph(s)                 | Yes    | `bwip-js`                 |
-| `calloutPlugin`        | `callout`        | Paragraph                    | No     | —                         |
+| `calloutPlugin`        | `callout`        | Table                        | No     | —                         |
 | `changelogPlugin`      | `changelog`      | [Paragraph, Table]           | No     | —                         |
 | `codeBlockPlugin`      | `codeBlock`      | Paragraph[]                  | Yes    | `highlight.js` (optional) |
 | `coverPagePlugin`      | `coverPage`      | Paragraph[]                  | No     | —                         |

@@ -28,6 +28,6 @@ describe('plugin invocation styles', () => {
     expect(xml).toContain('<w:color w:val="123456"/>')
     expect(xml).toContain('<w:sz w:val="56"/>')
     expect(xml).toContain('<w:jc w:val="right"/>')
-    expect(xml).toContain('<w:pBdr>')
+    expect(xml).toContain('<w:tcBorders>')
   })
 })

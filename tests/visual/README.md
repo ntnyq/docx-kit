@@ -89,6 +89,10 @@ The ten fixtures still produce twelve pages, with no clipping, missing content,
 or unexpected blank pages. The new design-sample suite separately covers three
 layouts, three palettes, CJK typography, and common plugin output.
 
+The Theme Studio spacing fix updates `08-callouts-and-data` to padded single-cell
+callouts. The page was reviewed with the same pinned renderer: titles, body text,
+and left borders remain aligned, with no clipping or page-count change.
+
 To investigate a locally installed LibreOffice version, use:
 
 ```shell

@@ -4,8 +4,20 @@ import type { BuiltinTheme } from '../../utils'
 interface Props {
   lastRenderedLabel: string
   loading: boolean
+  /**
+   * Selected document layout.
+   */
+  selectedLayoutId: string
   selectedThemeId: string
   themes: readonly BuiltinTheme[]
+  /**
+   * Available document layouts.
+   */
+  layouts: readonly {
+    description: string
+    preset: { id: string }
+    title: string
+  }[]
 }
 
 defineProps<Props>()
@@ -13,6 +25,7 @@ defineProps<Props>()
 const emit = defineEmits<{
   render: []
   reset: []
+  selectLayout: [layoutId: string]
   selectTheme: [themeId: string]
 }>()
 </script>
@@ -29,9 +42,6 @@ const emit = defineEmits<{
       </span>
       <div class="studio-heading">
         <h1 class="studio-title">Theme Studio</h1>
-        <p class="studio-description">
-          Tune design tokens and preview the generated DOCX.
-        </p>
       </div>
     </div>
 
@@ -56,6 +66,25 @@ const emit = defineEmits<{
         }}
       </span>
 
+      <label class="theme-select-field layout-select-field">
+        <span class="visually-hidden">Document layout</span>
+        <select
+          @change="
+            emit('selectLayout', ($event.target as HTMLSelectElement).value)
+          "
+          :value="selectedLayoutId"
+          class="theme-select"
+        >
+          <option
+            v-for="layout in layouts"
+            :key="layout.preset.id"
+            :value="layout.preset.id"
+            :title="layout.description"
+          >
+            {{ layout.title }}
+          </option>
+        </select>
+      </label>
       <label class="theme-select-field">
         <span class="visually-hidden">Base theme</span>
         <select
@@ -98,11 +127,12 @@ const emit = defineEmits<{
 <style scoped>
 .studio-header {
   display: flex;
-  min-height: 72px;
+  min-height: 56px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 12px 20px;
+  gap: 16px;
+  padding: 8px 16px;
   background: var(--vp-c-bg);
 }
 
@@ -119,12 +149,12 @@ const emit = defineEmits<{
 
 .studio-mark {
   display: grid;
-  width: 34px;
-  height: 40px;
+  width: 26px;
+  height: 30px;
   flex: 0 0 auto;
   align-content: center;
   gap: 5px;
-  padding: 0 8px;
+  padding: 0 6px;
   border: 1px solid var(--vp-c-brand-2);
   border-radius: 6px;
   background: var(--vp-c-brand-soft);
@@ -151,15 +181,6 @@ const emit = defineEmits<{
   font-size: 16px;
   font-weight: 650;
   line-height: 1.4;
-}
-
-.studio-description {
-  margin: 1px 0 0;
-  overflow: hidden;
-  color: var(--vp-c-text-2);
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .studio-actions {
@@ -194,7 +215,8 @@ const emit = defineEmits<{
 }
 
 .theme-select {
-  min-width: 128px;
+  min-width: 104px;
+  appearance: auto;
   height: 34px;
   padding: 0 30px 0 10px;
   border: 1px solid var(--vp-c-border);
@@ -232,7 +254,7 @@ const emit = defineEmits<{
 }
 
 .studio-button-primary {
-  background: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-3);
   color: var(--vp-c-white);
 }
 
@@ -274,42 +296,63 @@ const emit = defineEmits<{
   }
 }
 
-@media (max-width: 900px) {
-  .studio-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .studio-actions {
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .render-status {
-    margin-right: auto;
-  }
-}
-
-@media (max-width: 560px) {
-  .studio-header {
-    padding: 12px 16px;
-  }
-
-  .studio-description,
+@media (max-width: 1100px) {
   .render-status {
     display: none;
   }
+}
 
-  .studio-actions {
+@media (max-width: 760px) {
+  .studio-header {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      'identity reset render'
+      'layout layout theme';
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px 6px;
+    padding: 8px 12px;
   }
 
-  .theme-select,
+  .studio-identity {
+    grid-area: identity;
+  }
+
+  .studio-mark {
+    display: none;
+  }
+
+  .studio-title {
+    font-size: 14px;
+  }
+
+  .studio-actions {
+    display: contents;
+  }
+
   .theme-select-field {
+    min-width: 0;
+    grid-area: theme;
+  }
+
+  .layout-select-field {
+    grid-area: layout;
+  }
+
+  .theme-select {
     width: 100%;
+    min-width: 0;
+  }
+
+  .studio-button {
+    padding: 0 8px;
+  }
+
+  .studio-button-secondary {
+    grid-area: reset;
+  }
+
+  .studio-button-primary {
+    grid-area: render;
   }
 }
 </style>

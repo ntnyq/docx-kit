@@ -65,13 +65,8 @@ onBeforeUnmount(() => {
 
 <template>
   <aside class="theme-inspector">
-    <section class="inspector-section">
-      <header class="section-header">
-        <div>
-          <span class="section-kicker">Theme details</span>
-          <h2 class="section-title">Identity</h2>
-        </div>
-      </header>
+    <details class="inspector-section identity-section">
+      <summary class="identity-summary">Theme details</summary>
 
       <div class="field-stack">
         <label class="studio-field">
@@ -104,12 +99,11 @@ onBeforeUnmount(() => {
           />
         </label>
       </div>
-    </section>
+    </details>
 
     <section class="inspector-section inspector-section-grow">
       <header class="section-header">
         <div>
-          <span class="section-kicker">Inspector</span>
           <h2 class="section-title">Design tokens</h2>
         </div>
         <p class="section-description">Changes render automatically.</p>
@@ -118,16 +112,15 @@ onBeforeUnmount(() => {
       <div
         aria-label="Token categories"
         class="inspector-tabs"
-        role="tablist"
+        role="group"
       >
         <button
           @click="activePanel = panel.id"
           v-for="panel in panels"
           :key="panel.id"
-          :aria-selected="activePanel === panel.id"
+          :aria-pressed="activePanel === panel.id"
           :class="{ active: activePanel === panel.id }"
           class="inspector-tab"
-          role="tab"
           type="button"
         >
           {{ panel.label }}
@@ -205,7 +198,7 @@ onBeforeUnmount(() => {
 }
 
 .inspector-section {
-  padding: 18px 20px;
+  padding: 12px;
   border-bottom: 1px solid var(--vp-c-divider);
 }
 
@@ -219,19 +212,32 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .section-header {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
-.section-kicker {
-  color: var(--vp-c-text-3);
-  font-size: 10px;
+.identity-summary {
+  color: var(--vp-c-text-2);
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.identity-summary:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
+.identity-section[open] .identity-summary {
+  margin-bottom: 12px;
+}
+
+.section-header {
+  flex-direction: column;
+  gap: 2px;
 }
 
 .section-title,
@@ -256,7 +262,7 @@ onBeforeUnmount(() => {
 }
 
 .field-stack {
-  gap: 12px;
+  gap: 8px;
 }
 
 .studio-field {
@@ -326,7 +332,7 @@ onBeforeUnmount(() => {
 }
 
 .inspector-panel {
-  padding-top: 18px;
+  padding-top: 12px;
 }
 
 .token-panel-stack {
@@ -336,7 +342,7 @@ onBeforeUnmount(() => {
 
 .export-panel {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .copy-button {
@@ -370,37 +376,5 @@ onBeforeUnmount(() => {
   font-size: 10px;
   line-height: 1.6;
   white-space: pre;
-}
-
-@media (max-width: 960px) {
-  .theme-inspector {
-    display: grid;
-    grid-template-columns: minmax(280px, 0.8fr) minmax(360px, 1.2fr);
-  }
-
-  .inspector-section {
-    border-right: 1px solid var(--vp-c-divider);
-    border-bottom: 0;
-  }
-
-  .inspector-section:last-child {
-    border-right: 0;
-  }
-}
-
-@media (max-width: 720px) {
-  .theme-inspector {
-    display: block;
-  }
-
-  .inspector-section {
-    padding: 16px;
-    border-right: 0;
-    border-bottom: 1px solid var(--vp-c-divider);
-  }
-
-  .inspector-section:last-child {
-    border-bottom: 0;
-  }
 }
 </style>

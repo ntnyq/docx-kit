@@ -103,7 +103,7 @@ function toColorInputValue(value: number | string) {
 <style scoped>
 .token-group {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .token-header {
@@ -132,7 +132,7 @@ function toColorInputValue(value: number | string) {
 
 .token-row {
   display: grid;
-  grid-template-columns: minmax(72px, 92px) 26px minmax(0, 1fr);
+  grid-template-columns: minmax(64px, 76px) 26px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
 }

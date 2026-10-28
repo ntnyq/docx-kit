@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { createDocxPreview } from 'docx-kit'
 import {
+  computed,
   nextTick,
   onBeforeUnmount,
+  onMounted,
   shallowRef,
   useTemplateRef,
   watch,
@@ -14,56 +16,103 @@ interface Props {
   blob: Blob | null
   error: string
   loading: boolean
+  /**
+   * Preview scale, or fit the document to the available width.
+   */
+  zoom: 'fit' | number
 }
 
 const props = defineProps<Props>()
 
 const previewContainer = useTemplateRef<HTMLElement>('previewContainer')
+const previewShell = useTemplateRef<HTMLElement>('previewShell')
 const renderError = shallowRef('')
+const availableWidth = shallowRef(0)
+const documentWidth = shallowRef(0)
+const previewScale = computed(() => {
+  if (props.zoom !== 'fit') {
+    return props.zoom
+  }
+  if (!availableWidth.value || !documentWidth.value) {
+    return 1
+  }
+  return Math.min(
+    1,
+    Math.max(1, availableWidth.value - 32) / documentWidth.value,
+  )
+})
 
-let previewInstance: DocxPreview | null = null
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  if (!previewShell.value) {
+    return
+  }
+  resizeObserver = new ResizeObserver(() => {
+    availableWidth.value = previewShell.value?.clientWidth ?? 0
+  })
+  resizeObserver.observe(previewShell.value)
+})
 
 watch(
   () => props.blob,
-  async blob => {
-    if (previewInstance) {
-      previewInstance.destroy()
-      previewInstance = null
-    }
+  async (blob, _previousBlob, onCleanup) => {
+    let isStale = false
+    let previewInstance: DocxPreview | null = null
+    onCleanup(() => {
+      isStale = true
+      previewInstance?.destroy()
+    })
 
     renderError.value = ''
     if (!blob) {
+      documentWidth.value = 0
       return
     }
 
     await nextTick()
-    if (!previewContainer.value) {
+    const container = previewContainer.value
+    if (isStale || !container) {
       return
     }
 
     try {
-      previewInstance = createDocxPreview(previewContainer.value, {
+      previewInstance = createDocxPreview(container, {
         className: 'docxkit-theme-preview',
       })
       await previewInstance.render(blob)
+      if (isStale) {
+        return
+      }
+      documentWidth.value = Math.max(
+        0,
+        ...Array.from(
+          container.querySelectorAll<HTMLElement>(
+            'section.docxkit-theme-preview',
+          ),
+          page => page.offsetWidth,
+        ),
+      )
     } catch (error) {
-      renderError.value = String(error)
+      if (!isStale) {
+        renderError.value = String(error)
+      }
     }
   },
-  { flush: 'post' },
+  { flush: 'post', immediate: true },
 )
 
 onBeforeUnmount(() => {
-  if (previewInstance) {
-    previewInstance.destroy()
-    previewInstance = null
-  }
+  resizeObserver?.disconnect()
 })
 </script>
 
 <template>
   <section
+    ref="previewShell"
     :style="{ '--theme-preview-accent': accentColor }"
+    aria-label="Document preview"
+    tabindex="0"
     class="preview-shell"
   >
     <div
@@ -99,10 +148,13 @@ onBeforeUnmount(() => {
       v-else-if="blob"
       class="preview-stage"
     >
-      <div
-        ref="previewContainer"
-        class="preview-renderer"
-      />
+      <div class="preview-renderer">
+        <div
+          ref="previewContainer"
+          :style="{ zoom: previewScale }"
+          class="preview-document"
+        />
+      </div>
 
       <div
         v-if="loading"
@@ -153,6 +205,8 @@ onBeforeUnmount(() => {
   min-height: 0;
   flex: 1;
   overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   background-color: var(--vp-c-bg-alt);
   background-image:
     linear-gradient(var(--vp-c-divider) 1px, transparent 1px),
@@ -167,17 +221,29 @@ onBeforeUnmount(() => {
 
 .preview-renderer {
   min-height: 100%;
-  padding: 28px clamp(20px, 5vw, 72px);
+  width: max-content;
+  min-width: 100%;
+  padding: 16px;
+}
+
+.preview-document {
+  width: max-content;
+  margin-inline: auto;
+}
+
+.preview-shell:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: -2px;
 }
 
 .preview-renderer :deep(.docxkit-theme-preview-wrapper) {
-  min-height: calc(100vh - var(--vp-nav-height) - 193px);
+  width: max-content;
   padding: 0;
   background: transparent;
 }
 
 .preview-renderer :deep(section.docxkit-theme-preview) {
-  margin: 0 auto 24px;
+  margin: 0 auto 16px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: #fff;
   box-shadow:

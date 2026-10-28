@@ -124,7 +124,7 @@ Different plugin types follow different render patterns. Here are the common app
 
 ### Paragraph-Based (Simple Text Output)
 
-Plugins like callout and watermark render a single Paragraph:
+Plugins like badge and watermark render a single Paragraph:
 
 ```ts
 render(options) {
@@ -138,7 +138,7 @@ render(options) {
 
 ### Table-Based (Structured Data)
 
-Plugins like dataTable and propertyTable render a Table:
+Plugins like dataTable, propertyTable, and callout render a Table. Callout uses a single cell to preserve padding in Word and browser previews:
 
 ```ts
 render(options) {

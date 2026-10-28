@@ -1,7 +1,7 @@
 /**
  * Callout plugin — colored info / warning / success / danger boxes.
  *
- * Renders a single `Paragraph` with a prominent left border, a tinted
+ * Renders a padded single-cell table with a prominent left border, a tinted
  * background, an optional bold title, and body text.
  *
  * @module plugins/callout
@@ -20,7 +20,17 @@
  */
 
 import { createPluginStyle, definePlugin } from '@docxkit/core'
-import { BorderStyle, Paragraph, ShadingType, TextRun } from 'docx'
+import {
+  AlignmentType,
+  BorderStyle,
+  Paragraph,
+  ShadingType,
+  Table,
+  TableCell,
+  TableRow,
+  TextRun,
+  WidthType,
+} from 'docx'
 
 const CALLOUT_PRESETS = {
   danger: {
@@ -103,26 +113,51 @@ export function calloutPlugin() {
         ),
       )
 
-      return new Paragraph(
-        pluginStyles.paragraph({
-          children: runs,
-          indent: { left: 180, right: 120 },
-          keepLines: true,
-          spacing: { after: 180, before: 160, line: 336 },
-          border: {
-            left: {
-              color: tone,
-              size: 18,
-              space: 8,
-              style: BorderStyle.SINGLE,
-            },
-          },
-          shading: {
-            fill: colors?.surface?.replace(/^#/, '') ?? preset.bg,
-            type: ShadingType.CLEAR,
-          },
-        }),
-      )
+      // Cell margins are supported by both Word and the DOM preview;
+      // paragraph border spacing is ignored by docx-preview.
+      const noBorder = { color: tone, size: 0, style: BorderStyle.NONE }
+      return new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+          bottom: noBorder,
+          insideHorizontal: noBorder,
+          insideVertical: noBorder,
+          left: noBorder,
+          right: noBorder,
+          top: noBorder,
+        },
+        rows: [
+          new TableRow({
+            cantSplit: true,
+            children: [
+              new TableCell({
+                margins: { bottom: 140, left: 180, right: 180, top: 140 },
+                borders: {
+                  bottom: noBorder,
+                  left: { color: tone, size: 18, style: BorderStyle.SINGLE },
+                  right: noBorder,
+                  top: noBorder,
+                },
+                children: [
+                  new Paragraph(
+                    pluginStyles.paragraph({
+                      alignment: AlignmentType.LEFT,
+                      children: runs,
+                      indent: { firstLine: 0, left: 0, right: 0 },
+                      keepLines: true,
+                      spacing: { after: 0, before: 0, line: 336 },
+                    }),
+                  ),
+                ],
+                shading: {
+                  fill: colors?.surface?.replace(/^#/, '') ?? preset.bg,
+                  type: ShadingType.CLEAR,
+                },
+              }),
+            ],
+          }),
+        ],
+      })
     },
   })
 }
