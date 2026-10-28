@@ -21,8 +21,9 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import { Paragraph, ShadingType, TextRun } from 'docx'
+import type { PluginStyleAdapter } from '@docxkit/core'
 
 /**
  * Options for the CodeBlock plugin.
@@ -87,7 +88,8 @@ interface HighlightJs {
 export function codeBlockPlugin() {
   return definePlugin<'codeBlock', CodeBlockOptions>({
     name: 'codeBlock',
-    async render(options) {
+    async render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const lines = options.code.split('\n')
 
       // Try highlighting when a language is specified
@@ -102,14 +104,18 @@ export function codeBlockPlugin() {
             language: options.language,
           })
           const tokens = result.value || options.code
-          return tokensToParagraphs(tokens, options.showLineNumbers)
+          return tokensToParagraphs(
+            tokens,
+            pluginStyles,
+            options.showLineNumbers,
+          )
         } catch {
           // Fall through to plain rendering
         }
       }
 
       // Plain rendering
-      return linesToParagraphs(lines, options.showLineNumbers)
+      return linesToParagraphs(lines, pluginStyles, options.showLineNumbers)
     },
   })
 }
@@ -131,37 +137,45 @@ function decodeHighlightText(value: string): string {
  * background. Optionally prepends line numbers.
  *
  * @param lines - — Source code lines to render
+ * @param styles - Resolved invocation style adapter
  * @param showLineNumbers - — Whether to prepend line numbers
  * @returns Array of Paragraph objects, one per line
  */
 function linesToParagraphs(
   lines: string[],
+  styles: PluginStyleAdapter,
   showLineNumbers?: boolean,
 ): Paragraph[] {
   const maxDigits = showLineNumbers ? String(lines.length).length : 0
   return lines.map(
     (line, i) =>
-      new Paragraph({
-        shading: { fill: CODE_BG, type: ShadingType.CLEAR },
-        spacing: { after: 0, before: 0 },
-        children: [
-          ...(showLineNumbers
-            ? [
-                new TextRun({
-                  color: LINE_NO_COLOR,
-                  font: MONO_FONT,
-                  size: FONT_SIZE,
-                  text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
-                }),
-              ]
-            : []),
-          new TextRun({
-            font: MONO_FONT,
-            size: FONT_SIZE,
-            text: line,
-          }),
-        ],
-      }),
+      new Paragraph(
+        styles.paragraph({
+          shading: { fill: CODE_BG, type: ShadingType.CLEAR },
+          spacing: { after: 0, before: 0 },
+          children: [
+            ...(showLineNumbers
+              ? [
+                  new TextRun(
+                    styles.text({
+                      color: LINE_NO_COLOR,
+                      font: MONO_FONT,
+                      size: FONT_SIZE,
+                      text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
+                    }),
+                  ),
+                ]
+              : []),
+            new TextRun(
+              styles.text({
+                font: MONO_FONT,
+                size: FONT_SIZE,
+                text: line,
+              }),
+            ),
+          ],
+        }),
+      ),
   )
 }
 
@@ -174,9 +188,12 @@ function linesToParagraphs(
  * @param html - — HTML output from `hljs.highlight().value`
  * @returns Array of styled TextRun objects
  */
-function parseHighlightHtml(html: string): TextRun[] {
+function parseHighlightHtml(
+  html: string,
+  styles: PluginStyleAdapter,
+  colorStack: (string | undefined)[],
+): TextRun[] {
   const results: TextRun[] = []
-  const colorStack: (string | undefined)[] = [undefined]
   const tokenRegex = /<span\b[^>]*>|<\/span>|[^<]+/g
 
   for (const match of html.matchAll(tokenRegex)) {
@@ -201,12 +218,14 @@ function parseHighlightHtml(html: string): TextRun[] {
     const text = decodeHighlightText(token)
     if (text.length > 0) {
       results.push(
-        new TextRun({
-          color: colorStack.at(-1),
-          font: MONO_FONT,
-          size: FONT_SIZE,
-          text,
-        }),
+        new TextRun(
+          styles.text({
+            color: colorStack.at(-1),
+            font: MONO_FONT,
+            size: FONT_SIZE,
+            text,
+          }),
+        ),
       )
     }
   }
@@ -222,34 +241,41 @@ function parseHighlightHtml(html: string): TextRun[] {
  * with syntax-colored TextRun children.
  *
  * @param html - — Highlighted HTML string from highlight.js
+ * @param styles - Resolved invocation style adapter
  * @param showLineNumbers - — Whether to prepend line numbers
  * @returns Array of Paragraph objects, one per line
  */
 function tokensToParagraphs(
   html: string,
+  styles: PluginStyleAdapter,
   showLineNumbers?: boolean,
 ): Paragraph[] {
+  const colorStack: (string | undefined)[] = [undefined]
   const lineStrings = html.split('\n')
   const maxDigits = showLineNumbers ? String(lineStrings.length).length : 0
 
   return lineStrings.map((lineHtml, i) => {
-    const runs = parseHighlightHtml(lineHtml)
-    return new Paragraph({
-      shading: { fill: CODE_BG, type: ShadingType.CLEAR },
-      spacing: { after: 0, before: 0 },
-      children: [
-        ...(showLineNumbers
-          ? [
-              new TextRun({
-                color: LINE_NO_COLOR,
-                font: MONO_FONT,
-                size: FONT_SIZE,
-                text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
-              }),
-            ]
-          : []),
-        ...runs,
-      ],
-    })
+    const runs = parseHighlightHtml(lineHtml, styles, colorStack)
+    return new Paragraph(
+      styles.paragraph({
+        shading: { fill: CODE_BG, type: ShadingType.CLEAR },
+        spacing: { after: 0, before: 0 },
+        children: [
+          ...(showLineNumbers
+            ? [
+                new TextRun(
+                  styles.text({
+                    color: LINE_NO_COLOR,
+                    font: MONO_FONT,
+                    size: FONT_SIZE,
+                    text: `${String(i + 1).padStart(maxDigits, ' ')} \u{2502} `,
+                  }),
+                ),
+              ]
+            : []),
+          ...runs,
+        ],
+      }),
+    )
   })
 }

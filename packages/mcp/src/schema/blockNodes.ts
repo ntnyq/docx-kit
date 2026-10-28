@@ -4,7 +4,7 @@ export interface BlockNodeDefinition {
 }
 
 export type NodeCollectionKind =
-  'block' | 'inline' | 'listItem' | 'math' | 'paragraph' | 'text'
+  'block' | 'inline' | 'listItem' | 'math' | 'paragraph' | 'tableRow' | 'text'
 
 export type SchemaFieldKind =
   'array' | 'boolean' | 'number' | 'object' | 'string' | 'unknown'
@@ -167,7 +167,7 @@ export const BLOCK_NODE_DEFINITIONS = {
   table: {
     fields: {
       columns: { kind: 'array', nonEmpty: true, required: true },
-      data: array(true),
+      data: array(true, 'tableRow'),
       header: { kind: 'boolean' },
       striped: { kind: 'boolean' },
     },
@@ -257,6 +257,7 @@ export function buildBlockNodeJsonSchemas(): Record<string, unknown>[] {
 export function buildNestedNodeJsonSchemas(): Record<string, unknown> {
   const text = buildNodeJsonSchema(TEXT_NODE_DEFINITION, 'text')
   return {
+    tableRowNode: { type: 'object' },
     textNode: { anyOf: [{ type: 'string' }, text] },
     inlineNode: {
       oneOf: [

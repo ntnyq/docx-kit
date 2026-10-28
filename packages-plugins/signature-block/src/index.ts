@@ -21,7 +21,7 @@
  * ```
  */
 
-import { definePlugin, DocxKitError } from '@docxkit/core'
+import { createPluginStyle, definePlugin, DocxKitError } from '@docxkit/core'
 import {
   AlignmentType,
   Paragraph,
@@ -73,7 +73,8 @@ export interface SignatureParty {
 export function signatureBlockPlugin() {
   return definePlugin<'signatureBlock', SignatureBlockOptions>({
     name: 'signatureBlock',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const { columns = 2, parties } = options
 
       if (!Number.isSafeInteger(columns) || columns <= 0) {
@@ -84,41 +85,71 @@ export function signatureBlockPlugin() {
       }
 
       if (!parties.length) {
-        return new Paragraph({
-          alignment: AlignmentType.CENTER,
-          children: [new TextRun({ color: '999999', text: '(no signatures)' })],
-        })
+        return new Paragraph(
+          pluginStyles.paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun(
+                pluginStyles.text({ color: '999999', text: '(no signatures)' }),
+              ),
+            ],
+          }),
+        )
       }
 
       // Build cell for a single party
       function buildPartyCell(party: SignatureParty): TableCell {
-        const labelPara = new Paragraph({
-          children: [new TextRun({ bold: true, text: party.label })],
-          spacing: { after: 200 },
-        })
+        const labelPara = new Paragraph(
+          pluginStyles.paragraph({
+            spacing: { after: 200 },
+            children: [
+              new TextRun(pluginStyles.text({ bold: true, text: party.label })),
+            ],
+          }),
+        )
 
         const sigPara = party.name
-          ? new Paragraph({
-              children: [new TextRun({ text: party.name, underline: {} })],
-              spacing: { after: 80 },
-            })
-          : new Paragraph({
-              spacing: { after: 80 },
-              children: [
-                new TextRun({
-                  text: '_____________________________',
-                  underline: {},
+          ? new Paragraph(
+              pluginStyles.paragraph({
+                spacing: { after: 80 },
+                children: [
+                  new TextRun(
+                    pluginStyles.text({ text: party.name, underline: {} }),
+                  ),
+                ],
+              }),
+            )
+          : new Paragraph(
+              pluginStyles.paragraph({
+                spacing: { after: 80 },
+                children: [
+                  new TextRun(
+                    pluginStyles.text({
+                      text: '_____________________________',
+                      underline: {},
+                    }),
+                  ),
+                ],
+              }),
+            )
+
+        const datePara = new Paragraph(
+          pluginStyles.paragraph({
+            children: [
+              new TextRun(
+                pluginStyles.text({
+                  color: '666666',
+                  size: 18,
+                  text: party.date ?? '',
                 }),
-              ],
-            })
+              ),
+            ],
+          }),
+        )
 
-        const datePara = new Paragraph({
-          children: [
-            new TextRun({ color: '666666', size: 18, text: party.date ?? '' }),
-          ],
-        })
-
-        return new TableCell({ children: [labelPara, sigPara, datePara] })
+        return new TableCell(
+          pluginStyles.cell({ children: [labelPara, sigPara, datePara] }),
+        )
       }
 
       // Arrange parties into rows of `columns` each
@@ -132,7 +163,11 @@ export function signatureBlockPlugin() {
 
         // Pad last row if needed so all rows have `columns` cells
         if (rowCells.length < columns) {
-          const emptyCell = new TableCell({ children: [new Paragraph('')] })
+          const emptyCell = new TableCell(
+            pluginStyles.cell({
+              children: [new Paragraph(pluginStyles.paragraph({ text: '' }))],
+            }),
+          )
           const padCount = columns - rowCells.length
           const padding = Array.from({ length: padCount }).map(() => emptyCell)
           rowCells = [...rowCells, ...padding]

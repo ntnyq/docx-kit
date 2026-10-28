@@ -73,7 +73,7 @@ export async function loadNpmPlugin(
   }
 
   // Read and validate the manifest
-  const manifestPath = `${pkgPath}/docx-kit.plugin.json`
+  const manifestPath = path.join(pkgPath, 'docx-kit.plugin.json')
 
   if (!existsSync(manifestPath)) {
     throw new DocxKitError(
@@ -156,22 +156,14 @@ export async function loadNpmPlugin(
  * @returns The package root directory, or the original path if not found
  */
 function resolvePackageRoot(resolvedPath: string): string {
-  let dir = resolvedPath
-
-  // If it's a file, start from its directory
-  if (!dir.endsWith('/')) {
-    const lastSlash = dir.lastIndexOf('/')
-    if (lastSlash > 0) {
-      dir = dir.slice(0, lastSlash)
-    }
-  }
+  let dir = path.dirname(resolvedPath)
 
   // Walk up until we find package.json
   for (let i = 0; i < 10; i++) {
-    if (existsSync(`${dir}/package.json`)) {
+    if (existsSync(path.join(dir, 'package.json'))) {
       return dir
     }
-    const parent = dir.slice(0, dir.lastIndexOf('/'))
+    const parent = path.dirname(dir)
     if (!parent || parent === dir) {
       break
     }

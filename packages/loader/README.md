@@ -26,3 +26,18 @@ const { plugin, manifest } = await loader.load({
 ```
 
 Use `@docxkit/loader/browser` for URL and same-origin browser sources. External plugins must publish a valid `docx-kit.plugin.json`; its manifest is authorized before module code executes.
+
+For packages with a root manifest and a compiled entry such as `dist/index.js`,
+pass the manifest URL or a package directory URL ending in `/`. The loader resolves
+`main` relative to that manifest. A JavaScript module URL continues to use an
+adjacent manifest for compatibility.
+
+```ts
+import { createPluginLoader } from '@docxkit/loader/browser'
+
+const loader = createPluginLoader()
+const { plugin } = await loader.load({
+  type: 'url',
+  url: 'https://cdn.example.com/docx-kit-plugin-chart/docx-kit.plugin.json',
+})
+```

@@ -31,6 +31,7 @@
 
 import {
   createImageRun,
+  createPluginStyle,
   dataUrlToUint8Array,
   definePlugin,
   DocxKitError,
@@ -135,7 +136,8 @@ interface RenderImageResult {
 export function echartsPlugin() {
   return definePlugin<'echarts', EChartsPluginOptions>({
     name: 'echarts',
-    async render(options) {
+    async render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const width = options.width ?? 640
       const height = options.height ?? 360
       const imageType =
@@ -168,10 +170,14 @@ export function echartsPlugin() {
         width,
       })
 
-      const paragraphs: Paragraph[] = [new Paragraph({ children: [imageRun] })]
+      const paragraphs: Paragraph[] = [
+        new Paragraph(pluginStyles.paragraph({ children: [imageRun] })),
+      ]
 
       if (options.caption) {
-        paragraphs.push(new Paragraph({ text: options.caption }))
+        paragraphs.push(
+          new Paragraph(pluginStyles.paragraph({ text: options.caption })),
+        )
       }
 
       return paragraphs

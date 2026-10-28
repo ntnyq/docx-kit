@@ -1,4 +1,4 @@
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import { BorderStyle, Paragraph } from 'docx'
 
 const DIVIDER_STYLES = {
@@ -18,24 +18,27 @@ export interface DividerOptions {
 export function dividerPlugin() {
   return definePlugin<'divider', DividerOptions>({
     name: 'divider',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const color = options.color ?? 'D9D9D9'
       const style = DIVIDER_STYLES[options.style ?? 'solid']
 
-      return new Paragraph({
-        border: {
-          bottom: {
-            color,
-            size: 6,
-            space: 1,
-            style,
+      return new Paragraph(
+        pluginStyles.paragraph({
+          border: {
+            bottom: {
+              color,
+              size: 6,
+              space: 1,
+              style,
+            },
           },
-        },
-        spacing: {
-          after: options.spacingAfter ?? 200,
-          before: options.spacingBefore ?? 200,
-        },
-      })
+          spacing: {
+            after: options.spacingAfter ?? 200,
+            before: options.spacingBefore ?? 200,
+          },
+        }),
+      )
     },
   })
 }

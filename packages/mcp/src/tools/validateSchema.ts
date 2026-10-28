@@ -176,6 +176,15 @@ function validateCollection(
   }
   for (const [index, node] of nodes.entries()) {
     const nodePath = `${path}/${index}`
+    if (kind === 'tableRow') {
+      if (!isRecord(node)) {
+        errors.push({
+          message: 'Table data row must be an object',
+          path: nodePath,
+        })
+      }
+      continue
+    }
     if (
       typeof node === 'string'
       && ['listItem', 'paragraph', 'text'].includes(kind)

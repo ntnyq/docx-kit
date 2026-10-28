@@ -37,7 +37,11 @@ class BrowserPluginLoader extends PluginLoader {
     authorizeManifest: PluginManifestAuthorizer,
     load: typeof loadUrlPlugin,
   ) {
-    const manifestUrl = new URL('docx-kit.plugin.json', moduleUrl)
+    const sourceUrl = new URL(moduleUrl, globalThis.location?.href)
+    const isManifest = sourceUrl.pathname.endsWith('/docx-kit.plugin.json')
+    const manifestUrl = isManifest
+      ? sourceUrl
+      : new URL('docx-kit.plugin.json', sourceUrl)
     const response = await fetch(manifestUrl)
     if (!response.ok) {
       throw new DocxKitError(
@@ -46,9 +50,26 @@ class BrowserPluginLoader extends PluginLoader {
       )
     }
 
-    return load(moduleUrl, {
-      authorizeManifest,
-      manifest: await response.json(),
+    const manifest = await authorizeManifest(await response.json())
+    const entryUrl =
+      isManifest || sourceUrl.pathname.endsWith('/')
+        ? new URL(manifest.main, manifestUrl).href
+        : sourceUrl.href
+    const packageUrl = new URL('./', manifestUrl)
+    const entry = new URL(entryUrl)
+    if (
+      entry.origin !== packageUrl.origin
+      || !entry.pathname.startsWith(packageUrl.pathname)
+    ) {
+      throw new DocxKitError(
+        'MANIFEST_INVALID',
+        `Plugin entry "${manifest.main}" resolves outside its package URL`,
+      )
+    }
+
+    return load(entryUrl, {
+      manifest,
+      authorizeManifest: () => manifest,
     })
   }
 }

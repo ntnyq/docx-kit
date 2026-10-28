@@ -5,12 +5,9 @@ Plugin system types and all built-in plugin option types.
 ## `DocxPlugin<TName, TOptions>`
 
 ```ts
-interface DocxPlugin<
-  TName extends string = string,
-  TOptions = unknown,
-> {
+interface DocxPlugin<TName extends string = string, TOptions = unknown> {
   name: TName
-  setup?: (context: PluginRenderContext) => MaybePromise<void>
+  setup?: () => MaybePromise<void>
   render: (
     options: TOptions,
     context: PluginRenderContext,
@@ -25,6 +22,7 @@ Passed as the second argument to `render()`:
 ```ts
 interface PluginRenderContext {
   config: DocxKitConfig
+  style?: DocxStyleRule
   compileNode: (node: BlockNode) => Promise<unknown>
   utils: {
     image: {
@@ -46,14 +44,30 @@ type PluginRegistry = Record<string, unknown>
 Type-safe plugin factory:
 
 ```ts
-import { definePlugin } from 'docx-kit'
+import { Paragraph } from 'docx'
+import { createPluginStyle, definePlugin } from 'docx-kit'
 
 const myPlugin = definePlugin<'myPlugin', { text: string }>({
   name: 'myPlugin',
   render(options, ctx) {
-    // Full access to docx library via ctx.compileNode()
-    return new ctx.constructor.Paragraph({ text: options.text })
+    const styles = createPluginStyle(ctx.style)
+    return new Paragraph(styles.paragraph({ text: options.text }))
   },
+})
+```
+
+`context.style` contains the invocation's resolved stylesheet classes, theme
+tokens, and inline overrides. All built-in plugins apply these overrides to
+their paragraphs, text runs, and cells. Third-party plugins opt in through
+`createPluginStyle(context.style)`, which provides `paragraph()`, `text()`, and
+`cell()` adapters for native `docx` constructor options. Unspecified properties
+retain the plugin's defaults, including nested spacing and borders.
+
+```ts
+doc.use(myPlugin).plugin('myPlugin', { text: 'Aligned label' }, {
+  color: '#245A96',
+  fontSize: 14,
+  textAlign: 'right',
 })
 ```
 

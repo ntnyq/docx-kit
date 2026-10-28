@@ -3,6 +3,54 @@ import { docxSchemaResource } from '../src/resources/schema'
 import { validateSchema } from '../src/tools/validateSchema'
 
 describe('nested schema validation', () => {
+  it('exposes the same row-object contract in the JSON Schema resource', () => {
+    expect(docxSchemaResource.schema.definitions).toMatchObject({
+      tableRowNode: { type: 'object' },
+    })
+    expect(
+      docxSchemaResource.schema.definitions.blockNode.oneOf,
+    ).toContainEqual(
+      expect.objectContaining({
+        properties: expect.objectContaining({
+          type: { const: 'table' },
+          data: {
+            items: { $ref: '#/definitions/tableRowNode' },
+            type: 'array',
+          },
+        }),
+      }),
+    )
+    expect(
+      validateSchema({
+        content: [
+          {
+            columns: [{ key: 'name', title: 'Name' }],
+            data: [{}],
+            type: 'table',
+          },
+        ],
+      }).valid,
+    ).toBe(true)
+  })
+  it.each([null, [], 'row', 1, false])(
+    'rejects a non-object table row: %j',
+    row => {
+      expect(
+        validateSchema({
+          content: [
+            {
+              columns: [{ key: 'name', title: 'Name' }],
+              data: [row],
+              type: 'table',
+            },
+          ],
+        }),
+      ).toMatchObject({
+        errors: [{ path: '/content/0/data/0' }],
+        valid: false,
+      })
+    },
+  )
   it.each(['constructor', '__proto__', 'toString'])(
     'rejects inherited discriminator %s without throwing',
     type => {

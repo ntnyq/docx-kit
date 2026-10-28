@@ -1,4 +1,4 @@
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -33,47 +33,76 @@ export interface ChangelogOptions {
 export function changelogPlugin() {
   return definePlugin<'changelog', ChangelogOptions>({
     name: 'changelog',
-    render(options) {
-      const title = new Paragraph({
-        spacing: { after: 180 },
-        children: [
-          new TextRun({
-            bold: true,
-            size: 28,
-            text: options.title ?? 'Changelog',
-          }),
-        ],
-      })
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
+      const title = new Paragraph(
+        pluginStyles.paragraph({
+          spacing: { after: 180 },
+          children: [
+            new TextRun(
+              pluginStyles.text({
+                bold: true,
+                size: 28,
+                text: options.title ?? 'Changelog',
+              }),
+            ),
+          ],
+        }),
+      )
 
       if (options.entries.length === 0) {
         return [
           title,
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [new TextRun({ color: '999999', text: '(no entries)' })],
-          }),
+          new Paragraph(
+            pluginStyles.paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [
+                new TextRun(
+                  pluginStyles.text({ color: '999999', text: '(no entries)' }),
+                ),
+              ],
+            }),
+          ),
         ]
       }
 
       const header = new TableRow({
         children: ['Version', 'Date', 'Type', 'Changes'].map(
           label =>
-            new TableCell({
-              shading: { fill: '4472C4', type: ShadingType.CLEAR },
-              borders: {
-                bottom: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-                left: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-                right: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-                top: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-              },
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({ bold: true, color: 'FFFFFF', text: label }),
-                  ],
-                }),
-              ],
-            }),
+            new TableCell(
+              pluginStyles.cell({
+                shading: { fill: '4472C4', type: ShadingType.CLEAR },
+                borders: {
+                  left: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
+                  top: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
+                  bottom: {
+                    color: 'D9D9D9',
+                    size: 1,
+                    style: BorderStyle.SINGLE,
+                  },
+                  right: {
+                    color: 'D9D9D9',
+                    size: 1,
+                    style: BorderStyle.SINGLE,
+                  },
+                },
+                children: [
+                  new Paragraph(
+                    pluginStyles.paragraph({
+                      children: [
+                        new TextRun(
+                          pluginStyles.text({
+                            bold: true,
+                            color: 'FFFFFF',
+                            text: label,
+                          }),
+                        ),
+                      ],
+                    }),
+                  ),
+                ],
+              }),
+            ),
         ),
       })
 
@@ -87,40 +116,48 @@ export function changelogPlugin() {
               entry.changes,
             ].map(
               (value, index) =>
-                new TableCell({
-                  borders: {
-                    bottom: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
+                new TableCell(
+                  pluginStyles.cell({
+                    borders: {
+                      bottom: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
+                      left: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
+                      right: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
+                      top: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
                     },
-                    left: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
-                    },
-                    right: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
-                    },
-                    top: {
-                      color: 'D9D9D9',
-                      size: 1,
-                      style: BorderStyle.SINGLE,
-                    },
-                  },
-                  children: [
-                    new Paragraph({ children: [new TextRun({ text: value })] }),
-                  ],
-                  shading:
-                    index === 2
-                      ? {
-                          fill: TYPE_COLORS[entry.type],
-                          type: ShadingType.CLEAR,
-                        }
-                      : undefined,
-                }),
+                    children: [
+                      new Paragraph(
+                        pluginStyles.paragraph({
+                          children: [
+                            new TextRun(pluginStyles.text({ text: value })),
+                          ],
+                        }),
+                      ),
+                    ],
+                    shading:
+                      index === 2
+                        ? {
+                            fill: TYPE_COLORS[entry.type],
+                            type: ShadingType.CLEAR,
+                          }
+                        : undefined,
+                  }),
+                ),
             ),
           }),
       )

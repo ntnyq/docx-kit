@@ -11,14 +11,15 @@
 export { createImageRun } from './utils/image'
 // ---------- Builder ----------
 export { DocxBuilder } from './builder/DocxBuilder'
-
 export { validateManifest } from './loader/manifest'
-
 export { dataUrlToUint8Array } from './utils/dataUrl'
-export { createDocx, renderDocx } from './builder/createDocx'
 
+export { createPluginStyle } from './style/pluginStyle'
+
+export { createDocx, renderDocx } from './builder/createDocx'
 // ---------- Loader ----------
 export { createPluginLoader, PluginLoader } from './loader/PluginLoader'
+
 // ---------- Re-exports from @docxkit/types ----------
 // Value exports
 export {
@@ -31,9 +32,10 @@ export {
   type ErrorCode,
 } from '@docxkit/types'
 export type { PluginManifest } from './loader/manifest'
-
 // ---------- Compiler internals (for plugin authors) ----------
 export type { CompilationSession } from './compiler/numbers'
+
+export type { PluginStyleAdapter } from './style/pluginStyle'
 
 // ---------- Local types ----------
 export type { DocxSchema, RenderDocxOptions } from './builder/createDocx'

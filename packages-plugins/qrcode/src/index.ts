@@ -18,6 +18,7 @@
 
 import {
   createImageRun,
+  createPluginStyle,
   dataUrlToUint8Array,
   definePlugin,
 } from '@docxkit/core'
@@ -83,7 +84,8 @@ export interface QRCodePluginOptions {
 export function qrcodePlugin() {
   return definePlugin<'qrcode', QRCodePluginOptions>({
     name: 'qrcode',
-    async render(options) {
+    async render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       // Dynamic import: peer dep `qrcode` is not bundled in core.
       const QRCode =
         (await import('qrcode')).default ?? (await import('qrcode'))
@@ -104,10 +106,14 @@ export function qrcodePlugin() {
         width: size,
       })
 
-      const paragraphs: Paragraph[] = [new Paragraph({ children: [imageRun] })]
+      const paragraphs: Paragraph[] = [
+        new Paragraph(pluginStyles.paragraph({ children: [imageRun] })),
+      ]
 
       if (options.caption) {
-        paragraphs.push(new Paragraph({ text: options.caption }))
+        paragraphs.push(
+          new Paragraph(pluginStyles.paragraph({ text: options.caption })),
+        )
       }
 
       return paragraphs

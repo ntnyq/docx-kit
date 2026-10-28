@@ -9,6 +9,7 @@
 
 import {
   createImageRun,
+  createPluginStyle,
   dataUrlToUint8Array,
   definePlugin,
 } from '@docxkit/core'
@@ -128,7 +129,8 @@ interface RenderedBarcode {
 export function barcodePlugin() {
   return definePlugin<'barcode', BarcodeOptions>({
     name: 'barcode',
-    async render(options) {
+    async render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const rendered = await renderBarcode(options)
       const width = options.width ?? Math.min(rendered.width, 320)
       const height = Math.max(
@@ -137,25 +139,29 @@ export function barcodePlugin() {
       )
       const alignment = toAlignment(options.alignment)
       const paragraphs = [
-        new Paragraph({
-          alignment,
-          children: [
-            createImageRun({
-              data: rendered.data,
-              height,
-              type: 'png',
-              width,
-            }),
-          ],
-        }),
+        new Paragraph(
+          pluginStyles.paragraph({
+            alignment,
+            children: [
+              createImageRun({
+                data: rendered.data,
+                height,
+                type: 'png',
+                width,
+              }),
+            ],
+          }),
+        ),
       ]
 
       if (options.caption) {
         paragraphs.push(
-          new Paragraph({
-            alignment,
-            text: options.caption,
-          }),
+          new Paragraph(
+            pluginStyles.paragraph({
+              alignment,
+              text: options.caption,
+            }),
+          ),
         )
       }
 

@@ -14,7 +14,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import { AlignmentType, PageNumber, Paragraph, TextRun } from 'docx'
 
 /**
@@ -56,7 +56,8 @@ export interface PageNumberOptions {
 export function pageNumberPlugin() {
   return definePlugin<'pageNumber', PageNumberOptions>({
     name: 'pageNumber',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const alignment = options.alignment ?? AlignmentType.CENTER
       // docx's `TextRun.size` is in half-points; user-facing option is in points.
       const halfPoints = (options.fontSize ?? 10) * 2
@@ -67,17 +68,21 @@ export function pageNumberPlugin() {
         ? ['Page ', PageNumber.CURRENT, ' of ', PageNumber.TOTAL_PAGES]
         : [PageNumber.CURRENT]
 
-      return new Paragraph({
-        alignment,
-        spacing: { after: 0, before: 0 },
-        children: [
-          new TextRun({
-            children,
-            font: 'Arial',
-            size: halfPoints,
-          }),
-        ],
-      })
+      return new Paragraph(
+        pluginStyles.paragraph({
+          alignment,
+          spacing: { after: 0, before: 0 },
+          children: [
+            new TextRun(
+              pluginStyles.text({
+                children,
+                font: 'Arial',
+                size: halfPoints,
+              }),
+            ),
+          ],
+        }),
+      )
     },
   })
 }

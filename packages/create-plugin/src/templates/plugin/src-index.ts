@@ -15,7 +15,7 @@ export function renderPluginSource(pluginName: string): string {
   const identifier = toIdentifier(pluginName)
   const typeName = toPascalCase(pluginName)
   return `import { Paragraph } from 'docx'
-import { definePlugin } from 'docx-kit'
+import { createPluginStyle, definePlugin } from 'docx-kit'
 
 export interface ${typeName}Options {
   text: string
@@ -24,9 +24,10 @@ export interface ${typeName}Options {
 export function ${identifier}Plugin() {
   return definePlugin<'${pluginName}', ${typeName}Options>({
     name: '${pluginName}',
-    render(options) {
+    render(options, context) {
+      const styles = createPluginStyle(context.style)
       // TODO: implement plugin rendering
-      return new Paragraph({ text: options.text })
+      return new Paragraph(styles.paragraph({ text: options.text }))
     },
   })
 }

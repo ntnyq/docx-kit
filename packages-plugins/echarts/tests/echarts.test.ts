@@ -1,4 +1,6 @@
 import { createPluginTestContext } from '@docxkit/pdk'
+import { Document, Packer } from 'docx'
+import JSZip from 'jszip'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { echartsPlugin } from '../src'
@@ -42,6 +44,23 @@ vi.stubGlobal('document', {
 })
 
 describe('echartsPlugin', () => {
+  it('applies invocation styles to the chart paragraph and caption', async () => {
+    const output = await echartsPlugin().render(
+      { caption: 'Styled chart', option: {} },
+      createPluginTestContext({
+        style: { color: '#123ABC', fontSize: 19, textAlign: 'right' },
+      }),
+    )
+    if (!Array.isArray(output)) {
+      throw new TypeError('Expected chart paragraphs')
+    }
+    const document = new Document({ sections: [{ children: output }] })
+    const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
+    const xml = await archive.file('word/document.xml')?.async('string')
+    expect(xml).toContain('<w:color w:val="123ABC"/>')
+    expect(xml).toContain('<w:sz w:val="38"/>')
+    expect(xml?.match(/<w:jc w:val="right"\/>/g)).toHaveLength(2)
+  })
   it('returns a plugin with name "echarts"', () => {
     const plugin = echartsPlugin()
     expect(plugin.name).toBe('echarts')

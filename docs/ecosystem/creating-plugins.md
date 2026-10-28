@@ -292,7 +292,7 @@ const { plugin } = await loader.load({
 // From URL (browser only)
 const { plugin } = await loader.load({
   type: 'url',
-  url: 'https://cdn.example.com/docx-kit-plugin-chart.js',
+  url: 'https://cdn.example.com/docx-kit-plugin-chart/docx-kit.plugin.json',
 })
 
 // From local file

@@ -1,4 +1,4 @@
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -10,6 +10,7 @@ import {
   TextRun,
   WidthType,
 } from 'docx'
+import type { PluginStyleAdapter } from '@docxkit/core'
 
 export interface InvoiceLineItem {
   description: string
@@ -38,7 +39,8 @@ export interface InvoiceParty {
 export function invoicePlugin() {
   return definePlugin<'invoice', InvoiceOptions>({
     name: 'invoice',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       validateInvoiceOptions(options)
 
       const currency = options.currency ?? ''
@@ -49,20 +51,35 @@ export function invoicePlugin() {
       const tax = subtotal * (options.taxRate ?? 0)
       const total = subtotal + tax
 
-      const header = new Paragraph({
-        spacing: { after: 180 },
-        children: [
-          new TextRun({ bold: true, size: 36, text: 'INVOICE' }),
-          new TextRun({
-            break: 1,
-            text: `Invoice #: ${options.invoiceNumber}`,
-          }),
-          new TextRun({ break: 1, text: `Date: ${options.date}` }),
-          ...(options.dueDate
-            ? [new TextRun({ break: 1, text: `Due: ${options.dueDate}` })]
-            : []),
-        ],
-      })
+      const header = new Paragraph(
+        pluginStyles.paragraph({
+          spacing: { after: 180 },
+          children: [
+            new TextRun(
+              pluginStyles.text({ bold: true, size: 36, text: 'INVOICE' }),
+            ),
+            new TextRun(
+              pluginStyles.text({
+                break: 1,
+                text: `Invoice #: ${options.invoiceNumber}`,
+              }),
+            ),
+            new TextRun(
+              pluginStyles.text({ break: 1, text: `Date: ${options.date}` }),
+            ),
+            ...(options.dueDate
+              ? [
+                  new TextRun(
+                    pluginStyles.text({
+                      break: 1,
+                      text: `Due: ${options.dueDate}`,
+                    }),
+                  ),
+                ]
+              : []),
+          ],
+        }),
+      )
 
       const itemRows = options.items.map(item => {
         const lineTotal = item.quantity * item.unitPrice
@@ -74,37 +91,8 @@ export function invoicePlugin() {
             formatCurrency(lineTotal, currency),
           ].map(
             value =>
-              new TableCell({
-                borders: {
-                  left: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-                  top: { color: 'D9D9D9', size: 1, style: BorderStyle.SINGLE },
-                  bottom: {
-                    color: 'D9D9D9',
-                    size: 1,
-                    style: BorderStyle.SINGLE,
-                  },
-                  right: {
-                    color: 'D9D9D9',
-                    size: 1,
-                    style: BorderStyle.SINGLE,
-                  },
-                },
-                children: [
-                  new Paragraph({ children: [new TextRun({ text: value })] }),
-                ],
-              }),
-          ),
-        })
-      })
-
-      const table = new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        rows: [
-          new TableRow({
-            children: ['Description', 'Qty', 'Unit Price', 'Amount'].map(
-              label =>
-                new TableCell({
-                  shading: { fill: '4472C4', type: ShadingType.CLEAR },
+              new TableCell(
+                pluginStyles.cell({
                   borders: {
                     bottom: {
                       color: 'D9D9D9',
@@ -128,57 +116,120 @@ export function invoicePlugin() {
                     },
                   },
                   children: [
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          bold: true,
-                          color: 'FFFFFF',
-                          text: label,
-                        }),
-                      ],
-                    }),
+                    new Paragraph(
+                      pluginStyles.paragraph({
+                        children: [
+                          new TextRun(pluginStyles.text({ text: value })),
+                        ],
+                      }),
+                    ),
                   ],
                 }),
+              ),
+          ),
+        })
+      })
+
+      const table = new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [
+          new TableRow({
+            children: ['Description', 'Qty', 'Unit Price', 'Amount'].map(
+              label =>
+                new TableCell(
+                  pluginStyles.cell({
+                    shading: { fill: '4472C4', type: ShadingType.CLEAR },
+                    borders: {
+                      bottom: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
+                      left: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
+                      right: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
+                      top: {
+                        color: 'D9D9D9',
+                        size: 1,
+                        style: BorderStyle.SINGLE,
+                      },
+                    },
+                    children: [
+                      new Paragraph(
+                        pluginStyles.paragraph({
+                          children: [
+                            new TextRun(
+                              pluginStyles.text({
+                                bold: true,
+                                color: 'FFFFFF',
+                                text: label,
+                              }),
+                            ),
+                          ],
+                        }),
+                      ),
+                    ],
+                  }),
+                ),
             ),
           }),
           ...itemRows,
         ],
       })
 
-      const totals = new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        spacing: { before: 180 },
-        children: [
-          new TextRun({
-            text: `Subtotal: ${formatCurrency(subtotal, currency)}`,
-          }),
-          new TextRun({
-            break: 1,
-            text: `Tax: ${formatCurrency(tax, currency)}`,
-          }),
-          new TextRun({
-            bold: true,
-            break: 1,
-            text: `Total: ${formatCurrency(total, currency)}`,
-          }),
-        ],
-      })
+      const totals = new Paragraph(
+        pluginStyles.paragraph({
+          alignment: AlignmentType.RIGHT,
+          spacing: { before: 180 },
+          children: [
+            new TextRun(
+              pluginStyles.text({
+                text: `Subtotal: ${formatCurrency(subtotal, currency)}`,
+              }),
+            ),
+            new TextRun(
+              pluginStyles.text({
+                break: 1,
+                text: `Tax: ${formatCurrency(tax, currency)}`,
+              }),
+            ),
+            new TextRun(
+              pluginStyles.text({
+                bold: true,
+                break: 1,
+                text: `Total: ${formatCurrency(total, currency)}`,
+              }),
+            ),
+          ],
+        }),
+      )
 
       return [
         header,
-        partyLines('From', options.from),
-        partyLines('To', options.to),
+        partyLines('From', options.from, pluginStyles),
+        partyLines('To', options.to, pluginStyles),
         table,
         totals,
         ...(options.notes
           ? [
-              new Paragraph({
-                spacing: { before: 180 },
-                children: [
-                  new TextRun({ bold: true, text: 'Notes: ' }),
-                  new TextRun({ text: options.notes }),
-                ],
-              }),
+              new Paragraph(
+                pluginStyles.paragraph({
+                  spacing: { before: 180 },
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({ bold: true, text: 'Notes: ' }),
+                    ),
+                    new TextRun(pluginStyles.text({ text: options.notes })),
+                  ],
+                }),
+              ),
             ]
           : []),
       ]
@@ -194,15 +245,21 @@ function formatCurrency(value: number, currency: string) {
   return currency ? `${currency} ${formatted}` : formatted
 }
 
-function partyLines(label: string, party: InvoiceParty) {
+function partyLines(
+  label: string,
+  party: InvoiceParty,
+  pluginStyles: PluginStyleAdapter,
+) {
   const values = [party.name, party.address, party.email].filter(Boolean)
-  return new Paragraph({
-    spacing: { after: 120 },
-    children: [
-      new TextRun({ bold: true, text: `${label}: ` }),
-      new TextRun({ text: values.join(' · ') }),
-    ],
-  })
+  return new Paragraph(
+    pluginStyles.paragraph({
+      spacing: { after: 120 },
+      children: [
+        new TextRun(pluginStyles.text({ bold: true, text: `${label}: ` })),
+        new TextRun(pluginStyles.text({ text: values.join(' · ') })),
+      ],
+    }),
+  )
 }
 
 function validateInvoiceOptions(options: InvoiceOptions) {

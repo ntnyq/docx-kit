@@ -24,7 +24,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -101,13 +101,20 @@ export interface DataTableOptions {
 export function dataTablePlugin() {
   return definePlugin<'dataTable', DataTableOptions>({
     name: 'dataTable',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const { align, bordered, data, format, labels, striped } = options
       if (!data.length) {
-        return new Paragraph({
-          alignment: AlignmentType.CENTER,
-          children: [new TextRun({ color: '999999', text: '(no data)' })],
-        })
+        return new Paragraph(
+          pluginStyles.paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun(
+                pluginStyles.text({ color: '999999', text: '(no data)' }),
+              ),
+            ],
+          }),
+        )
       }
 
       // Infer columns from first row
@@ -125,18 +132,28 @@ export function dataTablePlugin() {
       // Header row
       const headerCells = columns.map(col => {
         const label = labels?.[col] ?? col
-        return new TableCell({
-          shading: HEADER_SHADING,
-          children: [
-            new Paragraph({
-              alignment: AlignmentType.CENTER,
-              children: [
-                new TextRun({ bold: true, color: 'FFFFFF', text: label }),
-              ],
-            }),
-          ],
-          ...(displayedBordered ? { borders: borderOptions } : {}),
-        })
+        return new TableCell(
+          pluginStyles.cell({
+            shading: HEADER_SHADING,
+            children: [
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({
+                        bold: true,
+                        color: 'FFFFFF',
+                        text: label,
+                      }),
+                    ),
+                  ],
+                }),
+              ),
+            ],
+            ...(displayedBordered ? { borders: borderOptions } : {}),
+          }),
+        )
       })
       const rows = [new TableRow({ children: headerCells })]
       const resolvedAlignments = new Map(
@@ -149,16 +166,20 @@ export function dataTablePlugin() {
           const colAlign = resolvedAlignments.get(col) ?? 'left'
           const val = formatValue(row[col], format?.[col])
 
-          return new TableCell({
-            shading: striped && i % 2 === 1 ? STRIPE_SHADING : undefined,
-            children: [
-              new Paragraph({
-                alignment: alignmentToDocx(colAlign),
-                children: [new TextRun({ text: val })],
-              }),
-            ],
-            ...(displayedBordered ? { borders: borderOptions } : {}),
-          })
+          return new TableCell(
+            pluginStyles.cell({
+              shading: striped && i % 2 === 1 ? STRIPE_SHADING : undefined,
+              children: [
+                new Paragraph(
+                  pluginStyles.paragraph({
+                    alignment: alignmentToDocx(colAlign),
+                    children: [new TextRun(pluginStyles.text({ text: val }))],
+                  }),
+                ),
+              ],
+              ...(displayedBordered ? { borders: borderOptions } : {}),
+            }),
+          )
         })
         rows.push(new TableRow({ children: cells }))
       }

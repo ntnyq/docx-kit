@@ -5,6 +5,34 @@ import { describe, expect, it } from 'vitest'
 import { codeBlockPlugin } from '../src'
 
 describe('codeBlockPlugin', () => {
+  it('preserves highlighted comment colors across lines', async () => {
+    const result = await codeBlockPlugin().render(
+      {
+        code: '/* first\nsecond\n*/ const done = true',
+        language: 'javascript',
+      },
+      createPluginTestContext(),
+    )
+    if (!Array.isArray(result)) {
+      throw new TypeError('Expected paragraph array')
+    }
+    const document = new Document({ sections: [{ children: result }] })
+    const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
+    const xml = await archive.file('word/document.xml')?.async('string')
+    const paragraphs = xml?.match(/<w:p>.*?<\/w:p>/g) ?? []
+    const runs = paragraphs.flatMap(
+      paragraph => paragraph.match(/<w:r>.*?<\/w:r>/g) ?? [],
+    )
+    const comments = runs.filter(run =>
+      />(?:\/\* first|second|\*\/)<\/w:t>/.test(run),
+    )
+    expect(comments).toHaveLength(3)
+    expect(comments.every(run => run.includes('<w:color'))).toBe(true)
+    expect(
+      new Set(comments.map(run => run.match(/w:color w:val="([^"]+)"/)?.[1]))
+        .size,
+    ).toBe(1)
+  })
   it('returns a plugin named "codeBlock"', () => {
     expect(codeBlockPlugin().name).toBe('codeBlock')
   })

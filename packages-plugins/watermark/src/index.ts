@@ -15,7 +15,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import { AlignmentType, Paragraph, TextRun } from 'docx'
 
 /**
@@ -60,20 +60,25 @@ export interface WatermarkOptions {
 export function watermarkPlugin() {
   return definePlugin<'watermark', WatermarkOptions>({
     name: 'watermark',
-    render(options) {
-      return new Paragraph({
-        alignment: options.alignment ?? AlignmentType.CENTER,
-        spacing: { after: 0, before: 0 },
-        children: [
-          new TextRun({
-            bold: true,
-            color: options.color ?? 'BFBFBF',
-            font: 'Arial',
-            size: options.fontSize ?? 48,
-            text: options.text,
-          }),
-        ],
-      })
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
+      return new Paragraph(
+        pluginStyles.paragraph({
+          alignment: options.alignment ?? AlignmentType.CENTER,
+          spacing: { after: 0, before: 0 },
+          children: [
+            new TextRun(
+              pluginStyles.text({
+                bold: true,
+                color: options.color ?? 'BFBFBF',
+                font: 'Arial',
+                size: options.fontSize ?? 48,
+                text: options.text,
+              }),
+            ),
+          ],
+        }),
+      )
     },
   })
 }

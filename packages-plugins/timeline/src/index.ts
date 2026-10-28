@@ -20,7 +20,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -108,102 +108,127 @@ const COL_WIDTHS = {
 export function timelinePlugin() {
   return definePlugin<'timeline', TimelineOptions>({
     name: 'timeline',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const { accentColor = '4472C4', events, layout = 'alternating' } = options
 
       if (events.length === 0) {
-        return new Paragraph({ text: '(No events)' })
+        return new Paragraph(pluginStyles.paragraph({ text: '(No events)' }))
       }
 
       const connectorCell = () =>
-        new TableCell({
-          width: { size: COL_WIDTHS.connector, type: WidthType.DXA },
-          borders: {
-            bottom: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-          },
-          children: [
-            new Paragraph({
-              alignment: AlignmentType.CENTER,
-              children: [
-                new TextRun({
-                  color: accentColor,
-                  font: 'Arial',
-                  size: 24,
-                  text: '\u{25CF}',
+        new TableCell(
+          pluginStyles.cell({
+            width: { size: COL_WIDTHS.connector, type: WidthType.DXA },
+            borders: {
+              bottom: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+            },
+            children: [
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({
+                        color: accentColor,
+                        font: 'Arial',
+                        size: 24,
+                        text: '\u{25CF}',
+                      }),
+                    ),
+                  ],
                 }),
-              ],
-            }),
-          ],
-        })
+              ),
+            ],
+          }),
+        )
 
       const dateCell = (date: string) =>
-        new TableCell({
-          width: { size: COL_WIDTHS.date, type: WidthType.DXA },
-          borders: {
-            bottom: { color: accentColor, size: 1, style: BorderStyle.SINGLE },
-            left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-          },
-          children: [
-            new Paragraph({
-              alignment: AlignmentType.RIGHT,
-              children: [
-                new TextRun({
-                  bold: true,
-                  color: accentColor,
-                  font: 'Arial',
-                  size: 22,
-                  text: date,
+        new TableCell(
+          pluginStyles.cell({
+            width: { size: COL_WIDTHS.date, type: WidthType.DXA },
+            borders: {
+              left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              bottom: {
+                color: accentColor,
+                size: 1,
+                style: BorderStyle.SINGLE,
+              },
+            },
+            children: [
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment: AlignmentType.RIGHT,
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({
+                        bold: true,
+                        color: accentColor,
+                        font: 'Arial',
+                        size: 22,
+                        text: date,
+                      }),
+                    ),
+                  ],
                 }),
-              ],
-            }),
-          ],
-          shading: {
-            fill: 'F0F5FF',
-            type: ShadingType.CLEAR,
-          },
-        })
+              ),
+            ],
+            shading: {
+              fill: 'F0F5FF',
+              type: ShadingType.CLEAR,
+            },
+          }),
+        )
 
       const contentCell = (title: string, description?: string) => {
         const runs: TextRun[] = [
-          new TextRun({
-            bold: true,
-            font: 'Arial',
-            size: 24,
-            text: title,
-          }),
+          new TextRun(
+            pluginStyles.text({
+              bold: true,
+              font: 'Arial',
+              size: 24,
+              text: title,
+            }),
+          ),
         ]
 
         if (description) {
           runs.push(
-            new TextRun({
-              break: 1,
-              color: '555555',
-              font: 'Arial',
-              size: 20,
-              text: description,
-            }),
+            new TextRun(
+              pluginStyles.text({
+                break: 1,
+                color: '555555',
+                font: 'Arial',
+                size: 20,
+                text: description,
+              }),
+            ),
           )
         }
 
-        return new TableCell({
-          children: [new Paragraph({ children: runs })],
-          width: { size: COL_WIDTHS.content, type: WidthType.DXA },
-          borders: {
-            left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
-            bottom: {
-              color: 'DDDDDD',
-              size: 1,
-              style: BorderStyle.SINGLE,
+        return new TableCell(
+          pluginStyles.cell({
+            width: { size: COL_WIDTHS.content, type: WidthType.DXA },
+            borders: {
+              left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
+              bottom: {
+                color: 'DDDDDD',
+                size: 1,
+                style: BorderStyle.SINGLE,
+              },
             },
-          },
-        })
+            children: [
+              new Paragraph(pluginStyles.paragraph({ children: runs })),
+            ],
+          }),
+        )
       }
 
       const rows: TableRow[] = events.map((event, index) => {

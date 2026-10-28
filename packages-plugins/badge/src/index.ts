@@ -1,4 +1,4 @@
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import { AlignmentType, Paragraph, ShadingType, TextRun } from 'docx'
 
 const BADGE_PRESETS = {
@@ -18,7 +18,8 @@ export interface BadgeOptions {
 export function badgePlugin() {
   return definePlugin<'badge', BadgeOptions>({
     name: 'badge',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const preset =
         typeof options.color === 'string' && options.color in BADGE_PRESETS
           ? BADGE_PRESETS[options.color as keyof typeof BADGE_PRESETS]
@@ -30,21 +31,25 @@ export function badgePlugin() {
       const background =
         options.backgroundColor ?? preset?.background ?? 'EDEDED'
 
-      return new Paragraph({
-        alignment: AlignmentType.LEFT,
-        spacing: { after: 120, before: 120 },
-        children: [
-          new TextRun({
-            bold: true,
-            color: foreground,
-            text: ` ${options.text} `,
-          }),
-        ],
-        shading: {
-          fill: background,
-          type: ShadingType.CLEAR,
-        },
-      })
+      return new Paragraph(
+        pluginStyles.paragraph({
+          alignment: AlignmentType.LEFT,
+          spacing: { after: 120, before: 120 },
+          children: [
+            new TextRun(
+              pluginStyles.text({
+                bold: true,
+                color: foreground,
+                text: ` ${options.text} `,
+              }),
+            ),
+          ],
+          shading: {
+            fill: background,
+            type: ShadingType.CLEAR,
+          },
+        }),
+      )
     },
   })
 }

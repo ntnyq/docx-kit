@@ -174,16 +174,11 @@ export async function compileDocument<TStyles extends StyleSheet>(
     })
   }
 
-  // Collect numbering configs generated during compilation
+  const { comments, footnotes } = await compileReferences(
+    session,
+    options.config as DocxKitConfig,
+  )
   const numberingConfig = session.toArray()
-  const comments = await compileComments(
-    session,
-    options.config as DocxKitConfig,
-  )
-  const footnotes = await compileFootnotes(
-    session,
-    options.config as DocxKitConfig,
-  )
 
   return new Document({
     comments,
@@ -242,60 +237,6 @@ function compileColumns(config?: SectionColumnsConfig) {
   }
 }
 
-async function compileComments(
-  session: CompilationSession,
-  config: DocxKitConfig,
-) {
-  const definitions = session.getComments()
-  if (definitions.length === 0) {
-    return undefined
-  }
-
-  return {
-    children: await Promise.all(
-      definitions.map(async ({ id, node }) => ({
-        author: node.author,
-        date: node.date ? new Date(node.date) : undefined,
-        id,
-        initials: node.initials,
-        children: await compileReferenceParagraphs(
-          node.comment,
-          config,
-          session,
-        ),
-      })),
-    ),
-  }
-}
-
-async function compileFootnotes(
-  session: CompilationSession,
-  config: DocxKitConfig,
-) {
-  const definitions = session.getFootnotes()
-  if (definitions.length === 0) {
-    return undefined
-  }
-
-  const entries = await Promise.all(
-    definitions.map(
-      async ({ id, node }) =>
-        [
-          String(id),
-          {
-            children: await compileReferenceParagraphs(
-              node.content,
-              config,
-              session,
-            ),
-          },
-        ] as const,
-    ),
-  )
-
-  return Object.fromEntries(entries)
-}
-
 /**
  * Compile section headers or footers into `docx` `Header`/`Footer` objects.
  *
@@ -331,8 +272,6 @@ async function compileHeaderFooter<TStyles extends StyleSheet>(
 
   return Object.keys(result).length > 0 ? result : undefined
 }
-
-// ---------- Page / Section properties ----------
 
 /**
  * Compile header/footer content into supported block children.
@@ -384,7 +323,7 @@ async function compileHeaderFooterChildren<TStyles extends StyleSheet>(
   return result
 }
 
-// ---------- Header / Footer (deduplicated) ----------
+// ---------- Page / Section properties ----------
 
 function compileLineNumbers(config?: SectionLineNumberConfig) {
   if (!config) {
@@ -398,6 +337,8 @@ function compileLineNumbers(config?: SectionLineNumberConfig) {
     start: config.start,
   }
 }
+
+// ---------- Header / Footer (deduplicated) ----------
 
 function compilePageBorders(config?: PageBorderConfig) {
   if (!config) {
@@ -458,6 +399,62 @@ async function compileReferenceParagraphs(
         : compileParagraph(item, config, session),
     ),
   )
+}
+
+/**
+ * Drain annotation queues together: a body can register definitions in either
+ * queue while it compiles, so neither collection is complete until both drain.
+ */
+async function compileReferences(
+  session: CompilationSession,
+  config: DocxKitConfig,
+) {
+  const comments: {
+    author: string
+    children: Paragraph[]
+    id: number
+    date?: Date
+    initials?: string
+  }[] = []
+  const footnotes: Record<string, { children: Paragraph[] }> = {}
+  const commentDefinitions = session.getComments()
+  const footnoteDefinitions = session.getFootnotes()
+  let commentIndex = 0
+  let footnoteIndex = 0
+
+  while (
+    commentIndex < commentDefinitions.length
+    || footnoteIndex < footnoteDefinitions.length
+  ) {
+    if (footnoteIndex < footnoteDefinitions.length) {
+      const { id, node } = footnoteDefinitions[footnoteIndex++]
+      footnotes[String(id)] = {
+        children: await compileReferenceParagraphs(
+          node.content,
+          config,
+          session,
+        ),
+      }
+    } else {
+      const { id, node } = commentDefinitions[commentIndex++]
+      comments.push({
+        author: node.author,
+        date: node.date ? new Date(node.date) : undefined,
+        id,
+        initials: node.initials,
+        children: await compileReferenceParagraphs(
+          node.comment,
+          config,
+          session,
+        ),
+      })
+    }
+  }
+
+  return {
+    comments: comments.length > 0 ? { children: comments } : undefined,
+    footnotes: footnoteIndex > 0 ? footnotes : undefined,
+  }
 }
 
 /**

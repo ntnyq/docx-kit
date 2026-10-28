@@ -19,7 +19,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import { BorderStyle, Paragraph, ShadingType, TextRun } from 'docx'
 
 const CALLOUT_PRESETS = {
@@ -80,32 +80,41 @@ export interface CalloutOptions {
 export function calloutPlugin() {
   return definePlugin<'callout', CalloutOptions>({
     name: 'callout',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const preset = CALLOUT_PRESETS[options.type]
-      const runs: TextRun[] = [new TextRun({ text: `${preset.icon}  ` })]
+      const runs: TextRun[] = [
+        new TextRun(pluginStyles.text({ text: `${preset.icon}  ` })),
+      ]
 
       if (options.title) {
-        runs.push(new TextRun({ bold: true, text: `${options.title}\n` }))
+        runs.push(
+          new TextRun(
+            pluginStyles.text({ bold: true, text: `${options.title}\n` }),
+          ),
+        )
       }
 
-      runs.push(new TextRun({ text: options.content }))
+      runs.push(new TextRun(pluginStyles.text({ text: options.content })))
 
-      return new Paragraph({
-        children: runs,
-        spacing: { after: 120, before: 120 },
-        border: {
-          left: {
-            color: preset.border,
-            size: 12,
-            space: 8,
-            style: BorderStyle.SINGLE,
+      return new Paragraph(
+        pluginStyles.paragraph({
+          children: runs,
+          spacing: { after: 120, before: 120 },
+          border: {
+            left: {
+              color: preset.border,
+              size: 12,
+              space: 8,
+              style: BorderStyle.SINGLE,
+            },
           },
-        },
-        shading: {
-          fill: preset.bg,
-          type: ShadingType.CLEAR,
-        },
-      })
+          shading: {
+            fill: preset.bg,
+            type: ShadingType.CLEAR,
+          },
+        }),
+      )
     },
   })
 }

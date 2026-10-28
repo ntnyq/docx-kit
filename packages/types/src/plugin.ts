@@ -9,6 +9,7 @@
 
 import type { DocxKitConfig } from './document'
 import type { BlockNode } from './dsl/nodes'
+import type { DocxStyleRule } from './style'
 import type { MaybePromise } from './utility'
 
 /**
@@ -88,6 +89,11 @@ export interface PluginRenderContext {
    * The full document config.
    */
   config: DocxKitConfig
+  /**
+   * Invocation overrides after resolving stylesheet classes and theme tokens.
+   * Use `createPluginStyle` to apply them to native docx constructor options.
+   */
+  style?: DocxStyleRule
   /**
    * Compile a child node (useful for nesting).
    *

@@ -21,7 +21,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
   Paragraph,
@@ -80,14 +80,21 @@ export interface PropertyTableOptions {
 export function propertyTablePlugin() {
   return definePlugin<'propertyTable', PropertyTableOptions>({
     name: 'propertyTable',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const { items, keyBold = true, striped = true } = options
 
       if (!items.length) {
-        return new Paragraph({
-          alignment: AlignmentType.CENTER,
-          children: [new TextRun({ color: '999999', text: '(no items)' })],
-        })
+        return new Paragraph(
+          pluginStyles.paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun(
+                pluginStyles.text({ color: '999999', text: '(no items)' }),
+              ),
+            ],
+          }),
+        )
       }
 
       const rows = items.map((item, i) => {
@@ -97,29 +104,41 @@ export function propertyTablePlugin() {
 
         return new TableRow({
           children: [
-            new TableCell({
-              shading: keyShading,
-              width: { size: 3500, type: WidthType.DXA },
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.RIGHT,
-                  children: [
-                    new TextRun({
-                      bold: keyBold,
-                      text: item.key,
+            new TableCell(
+              pluginStyles.cell({
+                shading: keyShading,
+                width: { size: 3500, type: WidthType.DXA },
+                children: [
+                  new Paragraph(
+                    pluginStyles.paragraph({
+                      alignment: AlignmentType.RIGHT,
+                      children: [
+                        new TextRun(
+                          pluginStyles.text({
+                            bold: keyBold,
+                            text: item.key,
+                          }),
+                        ),
+                      ],
                     }),
-                  ],
-                }),
-              ],
-            }),
-            new TableCell({
-              shading: cellShading,
-              children: [
-                new Paragraph({
-                  children: [new TextRun({ text: item.value })],
-                }),
-              ],
-            }),
+                  ),
+                ],
+              }),
+            ),
+            new TableCell(
+              pluginStyles.cell({
+                shading: cellShading,
+                children: [
+                  new Paragraph(
+                    pluginStyles.paragraph({
+                      children: [
+                        new TextRun(pluginStyles.text({ text: item.value })),
+                      ],
+                    }),
+                  ),
+                ],
+              }),
+            ),
           ],
         })
       })

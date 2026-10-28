@@ -24,7 +24,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -105,25 +105,36 @@ export interface MeetingMinutesOptions {
 export function meetingMinutesPlugin() {
   return definePlugin<'meetingMinutes', MeetingMinutesOptions>({
     name: 'meetingMinutes',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       // Title
-      const titlePara = new Paragraph({
-        children: [new TextRun({ bold: true, size: 32, text: options.title })],
-        heading: HeadingLevel.HEADING_1,
-        spacing: { after: 200 },
-      })
+      const titlePara = new Paragraph(
+        pluginStyles.paragraph({
+          heading: HeadingLevel.HEADING_1,
+          spacing: { after: 200 },
+          children: [
+            new TextRun(
+              pluginStyles.text({ bold: true, size: 32, text: options.title }),
+            ),
+          ],
+        }),
+      )
 
       // Meta info
-      const metaPara = new Paragraph({
-        spacing: { after: 300 },
-        children: [
-          new TextRun({ bold: true, text: '日期：' }),
-          new TextRun({ text: options.date }),
-          new TextRun({ text: ' '.repeat(4) }),
-          new TextRun({ bold: true, text: '参会人员：' }),
-          new TextRun({ text: options.attendees.join('、') }),
-        ],
-      })
+      const metaPara = new Paragraph(
+        pluginStyles.paragraph({
+          spacing: { after: 300 },
+          children: [
+            new TextRun(pluginStyles.text({ bold: true, text: '日期：' })),
+            new TextRun(pluginStyles.text({ text: options.date })),
+            new TextRun(pluginStyles.text({ text: ' '.repeat(4) })),
+            new TextRun(pluginStyles.text({ bold: true, text: '参会人员：' })),
+            new TextRun(
+              pluginStyles.text({ text: options.attendees.join('、') }),
+            ),
+          ],
+        }),
+      )
 
       // Only add table if there are agenda items
       if (options.agenda.length === 0) {
@@ -133,18 +144,28 @@ export function meetingMinutesPlugin() {
       // Header row
       const headerCells = AGENDA_COLUMNS.map(
         col =>
-          new TableCell({
-            borders: BORDER,
-            shading: HEADER_SHADING,
-            children: [
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new TextRun({ bold: true, color: 'FFFFFF', text: col }),
-                ],
-              }),
-            ],
-          }),
+          new TableCell(
+            pluginStyles.cell({
+              borders: BORDER,
+              shading: HEADER_SHADING,
+              children: [
+                new Paragraph(
+                  pluginStyles.paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [
+                      new TextRun(
+                        pluginStyles.text({
+                          bold: true,
+                          color: 'FFFFFF',
+                          text: col,
+                        }),
+                      ),
+                    ],
+                  }),
+                ),
+              ],
+            }),
+          ),
       )
 
       // Data rows
@@ -157,14 +178,18 @@ export function meetingMinutesPlugin() {
         ]
         const cells = values.map(
           val =>
-            new TableCell({
-              borders: BORDER,
-              children: [
-                new Paragraph({
-                  children: [new TextRun({ text: val })],
-                }),
-              ],
-            }),
+            new TableCell(
+              pluginStyles.cell({
+                borders: BORDER,
+                children: [
+                  new Paragraph(
+                    pluginStyles.paragraph({
+                      children: [new TextRun(pluginStyles.text({ text: val }))],
+                    }),
+                  ),
+                ],
+              }),
+            ),
         )
         return new TableRow({ children: cells })
       })

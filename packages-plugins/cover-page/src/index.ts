@@ -19,7 +19,7 @@
  * ```
  */
 
-import { definePlugin } from '@docxkit/core'
+import { createPluginStyle, definePlugin } from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -90,112 +90,137 @@ export interface CoverPageOptions {
 export function coverPagePlugin() {
   return definePlugin<'coverPage', CoverPageOptions>({
     name: 'coverPage',
-    render(options) {
+    render(options, context) {
+      const pluginStyles = createPluginStyle(context.style)
       const alignment = options.alignment ?? AlignmentType.CENTER
       const showRule = options.showRule !== false
 
-      const titlePara = new Paragraph({
-        alignment,
-        spacing: { after: 200 },
-        children: [
-          new TextRun({
-            bold: true,
-            font: 'Arial',
-            size: 56, // 28pt
-            text: options.title,
-          }),
-        ],
-        ...(options.backgroundColor
-          ? {
-              shading: {
-                fill: options.backgroundColor,
-                type: ShadingType.CLEAR,
-              },
-            }
-          : {}),
-      })
+      const titlePara = new Paragraph(
+        pluginStyles.paragraph({
+          alignment,
+          spacing: { after: 200 },
+          children: [
+            new TextRun(
+              pluginStyles.text({
+                bold: true,
+                font: 'Arial',
+                size: 56, // 28pt
+                text: options.title,
+              }),
+            ),
+          ],
+          ...(options.backgroundColor
+            ? {
+                shading: {
+                  fill: options.backgroundColor,
+                  type: ShadingType.CLEAR,
+                },
+              }
+            : {}),
+        }),
+      )
 
       return [
-        new Paragraph({ children: [], spacing: { before: 2400 } }),
+        new Paragraph(
+          pluginStyles.paragraph({ children: [], spacing: { before: 2400 } }),
+        ),
         titlePara,
         ...(options.subtitle
           ? [
-              new Paragraph({
-                alignment,
-                spacing: { after: 400 },
-                children: [
-                  new TextRun({
-                    color: '555555',
-                    font: 'Arial',
-                    size: 32,
-                    text: options.subtitle,
-                  }),
-                ],
-              }),
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment,
+                  spacing: { after: 400 },
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({
+                        color: '555555',
+                        font: 'Arial',
+                        size: 32,
+                        text: options.subtitle,
+                      }),
+                    ),
+                  ],
+                }),
+              ),
             ]
           : []),
         ...(showRule
           ? [
-              new Paragraph({
-                alignment,
-                children: [],
-                spacing: { after: 400 },
-                border: {
-                  bottom: {
-                    color: '4472C4',
-                    size: 6,
-                    space: 1,
-                    style: BorderStyle.SINGLE,
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment,
+                  children: [],
+                  spacing: { after: 400 },
+                  border: {
+                    bottom: {
+                      color: '4472C4',
+                      size: 6,
+                      space: 1,
+                      style: BorderStyle.SINGLE,
+                    },
                   },
-                },
-              }),
+                }),
+              ),
             ]
           : []),
         ...(options.author
           ? [
-              new Paragraph({
-                alignment,
-                spacing: { after: 120 },
-                children: [
-                  new TextRun({
-                    font: 'Arial',
-                    size: 28,
-                    text: options.author,
-                  }),
-                ],
-              }),
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment,
+                  spacing: { after: 120 },
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({
+                        font: 'Arial',
+                        size: 28,
+                        text: options.author,
+                      }),
+                    ),
+                  ],
+                }),
+              ),
             ]
           : []),
         ...(options.organization
           ? [
-              new Paragraph({
-                alignment,
-                spacing: { after: 120 },
-                children: [
-                  new TextRun({
-                    color: '333333',
-                    font: 'Arial',
-                    size: 24,
-                    text: options.organization,
-                  }),
-                ],
-              }),
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment,
+                  spacing: { after: 120 },
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({
+                        color: '333333',
+                        font: 'Arial',
+                        size: 24,
+                        text: options.organization,
+                      }),
+                    ),
+                  ],
+                }),
+              ),
             ]
           : []),
         ...(options.date
           ? [
-              new Paragraph({
-                alignment,
-                spacing: { after: 0 },
-                children: [
-                  new TextRun({
-                    color: '777777',
-                    font: 'Arial',
-                    size: 24,
-                    text: options.date,
-                  }),
-                ],
-              }),
+              new Paragraph(
+                pluginStyles.paragraph({
+                  alignment,
+                  spacing: { after: 0 },
+                  children: [
+                    new TextRun(
+                      pluginStyles.text({
+                        color: '777777',
+                        font: 'Arial',
+                        size: 24,
+                        text: options.date,
+                      }),
+                    ),
+                  ],
+                }),
+              ),
             ]
           : []),
       ]

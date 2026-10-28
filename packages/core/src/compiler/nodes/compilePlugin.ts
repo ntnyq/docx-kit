@@ -5,6 +5,7 @@
  */
 
 import { DocxKitError } from '@docxkit/types'
+import { resolveStyle } from '../../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
 import { compileNode } from '../compileNode'
 import type {
@@ -34,6 +35,12 @@ export async function compilePlugin<TStyles extends StyleSheet>(
 
   const ctx: PluginRenderContext = {
     config: config as DocxKitConfig,
+    style: resolveStyle({
+      className: node.className,
+      inline: node.style,
+      styles: config.styles,
+      theme: config.theme,
+    }),
     utils: {
       image: {
         fromDataUrl: (dataUrl: string) => dataUrlToUint8Array(dataUrl),
