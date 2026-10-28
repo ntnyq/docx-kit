@@ -1,0 +1,4 @@
+# eslint-disable yml/plain-scalar -- Skill UI metadata requires quoted strings.
+interface:
+  display_name: 'Add New Plugin'
+  short_description: 'Implement and integrate a docx-kit built-in plugin'
