@@ -34,6 +34,21 @@ const BUILTIN_PLUGIN_FACTORIES = {
 } as const
 
 describe('playground runtime', () => {
+  it('preserves import examples inside strings and comments', async () => {
+    const sample =
+      "\nimport { createDocx } from 'docx-kit'\nimport 'external-package'\n"
+    await expect(
+      executePlaygroundCode(`
+      import { createDocx } from 'docx-kit'
+      /*
+      import { notAnImport } from 'docx-kit'
+      */
+      const sample = ${'`'}${sample}${'`'}
+      sample
+    `),
+    ).resolves.toBe(sample)
+  })
+
   it.each([
     `createDocx()\n  .p('Hello')\n  .toBlob()`,
     `createDocx({\n  page: { margin: 0 }\n}).toBlob() // final comment`,

@@ -5,31 +5,17 @@ import { transform } from 'sucrase'
  * Transform user-written TypeScript code into executable JavaScript.
  *
  * Pipeline:
- * 1. Named `docx` imports → destructuring from the injected `docx` namespace
- * 2. Named `docx-kit` imports → destructuring from the injected `docxKit` namespace
- * 3. Remaining `import` lines → stripped
- * 4. TypeScript→JavaScript via sucrase (strips generics, type annotations, etc.)
- * 5. Last expression auto-wrapped with `return` if needed
- * 6. Wrapped in `"use strict"; return (async () => { … })()`
+ * 1. Strip TypeScript syntax while retaining runtime imports
+ * 2. Rewrite import declarations using their parsed source ranges
+ * 3. Last expression auto-wrapped with `return` if needed
+ * 4. Wrapped in `"use strict"; return (async () => { … })()`
  */
 export function prepareCode(raw: string): string {
-  let body = replaceNamedImports(raw, 'docx', 'docx')
-
-  body = replaceNamedImports(body, 'docx-kit', 'docxKit')
-
-  // Step 3: Strip unsupported imports after the two runtime namespaces have
-  // been mapped. The first pattern handles multiline named/type imports.
-  body = body.replace(
-    /^[\t ]*import\s+(?:type\s+)?\{[^}]*\}\s+from\s+['"][^'"]+['"][\t ]*;?/gm,
-    '',
-  )
-  body = body.replace(/^[\t ]*import[^\n]*$/gm, '')
-
-  // Step 4: Transpile TypeScript → JavaScript via sucrase.
-  //    Strips generics, type annotations, enum declarations, etc.
-  body = transform(body, {
+  let body = transform(raw, {
+    keepUnusedImports: true,
     transforms: ['typescript'],
   }).code.trim()
+  body = replaceImports(body)
 
   // Return the complete final expression, regardless of line breaks or comments.
   const program = parse(body, {
@@ -42,7 +28,7 @@ export function prepareCode(raw: string): string {
     body = `${body.slice(0, last.start)}return (${body.slice(last.expression.start, last.expression.end)});${body.slice(last.end)}`
   }
 
-  // Step 6: Wrap in async IIFE so user `await` works.
+  // Wrap in async IIFE so user `await` works.
   return `"use strict";
 return (async () => {
 ${body}
@@ -52,31 +38,45 @@ ${body}
 /**
  * Replace named ESM imports with destructuring from an injected namespace.
  *
- * Type-only specifiers are omitted, and aliases are translated from
- * `source as local` to object-destructuring syntax (`source: local`).
+ * TypeScript has already been removed. Only actual import declarations are
+ * rewritten; strings, comments and dynamic imports retain their content.
  */
-function replaceNamedImports(
-  source: string,
-  moduleName: string,
-  namespaceName: string,
-): string {
-  const escapedModuleName = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const importPattern = new RegExp(
-    `^[\\t ]*import\\s+\\{([^}]+)\\}\\s+from\\s+['"]${escapedModuleName}['"][\\t ]*;?`,
-    'gm',
-  )
-
-  return source.replace(importPattern, (_match, names: string) => {
-    const runtimeNames = names
-      .split(',')
-      .map(name => name.trim())
-      .filter(name => name.length > 0 && !name.startsWith('type '))
-      .map(name => name.replace(/\s+as\s+/, ': '))
-
-    if (runtimeNames.length === 0) {
-      return ''
-    }
-
-    return `const { ${runtimeNames.join(', ')} } = ${namespaceName};`
+function replaceImports(source: string): string {
+  const program = parse(source, {
+    allowAwaitOutsideFunction: true,
+    allowReturnOutsideFunction: true,
+    ecmaVersion: 'latest',
+    sourceType: 'module',
   })
+  for (const statement of program.body.toReversed()) {
+    if (statement.type !== 'ImportDeclaration') {
+      continue
+    }
+    const namespace =
+      statement.source.value === 'docx-kit'
+        ? 'docxKit'
+        : statement.source.value === 'docx'
+          ? 'docx'
+          : undefined
+    const names = statement.specifiers.flatMap(specifier => {
+      if (specifier.type !== 'ImportSpecifier') {
+        return []
+      }
+      const imported =
+        specifier.imported.type === 'Identifier'
+          ? specifier.imported.name
+          : JSON.stringify(specifier.imported.value)
+      return [
+        imported === specifier.local.name
+          ? imported
+          : `${imported}: ${specifier.local.name}`,
+      ]
+    })
+    const replacement =
+      namespace && names.length
+        ? `const { ${names.join(', ')} } = ${namespace};`
+        : ''
+    source = `${source.slice(0, statement.start)}${replacement}${source.slice(statement.end)}`
+  }
+  return source
 }
