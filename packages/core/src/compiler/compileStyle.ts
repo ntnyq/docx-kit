@@ -16,6 +16,7 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx'
+import { normalizeHexColor } from '../utils/color'
 import { parseShorthandTwip, toPtEighth, toPtHalf, toTwip } from './units'
 import type {
   CellStyleRule,
@@ -66,7 +67,7 @@ export function compileBorder(style: CellStyleRule | ParagraphStyleRule) {
  */
 export function compileBorderRule(rule: NonNullable<DocxStyleRule['border']>) {
   return {
-    color: normalizeColor(rule.color),
+    color: normalizeHexColor(rule.color),
     size: rule.width == null ? 1 : toPtEighth(rule.width),
     style: compileBorderStyle(rule.style),
   }
@@ -124,7 +125,7 @@ export function compileCellStyle(style: CellStyleRule) {
       style.backgroundColor == null
         ? undefined
         : {
-            fill: normalizeColor(style.backgroundColor),
+            fill: normalizeHexColor(style.backgroundColor),
             type: ShadingType.CLEAR,
           },
   }
@@ -236,7 +237,7 @@ export function compileParagraphStyle(style: ParagraphStyleRule) {
 export function compileTextStyle(style: TextStyleRule) {
   const result: Record<string, unknown> = {
     allCaps: style.allCaps,
-    color: normalizeColor(style.color),
+    color: normalizeHexColor(style.color),
     doubleStrike: style.doubleStrike,
     emboss: style.emboss,
     highlight: compileHighlight(style.highlight),
@@ -271,7 +272,7 @@ export function compileTextStyle(style: TextStyleRule) {
       style.backgroundColor == null
         ? undefined
         : {
-            fill: normalizeColor(style.backgroundColor),
+            fill: normalizeHexColor(style.backgroundColor),
             type: ShadingType.CLEAR,
           },
     underline:
@@ -359,19 +360,6 @@ function compileVerticalAlign(value: DocxStyleRule['verticalAlign']) {
     return VerticalAlign.BOTTOM
   }
   return VerticalAlign.TOP
-}
-
-/**
- * Normalize CSS hex colors to the six hexadecimal digits expected by Word.
- *
- * @param color - Optional hexadecimal color with or without a leading `#`
- * @returns The expanded color without its leading `#`, or `undefined` when omitted
- */
-function normalizeColor(color?: string) {
-  const hex = color?.replace(/^#/, '')
-  return hex && /^[\da-f]{3}$/i.test(hex)
-    ? [...hex].map(char => char.repeat(2)).join('')
-    : hex
 }
 
 /**

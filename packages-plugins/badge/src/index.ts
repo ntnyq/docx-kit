@@ -1,4 +1,8 @@
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import { AlignmentType, Paragraph, ShadingType, TextRun } from 'docx'
 
 const BADGE_PRESETS = {
@@ -28,13 +32,13 @@ export function badgePlugin() {
 
       const foreground =
         (preset && options.color
-          ? config.theme?.colors?.[options.color]?.replace(/^#/, '')
+          ? normalizeHexColor(config.theme?.colors?.[options.color])
           : undefined)
         ?? preset?.foreground
         ?? (options.color && !preset ? options.color : '444444')
       const background =
-        options.backgroundColor?.replace(/^#/, '')
-        ?? config.theme?.colors?.surface?.replace(/^#/, '')
+        normalizeHexColor(options.backgroundColor)
+        ?? normalizeHexColor(config.theme?.colors?.surface)
         ?? preset?.background
         ?? 'EDEDED'
 
@@ -46,7 +50,7 @@ export function badgePlugin() {
             new TextRun(
               pluginStyles.text({
                 bold: true,
-                color: foreground.replace(/^#/, ''),
+                color: normalizeHexColor(foreground),
                 shading: { fill: background, type: ShadingType.CLEAR },
                 text: ` ${options.text} `,
               }),

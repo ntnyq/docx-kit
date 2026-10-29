@@ -4,6 +4,52 @@ import { describe, expect, it } from 'vitest'
 import { invoicePlugin } from '../src'
 
 describe('invoicePlugin', () => {
+  it.each([
+    [1, 1.005, '1.01'],
+    [0.7, 0.05, '0.04'],
+    [1, 30_000_000_000_000, '30,000,000,000,000.00'],
+    [1, 10_000_000_000_000.004, '10,000,000,000,000.00'],
+    [100, 450_359_962_737.0487, '45,035,996,273,704.87'],
+    [1e-7, 1e7, '1.00'],
+  ])(
+    'rounds quantity %s at unit price %s consistently',
+    (quantity, unitPrice, expected) => {
+      const result = invoicePlugin().render(
+        {
+          date: '2026-10-30',
+          from: { name: 'Issuer' },
+          invoiceNumber: 'ROUND',
+          items: [{ description: 'Fractional item', quantity, unitPrice }],
+          to: { name: 'Client' },
+        },
+        createPluginTestContext(),
+      )
+      expect(JSON.stringify(result)).toContain(`Subtotal: ${expected}`)
+      expect(JSON.stringify(result)).toContain(`Total: ${expected}`)
+    },
+  )
+
+  it('sums rounded line amounts and adds the rounded tax', () => {
+    const result = invoicePlugin().render(
+      {
+        date: '2026-10-30',
+        from: { name: 'Issuer' },
+        invoiceNumber: 'ROUND',
+        taxRate: 0.1,
+        to: { name: 'Client' },
+        items: [
+          { description: 'A', quantity: 1, unitPrice: 0.335 },
+          { description: 'B', quantity: 1, unitPrice: 0.335 },
+        ],
+      },
+      createPluginTestContext(),
+    )
+    const text = JSON.stringify(result)
+    expect(text).toContain('Subtotal: 0.68')
+    expect(text).toContain('Tax: 0.07')
+    expect(text).toContain('Total: 0.75')
+  })
+
   it('returns a plugin named "invoice"', () => {
     expect(invoicePlugin().name).toBe('invoice')
   })

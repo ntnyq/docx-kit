@@ -15,7 +15,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import { AlignmentType, Paragraph, TextRun } from 'docx'
 
 /**
@@ -70,7 +74,7 @@ export function watermarkPlugin() {
             new TextRun(
               pluginStyles.text({
                 bold: true,
-                color: options.color ?? 'BFBFBF',
+                color: normalizeHexColor(options.color ?? 'BFBFBF'),
                 font: 'Arial',
                 size: options.fontSize ?? 48,
                 text: options.text,

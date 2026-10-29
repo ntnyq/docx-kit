@@ -11,6 +11,7 @@
 export { createImageRun } from './utils/image'
 // ---------- DSL and definition helpers ----------
 export { inlineImg, span } from './dsl/helpers'
+export { normalizeHexColor } from './utils/color'
 // ---------- Builder ----------
 export { DocxBuilder } from './builder/DocxBuilder'
 export { defineStyles } from './style/defineStyles'

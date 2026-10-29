@@ -30,7 +30,9 @@ import {
   WpsShapeRun,
 } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
+import { resolveThemeTokens } from '../../style/theme'
 import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
+import { registerSessionRevision } from '../numbers'
 import { toPx } from '../units'
 import { compileInlineNodes } from './compileInline'
 import type {
@@ -86,12 +88,14 @@ export function compileBookmark<TStyles extends StyleSheet>(
  * @template TStyles - The document's stylesheet type
  * @param node - Checkbox state, optional label, and styling
  * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param baseStyle - Optional inherited paragraph or cell text style
  * @returns The checkbox control followed by its optional styled label
  * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
  */
 export function compileCheckbox<TStyles extends StyleSheet>(
   node: CheckboxNode<TStyles>,
   config: DocxKitConfig<TStyles>,
+  baseStyle?: DocxStyleRule,
 ): ParagraphChild[] {
   const children: ParagraphChild[] = [
     new CheckBox({
@@ -104,7 +108,7 @@ export function compileCheckbox<TStyles extends StyleSheet>(
 
   if (node.label) {
     const style = resolveStyle({
-      base: config.defaults?.text,
+      base: { ...config.defaults?.text, ...baseStyle },
       className: node.className,
       inline: node.style,
       styles: config.styles,
@@ -194,13 +198,20 @@ export function compileMath(node: MathNode) {
  * @template TStyles - The document's stylesheet type
  * @param node - Inserted or deleted text with revision metadata
  * @param config - Document configuration providing default styles, classes, and theme tokens
+ * @param baseStyle - Optional inherited paragraph or cell text style
+ * @param session - Compilation session recording emitted revisions
  * @returns Tracked-revision text runs in the original child order
  * @throws {DocxKitError} If a referenced style class is missing or has circular inheritance
  */
 export function compileRevision<TStyles extends StyleSheet>(
   node: RevisionNode<TStyles>,
   config: DocxKitConfig<TStyles>,
+  baseStyle?: DocxStyleRule,
+  session?: CompilationSession,
 ): ParagraphChild[] {
+  if (session) {
+    registerSessionRevision(session)
+  }
   const RevisionCtor =
     node.type === 'insertedText' ? InsertedTextRun : DeletedTextRun
 
@@ -208,14 +219,17 @@ export function compileRevision<TStyles extends StyleSheet>(
     const textNode: TextNode<TStyles> =
       typeof child === 'string' ? { text: child, type: 'text' } : child
     const style = resolveStyle({
-      base: config.defaults?.text,
-      className: textNode.className ?? node.className,
+      className: textNode.className,
+      inline: textNode.style,
       styles: config.styles,
       theme: config.theme,
-      inline: {
-        ...node.style,
-        ...textNode.style,
-      },
+      base: resolveStyle({
+        base: { ...config.defaults?.text, ...baseStyle },
+        className: node.className,
+        inline: node.style,
+        styles: config.styles,
+        theme: config.theme,
+      }),
     })
 
     return new RevisionCtor({
@@ -268,13 +282,16 @@ export async function compileTextBox<TStyles extends StyleSheet>(
   const shape = new WpsShapeRun({
     bodyProperties: {},
     children: [content],
-    floating: compileTextBoxFloating(node.box),
     type: 'wps',
+    floating: compileTextBoxFloating(
+      resolveThemeTokens(node.box, config.theme),
+    ),
     transformation: {
+      width: toTextBoxPx(resolveThemeTokens(node.box.width, config.theme)) ?? 0,
       // DrawingML shapes require an explicit height. Preserve the optional
       // public API with a one-line default when no height is supplied.
-      height: toTextBoxPx(node.box.height) ?? 48,
-      width: toTextBoxPx(node.box.width) ?? 0,
+      height:
+        toTextBoxPx(resolveThemeTokens(node.box.height, config.theme)) ?? 48,
     },
   })
 
@@ -451,5 +468,5 @@ function toEmu(value: UnitValue | undefined): number | undefined {
 function toTextBoxPx(value: UnitValue | undefined): number | undefined {
   // Text-box lengths historically interpret bare numbers as points, while
   // the shared image conversion interprets them as pixels.
-  return typeof value === 'number' ? (value * 96) / 72 : toPx(value)
+  return typeof value === 'number' ? (toPx(value)! * 96) / 72 : toPx(value)
 }

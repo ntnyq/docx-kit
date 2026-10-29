@@ -74,6 +74,27 @@ function validateValue(
       break
     case 'number':
       if (typeof value === 'number' && Number.isFinite(value)) {
+        if (schema.minimum !== undefined && value < schema.minimum) {
+          errors.push({
+            message: `Expected a number at least ${schema.minimum}`,
+            path,
+          })
+        }
+        if (schema.maximum !== undefined && value > schema.maximum) {
+          errors.push({
+            message: `Expected a number at most ${schema.maximum}`,
+            path,
+          })
+        }
+        if (
+          schema.exclusiveMinimum !== undefined
+          && value <= schema.exclusiveMinimum
+        ) {
+          errors.push({
+            message: `Expected a number greater than ${schema.exclusiveMinimum}`,
+            path,
+          })
+        }
         return
       }
       break

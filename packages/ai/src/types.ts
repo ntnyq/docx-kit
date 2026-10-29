@@ -95,6 +95,18 @@ export interface AiTemplateNumberSchema extends AiTemplateSchemaBase {
    * Schema type.
    */
   type: 'number'
+  /**
+   * Exclusive lower bound, expressed as a number in JSON Schema draft-07.
+   */
+  exclusiveMinimum?: number
+  /**
+   * Inclusive upper bound for a finite numeric value.
+   */
+  maximum?: number
+  /**
+   * Inclusive lower bound for a finite numeric value.
+   */
+  minimum?: number
 }
 
 export interface AiTemplateObjectSchema extends AiTemplateSchemaBase {

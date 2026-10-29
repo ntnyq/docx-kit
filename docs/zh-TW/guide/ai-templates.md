@@ -246,3 +246,5 @@ const inputSchema = toTemplateJsonSchema(reportTemplate.schema)
 const errors = validateTemplateData(reportTemplate.schema, {})
 // [{ path: '/title', message: 'Required field is missing' }]
 ```
+
+發票參數會在 MCP 呼叫和直接呼叫 `invoiceTemplate.generate()` 時驗證。數量必須為正有限數，單價必須為非負有限數，稅率必須為 `0..1` 內的有限數。驗證錯誤包含對應參數路徑。

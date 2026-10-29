@@ -19,7 +19,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -90,9 +94,9 @@ export function calloutPlugin() {
       const { config } = context
       const pluginStyles = createPluginStyle(context.style)
       const colors = config.theme?.colors
-      const tone = (
-        colors?.[options.type] ?? CALLOUT_PRESETS[options.type].border
-      ).replace(/^#/, '')
+      const tone = normalizeHexColor(
+        colors?.[options.type] ?? CALLOUT_PRESETS[options.type].border,
+      )
       const preset = CALLOUT_PRESETS[options.type]
       const runs: TextRun[] = []
 
@@ -150,7 +154,7 @@ export function calloutPlugin() {
                   ),
                 ],
                 shading: {
-                  fill: colors?.surface?.replace(/^#/, '') ?? preset.bg,
+                  fill: normalizeHexColor(colors?.surface) ?? preset.bg,
                   type: ShadingType.CLEAR,
                 },
               }),

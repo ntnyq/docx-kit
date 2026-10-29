@@ -21,7 +21,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import { Paragraph, ShadingType, TextRun } from 'docx'
 import type { PluginStyleAdapter } from '@docxkit/core'
 
@@ -100,7 +104,7 @@ export function codeBlockPlugin() {
     async render(options, context) {
       const { config } = context
       const appearance = {
-        background: config.theme?.colors?.surface?.replace(/^#/, '') ?? CODE_BG,
+        background: normalizeHexColor(config.theme?.colors?.surface) ?? CODE_BG,
         font: config.theme?.fonts?.code?.split(',')[0].trim() ?? MONO_FONT,
         styles: createPluginStyle(context.style),
       }

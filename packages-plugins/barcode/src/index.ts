@@ -12,6 +12,7 @@ import {
   createPluginStyle,
   dataUrlToUint8Array,
   definePlugin,
+  normalizeHexColor,
 } from '@docxkit/core'
 import { AlignmentType, Paragraph } from 'docx'
 import type { LiteralUnion } from '@docxkit/core'
@@ -183,10 +184,6 @@ async function loadBarcodeRenderer(): Promise<BarcodeRenderer> {
   }
 }
 
-function normalizeColor(color: string): string {
-  return color.replace(/^#/, '')
-}
-
 function readPngDimensions(data: Uint8Array) {
   const isPng =
     data.length >= 24
@@ -211,8 +208,8 @@ async function renderBarcode(
 ): Promise<RenderedBarcode> {
   const renderer = await loadBarcodeRenderer()
   const renderOptions: BarcodeRenderOptions = {
-    backgroundcolor: normalizeColor(options.backgroundColor ?? '#FFFFFF'),
-    barcolor: normalizeColor(options.barColor ?? '#000000'),
+    backgroundcolor: normalizeHexColor(options.backgroundColor ?? '#FFFFFF'),
+    barcolor: normalizeHexColor(options.barColor ?? '#000000'),
     bcid: options.format ?? 'code128',
     height: options.barHeight ?? 12,
     includetext: options.includeText ?? true,
@@ -223,7 +220,7 @@ async function renderBarcode(
     // BWIPP offsets are in points; negative values move text below the bars.
     textyoffset: -3,
     ...(options.textColor
-      ? { textcolor: normalizeColor(options.textColor) }
+      ? { textcolor: normalizeHexColor(options.textColor) }
       : {}),
   }
 

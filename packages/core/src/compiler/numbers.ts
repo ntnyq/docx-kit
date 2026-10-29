@@ -58,7 +58,6 @@ export class CompilationSession {
   private _counter = 0
 
   private _footnoteCounter = 0
-
   /**
    * Document footnotes registered while compiling inline content.
    */
@@ -135,6 +134,24 @@ export class CompilationSession {
   toArray(): NumberingConfigEntry[] | undefined {
     return this._map.size > 0 ? Array.from(this._map.values()) : undefined
   }
+}
+
+// Compiler-only metadata follows session lifetime without extending the public
+// CompilationSession type exposed to plugin authors.
+const revisionSessions = new WeakSet<CompilationSession>()
+
+/**
+ * Check revisions after body, header/footer and annotation compilation finish.
+ */
+export function hasSessionRevisions(session: CompilationSession): boolean {
+  return revisionSessions.has(session)
+}
+
+/**
+ * Record revisions emitted by any compiler, including nested plugin content.
+ */
+export function registerSessionRevision(session: CompilationSession) {
+  revisionSessions.add(session)
 }
 
 // -----------------------------------------------------------------

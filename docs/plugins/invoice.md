@@ -65,3 +65,5 @@ const doc = createDocx()
 - `quantity` must be a positive finite number.
 - `unitPrice` must be finite and non-negative.
 - `taxRate`, when provided, must stay in the inclusive range `0..1`.
+
+Line amounts are rounded to two decimal places before summing the subtotal. Tax is rounded separately, then added to the subtotal. Half-cent ties round away from zero. The AI invoice template uses the same rounding rules.

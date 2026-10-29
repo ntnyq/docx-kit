@@ -24,7 +24,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -97,7 +101,7 @@ export function meetingMinutesPlugin() {
       const pluginStyles = createPluginStyle(context.style)
       const colors = config.theme?.colors
       const border = {
-        color: colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+        color: normalizeHexColor(colors?.border) ?? 'D5D9DF',
         size: 4,
         style: BorderStyle.SINGLE,
       }
@@ -107,8 +111,8 @@ export function meetingMinutesPlugin() {
         right: border,
         top: border,
       }
-      const surface = colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
-      const primary = colors?.primary?.replace(/^#/, '') ?? '1B2A4A'
+      const surface = normalizeHexColor(colors?.surface) ?? 'F4F6F8'
+      const primary = normalizeHexColor(colors?.primary) ?? '1B2A4A'
       // Title
       const titlePara = new Paragraph(
         pluginStyles.paragraph({

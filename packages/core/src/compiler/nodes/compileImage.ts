@@ -7,6 +7,7 @@
 import { createDocxKitError } from '@docxkit/errors'
 import { Paragraph, TextWrappingSide, TextWrappingType } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
+import { resolveThemeTokens } from '../../style/theme'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
 import {
   createImageRun,
@@ -16,7 +17,12 @@ import {
 import { compileParagraphStyle } from '../compileStyle'
 import { toPx } from '../units'
 import type { Buffer } from 'node:buffer'
-import type { DocxKitConfig, ImageNode, StyleSheet } from '@docxkit/types'
+import type {
+  DocxKitConfig,
+  DocxTheme,
+  ImageNode,
+  StyleSheet,
+} from '@docxkit/types'
 import type { IFloating } from 'docx'
 
 export async function compileImage<TStyles extends StyleSheet>(
@@ -41,8 +47,8 @@ export async function compileImage<TStyles extends StyleSheet>(
     })
   }
   const dimensions = resolveImageDimensions(
-    toPx(node.width),
-    toPx(node.height),
+    toPx(resolveThemeTokens(node.width, config.theme)),
+    toPx(resolveThemeTokens(node.height, config.theme)),
     metadata,
     { height: 180, width: 300 },
   )
@@ -61,7 +67,7 @@ export async function compileImage<TStyles extends StyleSheet>(
       createImageRun({
         alt: node.alt,
         data,
-        floating: compileImageFloating(node.floating),
+        floating: compileImageFloating(node.floating, config.theme),
         height: dimensions.height,
         type: metadata.type,
         width: dimensions.width,
@@ -72,6 +78,7 @@ export async function compileImage<TStyles extends StyleSheet>(
 
 export function compileImageFloating(
   floating: ImageNode['floating'],
+  theme?: DocxTheme,
 ): IFloating | undefined {
   if (!floating) {
     return undefined
@@ -82,6 +89,7 @@ export function compileImageFloating(
       verticalPosition: { offset: 0 },
     }
   }
+  floating = resolveThemeTokens(floating, theme)
   return {
     horizontalPosition: { offset: toEmu(floating.x) ?? 0 },
     verticalPosition: { offset: toEmu(floating.y) ?? 0 },

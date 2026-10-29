@@ -21,7 +21,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -74,9 +78,9 @@ export function propertyTablePlugin() {
       const { config } = context
       const pluginStyles = createPluginStyle(context.style)
       const surface =
-        config.theme?.colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
+        normalizeHexColor(config.theme?.colors?.surface) ?? 'F4F6F8'
       const border = {
-        color: config.theme?.colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+        color: normalizeHexColor(config.theme?.colors?.border) ?? 'D5D9DF',
         size: 4,
         style: BorderStyle.SINGLE,
       }

@@ -135,6 +135,54 @@ describe('report template', () => {
 })
 
 describe('invoice template', () => {
+  it.each([
+    [1, 1.005, '$1.01'],
+    [0.7, 0.05, '$0.04'],
+    [1, 30_000_000_000_000, '$30000000000000.00'],
+    [1, 10_000_000_000_000.004, '$10000000000000.00'],
+    [100, 450_359_962_737.0487, '$45035996273704.87'],
+    [1e-7, 1e7, '$1.00'],
+  ])(
+    'rounds quantity %s at unit price %s consistently',
+    (quantity, unitPrice, expected) => {
+      const result = invoiceTemplate.generate({
+        clientName: 'Client',
+        invoiceNumber: 'ROUND',
+        issuerName: 'Issuer',
+        items: [{ description: 'Fractional item', quantity, unitPrice }],
+      })
+      const table = result.content.filter(isTableNode).find(node => node.header)
+      expect(table?.data[0].amount).toBe(expected)
+      expect(
+        result.content.filter(isTextParagraphNode).map(node => node.text),
+      ).toContain(`Total: ${expected}`)
+    },
+  )
+
+  it('sums rounded line amounts and adds the rounded tax', () => {
+    const result = invoiceTemplate.generate({
+      clientName: 'Client',
+      invoiceNumber: 'ROUND',
+      issuerName: 'Issuer',
+      taxRate: 0.1,
+      items: [
+        { description: 'A', quantity: 1, unitPrice: 0.335 },
+        { description: 'B', quantity: 1, unitPrice: 0.335 },
+      ],
+    })
+    const table = result.content.filter(isTableNode).find(node => node.header)
+    expect(table?.data.map(row => row.amount)).toEqual(['$0.34', '$0.34'])
+    expect(
+      result.content.filter(isTextParagraphNode).map(node => node.text),
+    ).toEqual(
+      expect.arrayContaining([
+        'Subtotal: $0.68',
+        'Tax (10%): $0.07',
+        'Total: $0.75',
+      ]),
+    )
+  })
+
   // eslint-disable-next-line vitest/expect-expect
   it('has valid structure', () => {
     validateTemplate(invoiceTemplate)

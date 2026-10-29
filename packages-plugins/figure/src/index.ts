@@ -1,4 +1,9 @@
-import { createPluginStyle, definePlugin, DocxKitError } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  DocxKitError,
+  normalizeHexColor,
+} from '@docxkit/core'
 import { Paragraph, TextRun } from 'docx'
 import type { ImageNode } from '@docxkit/core'
 
@@ -36,7 +41,7 @@ export function figurePlugin() {
       const { alignment = 'center', caption, source } = options
       const styles = createPluginStyle(context.style)
       const muted =
-        context.config.theme?.colors?.muted?.replace(/^#/, '') ?? '666666'
+        normalizeHexColor(context.config.theme?.colors?.muted) ?? '666666'
       const image = await context.compileNode({
         alt: options.alt,
         data: options.data,

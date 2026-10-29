@@ -24,7 +24,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -94,9 +98,9 @@ export function dataTablePlugin() {
       const { config } = context
       const pluginStyles = createPluginStyle(context.style)
       const colors = config.theme?.colors
-      const borderColor = colors?.border?.replace(/^#/, '') ?? 'D5D9DF'
-      const surface = colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
-      const headingColor = colors?.primary?.replace(/^#/, '') ?? '1B2A4A'
+      const borderColor = normalizeHexColor(colors?.border) ?? 'D5D9DF'
+      const surface = normalizeHexColor(colors?.surface) ?? 'F4F6F8'
+      const headingColor = normalizeHexColor(colors?.primary) ?? '1B2A4A'
       const { align, bordered, data, format, labels, striped } = options
       if (!data.length) {
         return new Paragraph(

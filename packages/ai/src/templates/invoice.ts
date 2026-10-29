@@ -7,6 +7,7 @@
  * @module ai/templates/invoice
  */
 
+import { validateTemplateData } from '../templateSchema'
 import type {
   BlockNode,
   DocxSchema,
@@ -145,11 +146,13 @@ const schema: AiTemplateSchema = {
           },
           quantity: {
             description: 'Quantity',
+            exclusiveMinimum: 0,
             required: true,
             type: 'number',
           },
           unitPrice: {
             description: 'Unit price',
+            minimum: 0,
             required: true,
             type: 'number',
           },
@@ -158,9 +161,16 @@ const schema: AiTemplateSchema = {
     },
     taxRate: {
       description: 'Tax rate percentage (e.g. 0.08 for 8%)',
+      maximum: 1,
+      minimum: 0,
       type: 'number',
     },
   },
+}
+
+function formatCents(cents: number): string {
+  const amount = BigInt(cents)
+  return `${amount / 100n}.${String(amount % 100n).padStart(2, '0')}`
 }
 
 /**
@@ -173,6 +183,12 @@ const schema: AiTemplateSchema = {
  * @returns A DocxSchema ready for rendering
  */
 function generate(params: InvoiceParams): DocxSchema {
+  const errors = validateTemplateData(schema, params)
+  if (errors.length) {
+    throw new TypeError(
+      `Invalid invoice parameters:\n${errors.map(error => `${error.path}: ${error.message}`).join('\n')}`,
+    )
+  }
   // Company info
   const issuerLines: ParagraphNode[] = params.issuerAddress
     ? [{ text: params.issuerAddress, type: 'paragraph' }]
@@ -192,20 +208,25 @@ function generate(params: InvoiceParams): DocxSchema {
   ]
 
   // Items table
-  const subtotal = params.items.reduce(
-    (sum: number, item: { quantity: number; unitPrice: number }) =>
-      sum + item.quantity * item.unitPrice,
-    0,
+  const lineCents = params.items.map(item =>
+    toCents(item.unitPrice, item.quantity),
   )
+  const subtotalCents = lineCents.reduce((sum, cents) => sum + cents, 0)
   const taxRate = params.taxRate ?? 0
-  const tax = subtotal * taxRate
-  const total = subtotal + tax
+  const taxCents = toCents(subtotalCents, taxRate, 0)
+  const totalCents = subtotalCents + taxCents
+  if (
+    !Number.isSafeInteger(subtotalCents)
+    || !Number.isSafeInteger(totalCents)
+  ) {
+    throw new RangeError('Invoice amount exceeds safe integer cents')
+  }
 
-  const tableData: InvoiceTableRow[] = params.items.map(item => ({
-    amount: `$${(item.quantity * item.unitPrice).toFixed(2)}`,
+  const tableData: InvoiceTableRow[] = params.items.map((item, index) => ({
+    amount: `$${formatCents(lineCents[index])}`,
     description: item.description,
     quantity: String(item.quantity),
-    unitPrice: `$${item.unitPrice.toFixed(2)}`,
+    unitPrice: `$${formatCents(toCents(item.unitPrice))}`,
   }))
 
   const metadataTableNode: TableNode<Record<string, unknown>> = {
@@ -233,18 +254,18 @@ function generate(params: InvoiceParams): DocxSchema {
   }
 
   const subtotalNode: ParagraphNode = {
-    text: `Subtotal: $${subtotal.toFixed(2)}`,
+    text: `Subtotal: $${formatCents(subtotalCents)}`,
     type: 'paragraph',
   }
   const taxNode: ParagraphNode | undefined =
     taxRate > 0
       ? {
-          text: `Tax (${(taxRate * 100).toFixed(0)}%): $${tax.toFixed(2)}`,
+          text: `Tax (${(taxRate * 100).toFixed(0)}%): $${formatCents(taxCents)}`,
           type: 'paragraph',
         }
       : undefined
   const totalNode: ParagraphNode = {
-    text: `Total: $${total.toFixed(2)}`,
+    text: `Total: $${formatCents(totalCents)}`,
     type: 'paragraph',
   }
 
@@ -262,6 +283,36 @@ function generate(params: InvoiceParams): DocxSchema {
   return {
     content,
   }
+}
+
+/**
+ * Multiply decimal inputs exactly, then round half away from zero.
+ * Tax starts from integer cents, so it uses zero decimal places.
+ */
+function toCents(value: number, multiplier = 1, decimalPlaces = 2): number {
+  const parts = [value, multiplier].map(input => {
+    if (!Number.isFinite(input)) {
+      throw new RangeError('Invoice amount must be finite')
+    }
+    const [mantissa, exponent = '0'] = Math.abs(input).toString().split('e')
+    const fractionDigits = mantissa.split('.')[1]?.length ?? 0
+    return {
+      coefficient: BigInt(mantissa.replace('.', '')),
+      exponent: Number(exponent) - fractionDigits,
+    }
+  })
+  const coefficient = parts[0].coefficient * parts[1].coefficient
+  const exponent = parts[0].exponent + parts[1].exponent + decimalPlaces
+  const divisor = 10n ** BigInt(Math.max(0, -exponent))
+  const rounded =
+    exponent >= 0
+      ? coefficient * 10n ** BigInt(exponent)
+      : (coefficient + divisor / 2n) / divisor
+  const cents = Math.sign(value) * Math.sign(multiplier) * Number(rounded)
+  if (!Number.isSafeInteger(cents)) {
+    throw new RangeError('Invoice amount exceeds safe integer cents')
+  }
+  return cents
 }
 
 export const invoiceTemplate: AiTemplate<InvoiceParams> = {

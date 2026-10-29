@@ -243,3 +243,14 @@ const styles = defineStyles({
 | **Borders**   | `border`, `borderTop`, `borderRight`, `borderBottom`, `borderLeft`                                                                                                                                                                                                                                       |
 | **Size**      | `width`, `height`                                                                                                                                                                                                                                                                                        |
 | **Escape**    | `docx` — merge directly into docxjs options                                                                                                                                                                                                                                                              |
+
+## `normalizeHexColor()`
+
+Normalize colors before passing them to native `docx` options. Core styles and built-in plugins use the same conversion. Three-digit hex colors expand to six digits and the leading `#` is removed. Other values retain native validation.
+
+```ts
+import { normalizeHexColor } from 'docx-kit'
+
+normalizeHexColor('#f00') // 'ff0000'
+normalizeHexColor('#123456') // '123456'
+```

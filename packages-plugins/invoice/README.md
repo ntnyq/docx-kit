@@ -22,4 +22,5 @@ builder.plugin('invoice', {
 ## Notes
 
 - Automatically calculates subtotal, tax, and total
+- Rounds each line to two decimals before summing, rounds tax separately, and adds the rounded tax to the subtotal; half-cent ties round away from zero
 - Supports optional `dueDate`, `notes`, `currency`, and `taxRate`

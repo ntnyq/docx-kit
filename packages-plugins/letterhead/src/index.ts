@@ -1,4 +1,8 @@
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import { AlignmentType, BorderStyle, Paragraph, TextRun } from 'docx'
 
 export interface LetterheadOptions {
@@ -87,7 +91,7 @@ export function letterheadPlugin() {
                 space: 1,
                 style: BorderStyle.SINGLE,
                 color:
-                  config.theme?.colors?.accent?.replace(/^#/, '') ?? '2E75B6',
+                  normalizeHexColor(config.theme?.colors?.accent) ?? '2E75B6',
               },
             },
           }),

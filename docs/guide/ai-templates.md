@@ -246,3 +246,5 @@ const inputSchema = toTemplateJsonSchema(reportTemplate.schema)
 const errors = validateTemplateData(reportTemplate.schema, {})
 // [{ path: '/title', message: 'Required field is missing' }]
 ```
+
+Invoice generation validates parameters both through MCP and when calling `invoiceTemplate.generate()` directly. Quantities must be positive finite numbers, unit prices must be finite and non-negative, and tax rates must be finite numbers in `0..1`. Validation errors include the affected parameter path.

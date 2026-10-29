@@ -6,7 +6,7 @@
 
 import { ExternalHyperlink, InternalHyperlink, Paragraph, TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
-import { compileTextStyle } from '../compileStyle'
+import { compileParagraphStyle, compileTextStyle } from '../compileStyle'
 import type {
   DocxKitConfig,
   DocxStyleRule,
@@ -18,8 +18,16 @@ export function compileHyperlink<TStyles extends StyleSheet>(
   node: HyperlinkNode<TStyles>,
   config: DocxKitConfig<TStyles>,
 ) {
+  const style = resolveStyle({
+    base: { ...config.defaults?.text, ...config.defaults?.paragraph },
+    className: node.className,
+    inline: node.style,
+    styles: config.styles,
+    theme: config.theme,
+  })
   return new Paragraph({
-    children: [compileInlineHyperlink(node, config)],
+    ...compileParagraphStyle(style),
+    children: [compileInlineHyperlink(node, config, style)],
   })
 }
 

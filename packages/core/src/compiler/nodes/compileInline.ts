@@ -7,6 +7,7 @@
 import { createDocxKitError } from '@docxkit/errors'
 import { TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
+import { resolveThemeTokens } from '../../style/theme'
 import {
   createImageRun,
   readImageMetadata,
@@ -59,7 +60,7 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
         case 'bookmark':
           return compileBookmark(node, config, baseStyle)
         case 'checkbox':
-          return compileCheckbox(node, config)
+          return compileCheckbox(node, config, baseStyle)
         case 'comment':
           if (!session) {
             throw new Error('Comment nodes require a compilation session')
@@ -67,7 +68,7 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
           return compileComment(node, config, session, baseStyle)
         case 'deletedText':
         case 'insertedText':
-          return compileRevision(node, config)
+          return compileRevision(node, config, baseStyle, session)
         case 'footnote':
           if (!session) {
             throw new Error('Footnote nodes require a compilation session')
@@ -129,8 +130,9 @@ async function compileInlineImage<TStyles extends StyleSheet>(
   })
   const defaultHeight = toPx(inlineStyle.fontSize) ?? 16
   const dimensions = resolveImageDimensions(
-    toPx(node.width),
-    toPx(node.height) ?? (node.width === undefined ? defaultHeight : undefined),
+    toPx(resolveThemeTokens(node.width, config.theme)),
+    toPx(resolveThemeTokens(node.height, config.theme))
+      ?? (node.width === undefined ? defaultHeight : undefined),
     metadata,
     { height: defaultHeight, width: defaultHeight },
   )
@@ -138,7 +140,7 @@ async function compileInlineImage<TStyles extends StyleSheet>(
   return createImageRun({
     alt: node.alt,
     data,
-    floating: compileImageFloating(node.floating),
+    floating: compileImageFloating(node.floating, config.theme),
     height: dimensions.height,
     type: metadata.type,
     width: dimensions.width,

@@ -1,4 +1,8 @@
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import { CheckBox, Paragraph, TextRun } from 'docx'
 import { createGithubCheckbox } from './checkbox'
 import type { DocxStyleRule, PluginRenderContext } from '@docxkit/core'
@@ -52,18 +56,18 @@ export function checklistPlugin() {
     async render(options, context) {
       const styles = createPluginStyle(context.style)
       const muted =
-        context.config.theme?.colors?.muted?.replace(/^#/, '') ?? '666666'
+        normalizeHexColor(context.config.theme?.colors?.muted) ?? '666666'
       const fontSize = resolveTaskFontSize(context)
       const groupSize = Math.round(fontSize * 2 * 1.2)
       const titleSize = Math.round(fontSize * 2 * 1.4)
-      const groupColor = (
+      const groupColor = normalizeHexColor(
         context.config.theme?.colors?.accent
-        ?? context.config.theme?.colors?.primary
-        ?? '#252525'
-      ).replace(/^#/, '')
-      const titleColor = (
-        context.config.theme?.colors?.primary ?? '#252525'
-      ).replace(/^#/, '')
+          ?? context.config.theme?.colors?.primary
+          ?? '#252525',
+      )
+      const titleColor = normalizeHexColor(
+        context.config.theme?.colors?.primary ?? '#252525',
+      )
       const noteSize = Math.max(1, Math.round(fontSize * 2 * 0.8))
       const ownerSize = Math.max(1, Math.round(fontSize * 2 * 0.85))
       const taskIndent = Math.round(fontSize * 25)

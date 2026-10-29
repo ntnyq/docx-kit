@@ -4,10 +4,11 @@
  * @module style/theme
  */
 
-import type { DocxStyleRule, DocxTheme } from '@docxkit/types'
+import type { DocxTheme } from '@docxkit/types'
 
 /**
- * Resolve all theme token references in a style rule.
+ * Resolve theme token references in a style rule or selected layout fields.
+ * Callers must exclude document text and other literal content.
  *
  * Token syntax: `$category.key`
  * - `$colors.primary` → `theme.colors?.['primary']`
@@ -18,19 +19,16 @@ import type { DocxStyleRule, DocxTheme } from '@docxkit/types'
  * Non-token values pass through unchanged. Unknown token references
  * are left as-is (no error — styled text may use $ as a literal).
  *
- * @param rule - — The style rule to resolve tokens in
+ * @param value - Style or layout data to resolve tokens in
  * @param theme - — The theme to resolve against
- * @returns A new `DocxStyleRule` with tokens replaced by their values
+ * @returns Data with tokens replaced by their values, without mutating the input
  */
-export function resolveThemeTokens(
-  rule: DocxStyleRule,
-  theme?: DocxTheme,
-): DocxStyleRule {
+export function resolveThemeTokens<T>(value: T, theme?: DocxTheme): T {
   if (!theme) {
-    return rule
+    return value
   }
 
-  return resolveTokenValue(rule, theme) as DocxStyleRule
+  return resolveTokenValue(value, theme) as T
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

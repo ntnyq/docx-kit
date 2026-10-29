@@ -1,4 +1,9 @@
-import { createPluginStyle, definePlugin, DocxKitError } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  DocxKitError,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   Paragraph,
   ShadingType,
@@ -63,7 +68,7 @@ export function metricCardPlugin() {
 
       const styles = createPluginStyle(context.style)
       const colors = context.config.theme?.colors
-      const muted = colors?.muted?.replace(/^#/, '') ?? '666666'
+      const muted = normalizeHexColor(colors?.muted) ?? '666666'
       if (!items.length) {
         return new Paragraph(
           styles.paragraph({
@@ -99,7 +104,7 @@ export function metricCardPlugin() {
                   new TextRun(
                     styles.text({
                       bold: true,
-                      color: colors?.primary?.replace(/^#/, '') ?? '2E75B6',
+                      color: normalizeHexColor(colors?.primary) ?? '2E75B6',
                       size: 36,
                       text: String(item.value),
                     }),
@@ -130,9 +135,9 @@ export function metricCardPlugin() {
                     : ''
             const color =
               item.trend === 'up'
-                ? (colors?.success?.replace(/^#/, '') ?? '2E7D32')
+                ? (normalizeHexColor(colors?.success) ?? '2E7D32')
                 : item.trend === 'down'
-                  ? (colors?.danger?.replace(/^#/, '') ?? 'C62828')
+                  ? (normalizeHexColor(colors?.danger) ?? 'C62828')
                   : muted
             paragraphs.push(
               new Paragraph(
@@ -156,7 +161,7 @@ export function metricCardPlugin() {
               children: paragraphs,
               width,
               shading: {
-                fill: colors?.surface?.replace(/^#/, '') ?? 'F4F6F8',
+                fill: normalizeHexColor(colors?.surface) ?? 'F4F6F8',
                 type: ShadingType.CLEAR,
               },
             }),

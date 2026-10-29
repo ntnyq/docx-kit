@@ -20,7 +20,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -113,7 +117,7 @@ export function timelinePlugin() {
       const pluginStyles = createPluginStyle(context.style)
       const colors = config.theme?.colors
       const {
-        accentColor = colors?.accent?.replace(/^#/, '') ?? '2E75B6',
+        accentColor = normalizeHexColor(colors?.accent) ?? '2E75B6',
         events,
         layout = 'alternating',
       } = options
@@ -139,7 +143,7 @@ export function timelinePlugin() {
                   children: [
                     new TextRun(
                       pluginStyles.text({
-                        color: accentColor.replace(/^#/, ''),
+                        color: normalizeHexColor(accentColor),
                         size: 24,
                         text: '\u{25CF}',
                       }),
@@ -160,7 +164,7 @@ export function timelinePlugin() {
               right: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
               top: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
               bottom: {
-                color: accentColor.replace(/^#/, ''),
+                color: normalizeHexColor(accentColor),
                 size: 1,
                 style: BorderStyle.SINGLE,
               },
@@ -173,7 +177,7 @@ export function timelinePlugin() {
                     new TextRun(
                       pluginStyles.text({
                         bold: true,
-                        color: accentColor.replace(/^#/, ''),
+                        color: normalizeHexColor(accentColor),
                         size: 22,
                         text: date,
                       }),
@@ -183,7 +187,7 @@ export function timelinePlugin() {
               ),
             ],
             shading: {
-              fill: colors?.surface?.replace(/^#/, '') ?? 'F4F6F8',
+              fill: normalizeHexColor(colors?.surface) ?? 'F4F6F8',
               type: ShadingType.CLEAR,
             },
           }),

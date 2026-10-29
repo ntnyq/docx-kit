@@ -19,7 +19,11 @@
  * ```
  */
 
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -115,7 +119,7 @@ export function coverPagePlugin() {
           ...(options.backgroundColor
             ? {
                 shading: {
-                  fill: options.backgroundColor.replace(/^#/, ''),
+                  fill: normalizeHexColor(options.backgroundColor),
                   type: ShadingType.CLEAR,
                 },
               }
@@ -134,7 +138,7 @@ export function coverPagePlugin() {
                   children: [
                     new TextRun(
                       pluginStyles.text({
-                        color: colors?.muted?.replace(/^#/, '') ?? '666666',
+                        color: normalizeHexColor(colors?.muted) ?? '666666',
                         size: 28,
                         text: options.subtitle,
                       }),
@@ -153,7 +157,7 @@ export function coverPagePlugin() {
                   spacing: { after: 400 },
                   border: {
                     bottom: {
-                      color: colors?.accent?.replace(/^#/, '') ?? '2E75B6',
+                      color: normalizeHexColor(colors?.accent) ?? '2E75B6',
                       size: 6,
                       space: 1,
                       style: BorderStyle.SINGLE,

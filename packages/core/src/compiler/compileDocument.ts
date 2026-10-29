@@ -20,11 +20,12 @@ import {
   Paragraph,
   Table,
 } from 'docx'
+import { resolveThemeTokens } from '../style/theme'
 import { compileNode } from './compileNode'
 import { compileBorderRule } from './compileStyle'
 import { compileDocumentStyles } from './documentStyles'
 import { compileParagraph } from './nodes/compileParagraph'
-import { CompilationSession } from './numbers'
+import { CompilationSession, hasSessionRevisions } from './numbers'
 import { parseShorthandTwip, toTwip } from './units'
 import type {
   BlockNode,
@@ -203,8 +204,7 @@ export async function compileDocument<TStyles extends StyleSheet>(
     features: {
       updateFields: options.config.features?.updateFields,
       trackRevisions:
-        options.config.features?.trackRevisions
-        ?? hasTrackedRevisions(options.nodes),
+        options.config.features?.trackRevisions ?? hasSessionRevisions(session),
     },
     fonts: options.config.fonts?.map(font => ({
       // `docx` types this cross-platform byte input as Node's Buffer, but its
@@ -463,19 +463,24 @@ function compileSectionProperties(
   config: DocxKitConfig,
   sectionConfig?: SectionConfig,
 ) {
+  const page = resolveThemeTokens(config.page, config.theme)
   return {
     properties: {
-      column: compileColumns(sectionConfig?.columns),
-      lineNumbers: compileLineNumbers(sectionConfig?.lineNumbers),
       type: sectionConfig?.type,
+      column: compileColumns(
+        resolveThemeTokens(sectionConfig?.columns, config.theme),
+      ),
+      lineNumbers: compileLineNumbers(
+        resolveThemeTokens(sectionConfig?.lineNumbers, config.theme),
+      ),
       page: {
-        borders: compilePageBorders(config.page?.borders),
-        margin: compilePageMargin(config.page),
-        size: compilePageSize(config.page?.size, config.page?.orientation),
-        pageNumbers: config.page?.pageNumber
+        borders: compilePageBorders(page?.borders),
+        margin: compilePageMargin(page),
+        size: compilePageSize(page?.size, page?.orientation),
+        pageNumbers: page?.pageNumber
           ? {
-              formatType: config.page.pageNumber.format,
-              start: config.page.pageNumber.start,
+              formatType: page.pageNumber.format,
+              start: page.pageNumber.start,
             }
           : undefined,
       },
@@ -484,27 +489,6 @@ function compileSectionProperties(
       ),
     },
   }
-}
-
-function hasTrackedRevisions<TStyles extends StyleSheet>(
-  nodes: BlockNode<TStyles>[],
-): boolean {
-  return nodes.some(node => {
-    if (node.type === 'deletedText' || node.type === 'insertedText') {
-      return true
-    }
-    if (node.type === 'paragraph') {
-      return node.children?.some(
-        child => child.type === 'deletedText' || child.type === 'insertedText',
-      )
-    }
-    if (node.type === 'textBox') {
-      return node.children?.some(
-        child => child.type === 'deletedText' || child.type === 'insertedText',
-      )
-    }
-    return false
-  })
 }
 
 /**

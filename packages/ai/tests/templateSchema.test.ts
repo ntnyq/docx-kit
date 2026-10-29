@@ -8,6 +8,63 @@ import {
 } from '../src/templateSchema'
 
 describe('template schema boundaries', () => {
+  const invoice = {
+    clientName: 'Client',
+    invoiceNumber: 'INV',
+    issuerName: 'Issuer',
+    items: [{ description: 'Service', quantity: 1, unitPrice: 100 }],
+  }
+
+  it.each([
+    { data: { ...invoice, taxRate: -0.1 }, path: '/taxRate' },
+    { data: { ...invoice, taxRate: 1.1 }, path: '/taxRate' },
+    {
+      path: '/items/0/quantity',
+      data: {
+        ...invoice,
+        items: [{ description: 'Service', quantity: 0, unitPrice: 100 }],
+      },
+    },
+    {
+      path: '/items/0/quantity',
+      data: {
+        ...invoice,
+        items: [{ description: 'Service', quantity: -1, unitPrice: 100 }],
+      },
+    },
+    {
+      path: '/items/0/unitPrice',
+      data: {
+        ...invoice,
+        items: [{ description: 'Service', quantity: 1, unitPrice: -1 }],
+      },
+    },
+  ])(
+    'rejects invalid invoice bounds at $path in JSON Schema and direct generation',
+    ({ data, path }) => {
+      const validate = new Ajv().compile(
+        toTemplateJsonSchema(invoiceTemplate.schema),
+      )
+      expect(validate(data)).toBe(false)
+      expect(validateTemplateData(invoiceTemplate.schema, data)).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path })]),
+      )
+      expect(() => invoiceTemplate.generate(data)).toThrow(path)
+    },
+  )
+
+  it.each([0, 1])(
+    'accepts boundary tax rate %s, fractional quantities and free items',
+    taxRate => {
+      const data = {
+        ...invoice,
+        items: [{ description: 'Free', quantity: 0.5, unitPrice: 0 }],
+        taxRate,
+      }
+      expect(validateTemplateData(invoiceTemplate.schema, data)).toEqual([])
+      expect(() => invoiceTemplate.generate(data)).not.toThrow()
+    },
+  )
   it.each(BUILTIN_TEMPLATES)(
     'generates valid JSON Schema for the $name tool',
     template => {

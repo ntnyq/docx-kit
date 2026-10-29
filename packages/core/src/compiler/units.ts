@@ -147,7 +147,7 @@ export function toPtEighth(
     return undefined
   }
   if (typeof value === 'number') {
-    return Math.round(value * 8)
+    return assertFiniteLength(value, Math.round(value * 8))
   }
   const amount = Number(value.replace(/[%a-z]+$/i, ''))
   const pointsPerUnit = value.endsWith('px')
@@ -159,7 +159,7 @@ export function toPtEighth(
         : value.endsWith('in')
           ? POINTS_PER_INCH
           : 1
-  return Math.round(amount * pointsPerUnit * 8)
+  return assertFiniteLength(value, Math.round(amount * pointsPerUnit * 8))
 }
 
 /**
@@ -185,27 +185,36 @@ export function toPtHalf(
     return undefined
   }
   if (typeof value === 'number') {
-    return Math.round(value * HALF_POINTS_PER_POINT)
+    return assertFiniteLength(value, Math.round(value * HALF_POINTS_PER_POINT))
   }
 
   const n = Number(value.replace(/[%a-z]+$/i, ''))
   if (value.endsWith('pt')) {
-    return Math.round(n * HALF_POINTS_PER_POINT)
+    return assertFiniteLength(value, Math.round(n * HALF_POINTS_PER_POINT))
   }
   if (value.endsWith('px')) {
-    return Math.round(n * HALF_POINTS_PER_PX)
+    return assertFiniteLength(value, Math.round(n * HALF_POINTS_PER_PX))
   }
   if (value.endsWith('mm')) {
-    return Math.round(n * POINTS_PER_MM * HALF_POINTS_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_MM * HALF_POINTS_PER_POINT),
+    )
   }
   if (value.endsWith('cm')) {
-    return Math.round(n * POINTS_PER_CM * HALF_POINTS_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_CM * HALF_POINTS_PER_POINT),
+    )
   }
   if (value.endsWith('in')) {
-    return Math.round(n * POINTS_PER_INCH * HALF_POINTS_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_INCH * HALF_POINTS_PER_POINT),
+    )
   }
 
-  return Math.round(n * HALF_POINTS_PER_POINT)
+  return assertFiniteLength(value, Math.round(n * HALF_POINTS_PER_POINT))
 }
 
 /**
@@ -228,27 +237,33 @@ export function toPx(value: number | string | undefined): number | undefined {
     return undefined
   }
   if (typeof value === 'number') {
-    return value
+    return assertFiniteLength(value, value)
   }
 
   const n = Number(value.replace(/[%a-z]+$/i, ''))
   if (value.endsWith('px')) {
-    return n
+    return assertFiniteLength(value, n)
   }
   if (value.endsWith('pt')) {
-    return Math.round(n * PX_PER_POINT)
+    return assertFiniteLength(value, Math.round(n * PX_PER_POINT))
   }
   if (value.endsWith('mm')) {
-    return Math.round(n * POINTS_PER_MM * PX_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_MM * PX_PER_POINT),
+    )
   }
   if (value.endsWith('cm')) {
-    return Math.round(n * POINTS_PER_CM * PX_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_CM * PX_PER_POINT),
+    )
   }
   if (value.endsWith('in')) {
-    return Math.round(n * PIXELS_PER_INCH)
+    return assertFiniteLength(value, Math.round(n * PIXELS_PER_INCH))
   }
 
-  return n
+  return assertFiniteLength(value, n)
 }
 
 /**
@@ -272,25 +287,44 @@ export function toTwip(value: number | string | undefined): number | undefined {
     return undefined
   }
   if (typeof value === 'number') {
-    return Math.round(value * TWIPS_PER_POINT)
+    return assertFiniteLength(value, Math.round(value * TWIPS_PER_POINT))
   }
 
   const n = Number(value.replace(/[%a-z]+$/i, ''))
   if (value.endsWith('pt')) {
-    return Math.round(n * TWIPS_PER_POINT)
+    return assertFiniteLength(value, Math.round(n * TWIPS_PER_POINT))
   }
   if (value.endsWith('px')) {
-    return Math.round(n * TWIPS_PER_PX)
+    return assertFiniteLength(value, Math.round(n * TWIPS_PER_PX))
   }
   if (value.endsWith('mm')) {
-    return Math.round(n * POINTS_PER_MM * TWIPS_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_MM * TWIPS_PER_POINT),
+    )
   }
   if (value.endsWith('cm')) {
-    return Math.round(n * POINTS_PER_CM * TWIPS_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_CM * TWIPS_PER_POINT),
+    )
   }
   if (value.endsWith('in')) {
-    return Math.round(n * POINTS_PER_INCH * TWIPS_PER_POINT)
+    return assertFiniteLength(
+      value,
+      Math.round(n * POINTS_PER_INCH * TWIPS_PER_POINT),
+    )
   }
 
-  return Math.round(n * TWIPS_PER_POINT)
+  return assertFiniteLength(value, Math.round(n * TWIPS_PER_POINT))
+}
+
+/**
+ * Reject unresolved tokens and invalid arithmetic before writing OOXML lengths.
+ */
+function assertFiniteLength(input: number | string, result: number): number {
+  if (!Number.isFinite(result)) {
+    throw new RangeError(`Invalid length value: "${input}"`)
+  }
+  return result
 }

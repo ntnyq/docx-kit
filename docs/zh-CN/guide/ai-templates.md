@@ -246,3 +246,5 @@ const inputSchema = toTemplateJsonSchema(reportTemplate.schema)
 const errors = validateTemplateData(reportTemplate.schema, {})
 // [{ path: '/title', message: 'Required field is missing' }]
 ```
+
+发票参数会在 MCP 调用和直接调用 `invoiceTemplate.generate()` 时校验。数量必须为正有限数，单价必须为非负有限数，税率必须为 `0..1` 内的有限数。校验错误包含对应参数路径。

@@ -1,4 +1,8 @@
-import { createPluginStyle, definePlugin } from '@docxkit/core'
+import {
+  createPluginStyle,
+  definePlugin,
+  normalizeHexColor,
+} from '@docxkit/core'
 import {
   AlignmentType,
   BorderStyle,
@@ -44,7 +48,7 @@ export function invoicePlugin() {
       const pluginStyles = createPluginStyle(context.style)
       const colors = config.theme?.colors
       const border = {
-        color: colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+        color: normalizeHexColor(colors?.border) ?? 'D5D9DF',
         size: 4,
         style: BorderStyle.SINGLE,
       }
@@ -54,17 +58,23 @@ export function invoicePlugin() {
         right: border,
         top: border,
       }
-      const surface = colors?.surface?.replace(/^#/, '') ?? 'F4F6F8'
-      const primary = colors?.primary?.replace(/^#/, '') ?? '1B2A4A'
+      const surface = normalizeHexColor(colors?.surface) ?? 'F4F6F8'
+      const primary = normalizeHexColor(colors?.primary) ?? '1B2A4A'
       validateInvoiceOptions(options)
 
       const currency = options.currency ?? ''
-      const subtotal = options.items.reduce(
-        (sum, item) => sum + item.quantity * item.unitPrice,
-        0,
+      const lineCents = options.items.map(item =>
+        toCents(item.unitPrice, item.quantity),
       )
-      const tax = subtotal * (options.taxRate ?? 0)
-      const total = subtotal + tax
+      const subtotalCents = lineCents.reduce((sum, cents) => sum + cents, 0)
+      const taxCents = toCents(subtotalCents, options.taxRate ?? 0, 0)
+      const totalCents = subtotalCents + taxCents
+      if (
+        !Number.isSafeInteger(subtotalCents)
+        || !Number.isSafeInteger(totalCents)
+      ) {
+        throw new RangeError('Invoice amount exceeds safe integer cents')
+      }
 
       const header = new Paragraph(
         pluginStyles.paragraph({
@@ -101,14 +111,14 @@ export function invoicePlugin() {
         }),
       )
 
-      const itemRows = options.items.map(item => {
-        const lineTotal = item.quantity * item.unitPrice
+      const itemRows = options.items.map((item, index) => {
+        const lineTotal = lineCents[index]
         return new TableRow({
           cantSplit: true,
           children: [
             item.description,
             String(item.quantity),
-            formatCurrency(item.unitPrice, currency),
+            formatCurrency(toCents(item.unitPrice), currency),
             formatCurrency(lineTotal, currency),
           ].map(
             (value, index) =>
@@ -183,20 +193,20 @@ export function invoicePlugin() {
           children: [
             new TextRun(
               pluginStyles.text({
-                text: `Subtotal: ${formatCurrency(subtotal, currency)}`,
+                text: `Subtotal: ${formatCurrency(subtotalCents, currency)}`,
               }),
             ),
             new TextRun(
               pluginStyles.text({
                 break: 1,
-                text: `Tax: ${formatCurrency(tax, currency)}`,
+                text: `Tax: ${formatCurrency(taxCents, currency)}`,
               }),
             ),
             new TextRun(
               pluginStyles.text({
                 bold: true,
                 break: 1,
-                text: `Total: ${formatCurrency(total, currency)}`,
+                text: `Total: ${formatCurrency(totalCents, currency)}`,
               }),
             ),
           ],
@@ -229,11 +239,9 @@ export function invoicePlugin() {
   })
 }
 
-function formatCurrency(value: number, currency: string) {
-  const formatted = value.toLocaleString('en-US', {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-  })
+function formatCurrency(cents: number, currency: string) {
+  const amount = BigInt(cents)
+  const formatted = `${(amount / 100n).toLocaleString('en-US')}.${String(amount % 100n).padStart(2, '0')}`
   return currency ? `${currency} ${formatted}` : formatted
 }
 
@@ -252,6 +260,36 @@ function partyLines(
       ],
     }),
   )
+}
+
+/**
+ * Multiply decimal inputs exactly, then round half away from zero.
+ * Tax starts from integer cents, so it uses zero decimal places.
+ */
+function toCents(value: number, multiplier = 1, decimalPlaces = 2): number {
+  const parts = [value, multiplier].map(input => {
+    if (!Number.isFinite(input)) {
+      throw new RangeError('Invoice amount must be finite')
+    }
+    const [mantissa, exponent = '0'] = Math.abs(input).toString().split('e')
+    const fractionDigits = mantissa.split('.')[1]?.length ?? 0
+    return {
+      coefficient: BigInt(mantissa.replace('.', '')),
+      exponent: Number(exponent) - fractionDigits,
+    }
+  })
+  const coefficient = parts[0].coefficient * parts[1].coefficient
+  const exponent = parts[0].exponent + parts[1].exponent + decimalPlaces
+  const divisor = 10n ** BigInt(Math.max(0, -exponent))
+  const rounded =
+    exponent >= 0
+      ? coefficient * 10n ** BigInt(exponent)
+      : (coefficient + divisor / 2n) / divisor
+  const cents = Math.sign(value) * Math.sign(multiplier) * Number(rounded)
+  if (!Number.isSafeInteger(cents)) {
+    throw new RangeError('Invoice amount exceeds safe integer cents')
+  }
+  return cents
 }
 
 function validateInvoiceOptions(options: InvoiceOptions) {

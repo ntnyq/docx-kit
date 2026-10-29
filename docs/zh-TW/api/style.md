@@ -243,3 +243,14 @@ const styles = defineStyles({
 | **邊框** | `border`, `borderTop`, `borderRight`, `borderBottom`, `borderLeft` |
 | **尺寸** | `width`, `height` |
 | **底層設定** | `docx` — 直接合併到 docxjs 選項 |
+
+## `normalizeHexColor()`
+
+將顏色傳給原生 `docx` 選項前使用此工具正規化。核心樣式和內建外掛採用相同轉換：三位十六進位色值展開為六位，並移除開頭的 `#`；其他值保留原生驗證行為。
+
+```ts
+import { normalizeHexColor } from 'docx-kit'
+
+normalizeHexColor('#f00') // 'ff0000'
+normalizeHexColor('#123456') // '123456'
+```

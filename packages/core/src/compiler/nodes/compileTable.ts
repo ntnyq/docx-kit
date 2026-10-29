@@ -17,6 +17,8 @@ import {
   WidthType,
 } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
+import { resolveThemeTokens } from '../../style/theme'
+import { normalizeHexColor } from '../../utils/color'
 import {
   compileBorderRule,
   compileCellStyle,
@@ -120,7 +122,9 @@ export async function compileTable<
                 }),
               ],
               ...(columnSpan > 1 ? { columnSpan } : {}),
-              width: compileColumnWidth(col.width),
+              width: compileColumnWidth(
+                resolveThemeTokens(col.width, config.theme),
+              ),
             })
           },
         ),
@@ -181,7 +185,7 @@ export async function compileTable<
                             >) ?? {}),
                             type: ShadingType.CLEAR,
                             fill:
-                              config.theme?.colors?.surface?.replace(/^#/, '')
+                              normalizeHexColor(config.theme?.colors?.surface)
                               ?? 'F4F6F8',
                           },
                         }
@@ -204,7 +208,9 @@ export async function compileTable<
                     ...(cellRowSpan && cellRowSpan > 1
                       ? { rowSpan: cellRowSpan }
                       : {}),
-                    width: compileColumnWidth(col.width),
+                    width: compileColumnWidth(
+                      resolveThemeTokens(col.width, config.theme),
+                    ),
                   })
                 },
               ),
@@ -215,7 +221,7 @@ export async function compileTable<
   )
 
   const defaultBorder = {
-    color: config.theme?.colors?.border?.replace(/^#/, '') ?? 'D5D9DF',
+    color: normalizeHexColor(config.theme?.colors?.border) ?? 'D5D9DF',
     size: 4,
     style: BorderStyle.SINGLE,
   }
@@ -224,14 +230,14 @@ export async function compileTable<
     alignment: node.alignment,
     // Merged cells reduce the cell count, but not the underlying grid width.
     columnWidths: node.columns.map(() => 100),
-    float: compileTableFloat(node.floating),
+    float: compileTableFloat(resolveThemeTokens(node.floating, config.theme)),
     layout: node.layout,
     rows,
     style: node.styleName,
     tableLook: node.tableLook,
     visuallyRightToLeft: node.visuallyRightToLeft,
     borders:
-      compileTableBorders(node.borders)
+      compileTableBorders(resolveThemeTokens(node.borders, config.theme))
       ?? (node.bordered === false
         ? TableBorders.NONE
         : {
@@ -242,7 +248,7 @@ export async function compileTable<
             right: defaultBorder,
             top: defaultBorder,
           }),
-    width: compileColumnWidth(node.width) ?? {
+    width: compileColumnWidth(resolveThemeTokens(node.width, config.theme)) ?? {
       size: 100,
       type: WidthType.PERCENTAGE,
     },

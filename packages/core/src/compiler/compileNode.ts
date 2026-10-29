@@ -94,7 +94,12 @@ defaultRegistry
   )
   .register('deletedText', async (node, ctx) =>
     wrapParagraph(
-      compileRevision(node as RevisionNode, ctx.config as DocxKitConfig),
+      compileRevision(
+        node as RevisionNode,
+        ctx.config as DocxKitConfig,
+        undefined,
+        ctx.session,
+      ),
     ),
   )
   .register('heading', async (node, ctx) =>
@@ -118,7 +123,12 @@ defaultRegistry
   )
   .register('insertedText', async (node, ctx) =>
     wrapParagraph(
-      compileRevision(node as RevisionNode, ctx.config as DocxKitConfig),
+      compileRevision(
+        node as RevisionNode,
+        ctx.config as DocxKitConfig,
+        undefined,
+        ctx.session,
+      ),
     ),
   )
   .register('math', async node => wrapParagraph(compileMath(node as MathNode)))
