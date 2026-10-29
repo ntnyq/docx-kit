@@ -36,11 +36,13 @@
   },
   "dependencies": {
     "@docxkit/errors": "workspace:*",
+    "css-tree": "^3.2.1",
     "docx-preview": "0.4.1",
     "jszip": "^3.10.2"
   },
   "devDependencies": {
     "@docxkit/core": "workspace:*",
+    "@types/css-tree": "^3.2.0",
     "happy-dom": "^21.0.4"
   }
 }

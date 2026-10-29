@@ -68,6 +68,7 @@
     "@docxkit/plugin-timeline": "workspace:*",
     "@docxkit/plugin-toc": "workspace:*",
     "@docxkit/plugin-watermark": "workspace:*",
+    "ajv": "^8.20.0",
     "bwip-js": "^4.11.4",
     "qrcode": "^1.5.4"
   },

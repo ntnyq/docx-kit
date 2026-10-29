@@ -1071,6 +1071,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: '>=1.0.0'
         version: 1.32.2(zod@4.6.7)
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       bwip-js:
         specifier: ^4.11.4
         version: 4.11.4
@@ -1112,6 +1115,9 @@ importers:
       '@docxkit/errors':
         specifier: workspace:*
         version: link:../errors
+      css-tree:
+        specifier: ^3.2.1
+        version: 3.2.1
       docx-preview:
         specifier: 0.4.1
         version: 0.4.1
@@ -1122,6 +1128,9 @@ importers:
       '@docxkit/core':
         specifier: workspace:*
         version: link:../core
+      '@types/css-tree':
+        specifier: ^3.2.0
+        version: 3.2.0
       happy-dom:
         specifier: ^21.0.4
         version: 21.0.4
@@ -1988,6 +1997,9 @@ packages:
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
+
+  '@types/css-tree@3.2.0':
+    resolution: {integrity: sha512-J5KXmk6BFIepOT7280FdFyNs4c5fh0Uee0otjKEvzchrRs38Ii9qminqc4ds0L19X8Zd/rT+brR9jkBthygjWw==}
 
   '@types/debug@4.1.13':
     resolution: {integrity: sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==}
@@ -5392,7 +5404,7 @@ snapshots:
     dependencies:
       '@hono/node-server': 2.1.5(hono@4.13.14)
       ajv: 8.20.0
-      ajv-formats: 3.0.1
+      ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
       cors: 2.8.6
       cross-spawn: 7.0.6
@@ -5744,6 +5756,8 @@ snapshots:
     dependencies:
       '@types/deep-eql': 4.0.2
       assertion-error: 2.0.1
+
+  '@types/css-tree@3.2.0': {}
 
   '@types/debug@4.1.13':
     dependencies:
@@ -6295,8 +6309,8 @@ snapshots:
 
   acorn@8.19.0: {}
 
-  ajv-formats@3.0.1:
-    dependencies:
+  ajv-formats@3.0.1(ajv@8.20.0):
+    optionalDependencies:
       ajv: 8.20.0
 
   ajv@6.15.0:

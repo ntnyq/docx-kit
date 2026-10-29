@@ -11,6 +11,7 @@ import {
   buildBlockNodeJsonSchemas,
   buildNestedNodeJsonSchemas,
 } from '../schema/blockNodes'
+import { STYLE_RULE_SCHEMA, UNIT_VALUE_SCHEMA } from '../schema/styles'
 
 /**
  * DocxSchema JSON Schema for MCP resource exposure.
@@ -32,33 +33,9 @@ export const docxSchemaResource = {
     type: 'object',
     definitions: {
       ...buildNestedNodeJsonSchemas(),
+      styleRule: STYLE_RULE_SCHEMA,
       blockNode: {
         oneOf: buildBlockNodeJsonSchemas(),
-      },
-      styleRule: {
-        additionalProperties: true,
-        description: 'CSS-like style properties for a node',
-        type: 'object',
-        properties: {
-          backgroundColor: { type: 'string' },
-          borderBottom: { type: 'string' },
-          borderLeft: { type: 'string' },
-          borderRight: { type: 'string' },
-          borderTop: { type: 'string' },
-          color: { type: 'string' },
-          fontFamily: { type: 'string' },
-          fontFamilyEastAsia: { type: 'string' },
-          fontSize: { type: 'number' },
-          fontWeight: { enum: ['bold', 'normal', 'semibold'], type: 'string' },
-          lineHeight: { type: 'number' },
-          marginBottom: { type: 'number' },
-          marginLeft: { type: 'number' },
-          marginTop: { type: 'number' },
-          textAlign: {
-            enum: ['center', 'justify', 'left', 'right'],
-            type: 'string',
-          },
-        },
       },
     },
     properties: {
@@ -71,9 +48,21 @@ export const docxSchemaResource = {
         description: 'Page configuration',
         type: 'object',
         properties: {
-          margin: { type: 'string' },
+          margin: STYLE_RULE_SCHEMA.properties.margin,
           orientation: { enum: ['landscape', 'portrait'], type: 'string' },
-          size: { enum: ['A3', 'A4', 'Legal', 'Letter'], type: 'string' },
+          size: {
+            anyOf: [
+              { enum: ['A3', 'A4', 'Legal', 'Letter'] },
+              {
+                required: ['height', 'width'],
+                type: 'object',
+                properties: {
+                  height: UNIT_VALUE_SCHEMA,
+                  width: UNIT_VALUE_SCHEMA,
+                },
+              },
+            ],
+          },
         },
       },
       plugins: {

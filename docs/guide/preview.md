@@ -71,6 +71,9 @@ Uses `docx-preview` to render the DOCX as styled HTML elements inside the contai
 
 Embedded HTML (`altChunk`) is disabled by default. Set `renderAltChunks: true` to display it in sandboxed iframes without script or same-origin permissions. Executable hyperlink schemes such as `javascript:` are removed. Embedded HTML may still request external resources, so leave it disabled for untrusted documents that must not contact external servers.
 
+
+Each DOM render has an independent CSS scope and namespaced embedded fonts. Generated styles are parsed before mounting, and positioned content stays inside a containment wrapper. This wrapper is always present, including with `inWrapper: false`; that option controls only the decorative `docx-preview` wrapper. Existing class names and `container.querySelector()` access remain available.
+
 - **Text is selectable and searchable** (DOM-based)
 - Supports headers/footers, page breaks, tables, images
 - Fidelity: high (pixel-faithful to Word layout)

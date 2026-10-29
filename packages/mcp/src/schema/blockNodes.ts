@@ -1,3 +1,5 @@
+import { STYLE_RULE_SCHEMA, UNIT_VALUE_SCHEMA } from './styles'
+
 export interface BlockNodeDefinition {
   fields: Record<string, SchemaFieldRule>
   requireOneOf?: readonly string[]
@@ -290,8 +292,8 @@ function buildNodeJsonSchema(
 ): Record<string, unknown> {
   const required = type ? ['type'] : []
   const properties: Record<string, unknown> = type
-    ? { type: { const: type } }
-    : {}
+    ? { style: { $ref: '#/definitions/styleRule' }, type: { const: type } }
+    : { style: { $ref: '#/definitions/styleRule' } }
 
   for (const [field, rule] of Object.entries(definition.fields)) {
     properties[field] = fieldRuleToJsonSchema(rule)
@@ -305,6 +307,26 @@ function buildNodeJsonSchema(
     properties,
     required,
     type: 'object',
+  }
+
+  if (type === 'table') {
+    properties.cellStyle = STYLE_RULE_SCHEMA
+    properties.headerCellStyle = STYLE_RULE_SCHEMA
+    properties.columns = {
+      minItems: 1,
+      type: 'array',
+      items: {
+        required: ['key', 'title'],
+        type: 'object',
+        properties: {
+          cellStyle: STYLE_RULE_SCHEMA,
+          headerCellStyle: STYLE_RULE_SCHEMA,
+          key: { minLength: 1, type: 'string' },
+          title: { minLength: 1, type: 'string' },
+          width: UNIT_VALUE_SCHEMA,
+        },
+      },
+    }
   }
 
   if ('requireOneOf' in definition && definition.requireOneOf) {

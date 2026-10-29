@@ -11,6 +11,7 @@ import {
   MATH_NODE_DEFINITIONS,
   TEXT_NODE_DEFINITION,
 } from '../schema/blockNodes'
+import { validateStyle } from './validateStyle'
 import type {
   BlockNodeDefinition,
   BlockNodeType,
@@ -83,6 +84,15 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
   const errors: ValidationError[] = []
   const doc = schema as Record<string, unknown> | undefined
   const content = doc?.content
+  if (doc?.styles !== undefined) {
+    if (isRecord(doc.styles)) {
+      for (const [name, style] of Object.entries(doc.styles)) {
+        validateStyle(style, `/styles/${escapePointer(name)}`, errors)
+      }
+    } else {
+      errors.push({ message: 'Styles must be an object', path: '/styles' })
+    }
+  }
 
   if (!content) {
     errors.push({
@@ -134,6 +144,10 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
 
 function article(kind: string): string {
   return kind === 'array' || kind === 'object' ? 'an' : 'a'
+}
+
+function escapePointer(value: string): string {
+  return value.replaceAll('~', '~0').replaceAll('/', '~1')
 }
 
 function isNonEmptyString(value: unknown): value is string {
@@ -239,6 +253,9 @@ function validateDefinition(
   errors: ValidationError[],
   depth: number,
 ) {
+  if (node.style !== undefined) {
+    validateStyle(node.style, `${path}/style`, errors)
+  }
   for (const [field, rule] of Object.entries(definition.fields)) {
     const hasField = Object.hasOwn(node, field)
     if (rule.required && !hasField) {
@@ -392,6 +409,31 @@ function validateNode(
   }
   if (nodeType === 'table') {
     validateTableColumns(node.columns, path, errors)
+    for (const field of ['cellStyle', 'headerCellStyle']) {
+      if (node[field] !== undefined && typeof node[field] !== 'function') {
+        validateStyle(node[field], `${path}/${field}`, errors)
+      }
+    }
+    if (Array.isArray(node.data)) {
+      for (const [index, row] of node.data.entries()) {
+        if (!isRecord(row)) {
+          continue
+        }
+        for (const column of Array.isArray(node.columns) ? node.columns : []) {
+          if (!isRecord(column) || typeof column.key !== 'string') {
+            continue
+          }
+          const hint = `_${column.key}_style`
+          if (row[hint] !== undefined) {
+            validateStyle(
+              row[hint],
+              `${path}/data/${index}/${escapePointer(hint)}`,
+              errors,
+            )
+          }
+        }
+      }
+    }
   }
   if (nodeType === 'textBox') {
     const box = node.box as Record<string, unknown> | undefined
@@ -421,6 +463,15 @@ function validateTableColumns(
       continue
     }
     const record = column as Record<string, unknown>
+    for (const field of ['cellStyle', 'headerCellStyle']) {
+      if (record[field] !== undefined && typeof record[field] !== 'function') {
+        validateStyle(
+          record[field],
+          `${path}/columns/${index}/${field}`,
+          errors,
+        )
+      }
+    }
     for (const field of ['key', 'title']) {
       if (!isNonEmptyString(record[field])) {
         errors.push({

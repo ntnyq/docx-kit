@@ -71,6 +71,9 @@ await preview.render('https://example.com/report.docx')
 
 默认禁用嵌入 HTML（`altChunk`）。设置 `renderAltChunks: true` 后，可在不允许脚本和同源权限的沙箱 iframe 中展示。`javascript:` 等可执行超链接协议会被移除。嵌入 HTML 仍可能请求外部资源，因此对禁止访问外部服务器的不受信任文档，应保持禁用。
 
+
+每次 DOM 渲染都有独立的 CSS 作用域，嵌入字体也使用独立名称。生成的样式在挂载前经过解析，定位内容受到包裹层约束。即使设置 `inWrapper: false`，该隔离包裹层仍然存在；该选项仅控制 `docx-preview` 的装饰包裹层。原有类名和 `container.querySelector()` 查询方式继续可用。
+
 - **文本可选择、可搜索**（基于 DOM）
 - 支持页眉、页脚、分页、表格与图片
 - 还原度高，尽量贴近 Word 布局

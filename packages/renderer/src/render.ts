@@ -17,6 +17,7 @@ import { normalizeDocxInput } from './normalize'
 import { preparePageFields, resolvePageFields } from './page-fields'
 import { trackDocumentResources } from './resources'
 import { sanitizePreviewNode } from './sanitize'
+import { isolatePreviewStyles } from './styles'
 import type { DocxInput, DocxPreviewOptions } from './types'
 
 /**
@@ -73,9 +74,9 @@ export async function renderDocxPreview(
   // Build docx-preview options by merging defaults with user-provided options
   const renderOptions = {
     ...docxPreviewDefaults,
+    ...stripUnknownOptions(options),
     breakPages,
     className: options.className ?? DEFAULT_OPTIONS.className,
-    ...stripUnknownOptions(options),
     renderAltChunks: options.renderAltChunks ?? false,
     h(element: Parameters<typeof docxPreviewDefaults.h>[0]) {
       return sanitizePreviewNode((options.h ?? docxPreviewDefaults.h)(element))
@@ -88,7 +89,9 @@ export async function renderDocxPreview(
     dispose = trackDocumentResources(document)
     preparePageFields(document)
     const nodes = await renderDocument(document, renderOptions)
-    container.replaceChildren(...nodes)
+    container.replaceChildren(
+      isolatePreviewStyles(nodes, container.ownerDocument),
+    )
     resolvePageFields(container, renderOptions.className)
     return dispose
   } catch (error) {
