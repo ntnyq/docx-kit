@@ -1,3 +1,4 @@
+import { serializeDocxKitError } from '@docxkit/core'
 /**
  * docx-kit MCP server — AI agent integration via
  * Model Context Protocol.
@@ -151,7 +152,7 @@ export async function createDocxKitServer(
           isError: true,
           content: [
             {
-              text: `Document creation failed: ${(error as Error).message}`,
+              text: JSON.stringify(serializeDocxKitError(error), null, 2),
               type: 'text' as const,
             },
           ],

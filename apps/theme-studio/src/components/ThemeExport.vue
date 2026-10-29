@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DiagnosticDetails from '@docxkit/app-shared/components/DiagnosticDetails.vue'
 import { Button } from '@docxkit/app-shared/components/ui/button'
 import {
   Sheet,
@@ -9,12 +10,14 @@ import {
   SheetTitle,
 } from '@docxkit/app-shared/components/ui/sheet'
 import { useCopy } from '@docxkit/app-shared/composables/useCopy'
+import { serializeDocxKitError } from '@docxkit/app-shared/lib/diagnostics'
 import { downloadBlob } from '@docxkit/app-shared/lib/download'
 import { Check, Copy, Download } from '@lucide/vue'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { toDocxTheme } from '../utils/themeStudio'
 import ThemeCodePreview from './ThemeCodePreview.vue'
+import type { SerializedDocxKitError } from '@docxkit/app-shared/lib/diagnostics'
 import type { EditableTheme } from '../utils/themeStudio'
 
 const props = defineProps<{ snippet: string; theme: EditableTheme }>()
@@ -22,9 +25,11 @@ const open = defineModel<boolean>('open', { default: false })
 const { t } = useI18n()
 const { copied, copyError, copyText } = useCopy()
 const exportError = shallowRef('')
+const exportDiagnostic = shallowRef<SerializedDocxKitError | null>(null)
 
 function download(format: 'json' | 'ts') {
   exportError.value = ''
+  exportDiagnostic.value = null
   try {
     const source =
       format === 'ts'
@@ -44,7 +49,8 @@ function download(format: 'json' | 'ts') {
       `theme.${format}`,
     )
   } catch (error) {
-    exportError.value = `${t('downloadFailed')} ${String(error)}`
+    exportDiagnostic.value = serializeDocxKitError(error)
+    exportError.value = `${t('downloadFailed')} ${exportDiagnostic.value.message}`
   }
 }
 </script>
@@ -84,6 +90,10 @@ function download(format: 'json' | 'ts') {
         >
           {{ exportError }}
         </p>
+        <DiagnosticDetails
+          v-if="exportDiagnostic"
+          :diagnostic="exportDiagnostic"
+        />
       </div>
       <SheetFooter
         class="flex-row flex-wrap justify-end gap-2 border-t bg-muted/30 p-4"

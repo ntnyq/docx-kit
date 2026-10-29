@@ -13,6 +13,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@docxkit/errors": "workspace:*",
     "@docxkit/renderer": "workspace:*",
     "@lucide/vue": "^1.63.0",
     "@vueuse/core": "^15.0.0",

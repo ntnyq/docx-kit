@@ -8,6 +8,9 @@ docx-kit 抛出结构化的 `DocxKitError` 实例，携带机器可读的错误�
 class DocxKitError extends Error {
   readonly code: string | ErrorCode  // Machine-readable code
   readonly cause: unknown            // Underlying error (if any)
+  readonly diagnosticCode?: DiagnosticCode // DOCXKIT_ code for known errors
+  readonly fix?: string              // Repair guidance
+  readonly docs?: string             // Canonical error reference URL
   name: 'DocxKitError'               // Always "DocxKitError"
 }
 ```
@@ -21,7 +24,7 @@ try {
   await doc.save('output.docx')
 } catch (err) {
   if (err instanceof DocxKitError) {
-    console.error(`[${err.code}] ${err.message}`)
+    console.error(`[${err.diagnosticCode ?? err.code}] ${err.message}`)
 
     switch (err.code) {
       case ERROR_CODES.EXPORT_FAILED:
@@ -45,17 +48,16 @@ try {
 
 ## 错误代码
 
-| 常量 | 代码 | 说明 |
-|---|---|---|
-| `ERROR_CODES.EXPORT_FAILED` | `'EXPORT_FAILED'` | 文档导出（保存或打包）失败 |
-| `ERROR_CODES.IMAGE_INVALID_DATA` | `'IMAGE_INVALID_DATA'` | 图片数据为空、损坏或不受支持 |
-| `ERROR_CODES.IMAGE_UNKNOWN_TYPE` | `'IMAGE_UNKNOWN_TYPE'` | 无法确定图片格式 |
-| `ERROR_CODES.PLUGIN_NOT_REGISTERED` | `'PLUGIN_NOT_REGISTERED'` | 插件节点引用了未注册的插件 |
-| `ERROR_CODES.PLUGIN_RENDER_FAILED` | `'PLUGIN_RENDER_FAILED'` | 插件的 `render()` 抛出错误 |
-| `ERROR_CODES.STYLE_INVALID_UNIT` | `'STYLE_INVALID_UNIT'` | 样式值中的单位字符串无效 |
-| `ERROR_CODES.STYLE_UNKNOWN_CLASS` | `'STYLE_UNKNOWN_CLASS'` | `className` 引用了不存在的样式表键 |
-| `ERROR_CODES.TABLE_INVALID_COLUMNS` | `'TABLE_INVALID_COLUMNS'` | 创建表格时未提供列 |
-| `ERROR_CODES.UNKNOWN_NODE_TYPE` | `'UNKNOWN_NODE_TYPE'` | 节点类型没有已注册的编译器 |
+所有诊断码和修复步骤见[错误参考](/zh-CN/errors/)。
+
+`error.code` 保留旧值，`error.diagnosticCode` 新增 `DOCXKIT_` 前缀。已知错误还提供 `fix` 和 `docs`，自定义字符串错误码继续可用。
+
+```ts
+import { createDocxKitError, serializeDocxKitError } from 'docx-kit'
+
+const error = createDocxKitError('PLUGIN_NOT_REGISTERED', { pluginName: 'qrcode' })
+console.error(serializeDocxKitError(error))
+```
 
 ## 常见错误场景
 
@@ -190,7 +192,7 @@ async function generateReports(items: Item[]) {
       results.push({ item })
     } catch (err) {
       const message = err instanceof DocxKitError
-        ? `[${err.code}] ${err.message}`
+        ? `[${err.diagnosticCode ?? err.code}] ${err.message}`
         : String(err)
       results.push({ item, error: message })
     }

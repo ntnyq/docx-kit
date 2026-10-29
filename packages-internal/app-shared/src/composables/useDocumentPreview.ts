@@ -1,7 +1,9 @@
 import { useElementSize } from '@vueuse/core'
 import { computed, nextTick, shallowRef, watch } from 'vue'
+import { serializeDocxKitError } from '../lib/diagnostics'
 import type { DocxPreview } from '@docxkit/renderer'
 import type { Ref } from 'vue'
+import type { SerializedDocxKitError } from '../lib/diagnostics'
 
 /**
  * Render only the newest DOCX and dispose media URLs when its input changes.
@@ -13,6 +15,7 @@ export function useDocumentPreview(
   zoom: Readonly<Ref<'fit' | number>>,
 ) {
   const renderError = shallowRef('')
+  const renderDiagnostic = shallowRef<SerializedDocxKitError | null>(null)
   const rendering = shallowRef(false)
   const pageCount = shallowRef(0)
   const documentWidth = shallowRef(794)
@@ -34,6 +37,7 @@ export function useDocumentPreview(
       })
       pageCount.value = 0
       renderError.value = ''
+      renderDiagnostic.value = null
       rendering.value = Boolean(source)
       await nextTick()
       container.value?.replaceChildren()
@@ -65,7 +69,8 @@ export function useDocumentPreview(
         pageCount.value = pages.length
       } catch (error) {
         if (!stale) {
-          renderError.value = String(error)
+          renderDiagnostic.value = serializeDocxKitError(error)
+          renderError.value = renderDiagnostic.value.message
         }
       } finally {
         if (!stale) {
@@ -78,6 +83,7 @@ export function useDocumentPreview(
 
   return {
     pageCount,
+    renderDiagnostic,
     renderError,
     rendering,
     scale,

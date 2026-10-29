@@ -8,7 +8,7 @@
  * @module compiler/compileNode
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import { ColumnBreak, PageBreak, Paragraph } from 'docx'
 import { compileHeading } from './nodes/compileHeading'
 import { compileHyperlink } from './nodes/compileHyperlink'
@@ -165,9 +165,13 @@ defaultRegistry
     async () => new Paragraph({ children: [new PageBreak()] }),
   )
   .register('sectionBreak', async () => {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'UNKNOWN_NODE_TYPE',
-      'Section break nodes must be handled at the document compilation level',
+      { nodeType: 'sectionBreak' },
+      {
+        message:
+          'Section break nodes must be handled at the document compilation level',
+      },
     )
   })
   .register('plugin', async (node, ctx) =>

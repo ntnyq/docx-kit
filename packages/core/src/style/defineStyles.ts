@@ -1,4 +1,4 @@
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import type { StyleSheet } from '@docxkit/types'
 
 /**
@@ -26,10 +26,10 @@ export function defineStyles<const T extends StyleSheet>(styles: T): T {
         : [entry.extends]
       for (const parent of parents) {
         if (!styleKeys.has(parent)) {
-          throw new DocxKitError(
-            'STYLE_UNKNOWN_CLASS',
-            `Style class "${name}" extends unknown class "${parent}"`,
-          )
+          throw createDocxKitError('STYLE_UNKNOWN_CLASS', {
+            className: parent,
+            extendingClass: name,
+          })
         }
       }
     }

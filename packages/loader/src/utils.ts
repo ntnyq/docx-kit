@@ -7,7 +7,7 @@
  * @module loader/utils
  */
 
-import { DocxKitError } from '@docxkit/core'
+import { createDocxKitError } from '@docxkit/core'
 import type { DocxPlugin } from '@docxkit/core'
 
 /**
@@ -55,14 +55,14 @@ export async function resolvePluginExport(
       return plugin
     }
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'PLUGIN_LOAD_FAILED',
-      `Plugin factory from "${source}" failed`,
-      error,
+      { detail: `Plugin factory from "${source}" failed`, reason: 'factory' },
+      { cause: error },
     )
   }
-  throw new DocxKitError(
-    'PLUGIN_LOAD_FAILED',
-    `Module loaded from "${source}" does not export a valid DocxPlugin; use a default plugin instance or factory`,
-  )
+  throw createDocxKitError('PLUGIN_LOAD_FAILED', {
+    detail: `Module loaded from "${source}" does not export a valid DocxPlugin; use a default plugin instance or factory`,
+    reason: 'export',
+  })
 }

@@ -8,7 +8,7 @@
  * @module renderer/pack
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import { Packer } from 'docx'
 import type { Document } from 'docx'
 
@@ -28,10 +28,10 @@ export async function packToBase64String(doc: Document): Promise<string> {
   try {
     return await Packer.toBase64String(doc)
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'EXPORT_FAILED',
-      'Failed to pack document to base64',
-      error,
+      { format: 'base64' },
+      { cause: error },
     )
   }
 }
@@ -53,10 +53,10 @@ export async function packToBlob(doc: Document): Promise<Blob> {
   try {
     return await Packer.toBlob(doc)
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'EXPORT_FAILED',
-      'Failed to pack document to blob',
-      error,
+      { format: 'blob' },
+      { cause: error },
     )
   }
 }
@@ -82,10 +82,10 @@ export async function packToBuffer(doc: Document): Promise<Uint8Array> {
     const buffer = await Packer.toArrayBuffer(doc)
     return new Uint8Array(buffer)
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'EXPORT_FAILED',
-      'Failed to pack document to buffer',
-      error,
+      { format: 'buffer' },
+      { cause: error },
     )
   }
 }

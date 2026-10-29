@@ -4,7 +4,7 @@
  * @module compiler/nodes/compileTable
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import {
   BorderStyle,
   Paragraph,
@@ -60,10 +60,9 @@ export async function compileTable<
   session?: CompilationSession,
 ) {
   if (node.columns.length === 0) {
-    throw new DocxKitError(
-      'TABLE_INVALID_COLUMNS',
-      'Table must have at least one column',
-    )
+    throw createDocxKitError('TABLE_INVALID_COLUMNS', {
+      detail: 'Table must have at least one column',
+    })
   }
 
   // Resolve table-level style from stylesheet
@@ -319,17 +318,15 @@ function resolveDataGrid<
         node.data.length - rowIndex,
       )
       if (columnIndex + columnSpan > node.columns.length) {
-        throw new DocxKitError(
-          'TABLE_INVALID_COLUMNS',
-          'Column span exceeds the table grid',
-        )
+        throw createDocxKitError('TABLE_INVALID_COLUMNS', {
+          detail: 'Column span exceeds the table grid',
+        })
       }
       for (let offset = 0; offset < columnSpan; offset++) {
         if (occupiedUntil[columnIndex + offset] > rowIndex) {
-          throw new DocxKitError(
-            'TABLE_INVALID_COLUMNS',
-            'Table cell spans overlap',
-          )
+          throw createDocxKitError('TABLE_INVALID_COLUMNS', {
+            detail: 'Table cell spans overlap',
+          })
         }
         occupiedUntil[columnIndex + offset] = rowIndex + rowSpan
       }
@@ -347,10 +344,9 @@ function resolveHeaderGrid<TData extends Record<string, unknown>>(
     const column = columns[columnIndex]
     const columnSpan = resolveSpan(column.colSpan)
     if (columnIndex + columnSpan > columns.length) {
-      throw new DocxKitError(
-        'TABLE_INVALID_COLUMNS',
-        'Column span exceeds the table grid',
-      )
+      throw createDocxKitError('TABLE_INVALID_COLUMNS', {
+        detail: 'Column span exceeds the table grid',
+      })
     }
     cells.push({ column, columnSpan })
     columnIndex += columnSpan
@@ -363,10 +359,9 @@ function resolveSpan(value: unknown): number {
     return 1
   }
   if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {
-    throw new DocxKitError(
-      'TABLE_INVALID_COLUMNS',
-      'Table spans must be positive integers',
-    )
+    throw createDocxKitError('TABLE_INVALID_COLUMNS', {
+      detail: 'Table spans must be positive integers',
+    })
   }
   return value
 }

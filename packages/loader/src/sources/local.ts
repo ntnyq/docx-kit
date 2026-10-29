@@ -11,7 +11,7 @@
  * @module loader/sources/local
  */
 
-import { DocxKitError } from '@docxkit/core'
+import { createDocxKitError } from '@docxkit/core'
 import { resolvePluginExport } from '../utils'
 import { resolveManifest } from './options'
 
@@ -53,10 +53,13 @@ export async function loadLocalPlugin(
           default?: unknown
         }
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'PLUGIN_LOAD_FAILED',
-      `Failed to import plugin from local path: "${path}"`,
-      error,
+      {
+        detail: `Failed to import plugin from local path: "${path}"`,
+        reason: 'import',
+      },
+      { cause: error },
     )
   }
 

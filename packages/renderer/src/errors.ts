@@ -10,7 +10,8 @@
  * @module renderer/errors
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError, ERROR_CODES } from '@docxkit/errors'
+import type { DocxKitError } from '@docxkit/errors'
 
 /**
  * Renderer-specific error codes.
@@ -21,10 +22,10 @@ import { DocxKitError } from '@docxkit/errors'
  * - `MICROSOFT_URL_REQUIRED` — Microsoft renderer requires a URL string input
  */
 export const PREVIEW_ERROR_CODES = {
-  MICROSOFT_URL_REQUIRED: 'MICROSOFT_URL_REQUIRED',
-  PREVIEW_FETCH_FAILED: 'PREVIEW_FETCH_FAILED',
-  PREVIEW_INPUT_INVALID: 'PREVIEW_INPUT_INVALID',
-  PREVIEW_RENDER_FAILED: 'PREVIEW_RENDER_FAILED',
+  MICROSOFT_URL_REQUIRED: ERROR_CODES.MICROSOFT_URL_REQUIRED,
+  PREVIEW_FETCH_FAILED: ERROR_CODES.PREVIEW_FETCH_FAILED,
+  PREVIEW_INPUT_INVALID: ERROR_CODES.PREVIEW_INPUT_INVALID,
+  PREVIEW_RENDER_FAILED: ERROR_CODES.PREVIEW_RENDER_FAILED,
 } as const
 
 /**
@@ -46,5 +47,5 @@ export function createPreviewError(
   message: string,
   cause?: unknown,
 ): DocxKitError {
-  return new DocxKitError(code, message, cause)
+  return createDocxKitError(code, { detail: message }, { cause })
 }

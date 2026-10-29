@@ -1,3 +1,4 @@
+import { serializeDocxKitError } from '@docxkit/app-shared/lib/diagnostics'
 import { downloadBlob } from '@docxkit/app-shared/lib/download'
 import { THEME_LIST } from 'docx-kit'
 import { computed, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
@@ -14,6 +15,7 @@ import {
   updateThemeToken,
 } from '../utils/themeStudio'
 import { hasInvalidThemeTokens } from '../utils/validateTheme'
+import type { SerializedDocxKitError } from '@docxkit/app-shared/lib/diagnostics'
 import type { BuiltinTheme, EditableThemeCategory } from '../utils/themeStudio'
 
 const BUILTIN_THEMES = THEME_LIST as readonly BuiltinTheme[]
@@ -31,6 +33,7 @@ export function useThemeStudio() {
   const previewBlob = shallowRef<Blob | null>(null)
   const loading = shallowRef(false)
   const studioError = shallowRef('')
+  const studioDiagnostic = shallowRef<SerializedDocxKitError | null>(null)
   const autoPreview = shallowRef(true)
   const lastRenderedAt = shallowRef<Date | null>(null)
   const renderedSnapshot = shallowRef('')
@@ -134,6 +137,7 @@ export function useThemeStudio() {
   async function renderPreview() {
     cancelRender()
     studioError.value = ''
+    studioDiagnostic.value = null
     if (hasInvalidTokens.value) {
       studioError.value = t('fixTokens')
       return
@@ -155,7 +159,8 @@ export function useThemeStudio() {
       lastRenderedAt.value = new Date()
     } catch (error) {
       if (token === renderToken) {
-        studioError.value = String(error)
+        studioDiagnostic.value = serializeDocxKitError(error)
+        studioError.value = studioDiagnostic.value.message
         previewBlob.value = null
       }
     } finally {
@@ -168,6 +173,7 @@ export function useThemeStudio() {
   function scheduleRender() {
     cancelRender()
     studioError.value = ''
+    studioDiagnostic.value = null
     if (!autoPreview.value || hasInvalidTokens.value) {
       return
     }
@@ -190,7 +196,8 @@ export function useThemeStudio() {
         `${selectedLayoutId.value}-${editableTheme.value.id}.docx`,
       )
     } catch (error) {
-      studioError.value = `${t('downloadFailed')} ${String(error)}`
+      studioDiagnostic.value = serializeDocxKitError(error)
+      studioError.value = `${t('downloadFailed')} ${studioDiagnostic.value.message}`
     }
   }
 
@@ -220,6 +227,7 @@ export function useThemeStudio() {
     setMetadata,
     setToken,
     stale,
+    studioDiagnostic,
     studioError,
     themes: BUILTIN_THEMES,
   }

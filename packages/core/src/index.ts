@@ -26,12 +26,17 @@ export { createDocx, renderDocx } from './builder/createDocx'
 export { createPluginLoader, PluginLoader } from './loader/PluginLoader'
 
 // ---------- Shared errors ----------
-export { DocxKitError, ERROR_CODES, type ErrorCode } from '@docxkit/errors'
-
+export {
+  createDocxKitError,
+  DIAGNOSTIC_CODES,
+  DocxKitError,
+  ERROR_CODES,
+  serializeDocxKitError,
+} from '@docxkit/errors'
 export type { PluginManifest } from './loader/manifest'
+
 // ---------- Compiler internals (for plugin authors) ----------
 export type { CompilationSession } from './compiler/numbers'
-
 export type { PluginStyleAdapter } from './style/pluginStyle'
 
 // ---------- Local types ----------
@@ -44,6 +49,16 @@ export type {
   PluginSecurityPolicy,
   PluginSource,
 } from './loader/PluginLoader'
+
+export type {
+  CreateDocxKitErrorOptions,
+  DiagnosticCode,
+  DocxKitErrorDetails,
+  ErrorCode,
+  ErrorParams,
+  PluginLoadReason,
+  SerializedDocxKitError,
+} from '@docxkit/errors'
 
 // Type exports
 export type {

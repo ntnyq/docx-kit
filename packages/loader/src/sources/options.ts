@@ -1,4 +1,4 @@
-import { DocxKitError, validateManifest } from '@docxkit/core'
+import { createDocxKitError, validateManifest } from '@docxkit/core'
 import type { PluginManifest, PluginManifestAuthorizer } from '@docxkit/core'
 
 export interface ExternalPluginLoadOptions {
@@ -19,10 +19,10 @@ export async function resolveManifest(
 ): Promise<PluginManifest | null> {
   if (options?.manifest === undefined) {
     if (options?.authorizeManifest) {
-      throw new DocxKitError(
-        'MANIFEST_MISSING',
-        'A plugin manifest is required before external code can be authorized',
-      )
+      throw createDocxKitError('MANIFEST_MISSING', {
+        detail:
+          'A plugin manifest is required before external code can be authorized',
+      })
     }
     return null
   }

@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { createAppI18n } from '@docxkit/app-shared/lib/i18n'
+import { createDocxKitError } from 'docx-kit'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp } from 'vue'
 import { createThemeSample } from '../utils/documentSamples'
@@ -73,5 +74,33 @@ describe('theme document lifecycle', () => {
     await Promise.resolve()
     expect(state.previewBlob.value).toBe(current)
     expect(state.stale.value).toBe(false)
+  })
+  it('reports unconvertible generation errors without rejecting the render', async () => {
+    toBlob.mockRejectedValueOnce(Object.create(null))
+    const state = mountStudio()
+    await vi.waitFor(() =>
+      expect(state.studioError.value).toBe('Unknown error'),
+    )
+    expect(state.studioDiagnostic.value).toEqual({ message: 'Unknown error' })
+    expect(state.loading.value).toBe(false)
+    expect(state.previewBlob.value).toBeNull()
+  })
+
+  it('shows sanitized diagnostic text with a documentation link', async () => {
+    toBlob.mockRejectedValueOnce(
+      createDocxKitError('IMAGE_INVALID_DATA', {
+        detail:
+          'Could not resolve image: https://demo:EXAMPLE_PASSWORD@example.invalid/image.png?key=EXAMPLE_KEY',
+      }),
+    )
+    const state = mountStudio()
+    await vi.waitFor(() =>
+      expect(state.studioError.value).toBe(
+        'Could not resolve image: https://example.invalid/image.png',
+      ),
+    )
+    expect(state.studioDiagnostic.value?.docs).toBe(
+      'https://docx-kit.ntnyq.dev/errors/docxkit_image_invalid_data/',
+    )
   })
 })

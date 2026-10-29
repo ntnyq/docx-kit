@@ -32,6 +32,25 @@ Small helper types used throughout the library:
 |---|---|
 | `DocxKitError` | Base error class with `code`, `message`, and `cause` |
 | `ErrorCode` | Union of error code literals (`EXPORT_FAILED`, `PLUGIN_NOT_REGISTERED`, etc.) |
+| `DiagnosticCode` | Full diagnostic code union with the DOCXKIT_ prefix. |
+| `ErrorParams<Code>` | Catalog parameters for a selected legacy error code. |
+| `CreateDocxKitErrorOptions` | Original cause and an optional legacy message override. |
+| `DocxKitErrorDetails` | Optional repair guidance, documentation URL, and source locations. |
+| `SerializedDocxKitError` | Allowlisted DTO for application and MCP error output. |
+| `PluginLoadReason` | Explicit plugin-loading failure reason used to select a repair. |
+
+Create errors with `createDocxKitError(code, params, options?)` and serialize them with `serializeDocxKitError(error)`. `DIAGNOSTIC_CODES` maps each legacy code to its full diagnostic code. Existing constructors, custom string codes, names, messages, and causes remain supported.
+
+See the [error reference](/errors/) for all codes and repair steps.
+
+```ts
+import { createDocxKitError, serializeDocxKitError } from 'docx-kit'
+import type { ErrorParams } from 'docx-kit'
+
+const params: ErrorParams<'PLUGIN_NOT_REGISTERED'> = { pluginName: 'qrcode' }
+const error = createDocxKitError('PLUGIN_NOT_REGISTERED', params)
+console.error(serializeDocxKitError(error))
+```
 
 See [Error Handling](/guide/errors) for the full error code list and usage patterns.
 

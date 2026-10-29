@@ -8,7 +8,7 @@
  * @module loader/manifest
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import { isValidRange } from 'verkit'
 
 /**
@@ -125,10 +125,9 @@ const SEMVER_RE = /^\d+\.\d+\.\d+(?:-[a-z\d.-]+)?(?:\+[a-z\d.-]+)?$/i
  */
 export function validateManifest(json: unknown): PluginManifest {
   if (!json || typeof json !== 'object' || Array.isArray(json)) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      'Plugin manifest must be a non-null object',
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: 'Plugin manifest must be a non-null object',
+    })
   }
 
   const obj = json as Record<string, unknown>
@@ -144,10 +143,9 @@ export function validateManifest(json: unknown): PluginManifest {
   // Validate plugin sub-object
   const pluginObj = obj.plugin
   if (!pluginObj || typeof pluginObj !== 'object' || Array.isArray(pluginObj)) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      'Plugin manifest field "plugin" must be a non-null object',
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: 'Plugin manifest field "plugin" must be a non-null object',
+    })
   }
 
   const plugin = pluginObj as Record<string, unknown>
@@ -178,10 +176,9 @@ export function validateManifest(json: unknown): PluginManifest {
 
 function assertRange(range: string, field: string) {
   if (!isValidRange(range)) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      `Plugin manifest field "${field}" is not a valid semver range: "${range}"`,
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: `Plugin manifest field "${field}" is not a valid semver range: "${range}"`,
+    })
   }
 }
 
@@ -194,28 +191,25 @@ function assertRelativePath(path: string, field: string) {
     || normalized.startsWith('//')
     || segments.includes('..')
   ) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      `Plugin manifest field "${field}" must be a safe relative path beginning with "./"`,
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: `Plugin manifest field "${field}" must be a safe relative path beginning with "./"`,
+    })
   }
 }
 
 function assertSemver(version: string, field: string) {
   if (!SEMVER_RE.test(version)) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      `Plugin manifest field "${field}" is not a valid semver: "${version}"`,
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: `Plugin manifest field "${field}" is not a valid semver: "${version}"`,
+    })
   }
 }
 
 function assertString(value: unknown, field: string): asserts value is string {
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      `Plugin manifest field "${field}" must be a non-empty string`,
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: `Plugin manifest field "${field}" must be a non-empty string`,
+    })
   }
 }
 
@@ -224,10 +218,9 @@ function assertStringRecord(
   field: string,
 ): asserts value is Record<string, string> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      `Plugin manifest field "${field}" must be an object`,
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: `Plugin manifest field "${field}" must be an object`,
+    })
   }
 
   for (const [key, entry] of Object.entries(value)) {

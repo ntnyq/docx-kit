@@ -1,3 +1,4 @@
+import { serializeDocxKitError } from '@docxkit/app-shared/lib/diagnostics'
 import { downloadBlob } from '@docxkit/app-shared/lib/download'
 import { academicPreset } from '@docxkit/preset-academic'
 import { classicPreset } from '@docxkit/preset-classic'
@@ -7,6 +8,7 @@ import { useI18n } from 'vue-i18n'
 import { DEFAULT_CODE, PRESETS } from '../constants/templates'
 import { mergeWithPreset } from '../utils/mergeWithPreset'
 import { executePlaygroundCode } from '../utils/playgroundRunner'
+import type { SerializedDocxKitError } from '@docxkit/app-shared/lib/diagnostics'
 import type { DocxPreset } from 'docx-kit'
 import type { Preset } from '../constants/templates'
 
@@ -29,6 +31,7 @@ export function useDocxPlayground() {
   const resultBlob = shallowRef<Blob | null>(null)
   const loading = shallowRef(false)
   const playgroundError = shallowRef('')
+  const playgroundDiagnostic = shallowRef<SerializedDocxKitError | null>(null)
   const renderedSource = shallowRef('')
   const renderedStyle = shallowRef<string | undefined>()
   const hasEdits = computed(() => code.value !== activePreset.value.code)
@@ -45,6 +48,7 @@ export function useDocxPlayground() {
     code.value = preset.code
     resultBlob.value = null
     playgroundError.value = ''
+    playgroundDiagnostic.value = null
     const url = new URL(window.location.href)
     url.searchParams.set('example', preset.id)
     window.history.replaceState(null, '', url)
@@ -60,6 +64,7 @@ export function useDocxPlayground() {
     const style = activeStylePreset.value
     loading.value = true
     playgroundError.value = ''
+    playgroundDiagnostic.value = null
     resultBlob.value = null
     try {
       const result = await executePlaygroundCode(
@@ -86,7 +91,8 @@ export function useDocxPlayground() {
       renderedStyle.value = style?.id
     } catch (error) {
       if (token === runToken) {
-        playgroundError.value = String(error)
+        playgroundDiagnostic.value = serializeDocxKitError(error)
+        playgroundError.value = playgroundDiagnostic.value.message
       }
     } finally {
       if (token === runToken) {
@@ -102,7 +108,8 @@ export function useDocxPlayground() {
     try {
       downloadBlob(resultBlob.value, `${activePreset.value.id}.docx`)
     } catch (error) {
-      playgroundError.value = `${t('downloadFailed')} ${String(error)}`
+      playgroundDiagnostic.value = serializeDocxKitError(error)
+      playgroundError.value = `${t('downloadFailed')} ${playgroundDiagnostic.value.message}`
     }
   }
 
@@ -112,6 +119,7 @@ export function useDocxPlayground() {
       runToken++
       loading.value = false
       playgroundError.value = ''
+      playgroundDiagnostic.value = null
     },
     { flush: 'sync' },
   )
@@ -127,6 +135,7 @@ export function useDocxPlayground() {
     hasEdits,
     loading,
     loadPreset,
+    playgroundDiagnostic,
     playgroundError,
     presets: PRESETS,
     resultBlob,

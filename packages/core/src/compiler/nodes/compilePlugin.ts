@@ -4,7 +4,7 @@
  * @module compiler/nodes/compilePlugin
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
 import { compileNode } from '../compileNode'
@@ -27,10 +27,7 @@ export async function compilePlugin<TStyles extends StyleSheet>(
 ): Promise<FileChild | FileChild[]> {
   const plugin = plugins.get(node.name)
   if (!plugin) {
-    throw new DocxKitError(
-      'PLUGIN_NOT_REGISTERED',
-      `Plugin not registered: ${node.name}`,
-    )
+    throw createDocxKitError('PLUGIN_NOT_REGISTERED', { pluginName: node.name })
   }
 
   const ctx: PluginRenderContext = {
@@ -62,10 +59,10 @@ export async function compilePlugin<TStyles extends StyleSheet>(
   try {
     return (await plugin.render(node.options, ctx)) as FileChild | FileChild[]
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'PLUGIN_RENDER_FAILED',
-      `Plugin render failed: ${plugin.name}`,
-      error,
+      { pluginName: plugin.name },
+      { cause: error },
     )
   }
 }

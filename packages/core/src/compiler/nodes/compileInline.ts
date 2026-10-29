@@ -4,7 +4,7 @@
  * @module compiler/nodes/compileInline
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import { TextRun } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import {
@@ -94,9 +94,12 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
           })
         }
         default:
-          throw new DocxKitError(
+          throw createDocxKitError(
             'UNKNOWN_NODE_TYPE',
-            `Unknown inline node type: ${String((node as { type: unknown }).type)}`,
+            { nodeType: String((node as { type: unknown }).type) },
+            {
+              message: `Unknown inline node type: ${String((node as { type: unknown }).type)}`,
+            },
           )
       }
     }),
@@ -112,10 +115,10 @@ async function compileInlineImage<TStyles extends StyleSheet>(
   const data = await normalizeImageData(node.data, config.resolveImage)
   const metadata = readImageMetadata(data, node.imageType)
   if (!metadata) {
-    throw new DocxKitError(
-      'IMAGE_INVALID_DATA',
-      'Image format could not be detected; provide a supported imageType',
-    )
+    throw createDocxKitError('IMAGE_INVALID_DATA', {
+      detail:
+        'Image format could not be detected; provide a supported imageType',
+    })
   }
   const inlineStyle = resolveStyle({
     base: config.defaults?.image,

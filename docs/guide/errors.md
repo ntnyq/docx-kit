@@ -8,6 +8,9 @@ docx-kit throws structured `DocxKitError` instances with machine-readable error 
 class DocxKitError extends Error {
   readonly code: string | ErrorCode  // Machine-readable code
   readonly cause: unknown            // Underlying error (if any)
+  readonly diagnosticCode?: DiagnosticCode // DOCXKIT_ code for known errors
+  readonly fix?: string              // Repair guidance
+  readonly docs?: string             // Canonical error reference URL
   name: 'DocxKitError'               // Always "DocxKitError"
 }
 ```
@@ -21,7 +24,7 @@ try {
   await doc.save('output.docx')
 } catch (err) {
   if (err instanceof DocxKitError) {
-    console.error(`[${err.code}] ${err.message}`)
+    console.error(`[${err.diagnosticCode ?? err.code}] ${err.message}`)
 
     switch (err.code) {
       case ERROR_CODES.EXPORT_FAILED:
@@ -45,17 +48,16 @@ try {
 
 ## Error Codes
 
-| Constant | Code | Description |
-|---|---|---|
-| `ERROR_CODES.EXPORT_FAILED` | `'EXPORT_FAILED'` | Document export (save/pack) failed |
-| `ERROR_CODES.IMAGE_INVALID_DATA` | `'IMAGE_INVALID_DATA'` | Image data is empty, corrupt, or unsupported |
-| `ERROR_CODES.IMAGE_UNKNOWN_TYPE` | `'IMAGE_UNKNOWN_TYPE'` | Could not determine image format |
-| `ERROR_CODES.PLUGIN_NOT_REGISTERED` | `'PLUGIN_NOT_REGISTERED'` | Plugin node referenced unregistered plugin |
-| `ERROR_CODES.PLUGIN_RENDER_FAILED` | `'PLUGIN_RENDER_FAILED'` | Plugin's `render()` threw an error |
-| `ERROR_CODES.STYLE_INVALID_UNIT` | `'STYLE_INVALID_UNIT'` | Invalid unit string in a style value |
-| `ERROR_CODES.STYLE_UNKNOWN_CLASS` | `'STYLE_UNKNOWN_CLASS'` | `className` referenced a non-existent stylesheet key |
-| `ERROR_CODES.TABLE_INVALID_COLUMNS` | `'TABLE_INVALID_COLUMNS'` | Table created with no columns |
-| `ERROR_CODES.UNKNOWN_NODE_TYPE` | `'UNKNOWN_NODE_TYPE'` | Node type has no registered compiler |
+See the [complete error reference](/errors/) for all diagnostic codes and repair steps.
+
+`error.code` keeps its legacy value. `error.diagnosticCode` adds the `DOCXKIT_` prefix. Known errors also include `fix` and `docs`; custom string codes remain accepted.
+
+```ts
+import { createDocxKitError, serializeDocxKitError } from 'docx-kit'
+
+const error = createDocxKitError('PLUGIN_NOT_REGISTERED', { pluginName: 'qrcode' })
+console.error(serializeDocxKitError(error))
+```
 
 ## Common Error Scenarios
 
@@ -190,7 +192,7 @@ async function generateReports(items: Item[]) {
       results.push({ item })
     } catch (err) {
       const message = err instanceof DocxKitError
-        ? `[${err.code}] ${err.message}`
+        ? `[${err.diagnosticCode ?? err.code}] ${err.message}`
         : String(err)
       results.push({ item, error: message })
     }

@@ -9,7 +9,7 @@
  * @module compiler/registry
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import type { BlockNode, DocxKitConfig, DocxPlugin } from '@docxkit/types'
 import type { FileChild } from 'docx'
 import type { CompilationSession } from './numbers'
@@ -60,10 +60,7 @@ export class NodeCompilerRegistry {
   ): Promise<FileChild | FileChild[]> {
     const compiler = this._compilers.get(node.type)
     if (!compiler) {
-      throw new DocxKitError(
-        'UNKNOWN_NODE_TYPE',
-        `Unknown node type: ${node.type}`,
-      )
+      throw createDocxKitError('UNKNOWN_NODE_TYPE', { nodeType: node.type })
     }
     return compiler(node, ctx)
   }

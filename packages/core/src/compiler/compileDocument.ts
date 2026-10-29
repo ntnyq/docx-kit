@@ -11,7 +11,7 @@
  * @module compiler/compileDocument
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import {
   Column,
   Document,
@@ -313,10 +313,7 @@ async function compileHeaderFooterChildren<TStyles extends StyleSheet>(
         if (child instanceof Paragraph || child instanceof Table) {
           result.push(child)
         } else {
-          throw new DocxKitError(
-            'HEADER_FOOTER_INVALID_CONTENT',
-            'Header and footer plugins must render paragraphs or tables',
-          )
+          throw createDocxKitError('HEADER_FOOTER_INVALID_CONTENT', {})
         }
       }
     }

@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { DocxKitError, PluginLoader } from '@docxkit/core'
+import { createDocxKitError, PluginLoader } from '@docxkit/core'
 import { loadLocalPlugin } from './sources/local'
 import { loadUrlPlugin } from './sources/url'
 import { DOCX_KIT_VERSION } from './version'
@@ -44,10 +44,9 @@ class BrowserPluginLoader extends PluginLoader {
       : new URL('docx-kit.plugin.json', sourceUrl)
     const response = await fetch(manifestUrl)
     if (!response.ok) {
-      throw new DocxKitError(
-        'MANIFEST_MISSING',
-        `Plugin manifest could not be loaded from "${manifestUrl.href}": HTTP ${response.status}`,
-      )
+      throw createDocxKitError('MANIFEST_MISSING', {
+        detail: `Plugin manifest could not be loaded from "${manifestUrl.href}": HTTP ${response.status}`,
+      })
     }
 
     const manifest = await authorizeManifest(await response.json())
@@ -61,10 +60,9 @@ class BrowserPluginLoader extends PluginLoader {
       entry.origin !== packageUrl.origin
       || !entry.pathname.startsWith(packageUrl.pathname)
     ) {
-      throw new DocxKitError(
-        'MANIFEST_INVALID',
-        `Plugin entry "${manifest.main}" resolves outside its package URL`,
-      )
+      throw createDocxKitError('MANIFEST_INVALID', {
+        detail: `Plugin entry "${manifest.main}" resolves outside its package URL`,
+      })
     }
 
     return load(entryUrl, {

@@ -13,7 +13,7 @@ import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { DocxKitError } from '@docxkit/core'
+import { createDocxKitError, DocxKitError } from '@docxkit/core'
 import { resolvePluginExport } from '../utils'
 import { resolveManifest } from './options'
 
@@ -66,21 +66,21 @@ export async function loadNpmPlugin(
     // We need to walk up to the package root
     pkgPath = resolvePackageRoot(pkgPath)
   } catch {
-    throw new DocxKitError(
-      'PLUGIN_LOAD_FAILED',
-      `npm package "${packageName}" could not be resolved. Is it installed?`,
-    )
+    throw createDocxKitError('PLUGIN_LOAD_FAILED', {
+      detail: `npm package "${packageName}" could not be resolved. Is it installed?`,
+      reason: 'import',
+    })
   }
 
   // Read and validate the manifest
   const manifestPath = path.join(pkgPath, 'docx-kit.plugin.json')
 
   if (!existsSync(manifestPath)) {
-    throw new DocxKitError(
-      'MANIFEST_MISSING',
-      `Plugin manifest not found for package "${packageName}". `
+    throw createDocxKitError('MANIFEST_MISSING', {
+      detail:
+        `Plugin manifest not found for package "${packageName}". `
         + `Expected: ${manifestPath}`,
-    )
+    })
   }
 
   let manifest: NonNullable<Awaited<ReturnType<typeof resolveManifest>>>
@@ -94,10 +94,10 @@ export async function loadNpmPlugin(
     if (error instanceof DocxKitError) {
       throw error
     }
-    throw new DocxKitError(
+    throw createDocxKitError(
       'MANIFEST_INVALID',
-      `Failed to parse manifest for "${packageName}"`,
-      error,
+      { detail: `Failed to parse manifest for "${packageName}"` },
+      { cause: error },
     )
   }
 
@@ -105,10 +105,9 @@ export async function loadNpmPlugin(
   const entryPath = path.resolve(pkgPath, manifest.main)
   const packagePrefix = `${path.resolve(pkgPath)}${path.sep}`
   if (!entryPath.startsWith(packagePrefix)) {
-    throw new DocxKitError(
-      'MANIFEST_INVALID',
-      `Plugin entry "${manifest.main}" resolves outside package "${packageName}"`,
-    )
+    throw createDocxKitError('MANIFEST_INVALID', {
+      detail: `Plugin entry "${manifest.main}" resolves outside package "${packageName}"`,
+    })
   }
 
   // Dynamic import the plugin module
@@ -117,10 +116,13 @@ export async function loadNpmPlugin(
     mod = (await import(pathToFileURL(entryPath).href)) as
       DocxPlugin | { default?: unknown }
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'PLUGIN_LOAD_FAILED',
-      `Failed to import plugin module "${manifest.main}" from "${packageName}"`,
-      error,
+      {
+        detail: `Failed to import plugin module "${manifest.main}" from "${packageName}"`,
+        reason: 'import',
+      },
+      { cause: error },
     )
   }
 

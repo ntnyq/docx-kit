@@ -44,6 +44,7 @@ function withPrefix(prefix: string, link: string) {
 export const englishNav: LinkItem[] = [
   { link: '/guide/getting-started', text: 'Guide' },
   { link: '/api/types', text: 'API' },
+  { link: '/errors/', text: 'Error reference' },
   { link: '/ecosystem/packages', text: 'Packages' },
   { link: '/plugins/', text: 'Plugins' },
   { link: '/examples/basic-report', text: 'Examples' },
@@ -54,6 +55,7 @@ export const englishNav: LinkItem[] = [
 export const simplifiedNav: LinkItem[] = [
   { link: '/guide/getting-started', text: '指南' },
   { link: '/api/types', text: 'API' },
+  { link: '/errors/', text: '错误参考' },
   { link: '/ecosystem/packages', text: '包总览' },
   { link: '/plugins/', text: '插件' },
   { link: '/examples/basic-report', text: '示例' },
@@ -64,6 +66,7 @@ export const simplifiedNav: LinkItem[] = [
 export const traditionalNav: LinkItem[] = [
   { link: '/guide/getting-started', text: '指南' },
   { link: '/api/types', text: 'API' },
+  { link: '/errors/', text: '錯誤參考' },
   { link: '/ecosystem/packages', text: '套件總覽' },
   { link: '/plugins/', text: '外掛' },
   { link: '/examples/basic-report', text: '範例' },
@@ -303,6 +306,9 @@ export function buildEnglishSidebar() {
     '/examples/': section(rootPrefix, 'Examples', exampleLinks),
     '/guide/': section(rootPrefix, 'Guide', guideLinks),
     '/plugins/': section(rootPrefix, 'Plugins', pluginLinks),
+    '/errors/': section('', 'Error reference', [
+      { link: '/errors/', text: 'Error reference' },
+    ]),
   }
 }
 
@@ -313,6 +319,9 @@ export function buildSimplifiedSidebar(prefix: string) {
     [`${prefix}/examples/`]: section(prefix, '示例', zhExampleLinks),
     [`${prefix}/guide/`]: section(prefix, '指南', zhGuideLinks),
     [`${prefix}/plugins/`]: section(prefix, '插件', zhPluginLinks),
+    [`${prefix}/errors/`]: section(prefix, '错误参考', [
+      { link: '/errors/', text: '错误参考' },
+    ]),
   }
 }
 
@@ -323,6 +332,9 @@ export function buildTraditionalSidebar(prefix: string) {
     [`${prefix}/examples/`]: section(prefix, '範例', zhTwExampleLinks),
     [`${prefix}/guide/`]: section(prefix, '指南', zhTwGuideLinks),
     [`${prefix}/plugins/`]: section(prefix, '外掛', zhTwPluginLinks),
+    [`${prefix}/errors/`]: section(prefix, '錯誤參考', [
+      { link: '/errors/', text: '錯誤參考' },
+    ]),
   }
 }
 

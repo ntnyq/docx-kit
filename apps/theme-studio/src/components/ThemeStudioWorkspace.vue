@@ -33,6 +33,7 @@ const {
   selectedLayoutId,
   selectedThemeId,
   stale,
+  studioDiagnostic,
   studioError,
 } = studio
 const isMobile = useMediaQuery('(max-width: 767px)')
@@ -143,6 +144,7 @@ onMounted(() => {
           v-model:zoom="zoom"
           :blob="previewBlob"
           :error="studioError"
+          :diagnostic="studioDiagnostic"
           :loading
           :stale
           studio

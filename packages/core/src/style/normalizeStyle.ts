@@ -7,7 +7,7 @@
  * @module style/normalizeStyle
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import { resolveThemeTokens } from './theme'
 import type {
   DocxStyleRule,
@@ -97,21 +97,17 @@ function resolveStyleClass(
   visited: Set<string>,
 ): DocxStyleRule {
   if (visited.has(name)) {
-    throw new DocxKitError(
-      'STYLE_CIRCULAR_EXTENDS',
-      `Circular extends detected for style class "${name}". `
-        + `Chain: ${[...visited, name].join(' → ')}`,
-    )
+    throw createDocxKitError('STYLE_CIRCULAR_EXTENDS', {
+      chain: [...visited, name],
+      className: name,
+    })
   }
 
   const entry = styles?.[name]
   if (!entry) {
     // Only throw if styles are explicitly provided — allows optional stylesheets
     if (styles) {
-      throw new DocxKitError(
-        'STYLE_UNKNOWN_CLASS',
-        `Style class not found: "${name}"`,
-      )
+      throw createDocxKitError('STYLE_UNKNOWN_CLASS', { className: name })
     }
     return {}
   }

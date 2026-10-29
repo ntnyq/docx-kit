@@ -4,7 +4,11 @@ import { resolve } from 'node:path'
 const assets = resolve(import.meta.dirname, '../docs/.vitepress/dist/assets')
 const files = readdirSync(assets).filter(name => name.endsWith('.js'))
 for (const name of files) {
-  if (/monaco|\.worker-|playground|theme-studio/i.test(name)) {
+  if (
+    /monaco|\.worker-|playground|theme-studio|^(?:generate-error-docs|nostics|catalog)[.-]/i.test(
+      name,
+    )
+  ) {
     throw new Error(
       `Application code leaked into the documentation bundle: ${name}`,
     )

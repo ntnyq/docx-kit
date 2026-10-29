@@ -15,7 +15,7 @@
  * @module loader/sources/url
  */
 
-import { DocxKitError } from '@docxkit/core'
+import { createDocxKitError } from '@docxkit/core'
 import { resolvePluginExport } from '../utils'
 import { resolveManifest } from './options'
 
@@ -45,10 +45,13 @@ export async function loadUrlPlugin(
     mod = (await import(/* @vite-ignore */ url)) as
       DocxPlugin | { default?: unknown }
   } catch (error) {
-    throw new DocxKitError(
+    throw createDocxKitError(
       'PLUGIN_LOAD_FAILED',
-      `Failed to import plugin from URL: "${url}"`,
-      error,
+      {
+        detail: `Failed to import plugin from URL: "${url}"`,
+        reason: 'import',
+      },
+      { cause: error },
     )
   }
 

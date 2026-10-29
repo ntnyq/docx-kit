@@ -12,6 +12,7 @@ import {
 import { computed, toRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDocumentPreview } from '../composables/useDocumentPreview'
+import DiagnosticDetails from './DiagnosticDetails.vue'
 import IconButton from './IconButton.vue'
 import { Button } from './ui/button'
 import {
@@ -22,6 +23,7 @@ import {
 } from './ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Switch } from './ui/switch'
+import type { SerializedDocxKitError } from '../lib/diagnostics'
 
 interface Props {
   /**
@@ -36,6 +38,10 @@ interface Props {
    * Generation is pending or in flight.
    */
   loading: boolean
+  /**
+   * Repair guidance for generation errors when a diagnostic is available.
+   */
+  diagnostic?: SerializedDocxKitError | null
   /**
    * The source has changed since the displayed document was generated.
    */
@@ -52,12 +58,8 @@ const zoom = defineModel<'fit' | number>('zoom', { default: 'fit' })
 const { t } = useI18n()
 const previewContainer = useTemplateRef<HTMLElement>('previewContainer')
 const viewport = useTemplateRef<HTMLElement>('viewport')
-const { pageCount, renderError, rendering, scale } = useDocumentPreview(
-  toRef(props, 'blob'),
-  previewContainer,
-  viewport,
-  zoom,
-)
+const { pageCount, renderDiagnostic, renderError, rendering, scale } =
+  useDocumentPreview(toRef(props, 'blob'), previewContainer, viewport, zoom)
 const isBusy = computed(() => props.loading || rendering.value)
 const zoomLabel = computed(() =>
   zoom.value === 'fit' ? t('fitWidth') : `${Math.round(zoom.value * 100)}%`,
@@ -138,6 +140,10 @@ function adjustZoom(delta: number) {
         <pre
           class="max-h-60 overflow-auto whitespace-pre-wrap break-words font-mono text-xs"
           >{{ error }}</pre>
+        <DiagnosticDetails
+          v-if="diagnostic"
+          :diagnostic
+        />
         <Button
           @click="emit('refresh')"
           :disabled="loading"
@@ -216,6 +222,10 @@ function adjustZoom(delta: number) {
           {{ t('previewRenderFailed') }}
         </p>
         <pre class="my-2 whitespace-pre-wrap">{{ renderError }}</pre>
+        <DiagnosticDetails
+          v-if="renderDiagnostic"
+          :diagnostic="renderDiagnostic"
+        />
         <p>{{ t('downloadAfterError') }}</p>
       </div>
     </div>

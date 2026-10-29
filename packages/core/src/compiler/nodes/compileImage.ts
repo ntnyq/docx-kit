@@ -4,7 +4,7 @@
  * @module compiler/nodes/compileImage
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError } from '@docxkit/errors'
 import { Paragraph, TextWrappingSide, TextWrappingType } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
@@ -27,16 +27,18 @@ export async function compileImage<TStyles extends StyleSheet>(
     node.data == null
     || (typeof node.data === 'string' && node.data.length === 0)
   ) {
-    throw new DocxKitError('IMAGE_INVALID_DATA', 'Image data is empty or null')
+    throw createDocxKitError('IMAGE_INVALID_DATA', {
+      detail: 'Image data is empty or null',
+    })
   }
 
   const data = await normalizeImageData(node.data, config.resolveImage)
   const metadata = readImageMetadata(data, node.imageType)
   if (!metadata) {
-    throw new DocxKitError(
-      'IMAGE_INVALID_DATA',
-      'Image format could not be detected; provide a supported imageType',
-    )
+    throw createDocxKitError('IMAGE_INVALID_DATA', {
+      detail:
+        'Image format could not be detected; provide a supported imageType',
+    })
   }
   const dimensions = resolveImageDimensions(
     toPx(node.width),
@@ -120,19 +122,19 @@ export async function normalizeImageData(
       try {
         return await normalizeImageData(await resolveImage(data))
       } catch (error) {
-        throw new DocxKitError(
+        throw createDocxKitError(
           'IMAGE_INVALID_DATA',
-          `Could not resolve image: ${data}`,
-          error,
+          { detail: `Could not resolve image: ${data}` },
+          { cause: error },
         )
       }
     }
     // Preserve raw base64 support while rejecting paths before docx decodes them.
     if (!isBase64) {
-      throw new DocxKitError(
-        'IMAGE_INVALID_DATA',
-        'Image paths require docx-kit/node or config.resolveImage; otherwise supply bytes or a data URL',
-      )
+      throw createDocxKitError('IMAGE_INVALID_DATA', {
+        detail:
+          'Image paths require docx-kit/node or config.resolveImage; otherwise supply bytes or a data URL',
+      })
     }
   }
   return data as string | ArrayBuffer | Buffer | Uint8Array

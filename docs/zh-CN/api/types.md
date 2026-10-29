@@ -32,6 +32,25 @@ docx-kit 的类型系统按功能划分。选择以下章节查看详细类型�
 |---|---|
 | `DocxKitError` | 带有 `code`、`message` 和 `cause` 的错误基类 |
 | `ErrorCode` | 错误代码字面量联合类型（`EXPORT_FAILED`、`PLUGIN_NOT_REGISTERED` 等） |
+| `DiagnosticCode` | 带 DOCXKIT_ 前缀的完整诊断码联合类型。 |
+| `ErrorParams<Code>` | 指定旧错误码对应的目录参数。 |
+| `CreateDocxKitErrorOptions` | 原始 cause，以及可选的旧消息覆盖。 |
+| `DocxKitErrorDetails` | 可选的修复建议、文档链接和来源位置。 |
+| `SerializedDocxKitError` | 供应用和 MCP 输出使用的白名单错误 DTO。 |
+| `PluginLoadReason` | 用于选择修复建议的显式插件加载失败原因。 |
+
+使用 `createDocxKitError(code, params, options?)` 创建错误，使用 `serializeDocxKitError(error)` 序列化。`DIAGNOSTIC_CODES` 将旧错误码映射为完整诊断码。现有构造器、自定义字符串码、错误名称、消息和 cause 保持兼容。
+
+完整错误码及修复步骤见[错误参考](/zh-CN/errors/)。
+
+```ts
+import { createDocxKitError, serializeDocxKitError } from 'docx-kit'
+import type { ErrorParams } from 'docx-kit'
+
+const params: ErrorParams<'PLUGIN_NOT_REGISTERED'> = { pluginName: 'qrcode' }
+const error = createDocxKitError('PLUGIN_NOT_REGISTERED', params)
+console.error(serializeDocxKitError(error))
+```
 
 完整错误代码列表和使用方式见[错误处理](/zh-CN/guide/errors)。
 

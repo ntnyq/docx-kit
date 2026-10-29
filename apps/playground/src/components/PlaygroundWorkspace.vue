@@ -25,6 +25,7 @@ const {
   code,
   hasEdits,
   loading,
+  playgroundDiagnostic,
   playgroundError,
   resultBlob,
   stale,
@@ -128,6 +129,7 @@ onMounted(() => {
             v-model:zoom="zoom"
             :blob="resultBlob"
             :error="playgroundError"
+            :diagnostic="playgroundDiagnostic"
             :loading
             :stale
         /></ResizablePanel>

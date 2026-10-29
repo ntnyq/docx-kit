@@ -8,7 +8,7 @@
  * @module loader/PluginLoader
  */
 
-import { DocxKitError } from '@docxkit/errors'
+import { createDocxKitError, DocxKitError } from '@docxkit/errors'
 import { isValid, isValidRange, satisfies } from 'verkit'
 import { validateManifest } from './manifest'
 import type { DocxPlugin, MaybePromise } from '@docxkit/types'
@@ -226,10 +226,13 @@ export class PluginLoader {
       if (error instanceof DocxKitError) {
         throw error
       }
-      throw new DocxKitError(
+      throw createDocxKitError(
         'PLUGIN_LOAD_FAILED',
-        `Failed to load plugin from ${source.type} source`,
-        error,
+        {
+          detail: `Failed to load plugin from ${source.type} source`,
+          reason: 'import',
+        },
+        { cause: error },
       )
     }
 
@@ -286,10 +289,11 @@ export class PluginLoader {
       || !isValidRange(range)
       || !satisfies(kitVersion, range)
     ) {
-      throw new DocxKitError(
-        'PLUGIN_VERSION_MISMATCH',
-        `Plugin "${manifest.plugin.name}" requires docx-kit range "${range}" but ${kitVersion} is installed`,
-      )
+      throw createDocxKitError('PLUGIN_VERSION_MISMATCH', {
+        kitVersion,
+        pluginName: manifest.plugin.name,
+        range,
+      })
     }
   }
 
@@ -323,10 +327,10 @@ export class PluginLoader {
     path: string,
     _authorizeManifest: PluginManifestAuthorizer,
   ): Promise<{ manifest: PluginManifest | null; plugin: DocxPlugin }> {
-    throw new DocxKitError(
-      'PLUGIN_LOAD_FAILED',
-      `Local plugin loading not available in this environment. Cannot load: "${path}"`,
-    )
+    throw createDocxKitError('PLUGIN_LOAD_FAILED', {
+      detail: `Local plugin loading not available in this environment. Cannot load: "${path}"`,
+      reason: 'environment',
+    })
   }
 
   /**
@@ -342,11 +346,12 @@ export class PluginLoader {
     packageName: string,
     _authorizeManifest: PluginManifestAuthorizer,
   ): Promise<{ manifest: PluginManifest; plugin: DocxPlugin }> {
-    throw new DocxKitError(
-      'PLUGIN_LOAD_FAILED',
-      `npm plugin loading requires Node.js. Import from 'docx-kit/loader/node'. `
+    throw createDocxKitError('PLUGIN_LOAD_FAILED', {
+      reason: 'environment',
+      detail:
+        `npm plugin loading requires Node.js. Import from 'docx-kit/loader/node'. `
         + `Cannot load: "${packageName}"`,
-    )
+    })
   }
 
   // ---------- Internal: Validation ----------
@@ -364,11 +369,12 @@ export class PluginLoader {
     url: string,
     _authorizeManifest: PluginManifestAuthorizer,
   ): Promise<{ manifest: PluginManifest | null; plugin: DocxPlugin }> {
-    throw new DocxKitError(
-      'PLUGIN_LOAD_FAILED',
-      `URL plugin loading requires browser. Import from 'docx-kit/loader/browser'. `
+    throw createDocxKitError('PLUGIN_LOAD_FAILED', {
+      reason: 'environment',
+      detail:
+        `URL plugin loading requires browser. Import from 'docx-kit/loader/browser'. `
         + `Cannot load: "${url}"`,
-    )
+    })
   }
 
   /**
@@ -418,10 +424,10 @@ export class PluginLoader {
     if (this.options.security.allowExecute) {
       const allowed = await this.options.security.allowExecute(manifest, source)
       if (!allowed) {
-        throw new DocxKitError(
-          'PLUGIN_LOAD_FAILED',
-          `Plugin execution blocked by security policy: ${manifest.plugin.name}`,
-        )
+        throw createDocxKitError('PLUGIN_LOAD_FAILED', {
+          detail: `Plugin execution blocked by security policy: ${manifest.plugin.name}`,
+          reason: 'security',
+        })
       }
     }
   }
@@ -435,10 +441,10 @@ export class PluginLoader {
     if (this.options.security.allowLoad) {
       const allowed = await this.options.security.allowLoad(source)
       if (!allowed) {
-        throw new DocxKitError(
-          'PLUGIN_LOAD_FAILED',
-          `Plugin loading blocked by security policy: ${source.type}`,
-        )
+        throw createDocxKitError('PLUGIN_LOAD_FAILED', {
+          detail: `Plugin loading blocked by security policy: ${source.type}`,
+          reason: 'security',
+        })
       }
     }
   }

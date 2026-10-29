@@ -12,6 +12,7 @@ import {
 
 export default defineConfig({
   lang: 'en-US',
+  srcExclude: ['errors/_meta/**'],
   title: APP_TITLE,
   description:
     'CSS-like DOCX API Kit — Type-safe, plugin-extensible Word document generation',
