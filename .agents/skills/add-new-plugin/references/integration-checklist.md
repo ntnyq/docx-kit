@@ -45,7 +45,6 @@ Verify these real usage paths at minimum:
 | `scripts/generate-monaco-types.ts` | Add the package and real `dist/index.d.ts` path to `WORKSPACE_MODULES`; ensure additional referenced modules resolve in the type libraries |
 | `apps/playground/src/utils/monacoTypes.test.ts` | Verify that new exports, options, and public usage examples resolve in Monaco |
 | `apps/playground/src/utils/monacoTypes.generated.ts` | Build packages first, then regenerate; do not edit by hand |
-| `scripts/check-doc-examples.ts` | Add the factory to `pluginFactories` so documentation checks catch missing factory calls |
 
 The Playground currently injects only named imports from `docx-kit` and `docx`. Examples must use public entry points and cannot assume arbitrary third-party imports execute. The runtime loads through `import('docx-kit')`; no additional static injection table is needed.
 

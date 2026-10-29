@@ -85,7 +85,7 @@ describe('renderPackageJson', () => {
     expect(parsed.keywords).toContain('chart')
     expect(parsed.exports['.'].default).toBe('./dist/index.js')
     expect(parsed.files).toContain('docx-kit.plugin.json')
-    expect(parsed.peerDependencies.docx).toBe('^9.7.1')
+    expect(parsed.peerDependencies.docx).toBe('^9.15.0')
     expect(parsed.peerDependencies['docx-kit']).toBe(`^${packageJson.version}`)
     expect(parsed.devDependencies['docx-kit']).toBe(`^${packageJson.version}`)
     expect(parsed.devDependencies.tsdown).toBe('^0.23.3')

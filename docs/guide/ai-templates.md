@@ -171,7 +171,7 @@ const guide = generateSchemaGuide()
 // Returns a multi-line string with:
 // - DocxSchema structure overview
 // - All block node types with examples
-// - All built-in plugins with option schemas
+// - All built-in plugins with executable DSL examples
 ```
 
 ## Tool Definitions
@@ -223,7 +223,7 @@ if (result) {
 ## Template Discovery
 
 ```ts
-import { buildTemplateInfoList } from 'docx-kit/ai'
+import { buildTemplateInfoList } from 'docx-kit/mcp'
 
 const templates = buildTemplateInfoList()
 // Returns: [
@@ -232,4 +232,17 @@ const templates = buildTemplateInfoList()
 //   { name: 'resume', ... },
 //   { name: 'letter', ... },
 // ]
+```
+
+
+## Template Input Validation
+
+`generateToolDefinitions()` emits standard JSON Schema, including nested required fields. For custom integrations, use `toTemplateJsonSchema()` to convert template field definitions and `validateTemplateData()` to check unknown input. `applyTemplate()` validates before generation and throws a `TypeError` containing JSON Pointer paths for invalid parameters.
+
+```ts
+import { reportTemplate, toTemplateJsonSchema, validateTemplateData } from 'docx-kit/ai'
+
+const inputSchema = toTemplateJsonSchema(reportTemplate.schema)
+const errors = validateTemplateData(reportTemplate.schema, {})
+// [{ path: '/title', message: 'Required field is missing' }]
 ```

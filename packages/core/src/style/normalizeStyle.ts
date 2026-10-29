@@ -74,8 +74,9 @@ export function resolveStyle(options: ResolveStyleOptions): DocxStyleRule {
       ? options.className.split(/\s+/).filter(Boolean)
       : []
 
+  const cache = new Map<string, DocxStyleRule>()
   const classStyles = classNames.map(name =>
-    resolveStyleClass(name, options.styles, new Set()),
+    resolveStyleClass(name, options.styles, new Set(), cache),
   )
 
   // Merge: base → class(es) → inline
@@ -95,12 +96,18 @@ function resolveStyleClass(
   name: string,
   styles: StyleSheet | undefined,
   visited: Set<string>,
+  cache: Map<string, DocxStyleRule>,
 ): DocxStyleRule {
   if (visited.has(name)) {
     throw createDocxKitError('STYLE_CIRCULAR_EXTENDS', {
       chain: [...visited, name],
       className: name,
     })
+  }
+
+  const cached = cache.get(name)
+  if (cached) {
+    return cached
   }
 
   const entry = styles?.[name]
@@ -123,12 +130,13 @@ function resolveStyleClass(
   if (extendsValue) {
     const parents = Array.isArray(extendsValue) ? extendsValue : [extendsValue]
     const parentStyles = parents.map(parent =>
-      resolveStyleClass(parent, styles, new Set(visited)),
+      resolveStyleClass(parent, styles, visited, cache),
     )
     // Merge: parent styles as base, own properties override
     resolved = Object.assign({}, ...parentStyles, styleRule)
   }
 
   visited.delete(name)
+  cache.set(name, resolved)
   return resolved
 }

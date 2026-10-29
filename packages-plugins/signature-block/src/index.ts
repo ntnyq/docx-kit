@@ -42,7 +42,7 @@ export interface SignatureBlockOptions {
    */
   parties: SignatureParty[]
   /**
-   * Number of columns in the signature grid.
+   * Maximum columns in the signature grid, capped at the number of parties.
    * @default 2
    */
   columns?: number
@@ -97,6 +97,8 @@ export function signatureBlockPlugin() {
           }),
         )
       }
+
+      const columnCount = Math.min(columns, parties.length)
 
       // Build cell for a single party
       function buildPartyCell(party: SignatureParty): TableCell {
@@ -153,24 +155,29 @@ export function signatureBlockPlugin() {
         )
       }
 
-      // Arrange parties into rows of `columns` each
+      // Bound padding by the actual input rather than a caller-supplied count.
       const partyRows: SignatureParty[][] = []
-      for (let i = 0; i < parties.length; i += columns) {
-        partyRows[partyRows.length] = parties.slice(i, i + columns)
+      for (let i = 0; i < parties.length; i += columnCount) {
+        partyRows[partyRows.length] = parties.slice(i, i + columnCount)
       }
 
       const rows = partyRows.map(rowParties => {
         let rowCells = rowParties.map(buildPartyCell)
 
-        // Pad last row if needed so all rows have `columns` cells
-        if (rowCells.length < columns) {
-          const emptyCell = new TableCell(
-            pluginStyles.cell({
-              children: [new Paragraph(pluginStyles.paragraph({ text: '' }))],
-            }),
+        // Pad the final row without sharing mutable docx cell objects.
+        if (rowCells.length < columnCount) {
+          const padCount = columnCount - rowCells.length
+          const padding = Array.from(
+            { length: padCount },
+            () =>
+              new TableCell(
+                pluginStyles.cell({
+                  children: [
+                    new Paragraph(pluginStyles.paragraph({ text: '' })),
+                  ],
+                }),
+              ),
           )
-          const padCount = columns - rowCells.length
-          const padding = Array.from({ length: padCount }).map(() => emptyCell)
           rowCells = [...rowCells, ...padding]
         }
 

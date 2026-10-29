@@ -22,7 +22,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
       - run: pnpm run lint
-      - run: pnpm run typecheck
+      - run: pnpm run typecheck:workspace
       - run: pnpm run docs:verify
       - run: pnpm run apps:verify
       - run: pnpm run release:artifacts

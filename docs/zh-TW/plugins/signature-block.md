@@ -13,7 +13,7 @@ import { signatureBlockPlugin, type SignatureBlockOptions, type SignatureParty }
 | 選項 | 型別 | 預設值 | 說明 |
 |--------|------|---------|-------------|
 | `parties` | `SignatureParty[]` | _必填_ | 簽署方 |
-| `columns` | `number` | `2` | 簽名網格欄數 |
+| `columns` | `number` | `2` | 最大欄數，不超過簽署方人數 |
 
 ### `SignatureParty`
 

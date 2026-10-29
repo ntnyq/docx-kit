@@ -3,10 +3,10 @@
 ## Installation
 
 ```bash
-pnpm add docx-kit
+pnpm add docx-kit docx
 ```
 
-`docx-kit` depends on [`docx`](https://github.com/dolanmiu/docx) as its runtime engine — no additional setup needed.
+Install `docx` 9.15.0 or later in the 9.x series as a shared peer dependency. The builder, built-in plugins, and custom plugins must use the same `docx` instance.
 
 ### Optional Peer Dependencies
 

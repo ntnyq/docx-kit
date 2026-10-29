@@ -193,6 +193,9 @@ importers:
       bumpp:
         specifier: ^12.3.0
         version: 12.3.0
+      docx:
+        specifier: ^9.15.0
+        version: 9.15.0
       echarts:
         specifier: ^6.1.0
         version: 6.1.0
@@ -411,7 +414,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -424,7 +427,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -449,7 +452,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -465,7 +468,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -478,7 +481,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -500,7 +503,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
       highlight.js:
         specifier: '>=11.0.0'
@@ -519,7 +522,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -532,7 +535,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -548,7 +551,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -564,7 +567,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
       echarts:
         specifier: '>=5.0.0'
@@ -583,7 +586,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -605,7 +608,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -618,7 +621,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -631,7 +634,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -644,7 +647,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -660,7 +663,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -676,7 +679,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -689,7 +692,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -708,7 +711,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -724,7 +727,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -740,7 +743,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -753,7 +756,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/pdk':
@@ -801,6 +804,10 @@ importers:
       '@docxkit/core':
         specifier: workspace:*
         version: link:../core
+    devDependencies:
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
 
   packages/core:
     dependencies:
@@ -810,13 +817,13 @@ importers:
       '@docxkit/types':
         specifier: workspace:*
         version: link:../types
-      docx:
-        specifier: ^9.15.0
-        version: 9.15.0
       verkit:
         specifier: ^0.5.0
         version: 0.5.0
     devDependencies:
+      docx:
+        specifier: ^9.15.0
+        version: 9.15.0
       jszip:
         specifier: ^3.10.2
         version: 3.10.2
@@ -951,7 +958,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages-themes/warm
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       jszip:
@@ -1087,7 +1094,7 @@ importers:
   packages/pdk:
     dependencies:
       docx:
-        specifier: ^9.7.1
+        specifier: ^9.15.0
         version: 9.15.0
     devDependencies:
       '@docxkit/core':

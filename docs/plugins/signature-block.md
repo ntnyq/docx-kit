@@ -13,7 +13,7 @@ import { signatureBlockPlugin, type SignatureBlockOptions, type SignatureParty }
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `parties` | `SignatureParty[]` | _(required)_ | The signing parties |
-| `columns` | `number` | `2` | Number of columns in the signature grid |
+| `columns` | `number` | `2` | Maximum columns, capped at the number of parties |
 
 ### `SignatureParty`
 

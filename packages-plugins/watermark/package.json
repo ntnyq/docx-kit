@@ -39,7 +39,7 @@
   },
   "peerDependencies": {
     "@docxkit/core": "workspace:*",
-    "docx": "^9.7.1"
+    "docx": "^9.15.0"
   },
   "devDependencies": {
     "@docxkit/pdk": "workspace:*"

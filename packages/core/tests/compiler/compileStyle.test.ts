@@ -38,8 +38,8 @@ describe('compileTextStyle', () => {
 
   it('compiles color (strips #)', () => {
     expect(compileTextStyle({ color: '#ff0000' }).color).toBe('ff0000')
-    expect(compileTextStyle({ color: '#333' }).color).toBe('333')
-    expect(compileTextStyle({ color: '333' }).color).toBe('333')
+    expect(compileTextStyle({ color: '#333' }).color).toBe('333333')
+    expect(compileTextStyle({ color: '333' }).color).toBe('333333')
   })
 
   it('compiles fontFamily', () => {

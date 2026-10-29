@@ -46,16 +46,18 @@
 ## 安装
 
 ```shell
-npm install docx-kit
+npm install docx-kit docx
 ```
 
 ```shell
-yarn add docx-kit
+yarn add docx-kit docx
 ```
 
 ```shell
-pnpm add docx-kit
+pnpm add docx-kit docx
 ```
+
+请使用 9.x 系列中不低于 9.15.0 的 `docx`，核心和插件共享这份对等依赖。
 
 ---
 

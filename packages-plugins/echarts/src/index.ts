@@ -227,50 +227,42 @@ async function renderInBrowser(
   container.style.cssText = `width:${config.width}px;height:${config.height}px;position:fixed;left:-99999px;`
   document.body.append(container)
 
-  let chart = echarts.init(container, undefined, {
-    height: config.height,
-    renderer: config.renderer,
-    width: config.width,
-  })
-  chart.setOption({ ...option, animation: false })
-
-  const dataUrl = chart.getDataURL({
-    backgroundColor: '#ffffff',
-    pixelRatio: 2,
-    type: config.imageType === 'svg' ? 'svg' : 'png',
-  })
-
-  chart.dispose()
-
-  if (config.imageType === 'svg') {
-    chart = echarts.init(container, undefined, {
+  function captureChart(renderer: RenderConfig['renderer']) {
+    const chart = echarts.init(container, undefined, {
       height: config.height,
-      renderer: 'canvas',
+      renderer,
       width: config.width,
     })
-    chart.setOption({ ...option, animation: false })
-    const fallbackUrl = chart.getDataURL({
-      backgroundColor: '#ffffff',
-      pixelRatio: 2,
-      type: 'png',
-    })
-    chart.dispose()
-    container.remove()
-
-    return {
-      data: await dataUrlToUint8Array(dataUrl),
-      type: 'svg',
-      fallback: {
-        data: await dataUrlToUint8Array(fallbackUrl),
-        type: 'png',
-      },
+    try {
+      chart.setOption({ ...option, animation: false })
+      return chart.getDataURL({
+        backgroundColor: '#ffffff',
+        pixelRatio: 2,
+        type: renderer === 'svg' ? 'svg' : 'png',
+      })
+    } finally {
+      chart.dispose()
     }
   }
 
-  container.remove()
-  return {
-    data: await dataUrlToUint8Array(dataUrl),
-    type: 'png',
+  try {
+    const data = await dataUrlToUint8Array(captureChart(config.renderer))
+    if (config.imageType === 'svg') {
+      return {
+        data,
+        type: 'svg',
+        fallback: {
+          data: await dataUrlToUint8Array(captureChart('canvas')),
+          type: 'png',
+        },
+      }
+    }
+    return {
+      data,
+      type: 'png',
+    }
+  } finally {
+    container.remove()
   }
 }
 

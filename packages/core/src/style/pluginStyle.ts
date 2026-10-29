@@ -1,4 +1,4 @@
-import { TextRun, UnderlineType } from 'docx'
+import { TextRun } from 'docx'
 import {
   compileCellStyle,
   compileParagraphStyle,
@@ -74,10 +74,6 @@ export function createPluginStyle(
   if (style.italic === undefined && style.fontStyle === undefined) {
     delete text.italics
   }
-  if (style.underline === false) {
-    text.underline = { type: UnderlineType.NONE }
-  }
-
   return {
     cell: options => mergeStyleOptions(options, cell),
     text: options => mergeStyleOptions(options, text),

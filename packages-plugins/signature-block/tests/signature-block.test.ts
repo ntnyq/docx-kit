@@ -103,15 +103,36 @@ describe('signatureBlockPlugin', () => {
     expect(result).toBeInstanceOf(Paragraph)
   })
 
-  it.each([0, -1, 1.5])('rejects invalid column count %s', columns => {
-    expect(() =>
-      signatureBlockPlugin().render(
-        {
-          columns,
-          parties: [{ label: 'Signer' }],
-        },
+  it.each([100_000_000, Number.MAX_SAFE_INTEGER])(
+    'bounds grid allocation by parties when columns is %s',
+    async columns => {
+      const table = await signatureBlockPlugin().render(
+        { columns, parties: [{ label: 'Signer', name: 'Alice' }] },
         createPluginTestContext(),
-      ),
-    ).toThrow('positive integer')
-  })
+      )
+      if (!(table instanceof Table)) {
+        throw new TypeError('Expected a signature table')
+      }
+      const document = new Document({ sections: [{ children: [table] }] })
+      const archive = await JSZip.loadAsync(await Packer.toBuffer(document))
+      const xml = await archive.file('word/document.xml')?.async('string')
+      expect(xml?.match(/<w:tc>/g)).toHaveLength(1)
+      expect(xml).toContain('Alice')
+    },
+  )
+
+  it.each([0, -1, 1.5, NaN, Infinity])(
+    'rejects invalid column count %s',
+    columns => {
+      expect(() =>
+        signatureBlockPlugin().render(
+          {
+            columns,
+            parties: [{ label: 'Signer' }],
+          },
+          createPluginTestContext(),
+        ),
+      ).toThrow('positive integer')
+    },
+  )
 })

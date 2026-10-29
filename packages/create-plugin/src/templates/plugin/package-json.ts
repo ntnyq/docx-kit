@@ -55,7 +55,7 @@ export function renderPackageJson(
         typecheck: 'tsc --noEmit',
       },
       peerDependencies: {
-        docx: '^9.7.1',
+        docx: '^9.15.0',
         'docx-kit': DOCX_KIT_RANGE,
       },
       devDependencies: {

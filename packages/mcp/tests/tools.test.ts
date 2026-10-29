@@ -18,6 +18,7 @@ import {
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { runInNewContext } from 'node:vm'
+import { generateSchemaGuide } from '@docxkit/ai'
 import { createPluginLoader } from '@docxkit/core'
 import JSZip from 'jszip'
 import { PNG } from 'pngjs'
@@ -270,6 +271,7 @@ describe('createDocument', () => {
   it.each(BUILTIN_PLUGIN_CATALOG.filter(plugin => plugin.available))(
     'renders the advertised $name example',
     async plugin => {
+      expect(generateSchemaGuide()).toContain(plugin.usageExample)
       const directory = await mkdtemp(
         path.join(tmpdir(), 'docx-kit-mcp-catalog-'),
       )
@@ -456,6 +458,31 @@ describe('createDocument', () => {
 })
 
 describe('applyTemplate', () => {
+  it.each([
+    { data: {}, path: '/title', template: 'report' },
+    { data: {}, path: '/items', template: 'invoice' },
+    {
+      data: { body: 'HELLO', recipientName: 'Bob', senderName: 'Alice' },
+      path: '/body',
+      template: 'letter',
+    },
+    {
+      data: { name: 'Alice', skills: ['TypeScript', null] },
+      path: '/skills/1',
+      template: 'resume',
+    },
+    {
+      data: { sections: [null], title: 'Report' },
+      path: '/sections/0',
+      template: 'report',
+    },
+  ])(
+    'rejects invalid $template parameters at $path',
+    ({ data, path, template }) => {
+      expect(() => applyTemplate(template, data)).toThrow(path)
+    },
+  )
+
   it('applies report template', () => {
     const result = applyTemplate('report', { title: 'Test Report' })
     expect(result).not.toBeNull()

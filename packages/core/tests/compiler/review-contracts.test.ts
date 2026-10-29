@@ -22,6 +22,55 @@ async function renderPackage(nodes: BlockNode[], config: DocxKitConfig = {}) {
 }
 
 describe('reviewed document contracts', () => {
+  it('exports shorthand text, shading, and border colors as six-digit hex', async () => {
+    const read = await renderPackage([
+      {
+        text: 'Short colors',
+        type: 'paragraph',
+        style: {
+          backgroundColor: '#eF0',
+          borderBottom: { color: '#AbC', width: 1 },
+          color: '#333',
+        },
+      },
+      {
+        cellStyle: { backgroundColor: '#def' },
+        columns: [{ key: 'value', title: 'Value' }],
+        data: [{ value: 'Cell' }],
+        type: 'table',
+      },
+    ])
+    const xml = await read()
+    expect(xml).toContain('<w:color w:val="333333"/>')
+    expect(xml).toContain('w:fill="eeFF00"')
+    expect(xml).toContain('w:color="AAbbCC"')
+    expect(xml).toContain('w:fill="ddeeff"')
+  })
+
+  it('explicitly disables inherited document underlining on paragraphs and spans', async () => {
+    const read = await renderPackage(
+      [
+        {
+          style: { underline: false },
+          text: 'Plain paragraph',
+          type: 'paragraph',
+        },
+        {
+          type: 'paragraph',
+          children: [
+            { text: 'Inherited', type: 'text' },
+            { style: { underline: false }, text: 'Plain span', type: 'text' },
+          ],
+        },
+      ],
+      { defaults: { text: { underline: true } } },
+    )
+    const xml = await read()
+    expect(await read('word/styles.xml')).toContain('<w:u w:val="single"/>')
+    expect(xml.match(/<w:u w:val="none"\/>/g)).toHaveLength(2)
+    expect(xml).toContain('<w:u w:val="single"/>')
+  })
+
   it.each([
     ['Georgia, serif', 'Georgia'],
     ['Inter, Arial, sans-serif', 'Inter'],

@@ -3,10 +3,10 @@
 ## 安装
 
 ```bash
-pnpm add docx-kit
+pnpm add docx-kit docx
 ```
 
-`docx-kit` 使用 [`docx`](https://github.com/dolanmiu/docx) 作为运行时引擎，无需额外配置。
+请安装 9.x 系列中不低于 9.15.0 的 `docx` 作为共享对等依赖。构建器、内置插件和自定义插件需要使用同一份 `docx` 实例。
 
 ### 可选对等依赖
 

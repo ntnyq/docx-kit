@@ -4,7 +4,7 @@
  * @module mcp-server/tools/applyTemplate
  */
 
-import { BUILTIN_TEMPLATES } from '@docxkit/ai'
+import { BUILTIN_TEMPLATES, validateTemplateData } from '@docxkit/ai'
 import type { DocxSchema } from '@docxkit/core'
 
 /**
@@ -67,6 +67,7 @@ export const applyTemplateToolDefinition = {
  * @param templateName - — Template name (e.g. 'report')
  * @param data - — Template parameters
  * @returns Generated DocxSchema and template name, or null if template not found
+ * @throws {TypeError} If parameters do not match the template, with JSON Pointer paths
  */
 export function applyTemplate(
   templateName: string,
@@ -77,6 +78,14 @@ export function applyTemplate(
     return null
   }
 
+  const errors = validateTemplateData(template.schema, data)
+  if (errors.length > 0) {
+    throw new TypeError(
+      `Invalid parameters for template "${templateName}":\n${errors.map(error => `${error.path || '/'}: ${error.message}`).join('\n')}`,
+    )
+  }
+
+  // The selected template's heterogeneous parameter type is checked above.
   const schema = template.generate(data as never)
   return {
     schema,

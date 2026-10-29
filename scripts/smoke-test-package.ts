@@ -174,6 +174,15 @@ try {
     delete externalPeers[workspacePackageName]
   }
 
+  // Exercise the minimum supported host version instead of resolving latest.
+  const minimumDocxVersion = externalPeers.docx?.replace(/^\^/, '')
+  if (!minimumDocxVersion || !/^\d+\.\d+\.\d+$/.test(minimumDocxVersion)) {
+    throw new Error(
+      'The consumer smoke test requires a concrete docx peer minimum',
+    )
+  }
+  externalPeers.docx = minimumDocxVersion
+
   writeFileSync(
     join(temporaryRoot, 'package.json'),
     `${JSON.stringify(
@@ -209,6 +218,7 @@ try {
   writeFileSync(
     join(temporaryRoot, 'smoke.mjs'),
     `import { readFile } from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import { join } from 'node:path'
 
 const expectedExports = [
@@ -254,7 +264,22 @@ try {
   if (error.code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') throw error
 }
 
+const require = createRequire(import.meta.url)
+const coreRequire = createRequire(import.meta.resolve('@docxkit/core'))
+if (coreRequire.resolve('docx') !== require.resolve('docx')) {
+  throw new Error('Core and consumers must share the docx host dependency')
+}
+
 const nodeModule = await import('docx-kit/node')
+const { Paragraph } = await import('docx')
+const figure = { data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', caption: 'Consumer figure' }
+await nodeModule.createDocx()
+  .use(nodeModule.figurePlugin())
+  .use({ name: 'consumerHeader', render: () => new Paragraph('Consumer header') })
+  .section({ header: { default: { children: [{ type: 'plugin', name: 'consumerHeader', options: {} }] } } })
+  .plugin('figure', figure)
+  .toBuffer()
+
 const outputPath = join(import.meta.dirname, 'consumer-smoke.docx')
 await nodeModule
   .createDocx()

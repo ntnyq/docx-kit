@@ -3,10 +3,10 @@
 ## 安裝
 
 ```bash
-pnpm add docx-kit
+pnpm add docx-kit docx
 ```
 
-`docx-kit` 使用 [`docx`](https://github.com/dolanmiu/docx) 作為執行階段引擎，無需額外設定。
+請安裝 9.x 系列中不低於 9.15.0 的 `docx` 作為共用同儕相依套件。建構器、內建外掛與自訂外掛必須使用同一份 `docx` 實例。
 
 ### 可選同儕相依套件
 

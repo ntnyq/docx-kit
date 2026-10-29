@@ -41,7 +41,8 @@ See the [monorepo guide](./docs/ecosystem/monorepo.md) for the package catalog.
 ## Development workflow
 
 1. Create a focused branch.
-2. Add or update tests with the implementation.
+2. Add or update tests for changed behavior. Avoid tests that only repeat
+   static configuration, navigation labels, or exact theme and preset values.
 3. Run the narrowest relevant checks while iterating.
 4. Run the full release verification before requesting review for a broad
    change.
@@ -70,8 +71,13 @@ pnpm run release:verify
 | Loader or registry         | Loader/registry tests, plugin lifecycle E2E      |
 | Browser applications       | `apps:verify` and a real-browser smoke check     |
 | Documentation UI           | `docs:verify` and a real-browser smoke check     |
-| Documentation only         | `docs:examples` and `docs:build`                 |
+| Documentation only         | `docs:verify`                                  |
 | Performance-sensitive path | `bench:node` and, when relevant, `bench:browser` |
+
+`typecheck` includes workspace TypeScript and application Vue checks. CI and
+`release:verify` run `typecheck:workspace` followed by `apps:verify` so Vue
+checks run once. `docs:verify` checks generated error references and builds
+the documentation, including VitePress dead-link validation.
 
 Run the plugin lifecycle test directly with:
 

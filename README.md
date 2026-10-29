@@ -46,16 +46,18 @@
 ## Install
 
 ```shell
-npm install docx-kit
+npm install docx-kit docx
 ```
 
 ```shell
-yarn add docx-kit
+yarn add docx-kit docx
 ```
 
 ```shell
-pnpm add docx-kit
+pnpm add docx-kit docx
 ```
+
+Use `docx` 9.15.0 or later in the 9.x series. Core and plugins share this peer dependency.
 
 ---
 

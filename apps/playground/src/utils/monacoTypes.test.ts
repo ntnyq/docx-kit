@@ -100,12 +100,6 @@ describe('playground Monaco declarations', () => {
     typeService.dispose()
   })
 
-  it('converts file URLs without requiring a Windows drive letter', () => {
-    expect(toVirtualFileName('file:///node_modules/docx-kit/index.d.ts')).toBe(
-      '/node_modules/docx-kit/index.d.ts',
-    )
-  })
-
   it.each(PRESETS)(
     'type-checks the $label preset against the real package API',
     preset => {

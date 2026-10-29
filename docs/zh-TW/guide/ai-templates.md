@@ -171,7 +171,7 @@ const guide = generateSchemaGuide()
 // Returns a multi-line string with:
 // - DocxSchema structure overview
 // - All block node types with examples
-// - All built-in plugins with option schemas
+// - All built-in plugins with executable DSL examples
 ```
 
 ## 工具定義
@@ -223,7 +223,7 @@ if (result) {
 ## 範本發現
 
 ```ts
-import { buildTemplateInfoList } from 'docx-kit/ai'
+import { buildTemplateInfoList } from 'docx-kit/mcp'
 
 const templates = buildTemplateInfoList()
 // Returns: [
@@ -232,4 +232,17 @@ const templates = buildTemplateInfoList()
 //   { name: 'resume', ... },
 //   { name: 'letter', ... },
 // ]
+```
+
+
+## 範本輸入驗證
+
+`generateToolDefinitions()` 輸出標準 JSON Schema，並轉換巢狀必填欄位。自訂整合可用 `toTemplateJsonSchema()` 轉換範本欄位定義，以 `validateTemplateData()` 驗證未知輸入。`applyTemplate()` 會先驗證再產生，參數無效時拋出包含 JSON Pointer 欄位路徑的 `TypeError`。
+
+```ts
+import { reportTemplate, toTemplateJsonSchema, validateTemplateData } from 'docx-kit/ai'
+
+const inputSchema = toTemplateJsonSchema(reportTemplate.schema)
+const errors = validateTemplateData(reportTemplate.schema, {})
+// [{ path: '/title', message: 'Required field is missing' }]
 ```

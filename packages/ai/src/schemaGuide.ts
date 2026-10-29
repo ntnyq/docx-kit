@@ -5,7 +5,9 @@
  * @module ai/schemaGuide
  */
 
+import { BUILTIN_PLUGIN_GUIDES } from './plugins'
 import { BUILTIN_TEMPLATES } from './templates'
+import { toTemplateJsonSchema } from './templateSchema'
 import type { BuiltinAiTemplate } from './templates'
 import type { GenerateToolDefinitionsOptions } from './types'
 
@@ -74,7 +76,7 @@ export function generateSchemaGuide(): string {
     '',
     '### image',
     '```json',
-    '{ "type": "image", "data": "<base64 or URL>", "width": 200, "height": 100, "alt": "Logo" }',
+    '{ "type": "image", "data": "<raw base64 or data URL>", "width": 200, "height": 100, "alt": "Logo" }',
     '```',
     '',
     '### pageBreak',
@@ -95,83 +97,11 @@ export function generateSchemaGuide(): string {
     '## Built-in Plugins',
   ]
 
-  const pluginDescriptions: [string, string, string][] = [
-    [
-      'checklist',
-      'Grouped Word checkbox tasks',
-      '{ items: [{ text: string, checked?: boolean, owner?: string, note?: string, group?: string }], title?: string }',
-    ],
-    [
-      'figure',
-      'Image with caption and source credit',
-      '{ data: string, caption?: string, source?: string, alt?: string, width?: number | string, height?: number | string, alignment?: "center" | "left" | "right" }',
-    ],
-    [
-      'metricCard',
-      'Multi-column metric summary grid',
-      '{ items: [{ label: string, value: number | string, unit?: string, change?: string, trend?: "up" | "down" | "neutral" }], columns?: number }',
-    ],
-    [
-      'barcode',
-      'Linear barcode generation',
-      '{ text: string, format?: string, width?: number }',
-    ],
-    [
-      'callout',
-      'Highlighted callout box',
-      '{ type: "callout", title?: string, variant?: "info"|"warning"|"success"|"danger" }',
-    ],
-    [
-      'codeBlock',
-      'Syntax-highlighted code',
-      '{ code: string, language?: string }',
-    ],
-    [
-      'coverPage',
-      'Cover page layout',
-      '{ title: string, author?: string, date?: string }',
-    ],
-    [
-      'dataTable',
-      'Formatted data table',
-      '{ columns: [...], data: [...], striped?: boolean }',
-    ],
-    [
-      'echarts',
-      'ECharts chart embedding',
-      '{ option: object, width?: number, height?: number }',
-    ],
-    [
-      'meetingMinutes',
-      'Meeting minutes template',
-      '{ title?: string, date?: string, attendees?: string[], agenda?: [...], notes?: string[] }',
-    ],
-    ['pageNumber', 'Page numbering', '{ format?: string }'],
-    [
-      'propertyTable',
-      'Key-value property table',
-      '{ items: [{ key: string, value: string }] }',
-    ],
-    [
-      'qrcode',
-      'QR code generation',
-      '{ text: string, width?: number, height?: number }',
-    ],
-    [
-      'signatureBlock',
-      'Signature block layout',
-      '{ parties: [{ name: string, role?: string }] }',
-    ],
-    [
-      'timeline',
-      'Timeline visualization',
-      '{ events: [{ date: string, title: string, description?: string }] }',
-    ],
-    ['watermark', 'Page watermark text', '{ text: string, opacity?: number }'],
-  ]
-
-  for (const [name, desc, opts] of pluginDescriptions) {
-    parts.push(`- **${name}**: ${desc} — options: ${opts}`)
+  for (const plugin of BUILTIN_PLUGIN_GUIDES) {
+    parts.push(
+      `- **${plugin.name}**: ${plugin.description}`,
+      `  Example: \`${plugin.usageExample}\``,
+    )
   }
 
   return parts.join('\n')
@@ -330,23 +260,13 @@ function generateTemplateTools(template: BuiltinAiTemplate): Array<{
     parameters: Record<string, unknown>
   }
 }> {
-  const required =
-    template.schema.type === 'object'
-      ? Object.entries(template.schema.properties)
-          .filter(([, definition]) => definition.required)
-          .map(([key]) => key)
-      : []
-
   return [
     {
       type: 'function',
       function: {
         description: `Generate a ${template.name} document using the docx-kit AI template. ${template.description}`,
         name: `apply_template_${template.name}`,
-        parameters: {
-          ...(template.schema as unknown as Record<string, unknown>),
-          required,
-        },
+        parameters: toTemplateJsonSchema(template.schema),
       },
     },
   ]

@@ -8,6 +8,12 @@ export interface SidebarGroup {
   text: string
 }
 
+interface NavGroup extends SidebarGroup {
+  activeMatch?: string
+}
+
+type NavItem = LinkItem | NavGroup
+
 const rootPrefix = ''
 
 function mapLinks(prefix: string, items: LinkItem[]) {
@@ -41,37 +47,91 @@ function withPrefix(prefix: string, link: string) {
   return prefix ? `${prefix}${link}` : link
 }
 
-export const englishNav: LinkItem[] = [
+export const englishNav: NavItem[] = [
   { link: '/guide/getting-started', text: 'Guide' },
-  { link: '/api/types', text: 'API' },
-  { link: '/errors/', text: 'Error reference' },
-  { link: '/ecosystem/packages', text: 'Packages' },
-  { link: '/plugins/', text: 'Plugins' },
+  {
+    activeMatch: '/(api|errors)/',
+    text: 'Reference',
+    items: [
+      { link: '/api/types', text: 'API' },
+      { link: '/errors/', text: 'Errors' },
+    ],
+  },
+  {
+    activeMatch: '/(ecosystem|plugins)/',
+    text: 'Ecosystem',
+    items: [
+      { link: '/ecosystem/packages', text: 'Packages' },
+      { link: '/plugins/', text: 'Plugins' },
+    ],
+  },
   { link: '/examples/basic-report', text: 'Examples' },
-  { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
-  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: 'Theme Studio' },
+  {
+    text: 'Tools',
+    items: [
+      { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
+      {
+        link: 'https://docx-kit-theme-studio.ntnyq.dev/',
+        text: 'Theme Studio',
+      },
+    ],
+  },
 ]
 
-export const simplifiedNav: LinkItem[] = [
+export const simplifiedNav: NavItem[] = [
   { link: '/guide/getting-started', text: '指南' },
-  { link: '/api/types', text: 'API' },
-  { link: '/errors/', text: '错误参考' },
-  { link: '/ecosystem/packages', text: '包总览' },
-  { link: '/plugins/', text: '插件' },
+  {
+    activeMatch: '/(api|errors)/',
+    text: '参考',
+    items: [
+      { link: '/api/types', text: 'API' },
+      { link: '/errors/', text: '错误' },
+    ],
+  },
+  {
+    activeMatch: '/(ecosystem|plugins)/',
+    text: '生态',
+    items: [
+      { link: '/ecosystem/packages', text: '包总览' },
+      { link: '/plugins/', text: '插件' },
+    ],
+  },
   { link: '/examples/basic-report', text: '示例' },
-  { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
-  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主题工作室' },
+  {
+    text: '工具',
+    items: [
+      { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
+      { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主题工作室' },
+    ],
+  },
 ]
 
-export const traditionalNav: LinkItem[] = [
+export const traditionalNav: NavItem[] = [
   { link: '/guide/getting-started', text: '指南' },
-  { link: '/api/types', text: 'API' },
-  { link: '/errors/', text: '錯誤參考' },
-  { link: '/ecosystem/packages', text: '套件總覽' },
-  { link: '/plugins/', text: '外掛' },
+  {
+    activeMatch: '/(api|errors)/',
+    text: '參考',
+    items: [
+      { link: '/api/types', text: 'API' },
+      { link: '/errors/', text: '錯誤' },
+    ],
+  },
+  {
+    activeMatch: '/(ecosystem|plugins)/',
+    text: '生態',
+    items: [
+      { link: '/ecosystem/packages', text: '套件總覽' },
+      { link: '/plugins/', text: '外掛' },
+    ],
+  },
   { link: '/examples/basic-report', text: '範例' },
-  { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
-  { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主題工作室' },
+  {
+    text: '工具',
+    items: [
+      { link: 'https://docx-kit-playground.ntnyq.dev/', text: 'Playground' },
+      { link: 'https://docx-kit-theme-studio.ntnyq.dev/', text: '主題工作室' },
+    ],
+  },
 ]
 
 export const apiLinks: LinkItem[] = [
@@ -338,6 +398,20 @@ export function buildTraditionalSidebar(prefix: string) {
   }
 }
 
-export function navWithPrefix(prefix: string, items: LinkItem[]) {
-  return mapLinks(prefix, items)
+export function navWithPrefix(prefix: string, items: NavItem[]) {
+  return items.map(item => {
+    if ('items' in item) {
+      return {
+        ...item,
+        items: mapLinks(prefix, item.items),
+        activeMatch: item.activeMatch
+          ? `^${prefix}${item.activeMatch}`
+          : undefined,
+      }
+    }
+    return {
+      ...item,
+      link: withPrefix(prefix, item.link),
+    }
+  })
 }

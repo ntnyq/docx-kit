@@ -1,7 +1,7 @@
 /**
  * AI template type definitions.
  *
- * Each template provides a JSON Schema for its parameters,
+ * Each template provides field definitions for its parameters,
  * a system prompt for LLMs, and a generator that produces
  * a DocxSchema from filled parameters.
  *
@@ -15,7 +15,7 @@ import type { DocxSchema } from '@docxkit/core'
  *
  * Templates provide a structured way for LLMs to generate
  * docx-kit documents. Each template defines:
- * - A JSON Schema for its input parameters
+ * - Field definitions for validation and JSON Schema conversion
  * - A system prompt that guides the LLM
  * - A generator that maps parameters → DocxSchema
  *
@@ -31,7 +31,8 @@ export interface AiTemplate<TParams extends object = Record<string, unknown>> {
    */
   name: string
   /**
-   * JSON Schema describing the template's input parameters.
+   * Parameter field definitions. Use `toTemplateJsonSchema()` when a consumer
+   * expects standard JSON Schema rather than per-property required markers.
    */
   schema: AiTemplateSchema
   /**
@@ -80,7 +81,7 @@ export interface AiTemplateInfo {
    */
   name: string
   /**
-   * JSON Schema for input parameters.
+   * Parameter field definitions, convertible with `toTemplateJsonSchema()`.
    */
   schema: AiTemplateSchema
   /**
@@ -112,7 +113,7 @@ export interface AiTemplateObjectSchema extends AiTemplateSchemaBase {
 }
 
 /**
- * JSON Schema subset used for AI template parameters.
+ * Field definitions used for AI template validation and JSON Schema conversion.
  */
 export type AiTemplateSchema =
   | AiTemplateArraySchema
@@ -147,7 +148,7 @@ export interface GenerateToolDefinitionsOptions {
 }
 
 /**
- * JSON Schema definition for template parameters.
+ * Shared metadata for template parameter field definitions.
  *
  * Used by LLM function calling and MCP tool input validation.
  */

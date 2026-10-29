@@ -8,6 +8,8 @@
  * @module ai/promptBuilder
  */
 
+import { BUILTIN_PLUGIN_GUIDES } from './plugins'
+import { toTemplateJsonSchema } from './templateSchema'
 import type { AiTemplate } from './types'
 
 /**
@@ -39,22 +41,9 @@ export function buildFreeformPrompt(
     '- plugin: { type: "plugin", name: "...", options: { ... } }',
     '',
     '## Available Plugins',
-    '- barcode: Linear barcode generation',
-    '- checklist: Grouped tasks with Word checkboxes, owners, and notes',
-    '- figure: Image with caption and source credit',
-    '- metricCard: Multi-column metric summaries with values and trends',
-    '- coverPage: Cover page with title, author, date',
-    '- callout: Highlighted callout box',
-    '- watermark: Page watermark text',
-    '- qrcode: QR code generation',
-    '- echarts: ECharts chart embedding',
-    '- dataTable: Data table with formatting',
-    '- propertyTable: Key-value property table',
-    '- codeBlock: Syntax-highlighted code',
-    '- timeline: Timeline visualization',
-    '- meetingMinutes: Meeting minutes template',
-    '- signatureBlock: Signature block',
-    '- pageNumber: Page numbering',
+    ...BUILTIN_PLUGIN_GUIDES.map(
+      plugin => `- ${plugin.name}: ${plugin.description}`,
+    ),
   ]
 
   if (userContext) {
@@ -91,7 +80,7 @@ export function buildPrompt<TParams extends object>(
     `Description: ${template.description}`,
     '',
     '### Input Schema',
-    JSON.stringify(template.schema, null, 2),
+    JSON.stringify(toTemplateJsonSchema(template.schema), null, 2),
   ]
 
   // User context

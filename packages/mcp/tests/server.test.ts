@@ -11,6 +11,34 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 afterEach(() => vi.restoreAllMocks())
 
 describe('MCP server integration', () => {
+  it('returns template parameter paths as tool errors through the protocol', async () => {
+    const server = await createDocxKitServer()
+    const client = new Client({ name: 'docx-kit-test', version: '1.0.0' })
+    const [clientTransport, serverTransport] =
+      InMemoryTransport.createLinkedPair()
+    try {
+      await server.connect(serverTransport)
+      await client.connect(clientTransport)
+      const result = await client.callTool({
+        name: 'apply_template',
+        arguments: {
+          data: { body: 'HELLO', recipientName: 'Bob', senderName: 'Alice' },
+          template: 'letter',
+        },
+      })
+      expect(result.isError).toBe(true)
+      expect(result.content).toEqual([
+        expect.objectContaining({
+          text: expect.stringContaining('/body: Expected array'),
+        }),
+      ])
+      expect(JSON.stringify(result.content)).not.toContain('HELLO')
+    } finally {
+      await client.close()
+      await server.close()
+    }
+  })
+
   it('connects and renders an advertised built-in plugin through the protocol', async () => {
     const directory = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-server-'))
     const server = await createDocxKitServer({ outputDirectory: directory })

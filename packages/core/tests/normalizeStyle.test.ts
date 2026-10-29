@@ -89,4 +89,43 @@ describe('resolveStyle', () => {
     const result = resolveStyle({ className: '  ', styles: {} })
     expect(result).toEqual({})
   })
+
+  it('resolves shared inheritance once even when repeated at every level', () => {
+    let reads = 0
+    const styles: StyleSheet = {
+      get base() {
+        if (++reads > 2) {
+          throw new Error('Shared inheritance was expanded repeatedly')
+        }
+        return {
+          color: '#123456',
+        }
+      },
+    }
+    let parent = 'base'
+    for (let index = 0; index < 40; index++) {
+      const name = `level${index}`
+      styles[name] = { extends: [parent, parent] }
+      parent = name
+    }
+    expect(resolveStyle({ className: [parent, 'base'], styles })).toEqual({
+      color: '#123456',
+    })
+    expect(reads).toBe(1)
+  })
+
+  it('preserves diamond cascade order and observes changes between resolutions', () => {
+    const styles: StyleSheet = {
+      base: { color: '#111111' },
+      leaf: { extends: ['left', 'right'] },
+      left: { color: '#222222', extends: 'base' },
+      right: { extends: 'base', fontSize: 20 },
+    }
+    expect(resolveStyle({ className: 'leaf', styles })).toEqual({
+      color: '#111111',
+      fontSize: 20,
+    })
+    styles.base.color = '#333333'
+    expect(resolveStyle({ className: 'leaf', styles }).color).toBe('#333333')
+  })
 })

@@ -187,4 +187,52 @@ describe('echartsPlugin', () => {
       ),
     ).rejects.toThrow('requires renderer "svg"')
   })
+
+  it.each(['setOption', 'getDataURL'] as const)(
+    'disposes the chart and container when %s fails',
+    async method => {
+      const failure = new Error('Chart failed')
+      mockChart[method].mockImplementationOnce(() => {
+        throw failure
+      })
+      await expect(
+        echartsPlugin().render({ option: {} }, createPluginTestContext()),
+      ).rejects.toBe(failure)
+      expect(mockChart.dispose).toHaveBeenCalledExactlyOnceWith()
+      expect(mockContainer.remove).toHaveBeenCalledExactlyOnceWith()
+    },
+  )
+
+  it('removes the container when chart initialization fails', async () => {
+    const { init } = await import('echarts')
+    const failure = new Error('Initialization failed')
+    vi.mocked(init).mockImplementationOnce(() => {
+      throw failure
+    })
+    await expect(
+      echartsPlugin().render({ option: {} }, createPluginTestContext()),
+    ).rejects.toBe(failure)
+    expect(mockChart.dispose).not.toHaveBeenCalled()
+    expect(mockContainer.remove).toHaveBeenCalledExactlyOnceWith()
+  })
+
+  it('cleans up both instances when the SVG raster fallback fails', async () => {
+    const failure = new Error('Fallback failed')
+    mockChart.getDataURL.mockReturnValueOnce(
+      'data:image/svg+xml;base64,PHN2Zy8+',
+    )
+    mockChart.setOption
+      .mockImplementationOnce(() => {})
+      .mockImplementationOnce(() => {
+        throw failure
+      })
+    await expect(
+      echartsPlugin().render(
+        { imageType: 'svg', option: {} },
+        createPluginTestContext(),
+      ),
+    ).rejects.toBe(failure)
+    expect(mockChart.dispose).toHaveBeenCalledTimes(2)
+    expect(mockContainer.remove).toHaveBeenCalledExactlyOnceWith()
+  })
 })

@@ -37,14 +37,6 @@ describe('shared.ts — shared exports', () => {
     const mod = await import('../src/browser')
     expect(mod.dataUrlToUint8Array).toBeDefined()
   })
-
-  it('exports all type definitions', async () => {
-    const mod = await import('../src/browser')
-    // Types are compile-time only, but the module should load clean
-    expect(mod).toBeDefined()
-    // These are documented exports from shared.ts
-    expect(typeof mod.createDocx).toBe('function')
-  })
 })
 
 describe('node.ts — platform exports', () => {

@@ -7,8 +7,10 @@
  * @module ai
  */
 
+export { BUILTIN_PLUGIN_GUIDES } from './plugins'
 export { buildFreeformPrompt, buildPrompt } from './promptBuilder'
 export { generateSchemaGuide, generateToolDefinitions } from './schemaGuide'
+export { toTemplateJsonSchema, validateTemplateData } from './templateSchema'
 export {
   BUILTIN_TEMPLATES,
   invoiceTemplate,
@@ -21,6 +23,7 @@ export type { LetterParams } from './templates/letter'
 export type { ReportParams } from './templates/report'
 export type { ResumeParams } from './templates/resume'
 export type { InvoiceParams } from './templates/invoice'
+export type { TemplateValidationError } from './templateSchema'
 export type {
   AiTemplate,
   AiTemplateInfo,

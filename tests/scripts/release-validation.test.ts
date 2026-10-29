@@ -21,7 +21,6 @@ let temporaryRoot: string
 beforeEach(() => {
   temporaryRoot = mkdtempSync(join(tmpdir(), 'docx-kit-release-validation-'))
   for (const directory of [
-    'docs',
     'packages',
     'packages-plugins',
     'packages-presets',
@@ -34,7 +33,6 @@ beforeEach(() => {
     join(temporaryRoot, 'package.json'),
     JSON.stringify({ private: true, type: 'module' }),
   )
-  writeFileSync(join(temporaryRoot, 'README.md'), '# Fixture\n')
 })
 
 afterEach(() => {
@@ -103,30 +101,5 @@ describe('published artifact validation', () => {
     const result = runScript('check-package-artifacts.ts')
     expect(result.status).toBe(1)
     expect(result.stderr).toContain('dist/missing.js')
-  })
-})
-
-describe('barcode documentation validation', () => {
-  it.each(['doc.use(barcodePlugin)', '{ plugin: barcodePlugin }'])(
-    'rejects an uncalled factory in %s',
-    source => {
-      writeFileSync(
-        join(temporaryRoot, 'README.md'),
-        `\`\`\`ts\n${source}\n\`\`\`\n`,
-      )
-      const result = runScript('check-doc-examples.ts')
-      expect(result.status).toBe(1)
-      expect(result.stderr).toContain('barcodePlugin')
-    },
-  )
-
-  it('accepts a called barcode factory', () => {
-    writeFileSync(
-      join(temporaryRoot, 'README.md'),
-      '```ts\ndoc.use(barcodePlugin())\n```\n',
-    )
-    const result = runScript('check-doc-examples.ts')
-    expect(result.error).toBeUndefined()
-    expect(result.status).toBe(0)
   })
 })

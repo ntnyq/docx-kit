@@ -279,7 +279,9 @@ export function compileTextStyle(style: TextStyleRule) {
         ? { type: UnderlineType.DOUBLE }
         : style.underline
           ? { type: UnderlineType.SINGLE }
-          : undefined,
+          : style.underline === false
+            ? { type: UnderlineType.NONE }
+            : undefined,
   }
 
   // Merge docx escape hatch
@@ -360,13 +362,16 @@ function compileVerticalAlign(value: DocxStyleRule['verticalAlign']) {
 }
 
 /**
- * Strip leading `#` from a color string (docx expects raw hex).
+ * Normalize CSS hex colors to the six hexadecimal digits expected by Word.
  *
  * @param color - Optional hexadecimal color with or without a leading `#`
- * @returns The color without its leading `#`, or `undefined` when omitted
+ * @returns The expanded color without its leading `#`, or `undefined` when omitted
  */
 function normalizeColor(color?: string) {
-  return color?.replace(/^#/, '')
+  const hex = color?.replace(/^#/, '')
+  return hex && /^[\da-f]{3}$/i.test(hex)
+    ? [...hex].map(char => char.repeat(2)).join('')
+    : hex
 }
 
 /**
