@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/plugin-figure",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Images with captions and source credits — docx-kit plugin",
   "keywords": [
     "docx",

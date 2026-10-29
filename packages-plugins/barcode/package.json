@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/plugin-barcode",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Linear barcode generation — docx-kit plugin",
   "keywords": [
     "barcode",

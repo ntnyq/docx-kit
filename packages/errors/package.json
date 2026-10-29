@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/errors",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Shared error class and error codes for docx-kit packages",
   "license": "MIT",
   "author": {

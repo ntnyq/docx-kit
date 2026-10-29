@@ -1,7 +1,7 @@
 {
   "name": "@docxkit/plugin-metric-card",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Multi-column metric summary cards — docx-kit plugin",
   "keywords": [
     "docx",
