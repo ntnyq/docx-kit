@@ -110,41 +110,50 @@ async function promptOptions(
   initialName?: string,
 ): Promise<ScaffoldOptions | null> {
   const namePrompt = initialName ?? 'my-plugin'
+  let isCancelled = false
 
-  const result = await prompts([
+  const result = await prompts(
+    [
+      {
+        initial: namePrompt,
+        message: 'Plugin package name:',
+        name: 'pluginName',
+        type: 'text',
+      },
+      {
+        initial: 'A docx-kit plugin',
+        message: 'Description:',
+        name: 'description',
+        type: 'text',
+      },
+      {
+        message: 'Author:',
+        name: 'author',
+        type: 'text',
+      },
+      {
+        initial: 'MIT',
+        message: 'License:',
+        name: 'license',
+        type: 'text',
+      },
+      {
+        initial: '0.1.0',
+        message: 'Initial version:',
+        name: 'version',
+        type: 'text',
+      },
+    ],
     {
-      initial: namePrompt,
-      message: 'Plugin package name:',
-      name: 'pluginName',
-      type: 'text',
+      onCancel() {
+        isCancelled = true
+        return false
+      },
     },
-    {
-      initial: 'A docx-kit plugin',
-      message: 'Description:',
-      name: 'description',
-      type: 'text',
-    },
-    {
-      message: 'Author:',
-      name: 'author',
-      type: 'text',
-    },
-    {
-      initial: 'MIT',
-      message: 'License:',
-      name: 'license',
-      type: 'text',
-    },
-    {
-      initial: '0.1.0',
-      message: 'Initial version:',
-      name: 'version',
-      type: 'text',
-    },
-  ])
+  )
 
-  // User cancelled (Ctrl+C) — prompts returns null or undefined
-  if (!result || !result.pluginName) {
+  // Cancellation returns answers collected before the aborted question.
+  if (isCancelled || !result || !result.pluginName) {
     return null
   }
 
