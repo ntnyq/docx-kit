@@ -16,10 +16,3 @@ lib-cov
 # VitePress
 **/.vitepress/cache
 **/.vitepress/dist
-
-# Tencent workbuddy
-.workbuddy/**
-
-# AI skill superpower
-.superpowers/**
-plans/**

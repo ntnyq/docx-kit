@@ -1,4 +1,4 @@
-@import 'tw-animate-css';
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -49,14 +49,14 @@
   --canvas: #0a111e;
 }
 
-:root[data-app='theme-studio'] {
+:root[data-app="theme-studio"] {
   --primary: #0f837a;
   --accent: #e7f5f2;
   --accent-foreground: #0f837a;
   --ring: #0f837a;
 }
 
-:root.dark[data-app='theme-studio'] {
+:root.dark[data-app="theme-studio"] {
   --primary: #5bd5c7;
   --accent: #173e3c;
   --accent-foreground: #73e1d5;
@@ -87,8 +87,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans:
-    'Inter', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 @layer base {
@@ -99,7 +99,7 @@
     @apply m-0 bg-background font-sans text-sm text-foreground antialiased;
   }
   button:not(:disabled),
-  [role='button']:not([aria-disabled='true']) {
+  [role="button"]:not([aria-disabled="true"]) {
     cursor: pointer;
   }
   button,

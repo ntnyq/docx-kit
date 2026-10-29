@@ -11,7 +11,6 @@ docx-kit/
 │   └── theme-studio/
 ├── packages/
 │   ├── ai/
-│   ├── app-shared/
 │   ├── core/
 │   ├── create-plugin/
 │   ├── docx-kit/
@@ -23,6 +22,8 @@ docx-kit/
 │   ├── registry/
 │   ├── renderer/
 │   └── types/
+├── packages-internal/
+│   └── app-shared/
 ├── packages-plugins/
 │   ├── badge/
 │   ├── barcode/
@@ -61,12 +62,13 @@ docx-kit/
 
 | Scope               | Count | Notes                                                        |
 | ------------------- | ----- | ------------------------------------------------------------ |
-| `packages/`         | 13    | Runtime, tooling, AI, renderer, Markdown, and shared types   |
+| `packages/`         | 12    | Runtime, tooling, AI, renderer, Markdown, and shared types   |
+| `packages-internal/` | 1 | Private source packages shared by repository applications |
 | `packages-plugins/` | 22    | Every built-in plugin has its own package, tests, and README |
 | `packages-presets/` | 3     | Style presets for common document families                   |
 | `packages-themes/`  | 3     | Token-based themes for color systems                         |
 
-The two private applications in `apps/` are independently built and deployed. [Playground](https://docx-kit-playground.ntnyq.dev/?lang=en-US) owns the TypeScript editor and examples; [Theme Studio](https://docx-kit-theme-studio.ntnyq.dev/?lang=en-US) owns theme editing. `packages/app-shared` is a private source package for their UI, preferences, and preview lifecycle; it is not published on npm.
+The two private applications in `apps/` are independently built and deployed. [Playground](https://docx-kit-playground.ntnyq.dev/?lang=en-US) owns the TypeScript editor and examples; [Theme Studio](https://docx-kit-theme-studio.ntnyq.dev/?lang=en-US) owns theme editing. `packages-internal/app-shared` is a private source package for their UI, preferences, and preview lifecycle; it is not published on npm.
 
 From the repository root, run `pnpm build` before `pnpm playground:dev` or `pnpm theme-studio:dev`. `pnpm apps:build` builds both applications, while `pnpm docs:build` builds only the documentation site.
 

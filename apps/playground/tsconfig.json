@@ -10,6 +10,6 @@
     "src/**/*.ts",
     "src/**/*.vue",
     "vite.config.ts",
-    "../../packages/app-shared/src/env.d.ts"
+    "../../packages-internal/app-shared/src/env.d.ts"
   ]
 }

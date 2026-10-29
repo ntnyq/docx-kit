@@ -243,7 +243,7 @@ importers:
     dependencies:
       '@docxkit/app-shared':
         specifier: workspace:*
-        version: link:../../packages/app-shared
+        version: link:../../packages-internal/app-shared
       '@docxkit/preset-academic':
         specifier: workspace:*
         version: link:../../packages-presets/academic
@@ -304,7 +304,7 @@ importers:
     dependencies:
       '@docxkit/app-shared':
         specifier: workspace:*
-        version: link:../../packages/app-shared
+        version: link:../../packages-internal/app-shared
       '@lucide/vue':
         specifier: ^1.63.0
         version: 1.63.0(vue@3.5.44(@typescript/typescript6@6.0.2))
@@ -364,6 +364,43 @@ importers:
       vitepress:
         specifier: ^2.0.0-alpha.21
         version: 2.0.0-alpha.21(@types/node@26.6.6)(change-case@5.4.4)(esbuild@0.28.2)(jiti@2.7.0)(postcss@8.5.32)(qrcode@1.5.4)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.9.1)
+
+  packages-internal/app-shared:
+    dependencies:
+      '@docxkit/renderer':
+        specifier: workspace:*
+        version: link:../../packages/renderer
+      '@lucide/vue':
+        specifier: ^1.63.0
+        version: 1.63.0(vue@3.5.44(@typescript/typescript6@6.0.2))
+      '@vueuse/core':
+        specifier: ^15.0.0
+        version: 15.0.0(vue@3.5.44(@typescript/typescript6@6.0.2))
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      reka-ui:
+        specifier: ^2.11.0
+        version: 2.11.0(vue@3.5.44(@typescript/typescript6@6.0.2))
+      tailwind-merge:
+        specifier: ^3.7.0
+        version: 3.7.0
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
+      vue:
+        specifier: ^3.5.44
+        version: 3.5.44(@typescript/typescript6@6.0.2)
+      vue-i18n:
+        specifier: ^11.4.16
+        version: 11.4.16(vue@3.5.44(@typescript/typescript6@6.0.2))
+    devDependencies:
+      vue-tsc:
+        specifier: ^3.3.13
+        version: 3.3.13(@typescript/typescript6@6.0.2)
 
   packages-plugins/badge:
     dependencies:
@@ -761,43 +798,6 @@ importers:
       '@docxkit/core':
         specifier: workspace:*
         version: link:../core
-
-  packages/app-shared:
-    dependencies:
-      '@docxkit/renderer':
-        specifier: workspace:*
-        version: link:../renderer
-      '@lucide/vue':
-        specifier: ^1.63.0
-        version: 1.63.0(vue@3.5.44(@typescript/typescript6@6.0.2))
-      '@vueuse/core':
-        specifier: ^15.0.0
-        version: 15.0.0(vue@3.5.44(@typescript/typescript6@6.0.2))
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      reka-ui:
-        specifier: ^2.11.0
-        version: 2.11.0(vue@3.5.44(@typescript/typescript6@6.0.2))
-      tailwind-merge:
-        specifier: ^3.7.0
-        version: 3.7.0
-      tw-animate-css:
-        specifier: ^1.4.0
-        version: 1.4.0
-      vue:
-        specifier: ^3.5.44
-        version: 3.5.44(@typescript/typescript6@6.0.2)
-      vue-i18n:
-        specifier: ^11.4.16
-        version: 11.4.16(vue@3.5.44(@typescript/typescript6@6.0.2))
-    devDependencies:
-      vue-tsc:
-        specifier: ^3.3.13
-        version: 3.3.13(@typescript/typescript6@6.0.2)
 
   packages/core:
     dependencies:

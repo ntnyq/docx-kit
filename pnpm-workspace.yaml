@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - docs
+  - packages-internal/*
   - packages-plugins/*
   - packages-presets/*
   - packages-themes/*

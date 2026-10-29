@@ -30,7 +30,7 @@ Generated `dist/`, `output/`, and `tmp/` content must not be committed.
 - `packages-plugins/`: built-in plugin packages
 - `packages-presets/` and `packages-themes/`: reusable document styling
 - `apps/playground/` and `apps/theme-studio/`: independent browser applications
-- `packages/app-shared/`: private UI, preferences, and document preview source
+- `packages-internal/app-shared/`: private UI, preferences, and document preview source
 - `docs/`: VitePress documentation
 - `tests/e2e/`: cross-package lifecycle tests
 - `tests/visual/`: committed LibreOffice-rendered PNG baselines
