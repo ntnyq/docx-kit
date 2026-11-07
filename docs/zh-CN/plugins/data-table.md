@@ -18,6 +18,7 @@ import { dataTablePlugin, type DataTableOptions } from 'docx-kit'
 | `format` | `Record<string, 'currency' \| 'date' \| 'number' \| 'percent'>` | — | 各列的值格式化方式 |
 | `labels` | `Record<string, string>` | — | 可读列标签，如 `{ salary: '薪资' }` |
 | `striped` | `boolean` | `false` | 交替行背景底纹 |
+| `styles` | `DataTableStyles` | — | 本次调用的部位样式 |
 
 ## 示例
 
@@ -125,4 +126,59 @@ const doc = createDocx()
     align: { month: 'left', revenue: 'right', expenses: 'right', profit: 'right' },
   })
   .save('monthly-report.docx')
+```
+
+## 样式定制
+
+给插件工厂传入 `{ styles }`，可设置当前插件实例的默认样式；通过 `options.styles` 覆盖单次调用。插件包和 `docx-kit` 的 Node/browser 入口均导出 `CalloutConfig` / `CalloutStyles` 与 `DataTableConfig` / `DataTableStyles`。
+
+优先级从低到高：**内置默认值（含主题取值）→ 初始化 `styles` → 调用通用 `style`（`.plugin()` 第三个参数）→ 调用部位 `styles`**。缺省或 `undefined` 字段沿用默认值；嵌套普通对象按字段合并，数组整体替换，`0` 和 `false` 均生效。每次调用独立解析，不修改配置对象。单位和 `$colors.primary`、`$fontSize.lg`、`$spacing.md` 等主题 token 复用现有样式编译器。
+
+| 部位 | 样式类型 | 作用范围 |
+| --- | --- | --- |
+| `headerCell`、`bodyCell` | `Omit<CellStyleRule, 'height'>` | 表头及数据单元格的背景、边框、宽度与内边距 |
+| `stripedCell` | `Omit<CellStyleRule, 'height'>` | 斑马纹数据单元格的附加样式 |
+| `headerParagraph`、`bodyParagraph`、`emptyParagraph` | `ParagraphStyleRule` | 表头、正文、空数据提示的段落样式 |
+| `headerText`、`bodyText`、`emptyText` | `TextStyleRule` | 表头、正文、空数据提示的文字样式 |
+
+`bodyCell` 应用于所有数据行；启用 `striped: true` 时，第 2、4 等数据行额外应用 `stripedCell`。同一优先级内先应用 `bodyCell`，再应用 `stripedCell`；调用级 `bodyCell` 仍高于初始化 `stripedCell`。显式样式边框可覆盖 `bordered` 选定的默认值，包括 `bordered: false`。段落部位样式可覆盖自动推导或按列设置的对齐。空数据仅使用 `emptyParagraph`、`emptyText`。
+
+```ts
+import { createDocx, dataTablePlugin } from 'docx-kit/node'
+
+const doc = createDocx()
+  .use(dataTablePlugin({
+    styles: {
+      headerCell: { backgroundColor: '#EFF6FF' },
+      headerText: { color: '#1E40AF', fontSize: 12 },
+      bodyCell: { margin: '5pt 8pt' },
+      bodyText: { fontSize: 11 },
+      stripedCell: { backgroundColor: '#F8FAFC' },
+    },
+  }))
+  .plugin('dataTable', {
+    data: [{ name: 'Alice', score: 95 }, { name: 'Bob', score: 88 }],
+    striped: true,
+    styles: {
+      headerText: { bold: false },
+      bodyCell: { marginLeft: 0 },
+      stripedCell: { backgroundColor: '#E0F2FE' },
+    },
+  })
+```
+
+### JSON DSL、AI 与 MCP
+
+JSON DSL 中在调用的 `options.styles` 内填写与 Builder 相同的可序列化部位样式。AI 工具定义和 schema 指南已包含这些选项；MCP 通过 `docx-kit://schema` 和 `get_plugin_help().optionsSchema` 暴露对应结构。`validate_schema` 会拒绝未知部位、放错部位的属性及错误的样式值。其他内置插件也提供对应的部位样式契约。
+
+```json
+{
+  "type": "plugin",
+  "name": "dataTable",
+  "options": {
+    "data": [{ "score": 95 }, { "score": 88 }],
+    "striped": true,
+    "styles": { "stripedCell": { "backgroundColor": "#EFF6FF" } }
+  }
+}
 ```

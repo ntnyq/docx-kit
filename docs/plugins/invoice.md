@@ -67,3 +67,21 @@ const doc = createDocx()
 - `taxRate`, when provided, must stay in the inclusive range `0..1`.
 
 Line amounts are rounded to two decimal places before summing the subtotal. Tax is rounded separately, then added to the subtotal. Half-cent ties round away from zero. The AI invoice template uses the same rounding rules.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `InvoiceConfig` and `InvoiceStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `bodyText`, `headerText`, `metaText`, `notes`, `notesLabel`, `partyLabel`, `partyText`, `subtotal`, `tax`, `title`, `total` | `TextStyleRule` | Run typography |
+| `bodyParagraph`, `headerParagraph`, `notesParagraph`, `partyParagraph`, `titleParagraph`, `totalsParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+| `bodyCell`, `headerCell` | `Omit<CellStyleRule, 'height'>` | Cell shading, borders, width and padding |
+
+```ts
+invoicePlugin({
+  styles: { total: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

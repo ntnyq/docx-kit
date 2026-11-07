@@ -52,3 +52,21 @@ await doc.toBlob()
 每行不会跨页拆分。最后一行补齐空单元格；条目少于 `columns` 时，现有卡片平分全部宽度。无效列数会抛出代码为 `PLUGIN_RENDER_FAILED` 的 `DocxKitError`，空输入也会检查列数。
 
 网格使用主题的 `surface`、`primary`、`muted`、`success` 和 `danger` 颜色，并提供内置回退值。调用样式可覆盖文字、段落、单元格背景与边框。
+
+## 样式定制
+
+工厂的 `{ styles }` 设置实例默认值，`options.styles` 覆盖单次调用。插件包与 docx-kit 入口导出 `MetricCardConfig` 和 `MetricCardStyles`。优先级：**内置/主题默认值 → 初始化 styles → 通用 style → 单次部位 styles**。嵌套字段合并，数组整体替换，`undefined` 沿用默认，`0` / `false` 生效；支持单位与 `$colors.primary` 等主题 token。
+
+| 部位 | 样式类型 | 范围 |
+| --- | --- | --- |
+| `change`, `emptyText`, `label`, `unit`, `value` | `TextStyleRule` | 文字排版 |
+| `changeParagraph`, `emptyParagraph`, `labelParagraph`, `paddingParagraph`, `valueParagraph` | `ParagraphStyleRule` | 段落背景、边框、对齐、间距和分页 |
+| `cell` | `Omit<CellStyleRule, 'height'>` | 单元格背景、边框、宽度和内边距 |
+
+```ts
+metricCardPlugin({
+  styles: { value: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+单次调用在 `options.styles` 中使用相同部位名。JSON DSL、AI 工具 schema 与 MCP 校验共享这些契约；未知部位与放错部位的属性会被拒绝。

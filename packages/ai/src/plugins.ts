@@ -41,7 +41,7 @@ export const BUILTIN_PLUGIN_GUIDES: readonly BuiltinPluginGuide[] = [
   entry(
     'callout',
     'Highlighted information, warning, success, or danger box',
-    '{ type: "plugin", name: "callout", options: { type: "info", title: "Note", content: "Important message" } }',
+    '{ type: "plugin", name: "callout", options: { type: "info", title: "Note", content: "Important message", styles: { title: { color: "#2563EB" }, cell: { margin: "8pt 10pt" } } } }',
   ),
   entry(
     'changelog',
@@ -61,7 +61,7 @@ export const BUILTIN_PLUGIN_GUIDES: readonly BuiltinPluginGuide[] = [
   entry(
     'dataTable',
     'Data table with inferred columns and value formatting',
-    '{ type: "plugin", name: "dataTable", options: { data: [{ name: "Alice", score: 95 }], labels: { name: "Name", score: "Score" }, striped: true } }',
+    '{ type: "plugin", name: "dataTable", options: { data: [{ name: "Alice", score: 95 }], labels: { name: "Name", score: "Score" }, striped: true, styles: { headerText: { color: "#2563EB" }, stripedCell: { backgroundColor: "#EFF6FF" } } } }',
   ),
   entry(
     'divider',

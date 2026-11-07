@@ -71,16 +71,39 @@ doc.use(myPlugin).plugin('myPlugin', { text: 'Aligned label' }, {
 })
 ```
 
+### `createPluginStyle()`
+
+`createPluginStyle(style, options?)` 接受 `PluginStyleOptions`：`defaults` 與 `overrides` 是依序套用的可選 `DocxStyleRule` 層陣列，`theme` 用於解析各層中的主題 token。優先順序為原生外掛預設值 → `defaults` → `style` → `overrides`。巢狀欄位合併，陣列整體取代，`undefined` 沿用既有值。各層分別編譯，確保簡寫與別名遵循優先順序。
+
+```ts
+const titleStyle = createPluginStyle(context.style, {
+  defaults: [pluginConfig.styles?.title],
+  overrides: [options.styles?.title],
+  theme: context.config.theme,
+})
+const run = new TextRun(titleStyle.text({ text: options.title }))
+```
+
+
+部位樣式在頁首、頁尾的 `default`、`first`、`even` 中遵循相同規則；AI 工具 schema、MCP schema 資源及執行階段驗證皆檢查這些巢狀外掛選項。
+
+框線可僅指定色彩或寬度：既有框線屬性會保留，新建框線補齊編譯器預設的 `single` 樣式及 1/8 pt 線寬。後續設定 `fontFamilyEastAsia` 會保留既有拉丁字型。`docx` 文字排版直通也遵循相同優先順序，包括明確的 `bold: false` 及 `italics: false`。
+
+Margin 簡寫可混合長度與主題 token，例如 `margin: '$spacing.sm $spacing.md'`；數值型間距 token 以 pt 解讀。
+
 ---
 
 ## 內建外掛選項型別
 
 全部 22 個內建外掛及其選項型別。
 
+所有內建工廠都支援可選的 `<Plugin>Config` 預設 `styles`，單次呼叫也支援對應的型別安全部位 `styles`。部位樣式、優先順序及 JSON DSL 範例見 [Callout](/zh-TW/plugins/callout#樣式自訂) 和 [DataTable](/zh-TW/plugins/data-table#樣式自訂)。
+
 ### `BadgeOptions`
 
 ```ts
 interface BadgeOptions {
+  styles?: BadgeStyles
   text: string
   backgroundColor?: string
   color?: 'danger' | 'info' | 'neutral' | 'success' | 'warning' | string
@@ -91,6 +114,7 @@ interface BadgeOptions {
 
 ```ts
 interface BarcodeOptions {
+  styles?: BarcodeStyles
   text: string
   alignment?: 'center' | 'left' | 'right'
   backgroundColor?: string
@@ -115,13 +139,26 @@ interface CalloutOptions {
   type: 'info' | 'success' | 'warning' | 'danger'
   content: string
   title?: string
+  styles?: CalloutStyles
 }
+interface CalloutConfig {
+  styles?: CalloutStyles
+}
+
+interface CalloutStyles {
+  cell?: Omit<CellStyleRule, 'height'>
+  paragraph?: ParagraphStyleRule
+  title?: TextStyleRule
+  content?: TextStyleRule
+}
+
 ```
 
 ### `ChangelogOptions`
 
 ```ts
 interface ChangelogOptions {
+  styles?: ChangelogStyles
   entries: ChangelogEntry[]
   title?: string
 }
@@ -138,6 +175,7 @@ interface ChangelogEntry {
 
 ```ts
 interface ChecklistOptions {
+  styles?: ChecklistStyles
   items: ChecklistItem[]
   title?: string
 }
@@ -155,6 +193,7 @@ interface ChecklistItem {
 
 ```ts
 interface CodeBlockOptions {
+  styles?: CodeBlockStyles
   code: string
   language?: string // requires highlight.js peer dep
   showLineNumbers?: boolean
@@ -165,6 +204,7 @@ interface CodeBlockOptions {
 
 ```ts
 interface CoverPageOptions {
+  styles?: CoverPageStyles
   title: string
   subtitle?: string
   author?: string
@@ -186,16 +226,34 @@ interface DataTableOptions {
   align?: Record<string, ColAlign> // per-column alignment
   bordered?: boolean
   striped?: boolean
+  styles?: DataTableStyles
 }
 
 type ColFormat = 'currency' | 'date' | 'number' | 'percent'
 type ColAlign = 'left' | 'center' | 'right'
+interface DataTableConfig {
+  styles?: DataTableStyles
+}
+
+interface DataTableStyles {
+  headerCell?: Omit<CellStyleRule, 'height'>
+  bodyCell?: Omit<CellStyleRule, 'height'>
+  stripedCell?: Omit<CellStyleRule, 'height'>
+  headerParagraph?: ParagraphStyleRule
+  bodyParagraph?: ParagraphStyleRule
+  emptyParagraph?: ParagraphStyleRule
+  headerText?: TextStyleRule
+  bodyText?: TextStyleRule
+  emptyText?: TextStyleRule
+}
+
 ```
 
 ### `DividerOptions`
 
 ```ts
 interface DividerOptions {
+  styles?: DividerStyles
   color?: string
   spacingAfter?: number
   spacingBefore?: number
@@ -207,6 +265,7 @@ interface DividerOptions {
 
 ```ts
 interface EChartsPluginOptions {
+  styles?: EChartsStyles
   option: EChartsOption // full ECharts option object
   width?: number // default: 640
   height?: number // default: 360
@@ -222,6 +281,7 @@ interface EChartsPluginOptions {
 
 ```ts
 interface FigureOptions {
+  styles?: FigureStyles
   data: string | ArrayBuffer | Blob | Uint8Array
   alignment?: 'center' | 'left' | 'right' // default: center
   alt?: string
@@ -239,6 +299,7 @@ interface FigureOptions {
 
 ```ts
 interface InvoiceOptions {
+  styles?: InvoiceStyles
   date: string
   from: InvoiceParty
   invoiceNumber: string
@@ -267,6 +328,7 @@ interface InvoiceParty {
 
 ```ts
 interface LetterheadOptions {
+  styles?: LetterheadStyles
   companyName: string
   address?: string
   email?: string
@@ -280,6 +342,7 @@ interface LetterheadOptions {
 
 ```ts
 interface MeetingMinutesOptions {
+  styles?: MeetingMinutesStyles
   title: string
   date: string
   attendees: string[]
@@ -298,6 +361,7 @@ interface AgendaItem {
 
 ```ts
 interface MetricCardOptions {
+  styles?: MetricCardStyles
   items: MetricItem[]
   columns?: number // positive safe integer, default: 3
 }
@@ -317,6 +381,7 @@ interface MetricItem {
 
 ```ts
 interface PageNumberOptions {
+  styles?: PageNumberStyles
   alignment?: 'left' | 'center' | 'right'
   fontSize?: number // half-points, default: 20 (10pt)
   showTotal?: boolean // "Page X of Y" when true
@@ -327,6 +392,7 @@ interface PageNumberOptions {
 
 ```ts
 interface PropertyTableOptions {
+  styles?: PropertyTableStyles
   items: PropertyItem[]
   keyBold?: boolean // default: true
   striped?: boolean // default: true
@@ -342,6 +408,7 @@ interface PropertyItem {
 
 ```ts
 interface QRCodePluginOptions {
+  styles?: QRCodeStyles
   text: string
   size?: number // default: 128
   errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H'
@@ -356,6 +423,7 @@ interface QRCodePluginOptions {
 
 ```ts
 interface SignatureBlockOptions {
+  styles?: SignatureBlockStyles
   parties: SignatureParty[]
   columns?: number // default: 2
 }
@@ -371,6 +439,7 @@ interface SignatureParty {
 
 ```ts
 interface TimelineOptions {
+  styles?: TimelineStyles
   events: TimelineEvent[]
   layout?: 'alternating' | 'left' | 'right'
   accentColor?: string // default: active theme accent, otherwise '2E75B6'
@@ -387,6 +456,7 @@ interface TimelineEvent {
 
 ```ts
 interface TocOptions {
+  styles?: TocStyles
   maxLevel?: number // clamped to 1–9, default: 3
   title?: string // default: 'Contents'
 }
@@ -396,6 +466,7 @@ interface TocOptions {
 
 ```ts
 interface WatermarkOptions {
+  styles?: WatermarkStyles
   text: string
   color?: string // hex without #, default: 'BFBFBF'
   fontSize?: number // half-points, default: 48 (24pt)
@@ -431,3 +502,45 @@ interface WatermarkOptions {
 | `timelinePlugin` | `timeline` | 表格 | 否 | — |
 | `tocPlugin` | `toc` | [段落, TableOfContents] | 否 | — |
 | `watermarkPlugin` | `watermark` | 段落 | 否 | — |
+
+## 其他內建外掛的部位樣式
+
+工廠的 `{ styles }` 設定實例預設值，`options.styles` 覆寫單次呼叫。外掛套件與 docx-kit 入口匯出 `<Plugin>Config` 和 `<Plugin>Styles`。優先順序：**內建/主題預設值 → 初始化 styles → 通用 style → 單次部位 styles**。巢狀欄位合併，陣列整體替換，`undefined` 沿用預設，`0` / `false` 生效；支援單位與 `$colors.primary` 等主題 token。
+
+| 外掛 | 設定 / 樣式型別 | 文字部位 | 段落部位 | 儲存格部位（不含 height） |
+| --- | --- | --- | --- | --- |
+| [badgePlugin](../plugins/badge.md) | `BadgeConfig` / `BadgeStyles` | `text` | `paragraph` | — |
+| [dividerPlugin](../plugins/divider.md) | `DividerConfig` / `DividerStyles` | — | `paragraph` | — |
+| [pageNumberPlugin](../plugins/page-number.md) | `PageNumberConfig` / `PageNumberStyles` | `text` | `paragraph` | — |
+| [watermarkPlugin](../plugins/watermark.md) | `WatermarkConfig` / `WatermarkStyles` | `text` | `paragraph` | — |
+| [tocPlugin](../plugins/toc.md) | `TocConfig` / `TocStyles` | `title` | `titleParagraph` | — |
+| [coverPagePlugin](../plugins/cover-page.md) | `CoverPageConfig` / `CoverPageStyles` | `author` / `date` / `organization` / `subtitle` / `title` | `authorParagraph` / `dateParagraph` / `organizationParagraph` / `ruleParagraph` / `subtitleParagraph` / `titleParagraph` | — |
+| [letterheadPlugin](../plugins/letterhead.md) | `LetterheadConfig` / `LetterheadStyles` | `address` / `companyName` / `contact` / `tagline` | `addressParagraph` / `companyParagraph` / `contactParagraph` / `ruleParagraph` / `taglineParagraph` | — |
+| [barcodePlugin](../plugins/barcode.md) | `BarcodeConfig` / `BarcodeStyles` | `caption` | `captionParagraph` / `imageParagraph` | — |
+| [qrcodePlugin](../plugins/qrcode.md) | `QRCodeConfig` / `QRCodeStyles` | `caption` | `captionParagraph` / `imageParagraph` | — |
+| [echartsPlugin](../plugins/echarts.md) | `EChartsConfig` / `EChartsStyles` | `caption` | `captionParagraph` / `imageParagraph` | — |
+| [figurePlugin](../plugins/figure.md) | `FigureConfig` / `FigureStyles` | `caption` / `source` | `captionParagraph` / `imageParagraph` / `sourceParagraph` | — |
+| [propertyTablePlugin](../plugins/property-table.md) | `PropertyTableConfig` / `PropertyTableStyles` | `emptyText` / `keyText` / `valueText` | `emptyParagraph` / `keyParagraph` / `valueParagraph` | `keyCell` / `stripedCell` / `valueCell` |
+| [metricCardPlugin](../plugins/metric-card.md) | `MetricCardConfig` / `MetricCardStyles` | `change` / `emptyText` / `label` / `unit` / `value` | `changeParagraph` / `emptyParagraph` / `labelParagraph` / `paddingParagraph` / `valueParagraph` | `cell` |
+| [signatureBlockPlugin](../plugins/signature-block.md) | `SignatureBlockConfig` / `SignatureBlockStyles` | `date` / `emptyText` / `label` / `signature` | `dateParagraph` / `emptyParagraph` / `labelParagraph` / `paddingParagraph` / `signatureParagraph` | `cell` |
+| [changelogPlugin](../plugins/changelog.md) | `ChangelogConfig` / `ChangelogStyles` | `bodyText` / `emptyText` / `headerText` / `title` | `bodyParagraph` / `emptyParagraph` / `headerParagraph` / `titleParagraph` | `bodyCell` / `headerCell` |
+| [meetingMinutesPlugin](../plugins/meeting-minutes.md) | `MeetingMinutesConfig` / `MeetingMinutesStyles` | `bodyText` / `headerText` / `metaLabel` / `metaText` / `title` | `bodyParagraph` / `headerParagraph` / `metaParagraph` / `titleParagraph` | `bodyCell` / `headerCell` |
+| [invoicePlugin](../plugins/invoice.md) | `InvoiceConfig` / `InvoiceStyles` | `bodyText` / `headerText` / `metaText` / `notes` / `notesLabel` / `partyLabel` / `partyText` / `subtotal` / `tax` / `title` / `total` | `bodyParagraph` / `headerParagraph` / `notesParagraph` / `partyParagraph` / `titleParagraph` / `totalsParagraph` | `bodyCell` / `headerCell` |
+| [checklistPlugin](../plugins/checklist.md) | `ChecklistConfig` / `ChecklistStyles` | `emptyText` / `group` / `item` / `note` / `owner` / `title` | `emptyParagraph` / `groupParagraph` / `itemParagraph` / `noteParagraph` / `titleParagraph` | — |
+| [timelinePlugin](../plugins/timeline.md) | `TimelineConfig` / `TimelineStyles` | `connector` / `date` / `description` / `emptyText` / `title` | `connectorParagraph` / `contentParagraph` / `dateParagraph` / `emptyParagraph` | `connectorCell` / `contentCell` / `dateCell` |
+| [codeBlockPlugin](../plugins/code-block.md) | `CodeBlockConfig` / `CodeBlockStyles` | `code` / `lineNumber` | `paragraph` | — |
+
+此處僅自訂明確產生的標題。更新目錄欄位時，Word 使用文件的 TOC 樣式產生目錄項目。 ECharts 仍僅支援瀏覽器。圖表內容與尺寸使用 `option`、`width`、`height`，此處樣式控制周圍段落與圖說。
+
+```ts
+import { createDocx, metricCardPlugin } from 'docx-kit/node'
+
+const doc = createDocx()
+  .use(metricCardPlugin({
+    styles: { value: { color: '#2563EB', fontSize: 24 } },
+  }))
+  .plugin('metricCard', {
+    items: [{ label: 'Revenue', value: 128000, unit: 'USD' }],
+    styles: { value: { bold: false }, cell: { margin: '8pt' } },
+  }, { fontFamily: 'Arial' })
+```

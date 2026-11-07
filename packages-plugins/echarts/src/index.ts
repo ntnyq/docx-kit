@@ -37,10 +37,21 @@ import {
   DocxKitError,
   ERROR_CODES,
 } from '@docxkit/core'
-import { Paragraph } from 'docx'
+import { Paragraph, TextRun } from 'docx'
 
+import type { ParagraphStyleRule, TextStyleRule } from '@docxkit/core'
 // Use type-only import so the dep stays optional at runtime
 import type { EChartsOption } from 'echarts'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface EChartsConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: EChartsStyles
+}
 
 /**
  * Options for the ECharts plugin.
@@ -70,10 +81,32 @@ export interface EChartsPluginOptions {
    */
   renderer?: 'canvas' | 'svg'
   /**
+   * Per-part styles for this invocation.
+   */
+  styles?: EChartsStyles
+  /**
    * Chart width in pixels.
    * @default 640
    */
   width?: number
+}
+
+/**
+ * Independently configurable ECharts parts.
+ */
+export interface EChartsStyles {
+  /**
+   * Caption run typography.
+   */
+  caption?: TextStyleRule
+  /**
+   * Caption paragraph alignment, spacing and flow.
+   */
+  captionParagraph?: ParagraphStyleRule
+  /**
+   * Image paragraph alignment, spacing and flow.
+   */
+  imageParagraph?: ParagraphStyleRule
 }
 
 /**
@@ -133,11 +166,19 @@ interface RenderImageResult {
  *   })
  * ```
  */
-export function echartsPlugin() {
+export function echartsPlugin(pluginConfig: EChartsConfig = {}) {
   return definePlugin<'echarts', EChartsPluginOptions>({
     name: 'echarts',
     async render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof EChartsStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const captionStyle = partStyle('caption')
+      const captionParagraphStyle = partStyle('captionParagraph')
+      const imageParagraphStyle = partStyle('imageParagraph')
       const width = options.width ?? 640
       const height = options.height ?? 360
       const imageType =
@@ -171,12 +212,18 @@ export function echartsPlugin() {
       })
 
       const paragraphs: Paragraph[] = [
-        new Paragraph(pluginStyles.paragraph({ children: [imageRun] })),
+        new Paragraph(imageParagraphStyle.paragraph({ children: [imageRun] })),
       ]
 
       if (options.caption) {
         paragraphs.push(
-          new Paragraph(pluginStyles.paragraph({ text: options.caption })),
+          new Paragraph(
+            captionParagraphStyle.paragraph({
+              children: [
+                new TextRun(captionStyle.text({ text: options.caption })),
+              ],
+            }),
+          ),
         )
       }
 

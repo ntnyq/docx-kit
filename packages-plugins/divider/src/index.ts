@@ -5,6 +5,8 @@ import {
 } from '@docxkit/core'
 import { BorderStyle, Paragraph } from 'docx'
 
+import type { ParagraphStyleRule } from '@docxkit/core'
+
 const DIVIDER_STYLES = {
   dashed: BorderStyle.DASHED,
   dotted: BorderStyle.DOTTED,
@@ -12,23 +14,53 @@ const DIVIDER_STYLES = {
   solid: BorderStyle.SINGLE,
 } as const
 
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface DividerConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: DividerStyles
+}
+
 export interface DividerOptions {
   color?: string
   spacingAfter?: number
   spacingBefore?: number
   style?: keyof typeof DIVIDER_STYLES
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: DividerStyles
 }
 
-export function dividerPlugin() {
+/**
+ * Independently configurable Divider parts.
+ */
+export interface DividerStyles {
+  /**
+   * Paragraph alignment, spacing and flow.
+   */
+  paragraph?: ParagraphStyleRule
+}
+
+export function dividerPlugin(pluginConfig: DividerConfig = {}) {
   return definePlugin<'divider', DividerOptions>({
     name: 'divider',
     render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof DividerStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const paragraphStyle = partStyle('paragraph')
       const color = normalizeHexColor(options.color ?? 'D9D9D9')
       const style = DIVIDER_STYLES[options.style ?? 'solid']
 
       return new Paragraph(
-        pluginStyles.paragraph({
+        paragraphStyle.paragraph({
           border: {
             bottom: {
               color,

@@ -52,3 +52,21 @@ await doc.toBlob()
 Rows do not split across pages. The final row is padded with empty cells. If there are fewer items than `columns`, the available cards share the full width. Invalid column counts throw `DocxKitError` with code `PLUGIN_RENDER_FAILED`, including for empty input.
 
 The grid uses theme colors `surface`, `primary`, `muted`, `success`, and `danger` with built-in fallbacks. Invocation styles override text, paragraphs, and cell backgrounds or borders.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `MetricCardConfig` and `MetricCardStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `change`, `emptyText`, `label`, `unit`, `value` | `TextStyleRule` | Run typography |
+| `changeParagraph`, `emptyParagraph`, `labelParagraph`, `paddingParagraph`, `valueParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+| `cell` | `Omit<CellStyleRule, 'height'>` | Cell shading, borders, width and padding |
+
+```ts
+metricCardPlugin({
+  styles: { value: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

@@ -108,3 +108,21 @@ const doc = createDocx()
   })
   .save('multi-party.docx')
 ```
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `SignatureBlockConfig` and `SignatureBlockStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `date`, `emptyText`, `label`, `signature` | `TextStyleRule` | Run typography |
+| `dateParagraph`, `emptyParagraph`, `labelParagraph`, `paddingParagraph`, `signatureParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+| `cell` | `Omit<CellStyleRule, 'height'>` | Cell shading, borders, width and padding |
+
+```ts
+signatureBlockPlugin({
+  styles: { signature: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

@@ -117,3 +117,22 @@ pnpm add highlight.js
 ```
 
 Without it, code renders with monospaced font but no colors.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `CodeBlockConfig` and `CodeBlockStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `code`, `lineNumber` | `TextStyleRule` | Run typography |
+| `paragraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+
+`code` styles apply to plain and highlighted runs; an explicit color overrides syntax token colors. Use `paragraph.backgroundColor` for the whole code-line background.
+
+```ts
+codeBlockPlugin({
+  styles: { code: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

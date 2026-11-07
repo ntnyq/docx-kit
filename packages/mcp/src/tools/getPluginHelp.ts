@@ -1,3 +1,4 @@
+import { BUILTIN_PLUGIN_OPTION_SCHEMAS } from '@docxkit/ai'
 /**
  * MCP tool: get usage help for a specific plugin.
  *
@@ -23,6 +24,10 @@ export interface PluginHelpInfo {
    * Example usage in JSON DSL.
    */
   usageExample: string
+  /**
+   * Serializable options contract when available for a built-in plugin.
+   */
+  optionsSchema?: Record<string, unknown>
 }
 
 /**
@@ -63,6 +68,9 @@ export function buildPluginHelp(plugin: DocxPlugin): PluginHelpInfo {
     description:
       metadata?.description
       ?? `Plugin: ${plugin.name}. Renders ${plugin.name} content in the document.`,
+    optionsSchema: Object.hasOwn(BUILTIN_PLUGIN_OPTION_SCHEMAS, plugin.name)
+      ? BUILTIN_PLUGIN_OPTION_SCHEMAS[plugin.name]
+      : undefined,
     usageExample:
       metadata?.usageExample
       ?? `{ type: "plugin", name: "${plugin.name}", options: { ... } }`,

@@ -137,3 +137,23 @@ const doc = createDocx()
   })
   .save('deploy-spec.docx')
 ```
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `PropertyTableConfig` and `PropertyTableStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `emptyText`, `keyText`, `valueText` | `TextStyleRule` | Run typography |
+| `emptyParagraph`, `keyParagraph`, `valueParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+| `keyCell`, `stripedCell`, `valueCell` | `Omit<CellStyleRule, 'height'>` | Cell shading, borders, width and padding |
+
+`stripedCell` adds to `valueCell` on the second, fourth, etc. rows only when `striped` is true; within each level it overrides `valueCell`.
+
+```ts
+propertyTablePlugin({
+  styles: { keyText: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

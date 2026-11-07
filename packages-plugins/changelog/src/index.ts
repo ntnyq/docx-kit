@@ -15,12 +15,28 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
 const TYPE_COLORS = {
   added: 'E7F6EA',
   changed: 'FFF4D6',
   fixed: 'E8F1FB',
   removed: 'FDE7E9',
 } as const
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface ChangelogConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: ChangelogStyles
+}
 
 export interface ChangelogEntry {
   changes: string
@@ -31,15 +47,80 @@ export interface ChangelogEntry {
 
 export interface ChangelogOptions {
   entries: ChangelogEntry[]
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: ChangelogStyles
   title?: string
 }
 
-export function changelogPlugin() {
+/**
+ * Independently configurable Changelog parts.
+ */
+export interface ChangelogStyles {
+  /**
+   * Body cell shading, borders and padding.
+   */
+  bodyCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Body paragraph alignment, spacing and flow.
+   */
+  bodyParagraph?: ParagraphStyleRule
+  /**
+   * Body text run typography.
+   */
+  bodyText?: TextStyleRule
+  /**
+   * Empty paragraph alignment, spacing and flow.
+   */
+  emptyParagraph?: ParagraphStyleRule
+  /**
+   * Empty text run typography.
+   */
+  emptyText?: TextStyleRule
+  /**
+   * Header cell shading, borders and padding.
+   */
+  headerCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Header paragraph alignment, spacing and flow.
+   */
+  headerParagraph?: ParagraphStyleRule
+  /**
+   * Header text run typography.
+   */
+  headerText?: TextStyleRule
+  /**
+   * Title run typography.
+   */
+  title?: TextStyleRule
+  /**
+   * Title paragraph alignment, spacing and flow.
+   */
+  titleParagraph?: ParagraphStyleRule
+}
+
+export function changelogPlugin(pluginConfig: ChangelogConfig = {}) {
   return definePlugin<'changelog', ChangelogOptions>({
     name: 'changelog',
     render(options, context) {
       const { config } = context
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof ChangelogStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const bodyCellStyle = partStyle('bodyCell')
+      const bodyParagraphStyle = partStyle('bodyParagraph')
+      const bodyTextStyle = partStyle('bodyText')
+      const emptyParagraphStyle = partStyle('emptyParagraph')
+      const emptyTextStyle = partStyle('emptyText')
+      const headerCellStyle = partStyle('headerCell')
+      const headerParagraphStyle = partStyle('headerParagraph')
+      const headerTextStyle = partStyle('headerText')
+      const titleStyle = partStyle('title')
+      const titleParagraphStyle = partStyle('titleParagraph')
       const colors = config.theme?.colors
       const border = {
         color: normalizeHexColor(colors?.border) ?? 'D5D9DF',
@@ -55,11 +136,11 @@ export function changelogPlugin() {
       const surface = normalizeHexColor(colors?.surface) ?? 'F4F6F8'
       const primary = normalizeHexColor(colors?.primary) ?? '1B2A4A'
       const title = new Paragraph(
-        pluginStyles.paragraph({
+        titleParagraphStyle.paragraph({
           spacing: { after: 180 },
           children: [
             new TextRun(
-              pluginStyles.text({
+              titleStyle.text({
                 bold: true,
                 size: 28,
                 text: options.title ?? 'Changelog',
@@ -73,11 +154,14 @@ export function changelogPlugin() {
         return [
           title,
           new Paragraph(
-            pluginStyles.paragraph({
+            emptyParagraphStyle.paragraph({
               alignment: AlignmentType.CENTER,
               children: [
                 new TextRun(
-                  pluginStyles.text({ color: '999999', text: '(no entries)' }),
+                  emptyTextStyle.text({
+                    color: '999999',
+                    text: '(no entries)',
+                  }),
                 ),
               ],
             }),
@@ -91,15 +175,15 @@ export function changelogPlugin() {
         children: ['Version', 'Date', 'Type', 'Changes'].map(
           label =>
             new TableCell(
-              pluginStyles.cell({
+              headerCellStyle.cell({
                 borders,
                 shading: { fill: surface, type: ShadingType.CLEAR },
                 children: [
                   new Paragraph(
-                    pluginStyles.paragraph({
+                    headerParagraphStyle.paragraph({
                       children: [
                         new TextRun(
-                          pluginStyles.text({
+                          headerTextStyle.text({
                             bold: true,
                             color: primary,
                             text: label,
@@ -126,13 +210,13 @@ export function changelogPlugin() {
             ].map(
               (value, index) =>
                 new TableCell(
-                  pluginStyles.cell({
+                  bodyCellStyle.cell({
                     borders,
                     children: [
                       new Paragraph(
-                        pluginStyles.paragraph({
+                        bodyParagraphStyle.paragraph({
                           children: [
-                            new TextRun(pluginStyles.text({ text: value })),
+                            new TextRun(bodyTextStyle.text({ text: value })),
                           ],
                         }),
                       ),

@@ -74,29 +74,95 @@ export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
 export { signatureBlockPlugin } from '@docxkit/plugin-signature-block'
 // ---------- Preview (Browser DOCX viewer) ----------
 export { createDocxPreview, PREVIEW_ERROR_CODES } from '@docxkit/renderer'
-export type { TocOptions } from '@docxkit/plugin-toc'
+export type { TocConfig, TocOptions, TocStyles } from '@docxkit/plugin-toc'
 // ---------- Plugin option types ----------
-export type { BadgeOptions } from '@docxkit/plugin-badge'
-export type { FigureOptions } from '@docxkit/plugin-figure'
-export type { CalloutOptions } from '@docxkit/plugin-callout'
-export type { DividerOptions } from '@docxkit/plugin-divider'
-export type { QRCodePluginOptions } from '@docxkit/plugin-qrcode'
-export type { WatermarkOptions } from '@docxkit/plugin-watermark'
-export type { CodeBlockOptions } from '@docxkit/plugin-code-block'
-export type { CoverPageOptions } from '@docxkit/plugin-cover-page'
-export type { EChartsPluginOptions } from '@docxkit/plugin-echarts'
-export type { LetterheadOptions } from '@docxkit/plugin-letterhead'
-export type { PageNumberOptions } from '@docxkit/plugin-page-number'
-export type { BarcodeFormat, BarcodeOptions } from '@docxkit/plugin-barcode'
-export type { TimelineEvent, TimelineOptions } from '@docxkit/plugin-timeline'
-
-export type { ChecklistItem, ChecklistOptions } from '@docxkit/plugin-checklist'
-
-export type { MetricCardOptions, MetricItem } from '@docxkit/plugin-metric-card'
 export type {
+  BadgeConfig,
+  BadgeOptions,
+  BadgeStyles,
+} from '@docxkit/plugin-badge'
+export type {
+  FigureConfig,
+  FigureOptions,
+  FigureStyles,
+} from '@docxkit/plugin-figure'
+export type {
+  CalloutConfig,
+  CalloutOptions,
+  CalloutStyles,
+} from '@docxkit/plugin-callout'
+export type {
+  DividerConfig,
+  DividerOptions,
+  DividerStyles,
+} from '@docxkit/plugin-divider'
+export type {
+  QRCodeConfig,
+  QRCodePluginOptions,
+  QRCodeStyles,
+} from '@docxkit/plugin-qrcode'
+export type {
+  EChartsConfig,
+  EChartsPluginOptions,
+  EChartsStyles,
+} from '@docxkit/plugin-echarts'
+export type {
+  WatermarkConfig,
+  WatermarkOptions,
+  WatermarkStyles,
+} from '@docxkit/plugin-watermark'
+export type {
+  CodeBlockConfig,
+  CodeBlockOptions,
+  CodeBlockStyles,
+} from '@docxkit/plugin-code-block'
+export type {
+  CoverPageConfig,
+  CoverPageOptions,
+  CoverPageStyles,
+} from '@docxkit/plugin-cover-page'
+export type {
+  LetterheadConfig,
+  LetterheadOptions,
+  LetterheadStyles,
+} from '@docxkit/plugin-letterhead'
+export type {
+  PageNumberConfig,
+  PageNumberOptions,
+  PageNumberStyles,
+} from '@docxkit/plugin-page-number'
+export type {
+  BarcodeConfig,
+  BarcodeFormat,
+  BarcodeOptions,
+  BarcodeStyles,
+} from '@docxkit/plugin-barcode'
+export type {
+  TimelineConfig,
+  TimelineEvent,
+  TimelineOptions,
+  TimelineStyles,
+} from '@docxkit/plugin-timeline'
+
+export type {
+  ChecklistConfig,
+  ChecklistItem,
+  ChecklistOptions,
+  ChecklistStyles,
+} from '@docxkit/plugin-checklist'
+
+export type {
+  ChangelogConfig,
   ChangelogEntry,
   ChangelogOptions,
+  ChangelogStyles,
 } from '@docxkit/plugin-changelog'
+export type {
+  MetricCardConfig,
+  MetricCardOptions,
+  MetricCardStyles,
+  MetricItem,
+} from '@docxkit/plugin-metric-card'
 
 export { academicPreset, classicPreset, modernPreset }
 
@@ -159,31 +225,41 @@ export function useTheme(id: string): DocxTheme | undefined {
 }
 
 export type {
-  AgendaItem,
-  MeetingMinutesOptions,
-} from '@docxkit/plugin-meeting-minutes'
-export type {
-  PropertyItem,
-  PropertyTableOptions,
-} from '@docxkit/plugin-property-table'
-export type {
-  ColAlign,
-  ColFormat,
-  DataTableOptions,
-} from '@docxkit/plugin-data-table'
-export type {
-  SignatureBlockOptions,
-  SignatureParty,
-} from '@docxkit/plugin-signature-block'
-export type {
-  InvoiceLineItem,
-  InvoiceOptions,
-  InvoiceParty,
-} from '@docxkit/plugin-invoice'
-export type {
   DocxInput,
   DocxPreview,
   DocxPreviewOptions,
   PreviewErrorCode,
   RendererKind,
 } from '@docxkit/renderer'
+export type {
+  ColAlign,
+  ColFormat,
+  DataTableConfig,
+  DataTableOptions,
+  DataTableStyles,
+} from '@docxkit/plugin-data-table'
+export type {
+  InvoiceConfig,
+  InvoiceLineItem,
+  InvoiceOptions,
+  InvoiceParty,
+  InvoiceStyles,
+} from '@docxkit/plugin-invoice'
+export type {
+  PropertyItem,
+  PropertyTableConfig,
+  PropertyTableOptions,
+  PropertyTableStyles,
+} from '@docxkit/plugin-property-table'
+export type {
+  AgendaItem,
+  MeetingMinutesConfig,
+  MeetingMinutesOptions,
+  MeetingMinutesStyles,
+} from '@docxkit/plugin-meeting-minutes'
+export type {
+  SignatureBlockConfig,
+  SignatureBlockOptions,
+  SignatureBlockStyles,
+  SignatureParty,
+} from '@docxkit/plugin-signature-block'

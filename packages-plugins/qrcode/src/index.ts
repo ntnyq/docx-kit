@@ -22,7 +22,19 @@ import {
   dataUrlToUint8Array,
   definePlugin,
 } from '@docxkit/core'
-import { Paragraph } from 'docx'
+import { Paragraph, TextRun } from 'docx'
+
+import type { ParagraphStyleRule, TextStyleRule } from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface QRCodeConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: QRCodeStyles
+}
 
 /**
  * Options for the QRCode plugin.
@@ -57,6 +69,28 @@ export interface QRCodePluginOptions {
    * @default 128
    */
   size?: number
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: QRCodeStyles
+}
+
+/**
+ * Independently configurable QRCode parts.
+ */
+export interface QRCodeStyles {
+  /**
+   * Caption run typography.
+   */
+  caption?: TextStyleRule
+  /**
+   * Caption paragraph alignment, spacing and flow.
+   */
+  captionParagraph?: ParagraphStyleRule
+  /**
+   * Image paragraph alignment, spacing and flow.
+   */
+  imageParagraph?: ParagraphStyleRule
 }
 
 /**
@@ -81,11 +115,19 @@ export interface QRCodePluginOptions {
  *   })
  * ```
  */
-export function qrcodePlugin() {
+export function qrcodePlugin(pluginConfig: QRCodeConfig = {}) {
   return definePlugin<'qrcode', QRCodePluginOptions>({
     name: 'qrcode',
     async render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof QRCodeStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const captionStyle = partStyle('caption')
+      const captionParagraphStyle = partStyle('captionParagraph')
+      const imageParagraphStyle = partStyle('imageParagraph')
       // Dynamic import: peer dep `qrcode` is not bundled in core.
       const QRCode =
         (await import('qrcode')).default ?? (await import('qrcode'))
@@ -107,12 +149,18 @@ export function qrcodePlugin() {
       })
 
       const paragraphs: Paragraph[] = [
-        new Paragraph(pluginStyles.paragraph({ children: [imageRun] })),
+        new Paragraph(imageParagraphStyle.paragraph({ children: [imageRun] })),
       ]
 
       if (options.caption) {
         paragraphs.push(
-          new Paragraph(pluginStyles.paragraph({ text: options.caption })),
+          new Paragraph(
+            captionParagraphStyle.paragraph({
+              children: [
+                new TextRun(captionStyle.text({ text: options.caption })),
+              ],
+            }),
+          ),
         )
       }
 

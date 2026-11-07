@@ -27,7 +27,21 @@ import {
   normalizeHexColor,
 } from '@docxkit/core'
 import { Paragraph, ShadingType, TextRun } from 'docx'
-import type { PluginStyleAdapter } from '@docxkit/core'
+import type {
+  ParagraphStyleRule,
+  PluginStyleAdapter,
+  TextStyleRule,
+} from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface CodeBlockConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: CodeBlockStyles
+}
 
 /**
  * Options for the CodeBlock plugin.
@@ -49,6 +63,28 @@ export interface CodeBlockOptions {
    * @default false
    */
   showLineNumbers?: boolean
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: CodeBlockStyles
+}
+
+/**
+ * Independently configurable CodeBlock parts.
+ */
+export interface CodeBlockStyles {
+  /**
+   * Code run typography, including highlighted tokens.
+   */
+  code?: TextStyleRule
+  /**
+   * Line number run typography.
+   */
+  lineNumber?: TextStyleRule
+  /**
+   * Paragraph alignment, spacing and flow.
+   */
+  paragraph?: ParagraphStyleRule
 }
 
 /**
@@ -82,7 +118,9 @@ const FONT_SIZE = 18 // half-points → 9pt
  */
 interface CodeAppearance {
   background: string
+  codeStyle: PluginStyleAdapter
   font: string
+  lineNumberStyle: PluginStyleAdapter
   styles: PluginStyleAdapter
 }
 
@@ -98,15 +136,26 @@ interface HighlightJs {
  *
  * @returns A configured DocxPlugin for `'codeBlock'`
  */
-export function codeBlockPlugin() {
+export function codeBlockPlugin(pluginConfig: CodeBlockConfig = {}) {
   return definePlugin<'codeBlock', CodeBlockOptions>({
     name: 'codeBlock',
     async render(options, context) {
+      const partStyle = (...parts: (keyof CodeBlockStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const codeStyle = partStyle('code')
+      const lineNumberStyle = partStyle('lineNumber')
+      const paragraphStyle = partStyle('paragraph')
       const { config } = context
       const appearance = {
         background: normalizeHexColor(config.theme?.colors?.surface) ?? CODE_BG,
+        codeStyle,
         font: config.theme?.fonts?.code?.split(',')[0].trim() ?? MONO_FONT,
-        styles: createPluginStyle(context.style),
+        lineNumberStyle,
+        styles: paragraphStyle,
       }
       const lines = options.code.split('\n')
 
@@ -172,7 +221,7 @@ function linesToParagraphs(
             ...(showLineNumbers
               ? [
                   new TextRun(
-                    appearance.styles.text({
+                    appearance.lineNumberStyle.text({
                       color: LINE_NO_COLOR,
                       font: appearance.font,
                       size: FONT_SIZE,
@@ -182,7 +231,7 @@ function linesToParagraphs(
                 ]
               : []),
             new TextRun(
-              appearance.styles.text({
+              appearance.codeStyle.text({
                 font: appearance.font,
                 size: FONT_SIZE,
                 text: line,
@@ -275,7 +324,7 @@ function tokensToParagraphs(
       lineHtml,
       appearance.font,
       colorStack,
-      appearance.styles,
+      appearance.codeStyle,
     )
     return new Paragraph(
       appearance.styles.paragraph({
@@ -286,7 +335,7 @@ function tokensToParagraphs(
           ...(showLineNumbers
             ? [
                 new TextRun(
-                  appearance.styles.text({
+                  appearance.lineNumberStyle.text({
                     color: LINE_NO_COLOR,
                     font: appearance.font,
                     size: FONT_SIZE,

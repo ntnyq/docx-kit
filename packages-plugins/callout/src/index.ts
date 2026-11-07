@@ -36,6 +36,44 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface CalloutConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: CalloutStyles
+}
+
+/**
+ * Independently configurable Callout parts.
+ */
+export interface CalloutStyles {
+  /**
+   * Container shading, borders and padding.
+   */
+  cell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Body run typography.
+   */
+  content?: TextStyleRule
+  /**
+   * Shared paragraph alignment, spacing and flow.
+   */
+  paragraph?: ParagraphStyleRule
+  /**
+   * Title run typography.
+   */
+  title?: TextStyleRule
+}
+
 const CALLOUT_PRESETS = {
   danger: {
     bg: 'FCE4D6',
@@ -68,6 +106,10 @@ export interface CalloutOptions {
    */
   type: 'danger' | 'info' | 'success' | 'warning'
   /**
+   * Per-part styles for this invocation.
+   */
+  styles?: CalloutStyles
+  /**
    * Optional bold title line placed before the content.
    */
   title?: string
@@ -87,12 +129,21 @@ export interface CalloutOptions {
  *   .plugin('callout', { type: 'info', content: '系统将在今晚 22:00 升级。' })
  * ```
  */
-export function calloutPlugin() {
+export function calloutPlugin(pluginConfig: CalloutConfig = {}) {
   return definePlugin<'callout', CalloutOptions>({
     name: 'callout',
     render(options, context) {
       const { config } = context
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (part: keyof CalloutStyles) =>
+        createPluginStyle(context.style, {
+          defaults: [pluginConfig.styles?.[part]],
+          overrides: [options.styles?.[part]],
+          theme: config.theme,
+        })
+      const titleStyle = partStyle('title')
+      const contentStyle = partStyle('content')
+      const paragraphStyle = partStyle('paragraph')
+      const cellStyle = partStyle('cell')
       const colors = config.theme?.colors
       const tone = normalizeHexColor(
         colors?.[options.type] ?? CALLOUT_PRESETS[options.type].border,
@@ -103,14 +154,14 @@ export function calloutPlugin() {
       if (options.title) {
         runs.push(
           new TextRun(
-            pluginStyles.text({ bold: true, color: tone, text: options.title }),
+            titleStyle.text({ bold: true, color: tone, text: options.title }),
           ),
         )
       }
 
       runs.push(
         new TextRun(
-          pluginStyles.text({
+          contentStyle.text({
             break: options.title ? 1 : undefined,
             text: options.content,
           }),
@@ -134,30 +185,32 @@ export function calloutPlugin() {
           new TableRow({
             cantSplit: true,
             children: [
-              new TableCell({
-                margins: { bottom: 140, left: 180, right: 180, top: 140 },
-                borders: {
-                  bottom: noBorder,
-                  left: { color: tone, size: 18, style: BorderStyle.SINGLE },
-                  right: noBorder,
-                  top: noBorder,
-                },
-                children: [
-                  new Paragraph(
-                    pluginStyles.paragraph({
-                      alignment: AlignmentType.LEFT,
-                      children: runs,
-                      indent: { firstLine: 0, left: 0, right: 0 },
-                      keepLines: true,
-                      spacing: { after: 0, before: 0, line: 336 },
-                    }),
-                  ),
-                ],
-                shading: {
-                  fill: normalizeHexColor(colors?.surface) ?? preset.bg,
-                  type: ShadingType.CLEAR,
-                },
-              }),
+              new TableCell(
+                cellStyle.cell({
+                  margins: { bottom: 140, left: 180, right: 180, top: 140 },
+                  borders: {
+                    bottom: noBorder,
+                    left: { color: tone, size: 18, style: BorderStyle.SINGLE },
+                    right: noBorder,
+                    top: noBorder,
+                  },
+                  children: [
+                    new Paragraph(
+                      paragraphStyle.paragraph({
+                        alignment: AlignmentType.LEFT,
+                        children: runs,
+                        indent: { firstLine: 0, left: 0, right: 0 },
+                        keepLines: true,
+                        spacing: { after: 0, before: 0, line: 336 },
+                      }),
+                    ),
+                  ],
+                  shading: {
+                    fill: normalizeHexColor(colors?.surface) ?? preset.bg,
+                    type: ShadingType.CLEAR,
+                  },
+                }),
+              ),
             ],
           }),
         ],

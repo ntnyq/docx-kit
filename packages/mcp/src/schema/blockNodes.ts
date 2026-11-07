@@ -1,3 +1,7 @@
+import {
+  BUILTIN_PLUGIN_SCHEMA_CONDITIONS,
+  SECTION_BREAK_SCHEMA_CONDITION,
+} from '@docxkit/ai'
 import { STYLE_RULE_SCHEMA, UNIT_VALUE_SCHEMA } from './styles'
 
 export interface BlockNodeDefinition {
@@ -307,6 +311,14 @@ function buildNodeJsonSchema(
     properties,
     required,
     type: 'object',
+  }
+
+  if (type === 'plugin') {
+    schema.allOf = BUILTIN_PLUGIN_SCHEMA_CONDITIONS
+  }
+
+  if (type === 'sectionBreak') {
+    schema.allOf = [SECTION_BREAK_SCHEMA_CONDITION]
   }
 
   if (type === 'table') {

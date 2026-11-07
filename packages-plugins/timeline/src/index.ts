@@ -37,6 +37,22 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface TimelineConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: TimelineStyles
+}
+
 /**
  * A single timeline event.
  */
@@ -78,6 +94,64 @@ export interface TimelineOptions {
    * @default 'alternating'
    */
   layout?: 'alternating' | 'left' | 'right'
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: TimelineStyles
+}
+
+/**
+ * Independently configurable Timeline parts.
+ */
+export interface TimelineStyles {
+  /**
+   * Connector marker typography.
+   */
+  connector?: TextStyleRule
+  /**
+   * Connector cell shading, borders and padding.
+   */
+  connectorCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Connector paragraph alignment, spacing and flow.
+   */
+  connectorParagraph?: ParagraphStyleRule
+  /**
+   * Content cell shading, borders and padding.
+   */
+  contentCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Content paragraph alignment, spacing and flow.
+   */
+  contentParagraph?: ParagraphStyleRule
+  /**
+   * Date run typography.
+   */
+  date?: TextStyleRule
+  /**
+   * Date cell shading, borders and padding.
+   */
+  dateCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Date paragraph alignment, spacing and flow.
+   */
+  dateParagraph?: ParagraphStyleRule
+  /**
+   * Description run typography.
+   */
+  description?: TextStyleRule
+  /**
+   * Empty paragraph alignment, spacing and flow.
+   */
+  emptyParagraph?: ParagraphStyleRule
+  /**
+   * Empty text run typography.
+   */
+  emptyText?: TextStyleRule
+  /**
+   * Title run typography.
+   */
+  title?: TextStyleRule
 }
 
 /**
@@ -109,12 +183,29 @@ const COL_WIDTHS = {
  *   })
  * ```
  */
-export function timelinePlugin() {
+export function timelinePlugin(pluginConfig: TimelineConfig = {}) {
   return definePlugin<'timeline', TimelineOptions>({
     name: 'timeline',
     render(options, context) {
       const { config } = context
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof TimelineStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const connectorStyle = partStyle('connector')
+      const connectorCellStyle = partStyle('connectorCell')
+      const connectorParagraphStyle = partStyle('connectorParagraph')
+      const contentCellStyle = partStyle('contentCell')
+      const contentParagraphStyle = partStyle('contentParagraph')
+      const dateStyle = partStyle('date')
+      const dateCellStyle = partStyle('dateCell')
+      const dateParagraphStyle = partStyle('dateParagraph')
+      const descriptionStyle = partStyle('description')
+      const emptyParagraphStyle = partStyle('emptyParagraph')
+      const emptyTextStyle = partStyle('emptyText')
+      const titleStyle = partStyle('title')
       const colors = config.theme?.colors
       const {
         accentColor = normalizeHexColor(colors?.accent) ?? '2E75B6',
@@ -123,12 +214,18 @@ export function timelinePlugin() {
       } = options
 
       if (events.length === 0) {
-        return new Paragraph(pluginStyles.paragraph({ text: '(No events)' }))
+        return new Paragraph(
+          emptyParagraphStyle.paragraph({
+            children: [
+              new TextRun(emptyTextStyle.text({ text: '(No events)' })),
+            ],
+          }),
+        )
       }
 
       const connectorCell = () =>
         new TableCell(
-          pluginStyles.cell({
+          connectorCellStyle.cell({
             width: { size: COL_WIDTHS.connector, type: WidthType.DXA },
             borders: {
               bottom: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
@@ -138,11 +235,11 @@ export function timelinePlugin() {
             },
             children: [
               new Paragraph(
-                pluginStyles.paragraph({
+                connectorParagraphStyle.paragraph({
                   alignment: AlignmentType.CENTER,
                   children: [
                     new TextRun(
-                      pluginStyles.text({
+                      connectorStyle.text({
                         color: normalizeHexColor(accentColor),
                         size: 24,
                         text: '\u{25CF}',
@@ -157,7 +254,7 @@ export function timelinePlugin() {
 
       const dateCell = (date: string) =>
         new TableCell(
-          pluginStyles.cell({
+          dateCellStyle.cell({
             width: { size: COL_WIDTHS.date, type: WidthType.DXA },
             borders: {
               left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
@@ -171,11 +268,11 @@ export function timelinePlugin() {
             },
             children: [
               new Paragraph(
-                pluginStyles.paragraph({
+                dateParagraphStyle.paragraph({
                   alignment: AlignmentType.RIGHT,
                   children: [
                     new TextRun(
-                      pluginStyles.text({
+                      dateStyle.text({
                         bold: true,
                         color: normalizeHexColor(accentColor),
                         size: 22,
@@ -196,7 +293,7 @@ export function timelinePlugin() {
       const contentCell = (title: string, description?: string) => {
         const runs: TextRun[] = [
           new TextRun(
-            pluginStyles.text({
+            titleStyle.text({
               bold: true,
               size: 24,
               text: title,
@@ -207,7 +304,7 @@ export function timelinePlugin() {
         if (description) {
           runs.push(
             new TextRun(
-              pluginStyles.text({
+              descriptionStyle.text({
                 break: 1,
                 color: '555555',
                 size: 20,
@@ -218,7 +315,7 @@ export function timelinePlugin() {
         }
 
         return new TableCell(
-          pluginStyles.cell({
+          contentCellStyle.cell({
             width: { size: COL_WIDTHS.content, type: WidthType.DXA },
             borders: {
               left: { color: 'FFFFFF', size: 0, style: BorderStyle.NONE },
@@ -231,7 +328,9 @@ export function timelinePlugin() {
               },
             },
             children: [
-              new Paragraph(pluginStyles.paragraph({ children: runs })),
+              new Paragraph(
+                contentParagraphStyle.paragraph({ children: runs }),
+              ),
             ],
           }),
         )

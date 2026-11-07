@@ -117,3 +117,21 @@ const doc = createDocx()
   })
   .save('single-event.docx')
 ```
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `TimelineConfig` and `TimelineStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `connector`, `date`, `description`, `emptyText`, `title` | `TextStyleRule` | Run typography |
+| `connectorParagraph`, `contentParagraph`, `dateParagraph`, `emptyParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+| `connectorCell`, `contentCell`, `dateCell` | `Omit<CellStyleRule, 'height'>` | Cell shading, borders, width and padding |
+
+```ts
+timelinePlugin({
+  styles: { title: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

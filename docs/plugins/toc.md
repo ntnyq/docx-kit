@@ -29,3 +29,22 @@ const doc = createDocx()
 
 - The plugin emits a real DOCX TOC field, not a static text snapshot.
 - Microsoft Word may ask the user to update fields after opening the file.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `TocConfig` and `TocStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `title` | `TextStyleRule` | Run typography |
+| `titleParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+
+Only the explicit title is styled here. Word generates TOC entries using its TOC document styles when updating the field.
+
+```ts
+tocPlugin({
+  styles: { title: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

@@ -48,3 +48,22 @@ For browsers, import from `docx-kit`, supply bytes, a Blob, or a data URL, and e
 Image and caption paragraphs request keeping with the next paragraph when a caption or credit follows. Invocation styles can override this and the default alignment. Credits use the theme's `muted` color.
 
 Caption text is rendered as supplied. Automatic numbering, Word sequence fields, and cross-references are outside this plugin's current scope.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `FigureConfig` and `FigureStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `caption`, `source` | `TextStyleRule` | Run typography |
+| `captionParagraph`, `imageParagraph`, `sourceParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+
+Image dimensions and data still use the existing image options; `imageParagraph` styles its surrounding paragraph.
+
+```ts
+figurePlugin({
+  styles: { caption: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

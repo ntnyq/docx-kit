@@ -42,6 +42,12 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
 const AGENDA_COLUMNS = ['议题', '讨论', '决议', '负责人']
 
 /**
@@ -67,6 +73,16 @@ export interface AgendaItem {
 }
 
 /**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface MeetingMinutesConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: MeetingMinutesStyles
+}
+
+/**
  * Options for the MeetingMinutes plugin.
  */
 export interface MeetingMinutesOptions {
@@ -86,6 +102,60 @@ export interface MeetingMinutesOptions {
    * Meeting title (rendered as Heading 1).
    */
   title: string
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: MeetingMinutesStyles
+}
+
+/**
+ * Independently configurable MeetingMinutes parts.
+ */
+export interface MeetingMinutesStyles {
+  /**
+   * Body cell shading, borders and padding.
+   */
+  bodyCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Body paragraph alignment, spacing and flow.
+   */
+  bodyParagraph?: ParagraphStyleRule
+  /**
+   * Body text run typography.
+   */
+  bodyText?: TextStyleRule
+  /**
+   * Header cell shading, borders and padding.
+   */
+  headerCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Header paragraph alignment, spacing and flow.
+   */
+  headerParagraph?: ParagraphStyleRule
+  /**
+   * Header text run typography.
+   */
+  headerText?: TextStyleRule
+  /**
+   * Meta label run typography.
+   */
+  metaLabel?: TextStyleRule
+  /**
+   * Meta paragraph alignment, spacing and flow.
+   */
+  metaParagraph?: ParagraphStyleRule
+  /**
+   * Meta text run typography.
+   */
+  metaText?: TextStyleRule
+  /**
+   * Title run typography.
+   */
+  title?: TextStyleRule
+  /**
+   * Title paragraph alignment, spacing and flow.
+   */
+  titleParagraph?: ParagraphStyleRule
 }
 
 /**
@@ -93,12 +163,28 @@ export interface MeetingMinutesOptions {
  *
  * @returns A configured DocxPlugin for `'meetingMinutes'`
  */
-export function meetingMinutesPlugin() {
+export function meetingMinutesPlugin(pluginConfig: MeetingMinutesConfig = {}) {
   return definePlugin<'meetingMinutes', MeetingMinutesOptions>({
     name: 'meetingMinutes',
     render(options, context) {
       const { config } = context
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof MeetingMinutesStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const bodyCellStyle = partStyle('bodyCell')
+      const bodyParagraphStyle = partStyle('bodyParagraph')
+      const bodyTextStyle = partStyle('bodyText')
+      const headerCellStyle = partStyle('headerCell')
+      const headerParagraphStyle = partStyle('headerParagraph')
+      const headerTextStyle = partStyle('headerText')
+      const metaLabelStyle = partStyle('metaLabel')
+      const metaParagraphStyle = partStyle('metaParagraph')
+      const metaTextStyle = partStyle('metaText')
+      const titleStyle = partStyle('title')
+      const titleParagraphStyle = partStyle('titleParagraph')
       const colors = config.theme?.colors
       const border = {
         color: normalizeHexColor(colors?.border) ?? 'D5D9DF',
@@ -115,12 +201,12 @@ export function meetingMinutesPlugin() {
       const primary = normalizeHexColor(colors?.primary) ?? '1B2A4A'
       // Title
       const titlePara = new Paragraph(
-        pluginStyles.paragraph({
+        titleParagraphStyle.paragraph({
           heading: HeadingLevel.HEADING_1,
           spacing: { after: 200 },
           children: [
             new TextRun(
-              pluginStyles.text({ bold: true, size: 32, text: options.title }),
+              titleStyle.text({ bold: true, size: 32, text: options.title }),
             ),
           ],
         }),
@@ -128,15 +214,17 @@ export function meetingMinutesPlugin() {
 
       // Meta info
       const metaPara = new Paragraph(
-        pluginStyles.paragraph({
+        metaParagraphStyle.paragraph({
           spacing: { after: 300 },
           children: [
-            new TextRun(pluginStyles.text({ bold: true, text: '日期：' })),
-            new TextRun(pluginStyles.text({ text: options.date })),
-            new TextRun(pluginStyles.text({ text: ' '.repeat(4) })),
-            new TextRun(pluginStyles.text({ bold: true, text: '参会人员：' })),
+            new TextRun(metaLabelStyle.text({ bold: true, text: '日期：' })),
+            new TextRun(metaTextStyle.text({ text: options.date })),
+            new TextRun(metaTextStyle.text({ text: ' '.repeat(4) })),
             new TextRun(
-              pluginStyles.text({ text: options.attendees.join('、') }),
+              metaLabelStyle.text({ bold: true, text: '参会人员：' }),
+            ),
+            new TextRun(
+              metaTextStyle.text({ text: options.attendees.join('、') }),
             ),
           ],
         }),
@@ -151,17 +239,17 @@ export function meetingMinutesPlugin() {
       const headerCells = AGENDA_COLUMNS.map(
         col =>
           new TableCell(
-            pluginStyles.cell({
+            headerCellStyle.cell({
               borders,
               shading: { fill: surface, type: ShadingType.CLEAR },
               children: [
                 new Paragraph(
-                  pluginStyles.paragraph({
+                  headerParagraphStyle.paragraph({
                     alignment: AlignmentType.LEFT,
                     spacing: { after: 0, before: 0, line: 288 },
                     children: [
                       new TextRun(
-                        pluginStyles.text({
+                        headerTextStyle.text({
                           bold: true,
                           color: primary,
                           text: col,
@@ -186,12 +274,14 @@ export function meetingMinutesPlugin() {
         const cells = values.map(
           val =>
             new TableCell(
-              pluginStyles.cell({
+              bodyCellStyle.cell({
                 borders,
                 children: [
                   new Paragraph(
-                    pluginStyles.paragraph({
-                      children: [new TextRun(pluginStyles.text({ text: val }))],
+                    bodyParagraphStyle.paragraph({
+                      children: [
+                        new TextRun(bodyTextStyle.text({ text: val })),
+                      ],
                     }),
                   ),
                 ],

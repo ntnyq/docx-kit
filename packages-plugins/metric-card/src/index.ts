@@ -16,6 +16,22 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface MetricCardConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: MetricCardStyles
+}
+
 /**
  * Options for an equal-width grid of metric cards.
  */
@@ -26,6 +42,60 @@ export interface MetricCardOptions {
    * @default 3
    */
   columns?: number
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: MetricCardStyles
+}
+
+/**
+ * Independently configurable MetricCard parts.
+ */
+export interface MetricCardStyles {
+  /**
+   * Cell shading, borders and padding.
+   */
+  cell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Change run typography.
+   */
+  change?: TextStyleRule
+  /**
+   * Change paragraph alignment, spacing and flow.
+   */
+  changeParagraph?: ParagraphStyleRule
+  /**
+   * Empty paragraph alignment, spacing and flow.
+   */
+  emptyParagraph?: ParagraphStyleRule
+  /**
+   * Empty text run typography.
+   */
+  emptyText?: TextStyleRule
+  /**
+   * Label run typography.
+   */
+  label?: TextStyleRule
+  /**
+   * Label paragraph alignment, spacing and flow.
+   */
+  labelParagraph?: ParagraphStyleRule
+  /**
+   * Padding paragraph alignment, spacing and flow.
+   */
+  paddingParagraph?: ParagraphStyleRule
+  /**
+   * Unit run typography.
+   */
+  unit?: TextStyleRule
+  /**
+   * Value run typography.
+   */
+  value?: TextStyleRule
+  /**
+   * Value paragraph alignment, spacing and flow.
+   */
+  valueParagraph?: ParagraphStyleRule
 }
 
 /**
@@ -54,7 +124,7 @@ export interface MetricItem {
 /**
  * Create a metric-card plugin for report summaries and business indicators.
  */
-export function metricCardPlugin() {
+export function metricCardPlugin(pluginConfig: MetricCardConfig = {}) {
   return definePlugin<'metricCard', MetricCardOptions, Paragraph | Table>({
     name: 'metricCard',
     render(options, context) {
@@ -66,14 +136,32 @@ export function metricCardPlugin() {
         )
       }
 
-      const styles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof MetricCardStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const cellStyle = partStyle('cell')
+      const changeStyle = partStyle('change')
+      const changeParagraphStyle = partStyle('changeParagraph')
+      const emptyParagraphStyle = partStyle('emptyParagraph')
+      const emptyTextStyle = partStyle('emptyText')
+      const labelStyle = partStyle('label')
+      const labelParagraphStyle = partStyle('labelParagraph')
+      const paddingParagraphStyle = partStyle('paddingParagraph')
+      const unitStyle = partStyle('unit')
+      const valueStyle = partStyle('value')
+      const valueParagraphStyle = partStyle('valueParagraph')
       const colors = context.config.theme?.colors
       const muted = normalizeHexColor(colors?.muted) ?? '666666'
       if (!items.length) {
         return new Paragraph(
-          styles.paragraph({
+          emptyParagraphStyle.paragraph({
             children: [
-              new TextRun(styles.text({ color: muted, text: '(no metrics)' })),
+              new TextRun(
+                emptyTextStyle.text({ color: muted, text: '(no metrics)' }),
+              ),
             ],
           }),
         )
@@ -86,23 +174,27 @@ export function metricCardPlugin() {
         const cells = items.slice(offset, offset + columnCount).map(item => {
           const paragraphs = [
             new Paragraph(
-              styles.paragraph({
+              labelParagraphStyle.paragraph({
                 keepNext: true,
                 spacing: { after: 100 },
                 children: [
                   new TextRun(
-                    styles.text({ color: muted, size: 20, text: item.label }),
+                    labelStyle.text({
+                      color: muted,
+                      size: 20,
+                      text: item.label,
+                    }),
                   ),
                 ],
               }),
             ),
             new Paragraph(
-              styles.paragraph({
+              valueParagraphStyle.paragraph({
                 keepNext: Boolean(item.change || item.trend),
                 spacing: { after: 80 },
                 children: [
                   new TextRun(
-                    styles.text({
+                    valueStyle.text({
                       bold: true,
                       color: normalizeHexColor(colors?.primary) ?? '2E75B6',
                       size: 36,
@@ -112,7 +204,7 @@ export function metricCardPlugin() {
                   ...(item.unit
                     ? [
                         new TextRun(
-                          styles.text({
+                          unitStyle.text({
                             color: muted,
                             size: 20,
                             text: ` ${item.unit}`,
@@ -141,11 +233,11 @@ export function metricCardPlugin() {
                   : muted
             paragraphs.push(
               new Paragraph(
-                styles.paragraph({
+                changeParagraphStyle.paragraph({
                   spacing: { after: 0 },
                   children: [
                     new TextRun(
-                      styles.text({
+                      changeStyle.text({
                         color,
                         size: 18,
                         text: [arrow, item.change].filter(Boolean).join(' '),
@@ -157,7 +249,7 @@ export function metricCardPlugin() {
             )
           }
           return new TableCell(
-            styles.cell({
+            cellStyle.cell({
               children: paragraphs,
               width,
               shading: {
@@ -170,9 +262,11 @@ export function metricCardPlugin() {
         while (cells.length < columnCount) {
           cells.push(
             new TableCell(
-              styles.cell({
-                children: [new Paragraph(styles.paragraph({ text: '' }))],
+              cellStyle.cell({
                 width,
+                children: [
+                  new Paragraph(paddingParagraphStyle.paragraph({ text: '' })),
+                ],
               }),
             ),
           )

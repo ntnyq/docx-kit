@@ -14,8 +14,22 @@ import {
   definePlugin,
   normalizeHexColor,
 } from '@docxkit/core'
-import { AlignmentType, Paragraph } from 'docx'
-import type { LiteralUnion } from '@docxkit/core'
+import { AlignmentType, Paragraph, TextRun } from 'docx'
+import type {
+  LiteralUnion,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface BarcodeConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: BarcodeStyles
+}
 
 /**
  * Common linear barcode formats, while retaining the full bwip-js catalog.
@@ -86,6 +100,10 @@ export interface BarcodeOptions {
    */
   scale?: number
   /**
+   * Per-part styles for this invocation.
+   */
+  styles?: BarcodeStyles
+  /**
    * Human-readable text color as a hex string.
    */
   textColor?: string
@@ -93,6 +111,24 @@ export interface BarcodeOptions {
    * Display width in pixels. Defaults to the natural width, capped at 320.
    */
   width?: number
+}
+
+/**
+ * Independently configurable Barcode parts.
+ */
+export interface BarcodeStyles {
+  /**
+   * Caption run typography.
+   */
+  caption?: TextStyleRule
+  /**
+   * Caption paragraph alignment, spacing and flow.
+   */
+  captionParagraph?: ParagraphStyleRule
+  /**
+   * Image paragraph alignment, spacing and flow.
+   */
+  imageParagraph?: ParagraphStyleRule
 }
 
 interface BarcodeRenderer {
@@ -128,11 +164,19 @@ interface RenderedBarcode {
  *
  * @returns A configured plugin for the `barcode` node name
  */
-export function barcodePlugin() {
+export function barcodePlugin(pluginConfig: BarcodeConfig = {}) {
   return definePlugin<'barcode', BarcodeOptions>({
     name: 'barcode',
     async render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof BarcodeStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const captionStyle = partStyle('caption')
+      const captionParagraphStyle = partStyle('captionParagraph')
+      const imageParagraphStyle = partStyle('imageParagraph')
       const rendered = await renderBarcode(options)
       const width = options.width ?? Math.min(rendered.width, 320)
       const height = Math.max(
@@ -142,7 +186,7 @@ export function barcodePlugin() {
       const alignment = toAlignment(options.alignment)
       const paragraphs = [
         new Paragraph(
-          pluginStyles.paragraph({
+          imageParagraphStyle.paragraph({
             alignment,
             children: [
               createImageRun({
@@ -159,9 +203,11 @@ export function barcodePlugin() {
       if (options.caption) {
         paragraphs.push(
           new Paragraph(
-            pluginStyles.paragraph({
+            captionParagraphStyle.paragraph({
               alignment,
-              text: options.caption,
+              children: [
+                new TextRun(captionStyle.text({ text: options.caption })),
+              ],
             }),
           ),
         )

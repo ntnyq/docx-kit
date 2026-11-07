@@ -254,3 +254,5 @@ import { normalizeHexColor } from 'docx-kit'
 normalizeHexColor('#f00') // 'ff0000'
 normalizeHexColor('#123456') // '123456'
 ```
+
+Paragraph styles also accept `backgroundColor` for whole-paragraph shading, including theme color tokens.

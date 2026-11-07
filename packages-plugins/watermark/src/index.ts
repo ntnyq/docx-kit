@@ -22,6 +22,18 @@ import {
 } from '@docxkit/core'
 import { AlignmentType, Paragraph, TextRun } from 'docx'
 
+import type { ParagraphStyleRule, TextStyleRule } from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface WatermarkConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: WatermarkStyles
+}
+
 /**
  * Options for the Watermark plugin.
  */
@@ -45,6 +57,24 @@ export interface WatermarkOptions {
    * @default 48
    */
   fontSize?: number
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: WatermarkStyles
+}
+
+/**
+ * Independently configurable Watermark parts.
+ */
+export interface WatermarkStyles {
+  /**
+   * Paragraph alignment, spacing and flow.
+   */
+  paragraph?: ParagraphStyleRule
+  /**
+   * Text run typography.
+   */
+  text?: TextStyleRule
 }
 
 /**
@@ -61,18 +91,25 @@ export interface WatermarkOptions {
  *   .plugin('watermark', { text: 'DRAFT', color: 'FF0000' })
  * ```
  */
-export function watermarkPlugin() {
+export function watermarkPlugin(pluginConfig: WatermarkConfig = {}) {
   return definePlugin<'watermark', WatermarkOptions>({
     name: 'watermark',
     render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof WatermarkStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const paragraphStyle = partStyle('paragraph')
+      const textStyle = partStyle('text')
       return new Paragraph(
-        pluginStyles.paragraph({
+        paragraphStyle.paragraph({
           alignment: options.alignment ?? AlignmentType.CENTER,
           spacing: { after: 0, before: 0 },
           children: [
             new TextRun(
-              pluginStyles.text({
+              textStyle.text({
                 bold: true,
                 color: normalizeHexColor(options.color ?? 'BFBFBF'),
                 font: 'Arial',

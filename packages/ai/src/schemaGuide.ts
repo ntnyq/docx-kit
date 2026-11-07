@@ -6,6 +6,11 @@
  */
 
 import { BUILTIN_PLUGIN_GUIDES } from './plugins'
+import {
+  BUILTIN_PLUGIN_OPTION_SCHEMAS,
+  BUILTIN_PLUGIN_SCHEMA_CONDITIONS,
+  SECTION_BREAK_SCHEMA_CONDITION,
+} from './pluginSchema'
 import { BUILTIN_TEMPLATES } from './templates'
 import { toTemplateJsonSchema } from './templateSchema'
 import type { BuiltinAiTemplate } from './templates'
@@ -94,6 +99,22 @@ export function generateSchemaGuide(): string {
     '{ "type": "plugin", "name": "pluginName", "options": { /* plugin-specific */ } }',
     '```',
     '',
+    '## Plugin Part Styles',
+    'All built-in plugins accept per-part styles. Paragraph parts accept background/borders/alignment/spacing/flow, text parts accept typography, and cell parts accept shading/borders/padding/width (not height).',
+    'Callout styles: cell (cell style), paragraph (paragraph style), title/content (text styles).',
+    'DataTable styles: headerCell/bodyCell/stripedCell (cell styles), headerParagraph/bodyParagraph/emptyParagraph (paragraph styles), headerText/bodyText/emptyText (text styles).',
+    ...Object.entries(BUILTIN_PLUGIN_OPTION_SCHEMAS).map(
+      ([name, schema]) =>
+        `- ${name} style parts: ${Object.keys(schema.properties.styles.properties).join(', ')}`,
+    ),
+    'Set options.styles for one invocation or pass { styles } to the plugin factory for defaults.',
+    'Precedence: built-in/theme defaults → initialization styles → common node style → invocation part styles.',
+    'The same part contracts also apply inside section header/footer children (default, first and even variants).',
+    'New partial borders use compiler defaults (single, 1/8 pt); changes to existing borders retain other attributes. East Asian font overrides retain the Latin font. Margin shorthand supports multiple theme tokens. docx typography, including bold/italics false, follows the same cascade.',
+    'Nested fields merge, undefined retains defaults, false/0 override, arrays replace. Theme tokens such as $colors.primary and $spacing.md work in styles.',
+    'PropertyTable stripedCell adds to valueCell only on every second row when striped is true. TOC parts style the explicit title; Word generates entries using its TOC document styles. Checklist common body sizes keep existing metadata proportions; explicit part sizes override scaling.',
+    'stripedCell applies to every second data row only when striped is true, after bodyCell within each level. Explicit part styles can override bordered: false.',
+    '',
     '## Built-in Plugins',
   ]
 
@@ -145,18 +166,25 @@ export function generateToolDefinitions(
           additionalProperties: true,
           required: ['content'],
           type: 'object',
+          definitions: {
+            blockNode: {
+              additionalProperties: true,
+              properties: { type: { type: 'string' } },
+              type: 'object',
+              allOf: [
+                ...BUILTIN_PLUGIN_SCHEMA_CONDITIONS,
+                SECTION_BREAK_SCHEMA_CONDITION,
+              ],
+            },
+          },
           description:
             'A docx-kit DocxSchema object defining the document content, styles, and configuration.',
           properties: {
             content: {
+              items: { $ref: '#/definitions/blockNode' },
               type: 'array',
               description:
                 'Ordered array of block nodes (headings, paragraphs, tables, etc.)',
-              items: {
-                additionalProperties: true,
-                properties: { type: { type: 'string' } },
-                type: 'object',
-              },
             },
             page: {
               description: 'Page configuration (size, margins, orientation)',

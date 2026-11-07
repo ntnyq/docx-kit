@@ -29,3 +29,24 @@
 ![包含分组标题、负责人和备注的完整 Checklist 效果](/examples/checklist.png)
 
 <<< @/../apps/playground/src/constants/templates/checklist.ts#checklist-example
+
+## 样式定制
+
+工厂的 `{ styles }` 设置实例默认值，`options.styles` 覆盖单次调用。插件包与 docx-kit 入口导出 `ChecklistConfig` 和 `ChecklistStyles`。优先级：**内置/主题默认值 → 初始化 styles → 通用 style → 单次部位 styles**。嵌套字段合并，数组整体替换，`undefined` 沿用默认，`0` / `false` 生效；支持单位与 `$colors.primary` 等主题 token。
+
+| 部位 | 样式类型 | 范围 |
+| --- | --- | --- |
+| `emptyText`, `group`, `item`, `note`, `owner`, `title` | `TextStyleRule` | 文字排版 |
+| `emptyParagraph`, `groupParagraph`, `itemParagraph`, `noteParagraph`, `titleParagraph` | `ParagraphStyleRule` | 段落背景、边框、对齐、间距和分页 |
+
+通用正文字号保留标题、分组、负责人和备注的既有比例；部位的显式字号可覆盖该缩放。`item.fontSize` 同时调整图形复选框和任务缩进。负责人颜色现在也遵循通用样式优先级。
+
+```ts
+checklistPlugin({
+  styles: { title: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+单次调用在 `options.styles` 中使用相同部位名。JSON DSL、AI 工具 schema 与 MCP 校验共享这些契约；未知部位与放错部位的属性会被拒绝。
+
+文档继承字号与部位字号都支持长度 token，包括 `$spacing.body` 和 `$fontSize.base`。

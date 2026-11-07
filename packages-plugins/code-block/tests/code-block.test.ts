@@ -33,6 +33,43 @@ describe('codeBlockPlugin', () => {
         .size,
     ).toBe(1)
   })
+  it.each([undefined, 'typescript', 'unknown-language'])(
+    'keeps code, line numbers and paragraph shading independent with %s',
+    async language => {
+      const result = await codeBlockPlugin({
+        styles: {
+          code: { fontFamily: 'Courier New' },
+          lineNumber: { color: '#112233' },
+          paragraph: { backgroundColor: '#FFEEDD' },
+        },
+      }).render(
+        {
+          code: 'const x = 1',
+          language,
+          showLineNumbers: true,
+          styles: {
+            code: { bold: false, color: '#123ABC' },
+            lineNumber: { color: '#456DEF' },
+          },
+        },
+        createPluginTestContext({ style: { bold: true, color: '#789ABC' } }),
+      )
+      if (!Array.isArray(result)) {
+        throw new TypeError('Expected code paragraphs')
+      }
+      const archive = await JSZip.loadAsync(
+        await Packer.toBuffer(
+          new Document({ sections: [{ children: result }] }),
+        ),
+      )
+      const xml = await archive.file('word/document.xml')?.async('string')
+      expect(xml).toContain('w:fill="FFEEDD"')
+      expect(xml).toContain('<w:color w:val="456DEF"/>')
+      expect(xml).toContain('<w:color w:val="123ABC"/>')
+      expect(xml).toContain('w:ascii="Courier New"')
+      expect(xml).not.toContain('<w:color w:val="789ABC"/>')
+    },
+  )
   it('returns a plugin named "codeBlock"', () => {
     expect(codeBlockPlugin().name).toBe('codeBlock')
   })

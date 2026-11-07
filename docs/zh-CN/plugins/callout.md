@@ -15,6 +15,7 @@ import { calloutPlugin, type CalloutOptions } from 'docx-kit'
 | `content` | `string` | _必填_ | 提示块正文 |
 | `type` | `'info' \| 'warning' \| 'success' \| 'danger'` | _必填_ | 提示块样式，控制图标、颜色与色调 |
 | `title` | `string` | — | 正文前的可选加粗标题 |
+| `styles` | `CalloutStyles` | — | 本次调用的部位样式 |
 
 ### 类型预设
 
@@ -110,4 +111,59 @@ const doc = createDocx()
   })
 
   .save('multiple-callouts.docx')
+```
+
+## 样式定制
+
+给插件工厂传入 `{ styles }`，可设置当前插件实例的默认样式；通过 `options.styles` 覆盖单次调用。插件包和 `docx-kit` 的 Node/browser 入口均导出 `CalloutConfig` / `CalloutStyles` 与 `DataTableConfig` / `DataTableStyles`。
+
+优先级从低到高：**内置默认值（含主题取值）→ 初始化 `styles` → 调用通用 `style`（`.plugin()` 第三个参数）→ 调用部位 `styles`**。缺省或 `undefined` 字段沿用默认值；嵌套普通对象按字段合并，数组整体替换，`0` 和 `false` 均生效。每次调用独立解析，不修改配置对象。单位和 `$colors.primary`、`$fontSize.lg`、`$spacing.md` 等主题 token 复用现有样式编译器。
+
+| 部位 | 样式类型 | 作用范围 |
+| --- | --- | --- |
+| `cell` | `Omit<CellStyleRule, 'height'>` | 容器背景、边框、宽度及内边距 |
+| `paragraph` | `ParagraphStyleRule` | 共享段落的对齐、间距及分页控制 |
+| `title` | `TextStyleRule` | 标题文字 |
+| `content` | `TextStyleRule` | 正文文字 |
+
+```ts
+import { calloutPlugin, createDocx } from 'docx-kit/node'
+
+const doc = createDocx({
+  theme: { colors: { primary: '#2563EB' }, spacing: { md: 8 } },
+})
+  .use(calloutPlugin({
+    styles: {
+      cell: { margin: '8pt 10pt', borderLeft: { width: 3 } },
+      title: { fontSize: 16, color: '$colors.primary' },
+      content: { fontSize: 11 },
+    },
+  }))
+  .plugin('callout', {
+    type: 'info',
+    title: 'Note',
+    content: 'Custom body text',
+    styles: {
+      cell: { marginBottom: 0 },
+      title: { bold: false, color: '#DC2626' },
+      paragraph: { lineHeight: 1.5 },
+    },
+  }, { fontFamily: 'Arial' })
+```
+
+### JSON DSL、AI 与 MCP
+
+JSON DSL 中在调用的 `options.styles` 内填写与 Builder 相同的可序列化部位样式。AI 工具定义和 schema 指南已包含这些选项；MCP 通过 `docx-kit://schema` 和 `get_plugin_help().optionsSchema` 暴露对应结构。`validate_schema` 会拒绝未知部位、放错部位的属性及错误的样式值。其他内置插件也提供对应的部位样式契约。
+
+```json
+{
+  "type": "plugin",
+  "name": "callout",
+  "options": {
+    "type": "info",
+    "title": "Note",
+    "content": "Body",
+    "styles": { "title": { "color": "#2563EB" }, "cell": { "margin": 0 } }
+  }
+}
 ```

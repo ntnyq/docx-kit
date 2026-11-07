@@ -79,3 +79,20 @@ The page number plugin is best used within section headers/footers. Here's a con
 // header/footer configuration. The exact API depends on how
 // sections with headers/footers are set up.
 ```
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `PageNumberConfig` and `PageNumberStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `text` | `TextStyleRule` | Run typography |
+| `paragraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+
+```ts
+pageNumberPlugin({
+  styles: { text: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

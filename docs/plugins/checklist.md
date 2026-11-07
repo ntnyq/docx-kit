@@ -43,3 +43,24 @@ This Ocean theme sample includes both groups, owners, notes, and checked and unc
 The default `'github'` style uses SVG graphics with high-resolution PNG fallbacks. Checked boxes use the theme's `accent` color (falling back to `primary`) with a white check. Unchecked outlines use `muted` (falling back to `border`), and their fill uses `background`. Both image formats follow the same theme colors. Graphic checkboxes scale with the task's effective font size and align with the text's visual center; wrapped text and notes share the same text inset. These are static images and do not depend on symbol fonts.
 
 Set `checkboxStyle: 'native'` to use Word checkbox content controls that can be toggled in supported readers. Browser previews may display only their initial state. Notes and owners use the theme's `muted` color; invocation styles override default text and paragraph styling. Notes scale to approximately 80% of the task's effective font size, rounded to Word's half-point precision. Owner labels scale to approximately 85% and retain the theme's `muted` color even when task text has an explicit color override.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `ChecklistConfig` and `ChecklistStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `emptyText`, `group`, `item`, `note`, `owner`, `title` | `TextStyleRule` | Run typography |
+| `emptyParagraph`, `groupParagraph`, `itemParagraph`, `noteParagraph`, `titleParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+
+Common body font sizes retain the existing title/group/owner/note proportions. An explicit size on a part overrides that scaling. `item.fontSize` also scales graphic checkboxes and task indentation. Owner colors now follow the common style cascade.
+
+```ts
+checklistPlugin({
+  styles: { title: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.
+
+Inherited font sizes and part sizes both support all length-token categories, including `$spacing.body` as well as `$fontSize.base`.

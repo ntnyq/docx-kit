@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { createDocx } from '@docxkit/core'
 import { createPluginTestContext } from '@docxkit/pdk'
 import { Document, Packer, Paragraph, Table } from 'docx'
 import JSZip from 'jszip'
@@ -139,5 +140,100 @@ describe('dataTablePlugin', () => {
 
     expect(result).toBeInstanceOf(Table)
     expect(propertyReads).toBeLessThan(1000)
+  })
+  it('styles headers, body and stripes with per-level precedence', async () => {
+    const plugin = dataTablePlugin({
+      styles: {
+        bodyCell: { backgroundColor: '#EEEEEE', margin: 8 },
+        bodyText: { fontSize: 13 },
+        headerText: { fontSize: 16 },
+        stripedCell: { backgroundColor: '#DDDDDD', borderBottom: { width: 2 } },
+      },
+    })
+    const builder = createDocx({ theme: { colors: { primary: '#123ABC' } } })
+      .use(plugin)
+      .plugin(
+        'dataTable',
+        {
+          striped: true,
+          data: [
+            { label: 'First', score: 1 },
+            { label: 'Second', score: 2 },
+          ],
+          styles: {
+            bodyCell: { backgroundColor: '#CCCCCC', marginLeft: 0 },
+            bodyParagraph: { textAlign: 'center' },
+            headerCell: { backgroundColor: '#BBBBBB' },
+            headerText: { bold: false, color: '$colors.primary' },
+            stripedCell: {
+              backgroundColor: '#AAAAAA',
+              borderBottom: { color: '$colors.primary' },
+            },
+          },
+        },
+        { backgroundColor: '#FFFFFF', color: '#222222', fontSize: 12 },
+      )
+    const zip = await JSZip.loadAsync(await builder.toBuffer())
+    const xml = await zip.file('word/document.xml')?.async('string')
+    const rows = xml?.match(/<w:tr>.*?<\/w:tr>/g) ?? []
+    expect(rows).toHaveLength(3)
+    expect(rows[0]).toContain('w:fill="BBBBBB"')
+    expect(rows[0]).toContain('<w:color w:val="123ABC"/>')
+    expect(rows[0]).toContain('<w:b w:val="false"/>')
+    expect(rows[0]).toContain('<w:sz w:val="24"/>')
+    expect(rows[1]).toContain('w:fill="CCCCCC"')
+    expect(rows[1]).not.toContain('w:fill="AAAAAA"')
+    expect(rows[1]).toContain('<w:left w:type="dxa" w:w="0"/>')
+    expect(rows[1]).toContain('<w:right w:type="dxa" w:w="160"/>')
+    expect(rows[1]).toContain('<w:jc w:val="center"/>')
+    expect(rows[2]).toContain('w:fill="AAAAAA"')
+    expect(rows[2]).toContain('w:val="single" w:color="123ABC" w:sz="16"')
+  })
+
+  it('keeps stripe styles inactive when disabled and allows explicit borders', async () => {
+    const builder = createDocx()
+      .use(dataTablePlugin())
+      .plugin('dataTable', {
+        bordered: false,
+        data: [{ a: 'First' }, { a: 'Second' }],
+        styles: {
+          stripedCell: { backgroundColor: '#ABCDEF' },
+          bodyCell: {
+            borderBottom: { color: '#123456', style: 'dashed', width: 1 },
+          },
+        },
+      })
+    const zip = await JSZip.loadAsync(await builder.toBuffer())
+    const xml = await zip.file('word/document.xml')?.async('string')
+    expect(xml).toContain('w:val="dashed" w:color="123456" w:sz="8"')
+    expect(xml).not.toContain('w:fill="ABCDEF"')
+  })
+
+  it('styles the empty placeholder independently', async () => {
+    const builder = createDocx()
+      .use(
+        dataTablePlugin({
+          styles: {
+            bodyText: { color: '#999999' },
+            emptyText: { color: '#111111', italic: true },
+          },
+        }),
+      )
+      .plugin(
+        'dataTable',
+        {
+          data: [],
+          styles: {
+            emptyParagraph: { textAlign: 'right' },
+            emptyText: { color: '#333333' },
+          },
+        },
+        { color: '#222222' },
+      )
+    const zip = await JSZip.loadAsync(await builder.toBuffer())
+    const xml = await zip.file('word/document.xml')?.async('string')
+    expect(xml).toContain('<w:color w:val="333333"/>')
+    expect(xml).toContain('<w:i/>')
+    expect(xml).toContain('<w:jc w:val="right"/>')
   })
 })

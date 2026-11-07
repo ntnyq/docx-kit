@@ -254,3 +254,5 @@ import { normalizeHexColor } from 'docx-kit'
 normalizeHexColor('#f00') // 'ff0000'
 normalizeHexColor('#123456') // '123456'
 ```
+
+段落样式也支持 `backgroundColor`，用于整段背景，并支持主题颜色 token。

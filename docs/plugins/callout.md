@@ -15,6 +15,7 @@ import { calloutPlugin, type CalloutOptions } from 'docx-kit'
 | `content` | `string` | _(required)_ | Body text of the callout |
 | `type` | `'info' \| 'warning' \| 'success' \| 'danger'` | _(required)_ | Callout style — controls icon, color, and tone |
 | `title` | `string` | — | Optional bold title line placed before the content |
+| `styles` | `CalloutStyles` | — | Per-part styles for this invocation |
 
 ### Type Presets
 
@@ -110,4 +111,59 @@ const doc = createDocx()
   })
 
   .save('multiple-callouts.docx')
+```
+
+## Style Customization
+
+Pass `{ styles }` to the factory for defaults shared by that plugin instance. Set `options.styles` to override one invocation. `CalloutConfig` / `CalloutStyles` and `DataTableConfig` / `DataTableStyles` are exported from the plugin packages and `docx-kit` Node/browser entries.
+
+Precedence, from lowest to highest: **built-in defaults (including theme values) → initialization `styles` → common invocation `style` (the third `.plugin()` argument) → invocation part `styles`**. Missing or `undefined` fields retain defaults; nested plain objects merge by field; arrays replace entirely; `0` and `false` apply. Styles are resolved per invocation without changing the configuration objects. Units and theme tokens such as `$colors.primary`, `$fontSize.lg` and `$spacing.md` use the existing style compiler.
+
+| Part | Style type | Target |
+| --- | --- | --- |
+| `cell` | `Omit<CellStyleRule, 'height'>` | Container background, borders, width and padding |
+| `paragraph` | `ParagraphStyleRule` | Shared paragraph alignment, spacing and flow |
+| `title` | `TextStyleRule` | Title typography |
+| `content` | `TextStyleRule` | Body typography |
+
+```ts
+import { calloutPlugin, createDocx } from 'docx-kit/node'
+
+const doc = createDocx({
+  theme: { colors: { primary: '#2563EB' }, spacing: { md: 8 } },
+})
+  .use(calloutPlugin({
+    styles: {
+      cell: { margin: '8pt 10pt', borderLeft: { width: 3 } },
+      title: { fontSize: 16, color: '$colors.primary' },
+      content: { fontSize: 11 },
+    },
+  }))
+  .plugin('callout', {
+    type: 'info',
+    title: 'Note',
+    content: 'Custom body text',
+    styles: {
+      cell: { marginBottom: 0 },
+      title: { bold: false, color: '#DC2626' },
+      paragraph: { lineHeight: 1.5 },
+    },
+  }, { fontFamily: 'Arial' })
+```
+
+### JSON DSL, AI and MCP
+
+Only invocation `options.styles` belongs in JSON DSL. It uses the same serializable part objects as the builder. AI tool definitions and the schema guide describe these options; MCP exposes them in `docx-kit://schema` and `get_plugin_help().optionsSchema`. `validate_schema` rejects unknown parts, properties in the wrong part and invalid style values. Other built-in plugins also expose their own part-style contracts.
+
+```json
+{
+  "type": "plugin",
+  "name": "callout",
+  "options": {
+    "type": "info",
+    "title": "Note",
+    "content": "Body",
+    "styles": { "title": { "color": "#2563EB" }, "cell": { "margin": 0 } }
+  }
+}
 ```

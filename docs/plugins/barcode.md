@@ -85,3 +85,22 @@ doc.plugin('barcode', {
 The plugin uses the Node.js PNG renderer when available and the browser canvas
 renderer in browser builds. The displayed height is calculated from the
 generated image so changing `width` preserves the barcode aspect ratio.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `BarcodeConfig` and `BarcodeStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `caption` | `TextStyleRule` | Run typography |
+| `captionParagraph`, `imageParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+
+These styles affect DOCX paragraphs and the caption; barcode pixels, dimensions and embedded text use the existing barcode options.
+
+```ts
+barcodePlugin({
+  styles: { caption: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

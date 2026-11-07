@@ -17,6 +17,18 @@
 import { createPluginStyle, definePlugin } from '@docxkit/core'
 import { AlignmentType, PageNumber, Paragraph, TextRun } from 'docx'
 
+import type { ParagraphStyleRule, TextStyleRule } from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface PageNumberConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: PageNumberStyles
+}
+
 /**
  * Options for the Page Number plugin.
  */
@@ -36,6 +48,24 @@ export interface PageNumberOptions {
    * @default false
    */
   showTotal?: boolean
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: PageNumberStyles
+}
+
+/**
+ * Independently configurable PageNumber parts.
+ */
+export interface PageNumberStyles {
+  /**
+   * Paragraph alignment, spacing and flow.
+   */
+  paragraph?: ParagraphStyleRule
+  /**
+   * Text run typography.
+   */
+  text?: TextStyleRule
 }
 
 /**
@@ -53,11 +83,18 @@ export interface PageNumberOptions {
  *   const pn = doc.plugin('pageNumber', { alignment: 'center' })
  * ```
  */
-export function pageNumberPlugin() {
+export function pageNumberPlugin(pluginConfig: PageNumberConfig = {}) {
   return definePlugin<'pageNumber', PageNumberOptions>({
     name: 'pageNumber',
     render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof PageNumberStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const paragraphStyle = partStyle('paragraph')
+      const textStyle = partStyle('text')
       const alignment = options.alignment ?? AlignmentType.CENTER
       // docx's `TextRun.size` is in half-points; user-facing option is in points.
       const halfPoints = (options.fontSize ?? 10) * 2
@@ -69,12 +106,12 @@ export function pageNumberPlugin() {
         : [PageNumber.CURRENT]
 
       return new Paragraph(
-        pluginStyles.paragraph({
+        paragraphStyle.paragraph({
           alignment,
           spacing: { after: 0, before: 0 },
           children: [
             new TextRun(
-              pluginStyles.text({
+              textStyle.text({
                 children,
                 font: 'Arial',
                 size: halfPoints,

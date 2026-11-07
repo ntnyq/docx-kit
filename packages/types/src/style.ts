@@ -154,6 +154,11 @@ export type HighlightColor =
  * Used by {@link compileParagraphStyle} for `Paragraph` construction.
  */
 export interface ParagraphStyleRule {
+  /**
+   * Paragraph background shading (hex, named color, or theme token).
+   */
+  backgroundColor?: HexColor | StyleToken<string>
+
   // ---- border ----
   /**
    * Shorthand border for all four sides.

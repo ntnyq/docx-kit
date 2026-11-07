@@ -11,6 +11,7 @@ import {
   MATH_NODE_DEFINITIONS,
   TEXT_NODE_DEFINITION,
 } from '../schema/blockNodes'
+import { validatePluginOptions } from './validatePluginOptions'
 import { validateStyle } from './validateStyle'
 import type {
   BlockNodeDefinition,
@@ -404,6 +405,9 @@ function validateNode(
 
   validateDefinition(node, definition, path, errors, depth)
 
+  if (nodeType === 'plugin') {
+    validatePluginOptions(node.name, node.options, `${path}/options`, errors)
+  }
   if (nodeType === 'sectionBreak') {
     validateHeaderFooters(node.config, `${path}/config`, errors, depth + 1)
   }

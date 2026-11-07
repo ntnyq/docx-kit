@@ -269,3 +269,24 @@ const doc = createDocx()
 
 await downloadDocx(doc, 'wide-chart.docx')
 ```
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `EChartsConfig` and `EChartsStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `caption` | `TextStyleRule` | Run typography |
+| `captionParagraph`, `imageParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+
+ECharts remains browser-only. Chart content and dimensions use `option`, `width`, and `height`; these styles affect the surrounding paragraphs and caption.
+
+Import the factory and types from `docx-kit` (browser) or `@docxkit/plugin-echarts`.
+
+```ts
+echartsPlugin({
+  styles: { caption: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.

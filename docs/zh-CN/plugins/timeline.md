@@ -117,3 +117,21 @@ const doc = createDocx()
   })
   .save('single-event.docx')
 ```
+
+## 样式定制
+
+工厂的 `{ styles }` 设置实例默认值，`options.styles` 覆盖单次调用。插件包与 docx-kit 入口导出 `TimelineConfig` 和 `TimelineStyles`。优先级：**内置/主题默认值 → 初始化 styles → 通用 style → 单次部位 styles**。嵌套字段合并，数组整体替换，`undefined` 沿用默认，`0` / `false` 生效；支持单位与 `$colors.primary` 等主题 token。
+
+| 部位 | 样式类型 | 范围 |
+| --- | --- | --- |
+| `connector`, `date`, `description`, `emptyText`, `title` | `TextStyleRule` | 文字排版 |
+| `connectorParagraph`, `contentParagraph`, `dateParagraph`, `emptyParagraph` | `ParagraphStyleRule` | 段落背景、边框、对齐、间距和分页 |
+| `connectorCell`, `contentCell`, `dateCell` | `Omit<CellStyleRule, 'height'>` | 单元格背景、边框、宽度和内边距 |
+
+```ts
+timelinePlugin({
+  styles: { title: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+单次调用在 `options.styles` 中使用相同部位名。JSON DSL、AI 工具 schema 与 MCP 校验共享这些契约；未知部位与放错部位的属性会被拒绝。

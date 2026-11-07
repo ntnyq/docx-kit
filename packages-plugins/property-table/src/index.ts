@@ -38,12 +38,28 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
 /**
  * A single key-value pair.
  */
 export interface PropertyItem {
   key: string
   value: string
+}
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface PropertyTableConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: PropertyTableStyles
 }
 
 /**
@@ -64,6 +80,52 @@ export interface PropertyTableOptions {
    * @default true
    */
   striped?: boolean
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: PropertyTableStyles
+}
+
+/**
+ * Independently configurable PropertyTable parts.
+ */
+export interface PropertyTableStyles {
+  /**
+   * Empty paragraph alignment, spacing and flow.
+   */
+  emptyParagraph?: ParagraphStyleRule
+  /**
+   * Empty text run typography.
+   */
+  emptyText?: TextStyleRule
+  /**
+   * Key cell shading, borders and padding.
+   */
+  keyCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Key paragraph alignment, spacing and flow.
+   */
+  keyParagraph?: ParagraphStyleRule
+  /**
+   * Key text run typography.
+   */
+  keyText?: TextStyleRule
+  /**
+   * Additional value-cell styles for every second row when striped is true.
+   */
+  stripedCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Value cell shading, borders and padding.
+   */
+  valueCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Value paragraph alignment, spacing and flow.
+   */
+  valueParagraph?: ParagraphStyleRule
+  /**
+   * Value text run typography.
+   */
+  valueText?: TextStyleRule
 }
 
 /**
@@ -71,12 +133,26 @@ export interface PropertyTableOptions {
  *
  * @returns A configured DocxPlugin for `'propertyTable'`
  */
-export function propertyTablePlugin() {
+export function propertyTablePlugin(pluginConfig: PropertyTableConfig = {}) {
   return definePlugin<'propertyTable', PropertyTableOptions>({
     name: 'propertyTable',
     render(options, context) {
       const { config } = context
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof PropertyTableStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const emptyParagraphStyle = partStyle('emptyParagraph')
+      const emptyTextStyle = partStyle('emptyText')
+      const keyCellStyle = partStyle('keyCell')
+      const keyParagraphStyle = partStyle('keyParagraph')
+      const keyTextStyle = partStyle('keyText')
+      const stripedCellStyle = partStyle('valueCell', 'stripedCell')
+      const valueCellStyle = partStyle('valueCell')
+      const valueParagraphStyle = partStyle('valueParagraph')
+      const valueTextStyle = partStyle('valueText')
       const surface =
         normalizeHexColor(config.theme?.colors?.surface) ?? 'F4F6F8'
       const border = {
@@ -88,12 +164,12 @@ export function propertyTablePlugin() {
 
       if (!items.length) {
         return new Paragraph(
-          pluginStyles.paragraph({
+          emptyParagraphStyle.paragraph({
             alignment: AlignmentType.CENTER,
             spacing: { after: 0, before: 0, line: 288 },
             children: [
               new TextRun(
-                pluginStyles.text({ color: '999999', text: '(no items)' }),
+                emptyTextStyle.text({ color: '999999', text: '(no items)' }),
               ),
             ],
           }),
@@ -112,17 +188,17 @@ export function propertyTablePlugin() {
           cantSplit: true,
           children: [
             new TableCell(
-              pluginStyles.cell({
+              keyCellStyle.cell({
                 shading: keyShading,
                 width: { size: 30, type: WidthType.PERCENTAGE },
                 children: [
                   new Paragraph(
-                    pluginStyles.paragraph({
+                    keyParagraphStyle.paragraph({
                       alignment: AlignmentType.LEFT,
                       spacing: { after: 0, before: 0, line: 288 },
                       children: [
                         new TextRun(
-                          pluginStyles.text({
+                          keyTextStyle.text({
                             bold: keyBold,
                             text: item.key,
                           }),
@@ -134,14 +210,14 @@ export function propertyTablePlugin() {
               }),
             ),
             new TableCell(
-              pluginStyles.cell({
+              (striped && isEven ? stripedCellStyle : valueCellStyle).cell({
                 shading: cellShading,
                 children: [
                   new Paragraph(
-                    pluginStyles.paragraph({
+                    valueParagraphStyle.paragraph({
                       spacing: { after: 0, before: 0, line: 288 },
                       children: [
-                        new TextRun(pluginStyles.text({ text: item.value })),
+                        new TextRun(valueTextStyle.text({ text: item.value })),
                       ],
                     }),
                   ),

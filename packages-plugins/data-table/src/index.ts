@@ -42,6 +42,12 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
 /**
  * Per-column alignment hint.
  */
@@ -51,6 +57,16 @@ export type ColAlign = 'center' | 'left' | 'right'
  * Value formatter identifier.
  */
 export type ColFormat = 'currency' | 'date' | 'number' | 'percent'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface DataTableConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: DataTableStyles
+}
 
 /**
  * Options for the DataTable plugin.
@@ -84,6 +100,52 @@ export interface DataTableOptions {
    * @default false
    */
   striped?: boolean
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: DataTableStyles
+}
+
+/**
+ * Independently configurable DataTable parts.
+ */
+export interface DataTableStyles {
+  /**
+   * All body cells, including striped cells.
+   */
+  bodyCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Body paragraph alignment, spacing and flow.
+   */
+  bodyParagraph?: ParagraphStyleRule
+  /**
+   * Body run typography.
+   */
+  bodyText?: TextStyleRule
+  /**
+   * Empty-state paragraph formatting.
+   */
+  emptyParagraph?: ParagraphStyleRule
+  /**
+   * Empty-state run typography.
+   */
+  emptyText?: TextStyleRule
+  /**
+   * Header cell shading, borders and padding.
+   */
+  headerCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Header paragraph alignment, spacing and flow.
+   */
+  headerParagraph?: ParagraphStyleRule
+  /**
+   * Header run typography.
+   */
+  headerText?: TextStyleRule
+  /**
+   * Additional cell styles for every second data row when striped is true.
+   */
+  stripedCell?: Omit<CellStyleRule, 'height'>
 }
 
 /**
@@ -91,12 +153,24 @@ export interface DataTableOptions {
  *
  * @returns A configured DocxPlugin for `'dataTable'`
  */
-export function dataTablePlugin() {
+export function dataTablePlugin(pluginConfig: DataTableConfig = {}) {
   return definePlugin<'dataTable', DataTableOptions>({
     name: 'dataTable',
     render(options, context) {
       const { config } = context
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof DataTableStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: config.theme,
+        })
+      const headerCellStyle = partStyle('headerCell')
+      const headerParagraphStyle = partStyle('headerParagraph')
+      const headerTextStyle = partStyle('headerText')
+      const bodyCellStyle = partStyle('bodyCell')
+      const stripedCellStyle = partStyle('bodyCell', 'stripedCell')
+      const bodyParagraphStyle = partStyle('bodyParagraph')
+      const bodyTextStyle = partStyle('bodyText')
       const colors = config.theme?.colors
       const borderColor = normalizeHexColor(colors?.border) ?? 'D5D9DF'
       const surface = normalizeHexColor(colors?.surface) ?? 'F4F6F8'
@@ -104,11 +178,14 @@ export function dataTablePlugin() {
       const { align, bordered, data, format, labels, striped } = options
       if (!data.length) {
         return new Paragraph(
-          pluginStyles.paragraph({
+          partStyle('emptyParagraph').paragraph({
             alignment: AlignmentType.CENTER,
             children: [
               new TextRun(
-                pluginStyles.text({ color: '999999', text: '(no data)' }),
+                partStyle('emptyText').text({
+                  color: '999999',
+                  text: '(no data)',
+                }),
               ),
             ],
           }),
@@ -131,18 +208,18 @@ export function dataTablePlugin() {
       const headerCells = columns.map(col => {
         const label = labels?.[col] ?? col
         return new TableCell(
-          pluginStyles.cell({
+          headerCellStyle.cell({
             shading: { fill: surface, type: ShadingType.CLEAR },
             children: [
               new Paragraph(
-                pluginStyles.paragraph({
+                headerParagraphStyle.paragraph({
                   spacing: { after: 0, before: 0, line: 288 },
                   alignment: alignmentToDocx(
                     align?.[col] ?? inferAlignment(col, data),
                   ),
                   children: [
                     new TextRun(
-                      pluginStyles.text({
+                      headerTextStyle.text({
                         bold: true,
                         color: headingColor,
                         text: label,
@@ -174,12 +251,12 @@ export function dataTablePlugin() {
           const val = formatValue(row[col], format?.[col])
 
           return new TableCell(
-            pluginStyles.cell({
+            (striped && i % 2 === 1 ? stripedCellStyle : bodyCellStyle).cell({
               children: [
                 new Paragraph(
-                  pluginStyles.paragraph({
+                  bodyParagraphStyle.paragraph({
                     alignment: alignmentToDocx(colAlign),
-                    children: [new TextRun(pluginStyles.text({ text: val }))],
+                    children: [new TextRun(bodyTextStyle.text({ text: val }))],
                     spacing: { after: 0, before: 0, line: 288 },
                   }),
                 ),

@@ -201,6 +201,13 @@ export function compileParagraphStyle(style: ParagraphStyleRule) {
 
   return {
     alignment: compileAlignment(style.textAlign),
+    shading:
+      style.backgroundColor === undefined
+        ? undefined
+        : {
+            fill: normalizeHexColor(style.backgroundColor),
+            type: ShadingType.CLEAR,
+          },
     ...compileParagraphBorder(style),
     indent,
     keepLines: style.keepLines,

@@ -18,6 +18,7 @@ import { dataTablePlugin, type DataTableOptions } from 'docx-kit'
 | `format` | `Record<string, 'currency' \| 'date' \| 'number' \| 'percent'>` | — | Per-column value formatter |
 | `labels` | `Record<string, string>` | — | Human-readable column labels (e.g. `{ salary: '薪资' }`) |
 | `striped` | `boolean` | `false` | Alternate row background shading |
+| `styles` | `DataTableStyles` | — | Per-part styles for this invocation |
 
 ## Examples
 
@@ -125,4 +126,59 @@ const doc = createDocx()
     align: { month: 'left', revenue: 'right', expenses: 'right', profit: 'right' },
   })
   .save('monthly-report.docx')
+```
+
+## Style Customization
+
+Pass `{ styles }` to the factory for defaults shared by that plugin instance. Set `options.styles` to override one invocation. `CalloutConfig` / `CalloutStyles` and `DataTableConfig` / `DataTableStyles` are exported from the plugin packages and `docx-kit` Node/browser entries.
+
+Precedence, from lowest to highest: **built-in defaults (including theme values) → initialization `styles` → common invocation `style` (the third `.plugin()` argument) → invocation part `styles`**. Missing or `undefined` fields retain defaults; nested plain objects merge by field; arrays replace entirely; `0` and `false` apply. Styles are resolved per invocation without changing the configuration objects. Units and theme tokens such as `$colors.primary`, `$fontSize.lg` and `$spacing.md` use the existing style compiler.
+
+| Part | Style type | Target |
+| --- | --- | --- |
+| `headerCell`, `bodyCell` | `Omit<CellStyleRule, 'height'>` | Header/body background, borders, width and padding |
+| `stripedCell` | `Omit<CellStyleRule, 'height'>` | Extra formatting on striped body cells |
+| `headerParagraph`, `bodyParagraph`, `emptyParagraph` | `ParagraphStyleRule` | Header/body/empty-state paragraph formatting |
+| `headerText`, `bodyText`, `emptyText` | `TextStyleRule` | Header/body/empty-state typography |
+
+`bodyCell` applies to every data row. With `striped: true`, `stripedCell` additionally applies to the second, fourth, etc. data rows. Within each precedence level, `stripedCell` follows `bodyCell`; an invocation `bodyCell` still overrides initialization `stripedCell`. Explicit style borders override the defaults selected by `bordered`, including `bordered: false`. Paragraph part styles override inferred/per-column alignment. Empty data uses only the `emptyParagraph` and `emptyText` parts.
+
+```ts
+import { createDocx, dataTablePlugin } from 'docx-kit/node'
+
+const doc = createDocx()
+  .use(dataTablePlugin({
+    styles: {
+      headerCell: { backgroundColor: '#EFF6FF' },
+      headerText: { color: '#1E40AF', fontSize: 12 },
+      bodyCell: { margin: '5pt 8pt' },
+      bodyText: { fontSize: 11 },
+      stripedCell: { backgroundColor: '#F8FAFC' },
+    },
+  }))
+  .plugin('dataTable', {
+    data: [{ name: 'Alice', score: 95 }, { name: 'Bob', score: 88 }],
+    striped: true,
+    styles: {
+      headerText: { bold: false },
+      bodyCell: { marginLeft: 0 },
+      stripedCell: { backgroundColor: '#E0F2FE' },
+    },
+  })
+```
+
+### JSON DSL, AI and MCP
+
+Only invocation `options.styles` belongs in JSON DSL. It uses the same serializable part objects as the builder. AI tool definitions and the schema guide describe these options; MCP exposes them in `docx-kit://schema` and `get_plugin_help().optionsSchema`. `validate_schema` rejects unknown parts, properties in the wrong part and invalid style values. Other built-in plugins also expose their own part-style contracts.
+
+```json
+{
+  "type": "plugin",
+  "name": "dataTable",
+  "options": {
+    "data": [{ "score": 95 }, { "score": 88 }],
+    "striped": true,
+    "styles": { "stripedCell": { "backgroundColor": "#EFF6FF" } }
+  }
+}
 ```

@@ -61,6 +61,41 @@ describe('echartsPlugin', () => {
     expect(xml).toContain('<w:sz w:val="38"/>')
     expect(xml?.match(/<w:jc w:val="right"\/>/g)).toHaveLength(2)
   })
+  it('styles the chart and caption independently with initialization defaults and part overrides', async () => {
+    const output = await echartsPlugin({
+      styles: {
+        caption: { color: '#112233', fontFamily: 'Georgia' },
+        imageParagraph: { textAlign: 'left' },
+      },
+    }).render(
+      {
+        caption: 'Caption',
+        option: {},
+        styles: {
+          caption: { bold: false, color: '$colors.primary' },
+          captionParagraph: { textAlign: 'left' },
+          imageParagraph: { marginTop: 0, textAlign: 'right' },
+        },
+      },
+      createPluginTestContext({
+        config: { theme: { colors: { primary: '#123ABC' } } },
+        style: { bold: true, color: '#445566', textAlign: 'center' },
+      }),
+    )
+    if (!Array.isArray(output)) {
+      throw new TypeError('Expected chart paragraphs')
+    }
+    const archive = await JSZip.loadAsync(
+      await Packer.toBuffer(new Document({ sections: [{ children: output }] })),
+    )
+    const xml = await archive.file('word/document.xml')?.async('string')
+    expect(xml).toContain('<w:drawing>')
+    expect(xml).toContain('<w:jc w:val="right"/>')
+    expect(xml).toContain('<w:jc w:val="left"/>')
+    expect(xml).toContain('<w:color w:val="123ABC"/>')
+    expect(xml).toContain('<w:b w:val="false"/>')
+    expect(xml).toContain('w:ascii="Georgia"')
+  })
   it('returns a plugin with name "echarts"', () => {
     const plugin = echartsPlugin()
     expect(plugin.name).toBe('echarts')

@@ -33,6 +33,22 @@ import {
   WidthType,
 } from 'docx'
 
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  TextStyleRule,
+} from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface SignatureBlockConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: SignatureBlockStyles
+}
+
 /**
  * Options for the SignatureBlock plugin.
  */
@@ -46,6 +62,56 @@ export interface SignatureBlockOptions {
    * @default 2
    */
   columns?: number
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: SignatureBlockStyles
+}
+
+/**
+ * Independently configurable SignatureBlock parts.
+ */
+export interface SignatureBlockStyles {
+  /**
+   * Cell shading, borders and padding.
+   */
+  cell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Date run typography.
+   */
+  date?: TextStyleRule
+  /**
+   * Date paragraph alignment, spacing and flow.
+   */
+  dateParagraph?: ParagraphStyleRule
+  /**
+   * Empty paragraph alignment, spacing and flow.
+   */
+  emptyParagraph?: ParagraphStyleRule
+  /**
+   * Empty text run typography.
+   */
+  emptyText?: TextStyleRule
+  /**
+   * Label run typography.
+   */
+  label?: TextStyleRule
+  /**
+   * Label paragraph alignment, spacing and flow.
+   */
+  labelParagraph?: ParagraphStyleRule
+  /**
+   * Padding paragraph alignment, spacing and flow.
+   */
+  paddingParagraph?: ParagraphStyleRule
+  /**
+   * Signature run typography.
+   */
+  signature?: TextStyleRule
+  /**
+   * Signature paragraph alignment, spacing and flow.
+   */
+  signatureParagraph?: ParagraphStyleRule
 }
 
 /**
@@ -71,11 +137,26 @@ export interface SignatureParty {
  *
  * @returns A configured DocxPlugin for `'signatureBlock'`
  */
-export function signatureBlockPlugin() {
+export function signatureBlockPlugin(pluginConfig: SignatureBlockConfig = {}) {
   return definePlugin<'signatureBlock', SignatureBlockOptions>({
     name: 'signatureBlock',
     render(options, context) {
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof SignatureBlockStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const cellStyle = partStyle('cell')
+      const dateStyle = partStyle('date')
+      const dateParagraphStyle = partStyle('dateParagraph')
+      const emptyParagraphStyle = partStyle('emptyParagraph')
+      const emptyTextStyle = partStyle('emptyText')
+      const labelStyle = partStyle('label')
+      const labelParagraphStyle = partStyle('labelParagraph')
+      const paddingParagraphStyle = partStyle('paddingParagraph')
+      const signatureStyle = partStyle('signature')
+      const signatureParagraphStyle = partStyle('signatureParagraph')
       const { columns = 2, parties } = options
 
       if (!Number.isSafeInteger(columns) || columns <= 0) {
@@ -87,11 +168,14 @@ export function signatureBlockPlugin() {
 
       if (!parties.length) {
         return new Paragraph(
-          pluginStyles.paragraph({
+          emptyParagraphStyle.paragraph({
             alignment: AlignmentType.CENTER,
             children: [
               new TextRun(
-                pluginStyles.text({ color: '999999', text: '(no signatures)' }),
+                emptyTextStyle.text({
+                  color: '999999',
+                  text: '(no signatures)',
+                }),
               ),
             ],
           }),
@@ -103,31 +187,31 @@ export function signatureBlockPlugin() {
       // Build cell for a single party
       function buildPartyCell(party: SignatureParty): TableCell {
         const labelPara = new Paragraph(
-          pluginStyles.paragraph({
+          labelParagraphStyle.paragraph({
             spacing: { after: 200 },
             children: [
-              new TextRun(pluginStyles.text({ bold: true, text: party.label })),
+              new TextRun(labelStyle.text({ bold: true, text: party.label })),
             ],
           }),
         )
 
         const sigPara = party.name
           ? new Paragraph(
-              pluginStyles.paragraph({
+              signatureParagraphStyle.paragraph({
                 spacing: { after: 80 },
                 children: [
                   new TextRun(
-                    pluginStyles.text({ text: party.name, underline: {} }),
+                    signatureStyle.text({ text: party.name, underline: {} }),
                   ),
                 ],
               }),
             )
           : new Paragraph(
-              pluginStyles.paragraph({
+              signatureParagraphStyle.paragraph({
                 spacing: { after: 80 },
                 children: [
                   new TextRun(
-                    pluginStyles.text({
+                    signatureStyle.text({
                       text: '_____________________________',
                       underline: {},
                     }),
@@ -137,10 +221,10 @@ export function signatureBlockPlugin() {
             )
 
         const datePara = new Paragraph(
-          pluginStyles.paragraph({
+          dateParagraphStyle.paragraph({
             children: [
               new TextRun(
-                pluginStyles.text({
+                dateStyle.text({
                   color: '666666',
                   size: 18,
                   text: party.date ?? '',
@@ -151,7 +235,7 @@ export function signatureBlockPlugin() {
         )
 
         return new TableCell(
-          pluginStyles.cell({ children: [labelPara, sigPara, datePara] }),
+          cellStyle.cell({ children: [labelPara, sigPara, datePara] }),
         )
       }
 
@@ -171,9 +255,11 @@ export function signatureBlockPlugin() {
             { length: padCount },
             () =>
               new TableCell(
-                pluginStyles.cell({
+                cellStyle.cell({
                   children: [
-                    new Paragraph(pluginStyles.paragraph({ text: '' })),
+                    new Paragraph(
+                      paddingParagraphStyle.paragraph({ text: '' }),
+                    ),
                   ],
                 }),
               ),

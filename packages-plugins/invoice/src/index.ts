@@ -14,7 +14,22 @@ import {
   TextRun,
   WidthType,
 } from 'docx'
-import type { PluginStyleAdapter } from '@docxkit/core'
+import type {
+  CellStyleRule,
+  ParagraphStyleRule,
+  PluginStyleAdapter,
+  TextStyleRule,
+} from '@docxkit/core'
+
+/**
+ * Defaults shared by all calls using this plugin instance.
+ */
+export interface InvoiceConfig {
+  /**
+   * Default styles, overridden by invocation styles.
+   */
+  styles?: InvoiceStyles
+}
 
 export interface InvoiceLineItem {
   description: string
@@ -31,6 +46,10 @@ export interface InvoiceOptions {
   currency?: string
   dueDate?: string
   notes?: string
+  /**
+   * Per-part styles for this invocation.
+   */
+  styles?: InvoiceStyles
   taxRate?: number
 }
 
@@ -40,12 +59,118 @@ export interface InvoiceParty {
   email?: string
 }
 
-export function invoicePlugin() {
+/**
+ * Independently configurable Invoice parts.
+ */
+export interface InvoiceStyles {
+  /**
+   * Body cell shading, borders and padding.
+   */
+  bodyCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Body paragraph alignment, spacing and flow.
+   */
+  bodyParagraph?: ParagraphStyleRule
+  /**
+   * Body text run typography.
+   */
+  bodyText?: TextStyleRule
+  /**
+   * Header cell shading, borders and padding.
+   */
+  headerCell?: Omit<CellStyleRule, 'height'>
+  /**
+   * Header paragraph alignment, spacing and flow.
+   */
+  headerParagraph?: ParagraphStyleRule
+  /**
+   * Header text run typography.
+   */
+  headerText?: TextStyleRule
+  /**
+   * Meta text run typography.
+   */
+  metaText?: TextStyleRule
+  /**
+   * Notes run typography.
+   */
+  notes?: TextStyleRule
+  /**
+   * Notes label run typography.
+   */
+  notesLabel?: TextStyleRule
+  /**
+   * Notes paragraph alignment, spacing and flow.
+   */
+  notesParagraph?: ParagraphStyleRule
+  /**
+   * Party label run typography.
+   */
+  partyLabel?: TextStyleRule
+  /**
+   * Party paragraph alignment, spacing and flow.
+   */
+  partyParagraph?: ParagraphStyleRule
+  /**
+   * Party text run typography.
+   */
+  partyText?: TextStyleRule
+  /**
+   * Subtotal run typography.
+   */
+  subtotal?: TextStyleRule
+  /**
+   * Tax run typography.
+   */
+  tax?: TextStyleRule
+  /**
+   * Title run typography.
+   */
+  title?: TextStyleRule
+  /**
+   * Paragraph containing the invoice title and metadata.
+   */
+  titleParagraph?: ParagraphStyleRule
+  /**
+   * Total run typography.
+   */
+  total?: TextStyleRule
+  /**
+   * Totals paragraph alignment, spacing and flow.
+   */
+  totalsParagraph?: ParagraphStyleRule
+}
+
+export function invoicePlugin(pluginConfig: InvoiceConfig = {}) {
   return definePlugin<'invoice', InvoiceOptions>({
     name: 'invoice',
     render(options, context) {
       const { config } = context
-      const pluginStyles = createPluginStyle(context.style)
+      const partStyle = (...parts: (keyof InvoiceStyles)[]) =>
+        createPluginStyle(context.style, {
+          defaults: parts.map(part => pluginConfig.styles?.[part]),
+          overrides: parts.map(part => options.styles?.[part]),
+          theme: context.config.theme,
+        })
+      const bodyCellStyle = partStyle('bodyCell')
+      const bodyParagraphStyle = partStyle('bodyParagraph')
+      const bodyTextStyle = partStyle('bodyText')
+      const headerCellStyle = partStyle('headerCell')
+      const headerParagraphStyle = partStyle('headerParagraph')
+      const headerTextStyle = partStyle('headerText')
+      const metaTextStyle = partStyle('metaText')
+      const notesStyle = partStyle('notes')
+      const notesLabelStyle = partStyle('notesLabel')
+      const notesParagraphStyle = partStyle('notesParagraph')
+      const partyLabelStyle = partStyle('partyLabel')
+      const partyParagraphStyle = partStyle('partyParagraph')
+      const partyTextStyle = partStyle('partyText')
+      const subtotalStyle = partStyle('subtotal')
+      const taxStyle = partStyle('tax')
+      const titleStyle = partStyle('title')
+      const titleParagraphStyle = partStyle('titleParagraph')
+      const totalStyle = partStyle('total')
+      const totalsParagraphStyle = partStyle('totalsParagraph')
       const colors = config.theme?.colors
       const border = {
         color: normalizeHexColor(colors?.border) ?? 'D5D9DF',
@@ -77,11 +202,11 @@ export function invoicePlugin() {
       }
 
       const header = new Paragraph(
-        pluginStyles.paragraph({
+        titleParagraphStyle.paragraph({
           spacing: { after: 180 },
           children: [
             new TextRun(
-              pluginStyles.text({
+              titleStyle.text({
                 bold: true,
                 color: primary,
                 size: 36,
@@ -89,18 +214,18 @@ export function invoicePlugin() {
               }),
             ),
             new TextRun(
-              pluginStyles.text({
+              metaTextStyle.text({
                 break: 1,
                 text: `Invoice #: ${options.invoiceNumber}`,
               }),
             ),
             new TextRun(
-              pluginStyles.text({ break: 1, text: `Date: ${options.date}` }),
+              metaTextStyle.text({ break: 1, text: `Date: ${options.date}` }),
             ),
             ...(options.dueDate
               ? [
                   new TextRun(
-                    pluginStyles.text({
+                    metaTextStyle.text({
                       break: 1,
                       text: `Due: ${options.dueDate}`,
                     }),
@@ -123,18 +248,18 @@ export function invoicePlugin() {
           ].map(
             (value, index) =>
               new TableCell(
-                pluginStyles.cell({
+                bodyCellStyle.cell({
                   borders,
                   children: [
                     new Paragraph(
-                      pluginStyles.paragraph({
+                      bodyParagraphStyle.paragraph({
                         spacing: { after: 0, before: 0, line: 288 },
                         alignment:
                           index === 0
                             ? AlignmentType.LEFT
                             : AlignmentType.RIGHT,
                         children: [
-                          new TextRun(pluginStyles.text({ text: value })),
+                          new TextRun(bodyTextStyle.text({ text: value })),
                         ],
                       }),
                     ),
@@ -155,12 +280,12 @@ export function invoicePlugin() {
             children: ['Description', 'Qty', 'Unit Price', 'Amount'].map(
               (label, index) =>
                 new TableCell(
-                  pluginStyles.cell({
+                  headerCellStyle.cell({
                     borders,
                     shading: { fill: surface, type: ShadingType.CLEAR },
                     children: [
                       new Paragraph(
-                        pluginStyles.paragraph({
+                        headerParagraphStyle.paragraph({
                           spacing: { after: 0, before: 0, line: 288 },
                           alignment:
                             index === 0
@@ -168,7 +293,7 @@ export function invoicePlugin() {
                               : AlignmentType.RIGHT,
                           children: [
                             new TextRun(
-                              pluginStyles.text({
+                              headerTextStyle.text({
                                 bold: true,
                                 color: primary,
                                 text: label,
@@ -187,23 +312,23 @@ export function invoicePlugin() {
       })
 
       const totals = new Paragraph(
-        pluginStyles.paragraph({
+        totalsParagraphStyle.paragraph({
           alignment: AlignmentType.RIGHT,
           spacing: { before: 180 },
           children: [
             new TextRun(
-              pluginStyles.text({
+              subtotalStyle.text({
                 text: `Subtotal: ${formatCurrency(subtotalCents, currency)}`,
               }),
             ),
             new TextRun(
-              pluginStyles.text({
+              taxStyle.text({
                 break: 1,
                 text: `Tax: ${formatCurrency(taxCents, currency)}`,
               }),
             ),
             new TextRun(
-              pluginStyles.text({
+              totalStyle.text({
                 bold: true,
                 break: 1,
                 text: `Total: ${formatCurrency(totalCents, currency)}`,
@@ -215,20 +340,32 @@ export function invoicePlugin() {
 
       return [
         header,
-        partyLines('From', options.from, pluginStyles),
-        partyLines('To', options.to, pluginStyles),
+        partyLines(
+          'From',
+          options.from,
+          partyParagraphStyle,
+          partyLabelStyle,
+          partyTextStyle,
+        ),
+        partyLines(
+          'To',
+          options.to,
+          partyParagraphStyle,
+          partyLabelStyle,
+          partyTextStyle,
+        ),
         table,
         totals,
         ...(options.notes
           ? [
               new Paragraph(
-                pluginStyles.paragraph({
+                notesParagraphStyle.paragraph({
                   spacing: { before: 180 },
                   children: [
                     new TextRun(
-                      pluginStyles.text({ bold: true, text: 'Notes: ' }),
+                      notesLabelStyle.text({ bold: true, text: 'Notes: ' }),
                     ),
-                    new TextRun(pluginStyles.text({ text: options.notes })),
+                    new TextRun(notesStyle.text({ text: options.notes })),
                   ],
                 }),
               ),
@@ -248,15 +385,17 @@ function formatCurrency(cents: number, currency: string) {
 function partyLines(
   label: string,
   party: InvoiceParty,
-  pluginStyles: PluginStyleAdapter,
+  paragraphStyle: PluginStyleAdapter,
+  labelStyle: PluginStyleAdapter,
+  textStyle: PluginStyleAdapter,
 ) {
   const values = [party.name, party.address, party.email].filter(Boolean)
   return new Paragraph(
-    pluginStyles.paragraph({
+    paragraphStyle.paragraph({
       spacing: { after: 120 },
       children: [
-        new TextRun(pluginStyles.text({ bold: true, text: `${label}: ` })),
-        new TextRun(pluginStyles.text({ text: values.join(' · ') })),
+        new TextRun(labelStyle.text({ bold: true, text: `${label}: ` })),
+        new TextRun(textStyle.text({ text: values.join(' · ') })),
       ],
     }),
   )

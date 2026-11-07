@@ -67,3 +67,21 @@ const doc = createDocx()
 - 提供 `taxRate` 時，必須在閉區間 `0..1` 內。
 
 每行金額先保留兩位小數，再累加為小計。稅額單獨捨入後與小計相加得到總額；恰好半分時向遠離零的方向捨入。AI 發票範本採用相同規則。
+
+## 樣式自訂
+
+工廠的 `{ styles }` 設定實例預設值，`options.styles` 覆寫單次呼叫。外掛套件與 docx-kit 入口匯出 `InvoiceConfig` 和 `InvoiceStyles`。優先順序：**內建/主題預設值 → 初始化 styles → 通用 style → 單次部位 styles**。巢狀欄位合併，陣列整體替換，`undefined` 沿用預設，`0` / `false` 生效；支援單位與 `$colors.primary` 等主題 token。
+
+| 部位 | 樣式型別 | 範圍 |
+| --- | --- | --- |
+| `bodyText`, `headerText`, `metaText`, `notes`, `notesLabel`, `partyLabel`, `partyText`, `subtotal`, `tax`, `title`, `total` | `TextStyleRule` | 文字排版 |
+| `bodyParagraph`, `headerParagraph`, `notesParagraph`, `partyParagraph`, `titleParagraph`, `totalsParagraph` | `ParagraphStyleRule` | 段落背景、框線、對齊、間距及分頁 |
+| `bodyCell`, `headerCell` | `Omit<CellStyleRule, 'height'>` | 儲存格背景、框線、寬度及內距 |
+
+```ts
+invoicePlugin({
+  styles: { total: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+單次呼叫在 `options.styles` 中使用相同部位名稱。JSON DSL、AI 工具 schema 與 MCP 驗證共用這些契約；未知部位與放錯部位的屬性會被拒絕。

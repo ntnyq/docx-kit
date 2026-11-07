@@ -38,10 +38,13 @@ export type { PluginManifest } from './loader/manifest'
 
 // ---------- Compiler internals (for plugin authors) ----------
 export type { CompilationSession } from './compiler/numbers'
-export type { PluginStyleAdapter } from './style/pluginStyle'
-
 // ---------- Local types ----------
 export type { DocxSchema, RenderDocxOptions } from './builder/createDocx'
+
+export type {
+  PluginStyleAdapter,
+  PluginStyleOptions,
+} from './style/pluginStyle'
 
 export type {
   PluginLoaderOptions,
@@ -70,6 +73,7 @@ export type {
   BorderStyle,
   BulletItem,
   BulletListNode,
+  CellStyleRule,
   CheckboxNode,
   CheckboxSymbol,
   ClassName,
@@ -112,6 +116,7 @@ export type {
   PageNumberConfig,
   PageSize,
   ParagraphNode,
+  ParagraphStyleRule,
   PluginNode,
   PluginRegistry,
   PluginRenderContext,
@@ -137,6 +142,7 @@ export type {
   TextBoxNode,
   TextBoxOptions,
   TextNode,
+  TextStyleRule,
   ThematicBreakNode,
   ThemeColors,
   ThemeFonts,

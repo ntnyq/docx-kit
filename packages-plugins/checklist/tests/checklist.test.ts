@@ -57,6 +57,14 @@ describe('checklistPlugin', () => {
       },
     },
     {
+      fontSize: 15,
+      name: 'spacing tokens in inherited font sizes',
+      config: {
+        defaults: { text: { fontSize: '$spacing.body' } },
+        theme: { spacing: { body: 15 } },
+      },
+    },
+    {
       className: 'tasks',
       config: { styles: { tasks: { fontSize: 20 } } },
       fontSize: 20,
@@ -349,7 +357,7 @@ describe('checklistPlugin', () => {
     const ownerRun = xml.match(
       /<w:r>(?:(?!<\/w:r>)[\s\S])*?<w:t[^>]*> — Alice<\/w:t><\/w:r>/,
     )?.[0]
-    expect(ownerRun).toContain('<w:color w:val="789ABC"/>')
+    expect(ownerRun).toContain('<w:color w:val="123ABC"/>')
     expect(xml).toContain('<w:sz w:val="28"/>')
     expect(xml).toContain('<w:jc w:val="right"/>')
   })

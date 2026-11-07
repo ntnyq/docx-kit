@@ -86,6 +86,13 @@ describe('compileTextStyle', () => {
 })
 
 describe('compileParagraphStyle', () => {
+  it('compiles whole-paragraph background shading only when specified', () => {
+    expect(
+      compileParagraphStyle({ backgroundColor: '#ABCDEF' }).shading,
+    ).toEqual({ fill: 'ABCDEF', type: 'clear' })
+    expect(compileParagraphStyle({}).shading).toBeUndefined()
+  })
+
   it('compiles text alignment', () => {
     // docx 9.x uses string enum values
     expect(compileParagraphStyle({ textAlign: 'center' }).alignment).toBe(

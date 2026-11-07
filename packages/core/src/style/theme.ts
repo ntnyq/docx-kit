@@ -41,6 +41,27 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 /**
+ * Resolve each length in a margin shorthand, preserving numeric token values
+ * as points and leaving unresolved tokens for the length compiler to reject.
+ */
+function resolveMarginTokens(value: unknown, theme: DocxTheme): unknown {
+  const resolved = resolveTokenValue(value, theme)
+  if (typeof resolved !== 'string') {
+    return resolved
+  }
+  const parts = resolved.trim().split(/\s+/)
+  if (parts.length !== 2 && parts.length !== 4) {
+    return resolved
+  }
+  return parts
+    .map(part => {
+      const length = resolveSingleToken(part, theme) ?? part
+      return typeof length === 'number' ? `${length}pt` : length
+    })
+    .join(' ')
+}
+
+/**
  * Parse `$category.key` and look up the value in the theme.
  *
  * @param token - Theme token in `$category.key` form
@@ -80,7 +101,9 @@ function resolveTokenValue(value: unknown, theme: DocxTheme): unknown {
     return Object.fromEntries(
       Object.entries(value).map(([key, item]) => [
         key,
-        resolveTokenValue(item, theme),
+        key === 'margin'
+          ? resolveMarginTokens(item, theme)
+          : resolveTokenValue(item, theme),
       ]),
     )
   }

@@ -44,3 +44,21 @@ const doc = createDocx()
 
 - Empty `entries` still render the title with a centered `(no entries)` placeholder.
 - The plugin is a good fit for release notes, migration logs, or compliance change histories.
+
+## Style customization
+
+Pass `{ styles }` to the factory for instance defaults, and `options.styles` for invocation overrides. The package and docx-kit entry points export `ChangelogConfig` and `ChangelogStyles`. Priority: **built-in/theme defaults → initialization styles → common node style → invocation part styles**. Nested fields merge; arrays replace; `undefined` retains defaults; `0` and `false` apply. Units and theme tokens such as `$colors.primary` are supported.
+
+| Parts | Style type | Scope |
+| --- | --- | --- |
+| `bodyText`, `emptyText`, `headerText`, `title` | `TextStyleRule` | Run typography |
+| `bodyParagraph`, `emptyParagraph`, `headerParagraph`, `titleParagraph` | `ParagraphStyleRule` | Background, borders, alignment, spacing and flow |
+| `bodyCell`, `headerCell` | `Omit<CellStyleRule, 'height'>` | Cell shading, borders, width and padding |
+
+```ts
+changelogPlugin({
+  styles: { headerText: { color: '#2563EB', fontSize: 14 } },
+})
+```
+
+Use the same part names in `options.styles` for a single call. JSON DSL, AI tool schemas and MCP validation share these contracts; unknown parts and misplaced properties are rejected.
