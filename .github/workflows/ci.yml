@@ -38,7 +38,7 @@ jobs:
             node: lts/*
             visual: true
           - os: windows-latest
-            node: current
+            node: lts/*
             visual: false
     runs-on: ${{ matrix.os }}
     steps:
