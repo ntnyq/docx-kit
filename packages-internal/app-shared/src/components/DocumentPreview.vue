@@ -53,8 +53,8 @@ interface Props {
 }
 const props = defineProps<Props>()
 const emit = defineEmits<{ download: []; refresh: [] }>()
-const autoPreview = defineModel<boolean>('autoPreview', { default: true })
-const zoom = defineModel<'fit' | number>('zoom', { default: 'fit' })
+const autoPreview = defineModel<boolean>('autoPreview')
+const zoom = defineModel<'fit' | number>('zoom', { required: true })
 const { t } = useI18n()
 const previewContainer = useTemplateRef<HTMLElement>('previewContainer')
 const viewport = useTemplateRef<HTMLElement>('viewport')

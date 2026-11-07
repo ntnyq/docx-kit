@@ -9,7 +9,7 @@ import {
 } from './ui/dialog'
 
 defineProps<{ studio?: boolean }>()
-const open = defineModel<boolean>('open', { default: false })
+const open = defineModel<boolean>('open', { required: true })
 const { t } = useI18n()
 </script>
 

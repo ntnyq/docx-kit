@@ -44,6 +44,6 @@
     "@docxkit/core": "workspace:*"
   },
   "devDependencies": {
-    "docx": "^9.15.0"
+    "docx": "^9.15.3"
   }
 }

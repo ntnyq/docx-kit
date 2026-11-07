@@ -15,7 +15,7 @@ import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{ description: string; name: string }>()
 const emit = defineEmits<{ save: [name: string, description: string] }>()
-const open = defineModel<boolean>('open', { default: false })
+const open = defineModel<boolean>('open', { required: true })
 const { t } = useI18n()
 const nameDraft = shallowRef('')
 const descriptionDraft = shallowRef('')

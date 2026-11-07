@@ -21,7 +21,7 @@ import type { SerializedDocxKitError } from '@docxkit/app-shared/lib/diagnostics
 import type { EditableTheme } from '../utils/themeStudio'
 
 const props = defineProps<{ snippet: string; theme: EditableTheme }>()
-const open = defineModel<boolean>('open', { default: false })
+const open = defineModel<boolean>('open', { required: true })
 const { t } = useI18n()
 const { copied, copyError, copyText } = useCopy()
 const exportError = shallowRef('')

@@ -2,7 +2,7 @@
   "name": "docx-kit",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@12.16.1",
+  "packageManager": "pnpm@12.18.0",
   "description": "CSS-like DOCX API Kit — a type-safe, plugin-extensible DOCX generation library built on dolanmiu/docx.",
   "license": "MIT",
   "scripts": {
@@ -42,16 +42,16 @@
   },
   "devDependencies": {
     "@docxkit/core": "workspace:*",
-    "@ntnyq/eslint-config": "^7.0.0-beta.28",
+    "@ntnyq/eslint-config": "^7.0.0-beta.30",
     "@ntnyq/prettier-config": "^3.1.0",
     "@types/node": "^26.6.6",
     "@types/pngjs": "^6.0.5",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitejs/plugin-vue": "^6.0.10",
     "bumpp": "^12.3.0",
-    "docx": "^9.15.0",
+    "docx": "^9.15.3",
     "echarts": "^6.1.0",
-    "eslint": "^10.13.0",
+    "eslint": "^10.14.0",
     "happy-dom": "^21.0.4",
     "husky": "^9.1.7",
     "jszip": "^3.10.2",
@@ -60,11 +60,11 @@
     "pixelmatch": "^8.0.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.9.10",
-    "tsdown": "^0.23.3",
+    "tsdown": "^0.23.7",
     "tsx": "^4.23.15",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
-    "vite": "^8.3.5",
-    "vitest": "^5.0.5"
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
   },
   "nano-staged": {
     "*.{js,ts,mjs,cjs,md,vue,yml,yaml,toml,json}": "eslint --fix",

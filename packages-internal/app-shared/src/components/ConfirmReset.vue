@@ -13,7 +13,7 @@ import { Button } from './ui/button'
 
 defineProps<{ description: string; title: string }>()
 const emit = defineEmits<{ confirm: [] }>()
-const open = defineModel<boolean>('open', { default: false })
+const open = defineModel<boolean>('open', { required: true })
 const { t } = useI18n()
 
 function confirm() {

@@ -14,22 +14,22 @@
     "@docxkit/preset-academic": "workspace:*",
     "@docxkit/preset-classic": "workspace:*",
     "@docxkit/preset-modern": "workspace:*",
-    "@lucide/vue": "^1.63.0",
-    "@ntnyq/utils": "^0.24.0",
+    "@lucide/vue": "^1.70.0",
+    "@ntnyq/utils": "^0.25.0",
     "@vueuse/core": "^15.0.0",
     "acorn": "^8.19.0",
-    "docx": "^9.15.0",
+    "docx": "^9.15.3",
     "docx-kit": "workspace:*",
     "monaco-editor": "^0.57.0",
     "sucrase": "^3.35.1",
-    "vue": "^3.5.44",
-    "vue-i18n": "^11.4.16"
+    "vue": "^3.5.45",
+    "vue-i18n": "^11.4.18"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.5",
     "@vitejs/plugin-vue": "^6.0.10",
-    "tailwindcss": "^4.3.3",
-    "vite": "^8.3.5",
-    "vue-tsc": "^3.3.13"
+    "tailwindcss": "^4.3.5",
+    "vite": "^8.3.6",
+    "vue-tsc": "^3.3.14"
   }
 }
