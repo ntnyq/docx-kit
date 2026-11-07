@@ -16,9 +16,11 @@ function pluginOptions(
   parts: Record<string, unknown>,
   properties: Record<string, unknown> = {},
   required?: string[],
+  conditions?: object[],
 ) {
   return {
     additionalProperties: true,
+    ...(conditions ? { allOf: conditions } : {}),
     ...(required ? { required } : {}),
     type: 'object',
     properties: {
@@ -50,6 +52,48 @@ export const BUILTIN_PLUGIN_OPTION_SCHEMAS: Record<
     captionParagraph: PARAGRAPH_STYLE_SCHEMA,
     imageParagraph: PARAGRAPH_STYLE_SCHEMA,
   }),
+  bibliography: pluginOptions(
+    {
+      citation: TEXT_STYLE_SCHEMA,
+      citationParagraph: PARAGRAPH_STYLE_SCHEMA,
+      entry: TEXT_STYLE_SCHEMA,
+      entryParagraph: PARAGRAPH_STYLE_SCHEMA,
+      title: TEXT_STYLE_SCHEMA,
+      titleParagraph: PARAGRAPH_STYLE_SCHEMA,
+    },
+    {
+      bookmarkPrefix: string,
+      hyperlink: boolean,
+      ids: { items: { minLength: 1, type: 'string' }, type: 'array' },
+      mode: { enum: ['citation', 'list'] },
+      prefix: string,
+      suffix: string,
+      title: string,
+      entries: {
+        type: 'array',
+        items: {
+          required: ['id', 'title'],
+          type: 'object',
+          properties: {
+            authors: { items: string, type: 'array' },
+            doi: string,
+            id: { minLength: 1, type: 'string' },
+            publisher: string,
+            title: { pattern: '\\S', type: 'string' },
+            url: string,
+            year: string,
+          },
+        },
+      },
+    },
+    undefined,
+    [
+      {
+        if: { properties: { mode: { const: 'citation' } }, required: ['mode'] },
+        then: { required: ['ids'] },
+      },
+    ],
+  ),
   callout: pluginOptions(
     {
       cell: CELL_STYLE_SCHEMA,
@@ -107,6 +151,21 @@ export const BUILTIN_PLUGIN_OPTION_SCHEMAS: Record<
     title: TEXT_STYLE_SCHEMA,
     titleParagraph: PARAGRAPH_STYLE_SCHEMA,
   }),
+  crossReference: pluginOptions(
+    { paragraph: PARAGRAPH_STYLE_SCHEMA, text: TEXT_STYLE_SCHEMA },
+    {
+      fallback: string,
+      hyperlink: boolean,
+      kind: { enum: ['number', 'page', 'text'] },
+      prefix: string,
+      suffix: string,
+      target: {
+        pattern: '^[A-Za-z][A-Za-z0-9_]{0,39}(?![\\s\\S])',
+        type: 'string',
+      },
+    },
+    ['target'],
+  ),
   dataTable: pluginOptions(
     {
       bodyCell: CELL_STYLE_SCHEMA,
@@ -155,6 +214,47 @@ export const BUILTIN_PLUGIN_OPTION_SCHEMAS: Record<
     source: TEXT_STYLE_SCHEMA,
     sourceParagraph: PARAGRAPH_STYLE_SCHEMA,
   }),
+  glossary: pluginOptions(
+    {
+      bodyCell: CELL_STYLE_SCHEMA,
+      bodyParagraph: PARAGRAPH_STYLE_SCHEMA,
+      definition: TEXT_STYLE_SCHEMA,
+      fullForm: TEXT_STYLE_SCHEMA,
+      group: TEXT_STYLE_SCHEMA,
+      groupParagraph: PARAGRAPH_STYLE_SCHEMA,
+      headerCell: CELL_STYLE_SCHEMA,
+      headerParagraph: PARAGRAPH_STYLE_SCHEMA,
+      headerText: TEXT_STYLE_SCHEMA,
+      term: TEXT_STYLE_SCHEMA,
+      title: TEXT_STYLE_SCHEMA,
+      titleParagraph: PARAGRAPH_STYLE_SCHEMA,
+    },
+    {
+      groupBy: { enum: ['group', 'none'] },
+      locale: string,
+      sort: { enum: ['none', 'term'] },
+      title: string,
+      entries: {
+        type: 'array',
+        items: {
+          required: ['term', 'definition'],
+          type: 'object',
+          properties: {
+            definition: { pattern: '\\S', type: 'string' },
+            fullForm: string,
+            group: string,
+            term: { pattern: '\\S', type: 'string' },
+          },
+        },
+      },
+      labels: {
+        additionalProperties: false,
+        properties: { definition: string, fullForm: string, term: string },
+        type: 'object',
+      },
+    },
+    ['entries'],
+  ),
   invoice: pluginOptions({
     bodyCell: CELL_STYLE_SCHEMA,
     bodyParagraph: PARAGRAPH_STYLE_SCHEMA,

@@ -3,6 +3,7 @@ import { CHECKLIST_CODE } from './checklist'
 import { COMPREHENSIVE_CODE } from './comprehensive'
 import { MULTISECTION_CODE } from './multi-section'
 import { PLUGIN_CODE } from './plugins'
+import { REFERENCES_CODE } from './references'
 import { RICH_CONTENT_CODE } from './rich-content'
 import { THEME_CODE } from './theme'
 
@@ -18,6 +19,7 @@ export {
   COMPREHENSIVE_CODE,
   MULTISECTION_CODE,
   PLUGIN_CODE,
+  REFERENCES_CODE,
   RICH_CONTENT_CODE,
   THEME_CODE,
 }
@@ -26,6 +28,7 @@ export const PRESETS: Preset[] = [
   { code: COMPREHENSIVE_CODE, id: 'comprehensive', label: 'Comprehensive' },
   { code: BASIC_CODE, id: 'basic', label: 'Basic' },
   { code: PLUGIN_CODE, id: 'plugins', label: 'Plugins' },
+  { code: REFERENCES_CODE, id: 'references', label: 'References & Glossary' },
   { code: CHECKLIST_CODE, id: 'checklist', label: 'Checklist' },
   { code: MULTISECTION_CODE, id: 'multi-section', label: 'Multi-Section' },
   { code: THEME_CODE, id: 'theme', label: 'Theme' },

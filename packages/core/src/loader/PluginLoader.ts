@@ -11,7 +11,11 @@
 import { createDocxKitError, DocxKitError } from '@docxkit/errors'
 import { isValid, isValidRange, satisfies } from 'verkit'
 import { validateManifest } from './manifest'
-import type { DocxPlugin, MaybePromise } from '@docxkit/types'
+import type {
+  DocxPlugin,
+  MaybePromise,
+  PluginRenderContext,
+} from '@docxkit/types'
 import type { PluginManifest } from './manifest'
 
 // Re-export manifest types for convenience
@@ -128,8 +132,16 @@ export interface PluginSecurityPolicy {
 export type PluginSource =
   | { package: string; type: 'npm' }
   | { path: string; type: 'local' }
-  | { plugin: DocxPlugin; type: 'inline' }
+  | { plugin: InlinePlugin; type: 'inline' }
   | { type: 'url'; url: string }
+
+/**
+ * Schema sources erase concrete option types. Method variance accepts typed
+ * render hooks here, while fluent registration retains their original types.
+ */
+interface InlinePlugin extends Omit<DocxPlugin, 'render'> {
+  render(options: unknown, context: PluginRenderContext): unknown
+}
 
 /**
  * Settings resolved from user options with defaults applied.

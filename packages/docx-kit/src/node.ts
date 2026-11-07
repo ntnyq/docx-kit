@@ -125,19 +125,22 @@ export { barcodePlugin } from '@docxkit/plugin-barcode'
 export { calloutPlugin } from '@docxkit/plugin-callout'
 export { dividerPlugin } from '@docxkit/plugin-divider'
 export { invoicePlugin } from '@docxkit/plugin-invoice'
+export { glossaryPlugin } from '@docxkit/plugin-glossary'
 export { timelinePlugin } from '@docxkit/plugin-timeline'
 export { changelogPlugin } from '@docxkit/plugin-changelog'
 export { checklistPlugin } from '@docxkit/plugin-checklist'
 export { watermarkPlugin } from '@docxkit/plugin-watermark'
 export { codeBlockPlugin } from '@docxkit/plugin-code-block'
 export { coverPagePlugin } from '@docxkit/plugin-cover-page'
-export { dataTablePlugin } from '@docxkit/plugin-data-table'
 export { saveDocument, streamDocument }
+export { dataTablePlugin } from '@docxkit/plugin-data-table'
 export { letterheadPlugin } from '@docxkit/plugin-letterhead'
-export { metricCardPlugin } from '@docxkit/plugin-metric-card'
 
+export { metricCardPlugin } from '@docxkit/plugin-metric-card'
 export { pageNumberPlugin } from '@docxkit/plugin-page-number'
+export { bibliographyPlugin } from '@docxkit/plugin-bibliography'
 export { propertyTablePlugin } from '@docxkit/plugin-property-table'
+export { crossReferencePlugin } from '@docxkit/plugin-cross-reference'
 export { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
 export { signatureBlockPlugin } from '@docxkit/plugin-signature-block'
 export type { TocConfig, TocOptions, TocStyles } from '@docxkit/plugin-toc'
@@ -192,24 +195,6 @@ export type {
   PageNumberOptions,
   PageNumberStyles,
 } from '@docxkit/plugin-page-number'
-export type {
-  BarcodeConfig,
-  BarcodeFormat,
-  BarcodeOptions,
-  BarcodeStyles,
-} from '@docxkit/plugin-barcode'
-export type {
-  TimelineConfig,
-  TimelineEvent,
-  TimelineOptions,
-  TimelineStyles,
-} from '@docxkit/plugin-timeline'
-export type {
-  ChecklistConfig,
-  ChecklistItem,
-  ChecklistOptions,
-  ChecklistStyles,
-} from '@docxkit/plugin-checklist'
 
 export { academicPreset, classicPreset, modernPreset }
 
@@ -248,18 +233,48 @@ export function useTheme(id: string): DocxTheme | undefined {
 }
 
 export type {
+  BarcodeConfig,
+  BarcodeFormat,
+  BarcodeOptions,
+  BarcodeStyles,
+} from '@docxkit/plugin-barcode'
+
+export type {
+  GlossaryConfig,
+  GlossaryEntry,
+  GlossaryOptions,
+  GlossaryStyles,
+} from '@docxkit/plugin-glossary'
+export type {
+  TimelineConfig,
+  TimelineEvent,
+  TimelineOptions,
+  TimelineStyles,
+} from '@docxkit/plugin-timeline'
+export type {
+  ChecklistConfig,
+  ChecklistItem,
+  ChecklistOptions,
+  ChecklistStyles,
+} from '@docxkit/plugin-checklist'
+export type {
   ChangelogConfig,
   ChangelogEntry,
   ChangelogOptions,
   ChangelogStyles,
 } from '@docxkit/plugin-changelog'
-
 export type {
   MetricCardConfig,
   MetricCardOptions,
   MetricCardStyles,
   MetricItem,
 } from '@docxkit/plugin-metric-card'
+export type {
+  CrossReferenceConfig,
+  CrossReferenceOptions,
+  CrossReferenceStyles,
+} from '@docxkit/plugin-cross-reference'
+
 export type {
   ColAlign,
   ColFormat,
@@ -274,6 +289,7 @@ export type {
   InvoiceParty,
   InvoiceStyles,
 } from '@docxkit/plugin-invoice'
+
 export type {
   PropertyItem,
   PropertyTableConfig,
@@ -286,9 +302,19 @@ export type {
   MeetingMinutesOptions,
   MeetingMinutesStyles,
 } from '@docxkit/plugin-meeting-minutes'
+
 export type {
   SignatureBlockConfig,
   SignatureBlockOptions,
   SignatureBlockStyles,
   SignatureParty,
 } from '@docxkit/plugin-signature-block'
+export type {
+  BibliographyBaseOptions,
+  BibliographyCitationOptions,
+  BibliographyConfig,
+  BibliographyEntry,
+  BibliographyListOptions,
+  BibliographyOptions,
+  BibliographyStyles,
+} from '@docxkit/plugin-bibliography'

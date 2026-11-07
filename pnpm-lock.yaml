@@ -446,6 +446,22 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
 
+  packages-plugins/bibliography:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.15.0
+        version: 9.15.3
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
+
   packages-plugins/callout:
     dependencies:
       '@docxkit/core':
@@ -529,6 +545,22 @@ importers:
         specifier: workspace:*
         version: link:../../packages/pdk
 
+  packages-plugins/cross-reference:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.15.0
+        version: 9.15.3
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
+
   packages-plugins/data-table:
     dependencies:
       '@docxkit/core':
@@ -601,6 +633,22 @@ importers:
       pngjs:
         specifier: ^7.0.0
         version: 7.0.0
+
+  packages-plugins/glossary:
+    dependencies:
+      '@docxkit/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      docx:
+        specifier: ^9.15.0
+        version: 9.15.3
+    devDependencies:
+      '@docxkit/pdk':
+        specifier: workspace:*
+        version: link:../../packages/pdk
+      jszip:
+        specifier: ^3.10.2
+        version: 3.10.2
 
   packages-plugins/invoice:
     dependencies:
@@ -873,6 +921,9 @@ importers:
       '@docxkit/plugin-barcode':
         specifier: workspace:*
         version: link:../../packages-plugins/barcode
+      '@docxkit/plugin-bibliography':
+        specifier: workspace:*
+        version: link:../../packages-plugins/bibliography
       '@docxkit/plugin-callout':
         specifier: workspace:*
         version: link:../../packages-plugins/callout
@@ -888,6 +939,9 @@ importers:
       '@docxkit/plugin-cover-page':
         specifier: workspace:*
         version: link:../../packages-plugins/cover-page
+      '@docxkit/plugin-cross-reference':
+        specifier: workspace:*
+        version: link:../../packages-plugins/cross-reference
       '@docxkit/plugin-data-table':
         specifier: workspace:*
         version: link:../../packages-plugins/data-table
@@ -900,6 +954,9 @@ importers:
       '@docxkit/plugin-figure':
         specifier: workspace:*
         version: link:../../packages-plugins/figure
+      '@docxkit/plugin-glossary':
+        specifier: workspace:*
+        version: link:../../packages-plugins/glossary
       '@docxkit/plugin-invoice':
         specifier: workspace:*
         version: link:../../packages-plugins/invoice
@@ -1011,6 +1068,9 @@ importers:
       '@docxkit/plugin-barcode':
         specifier: workspace:*
         version: link:../../packages-plugins/barcode
+      '@docxkit/plugin-bibliography':
+        specifier: workspace:*
+        version: link:../../packages-plugins/bibliography
       '@docxkit/plugin-callout':
         specifier: workspace:*
         version: link:../../packages-plugins/callout
@@ -1026,6 +1086,9 @@ importers:
       '@docxkit/plugin-cover-page':
         specifier: workspace:*
         version: link:../../packages-plugins/cover-page
+      '@docxkit/plugin-cross-reference':
+        specifier: workspace:*
+        version: link:../../packages-plugins/cross-reference
       '@docxkit/plugin-data-table':
         specifier: workspace:*
         version: link:../../packages-plugins/data-table
@@ -1035,6 +1098,9 @@ importers:
       '@docxkit/plugin-figure':
         specifier: workspace:*
         version: link:../../packages-plugins/figure
+      '@docxkit/plugin-glossary':
+        specifier: workspace:*
+        version: link:../../packages-plugins/glossary
       '@docxkit/plugin-invoice':
         specifier: workspace:*
         version: link:../../packages-plugins/invoice

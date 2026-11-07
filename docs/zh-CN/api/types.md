@@ -12,7 +12,7 @@ docx-kit 的类型系统按功能划分。选择以下章节查看详细类型�
 | [样式](./style) | `DocxStyleRule`、`StyleSheet`、`StyleSheetEntry`、`BorderRule`、`FontWeight`、`defineStyles()`、`extends` 继承 |
 | [DSL 节点](./nodes) | `BlockNode`、`HeadingNode`、`ParagraphNode`、`ImageNode`、`TableNode`、`HyperlinkNode`、`BulletListNode` 及所有子类型 |
 | [构建器](./builder) | `DocxBuilder` 类 API、`createDocx()`、`renderDocx()`、`DocxSchema`、`span()`、`inlineImg()`、导出方法 |
-| [插件](./plugins) | `DocxPlugin`、`definePlugin()`、`PluginRenderContext`、全部 22 个内置插件的选项类型 |
+| [插件](./plugins) | `DocxPlugin`、`definePlugin()`、`PluginRenderContext`、全部 25 个内置插件的选项类型 |
 
 ## 工具类型
 

@@ -60,6 +60,9 @@ describe('buildFreeformPrompt', () => {
     expect(prompt).toContain('checklist')
     expect(prompt).toContain('figure')
     expect(prompt).toContain('metricCard')
+    expect(prompt).toContain('crossReference')
+    expect(prompt).toContain('bibliography')
+    expect(prompt).toContain('glossary')
   })
 
   it('includes user context when provided', () => {
@@ -100,6 +103,9 @@ describe('generateSchemaGuide', () => {
     expect(guide).toContain('checklist')
     expect(guide).toContain('figure')
     expect(guide).toContain('metricCard')
+    expect(guide).toContain('crossReference')
+    expect(guide).toContain('bibliography')
+    expect(guide).toContain('glossary')
     expect(guide).toContain('watermark')
     expect(guide).toContain('echarts')
   })

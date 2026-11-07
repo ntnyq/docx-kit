@@ -34,7 +34,7 @@ features:
     details: "鏈式呼叫 `.h1()`、`.p()`、`.table()`、`.image()`、`.section()` 與 `.plugin()`，以完整型別推斷逐步建置文件。"
 
   - icon: 🧩
-    title: 22 個內建外掛
+    title: 25 個內建外掛
     details: "內建外掛涵蓋徽章、條碼、提示區塊、程式碼區塊、封面、發票、二維碼、時間軸、目錄等常見內容。"
 
   - icon: 📦

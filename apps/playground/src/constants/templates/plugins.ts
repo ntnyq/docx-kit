@@ -2,7 +2,7 @@ import { unindent } from '@ntnyq/utils'
 import { CHECKLIST_BLOCK_CODE } from './checklist'
 
 /**
- * Plugins playground preset — showcases all 22 built-in plugins.
+ * Plugins playground preset — showcases all 25 built-in plugins.
  *
  * Plugin list:
  *   1. badge          — short status labels
@@ -27,6 +27,9 @@ import { CHECKLIST_BLOCK_CODE } from './checklist'
  *  20. checklist      — grouped Word checkbox tasks
  *  21. figure         — image with caption and source
  *  22. metricCard     — metric summary grid
+ *  23. crossReference — bookmark text, numbering and page fields
+ *  24. bibliography   — numeric references and linked citations
+ *  25. glossary       — terminology and abbreviation tables
  */
 export const PLUGIN_CODE = unindent(`
   import {
@@ -37,6 +40,9 @@ export const PLUGIN_CODE = unindent(`
     calloutPlugin,
     changelogPlugin,
     checklistPlugin,
+    crossReferencePlugin,
+    bibliographyPlugin,
+    glossaryPlugin,
     figurePlugin,
     metricCardPlugin,
     codeBlockPlugin,
@@ -67,6 +73,9 @@ export const PLUGIN_CODE = unindent(`
     .use(calloutPlugin())
     .use(changelogPlugin())
     .use(checklistPlugin())
+    .use(crossReferencePlugin())
+    .use(bibliographyPlugin())
+    .use(glossaryPlugin())
     .use(figurePlugin())
     .use(metricCardPlugin())
     .use(codeBlockPlugin())
@@ -90,7 +99,7 @@ export const PLUGIN_CODE = unindent(`
   // ════════════════════════════════════════════════════════════
   doc.plugin('coverPage', {
     title: 'docx-kit Built-in Plugins',
-    subtitle: 'All 22 plugins in one document',
+    subtitle: 'All 25 plugins in one document',
     author: 'Playground',
     date: new Date().toISOString().slice(0, 10),
     organization: 'docx-kit',
@@ -347,6 +356,16 @@ export const PLUGIN_CODE = unindent(`
         { label: 'Incidents', value: 0 },
       ],
     })
+
+  doc
+    .h1('21. Cross Reference')
+    .bookmark('pluginOverview', ['Plugin overview'])
+    .plugin('crossReference', { target: 'pluginOverview', prefix: 'See ', fallback: 'Plugin overview' })
+    .h1('22. Bibliography')
+    .plugin('bibliography', { entries: [{ id: 'guide', title: 'Document Generation Guide', authors: ['Alice'], year: '2026' }] })
+    .plugin('bibliography', { mode: 'citation', ids: ['guide'], entries: [{ id: 'guide', title: 'Document Generation Guide' }], prefix: 'See ' })
+    .h1('23. Glossary')
+    .plugin('glossary', { entries: [{ term: 'API', fullForm: 'Application Programming Interface', definition: 'A software interface.' }] })
 
   doc.toBlob()
 `)

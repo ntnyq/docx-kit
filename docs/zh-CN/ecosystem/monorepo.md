@@ -1,6 +1,6 @@
 # Monorepo 结构
 
-docx-kit 以 **pnpm workspace monorepo** 维护。文档涵盖当前工作区中的核心包、22 个插件包、3 个预设与 3 个主题。
+docx-kit 以 **pnpm workspace monorepo** 维护。文档涵盖当前工作区中的核心包、25 个插件包、3 个预设与 3 个主题。
 
 ## 目录结构
 
@@ -25,6 +25,9 @@ docx-kit/
 ├── packages-internal/
 │   └── app-shared/
 ├── packages-plugins/
+│   ├── cross-reference/
+│   ├── bibliography/
+│   ├── glossary/
 │   ├── badge/
 │   ├── barcode/
 │   ├── callout/
@@ -64,7 +67,7 @@ docx-kit/
 | ------------------- | ----- | ------------------------------------------------------------ |
 | `packages/` | 12 | 运行时、工具、AI、渲染器、Markdown 与共享类型 |
 | `packages-internal/` | 1 | 仓库内应用共享的私有源码包 |
-| `packages-plugins/` | 22 | 每个内置插件都有独立的包、测试与 README |
+| `packages-plugins/` | 25 | 每个内置插件都有独立的包、测试与 README |
 | `packages-presets/` | 3 | 常见文档类型的样式预设 |
 | `packages-themes/` | 3 | 基于令牌的配色主题 |
 

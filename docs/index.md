@@ -34,7 +34,7 @@ features:
     details: "Chain `.h1()`, `.p()`, `.table()`, `.image()`, `.section()` and `.plugin()` calls to build documents incrementally with strong type inference."
 
   - icon: 🧩
-    title: 22 Built-in Plugins
+    title: 25 Built-in Plugins
     details: "Built-in plugins cover badges, barcodes, callouts, code blocks, cover pages, invoices, QR codes, timelines, TOCs, and more."
 
   - icon: 📦

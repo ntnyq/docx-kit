@@ -33,6 +33,9 @@ This page is the package-level map of the current docx-kit monorepo. It compleme
 
 | Package | Focus |
 | --- | --- |
+| `@docxkit/plugin-cross-reference` | Bookmark text, number and page references |
+| `@docxkit/plugin-bibliography` | Numeric source lists and linked citations |
+| `@docxkit/plugin-glossary` | Sorted and grouped terminology tables |
 | `@docxkit/plugin-badge` | Status labels |
 | `@docxkit/plugin-barcode` | Linear barcodes |
 | `@docxkit/plugin-callout` | Admonition blocks |

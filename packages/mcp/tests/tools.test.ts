@@ -527,7 +527,7 @@ describe('buildPluginInfoList', () => {
   it('lists only built-in plugins available in Node.js', () => {
     const info = buildBuiltinPluginInfoList()
 
-    expect(info).toHaveLength(21)
+    expect(info).toHaveLength(24)
     expect(info.map(plugin => plugin.name)).not.toContain('echarts')
     expect(info.map(plugin => plugin.name)).toContain('signatureBlock')
     expect(info.map(plugin => plugin.name)).toContain('watermark')

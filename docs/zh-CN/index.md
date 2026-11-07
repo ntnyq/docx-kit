@@ -34,7 +34,7 @@ features:
     details: "链式调用 `.h1()`、`.p()`、`.table()`、`.image()`、`.section()` 与 `.plugin()`，以完整类型推断逐步构建文档。"
 
   - icon: 🧩
-    title: 22 个内置插件
+    title: 25 个内置插件
     details: "内置插件涵盖徽章、条形码、提示块、代码块、封面、发票、二维码、时间线、目录等常见内容。"
 
   - icon: 📦

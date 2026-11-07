@@ -185,6 +185,9 @@ export const guideLinks: LinkItem[] = [
 
 export const pluginLinks: LinkItem[] = [
   { link: '/plugins/', text: 'Overview' },
+  { link: '/plugins/cross-reference', text: 'Cross Reference' },
+  { link: '/plugins/bibliography', text: 'Bibliography' },
+  { link: '/plugins/glossary', text: 'Glossary' },
   { link: '/plugins/badge', text: 'Badge' },
   { link: '/plugins/barcode', text: 'Barcode' },
   { link: '/plugins/callout', text: 'Callout' },
@@ -260,6 +263,9 @@ export const zhExampleLinks: LinkItem[] = [
 
 export const zhPluginLinks: LinkItem[] = [
   { link: '/plugins/', text: '插件总览' },
+  { link: '/plugins/cross-reference', text: '交叉引用' },
+  { link: '/plugins/bibliography', text: '参考文献' },
+  { link: '/plugins/glossary', text: '术语与缩略语表' },
   { link: '/plugins/badge', text: '徽章' },
   { link: '/plugins/barcode', text: '条形码' },
   { link: '/plugins/callout', text: '提示块' },
@@ -335,6 +341,9 @@ export const zhTwExampleLinks: LinkItem[] = [
 
 export const zhTwPluginLinks: LinkItem[] = [
   { link: '/plugins/', text: '外掛總覽' },
+  { link: '/plugins/cross-reference', text: '交叉參照' },
+  { link: '/plugins/bibliography', text: '參考文獻' },
+  { link: '/plugins/glossary', text: '術語與縮寫表' },
   { link: '/plugins/badge', text: '徽章' },
   { link: '/plugins/barcode', text: '條碼' },
   { link: '/plugins/callout', text: '提示區塊' },

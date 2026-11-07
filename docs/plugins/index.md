@@ -1,11 +1,14 @@
 # Plugins
 
-docx-kit currently ships with **22 built-in plugins**. Each plugin lives in its own workspace package under `packages-plugins/`, can be registered with `.use(...)`, and is invoked through `.plugin(name, options)`.
+docx-kit currently ships with **25 built-in plugins**. Each plugin lives in its own workspace package under `packages-plugins/`, can be registered with `.use(...)`, and is invoked through `.plugin(name, options)`.
 
 ## Catalog
 
 | Plugin | Package | Node Name | Description |
 | --- | --- | --- | --- |
+| [Cross Reference](./cross-reference) | `@docxkit/plugin-cross-reference` | `crossReference` | Bookmark text, number and page references |
+| [Bibliography](./bibliography) | `@docxkit/plugin-bibliography` | `bibliography` | Numeric source lists and linked citations |
+| [Glossary](./glossary) | `@docxkit/plugin-glossary` | `glossary` | Sorted and grouped terminology tables |
 | [Badge](./badge) | `@docxkit/plugin-badge` | `badge` | Status chips and short labels |
 | [Barcode](./barcode) | `@docxkit/plugin-barcode` | `barcode` | Code 128, EAN, UPC, and other linear barcodes |
 | [Callout](./callout) | `@docxkit/plugin-callout` | `callout` | Info, warning, success, and danger boxes |
@@ -47,6 +50,7 @@ const doc = createDocx()
 
 | Plugin | Extra dependency or runtime note |
 | --- | --- |
+| `crossReference` | Word fields need refreshing; previews use cached fallback text |
 | `barcode` | Requires the `bwip-js` package |
 | `codeBlock` | Optional `highlight.js` peer dependency for syntax coloring |
 | `echarts` | Requires `echarts`; browser DOM is the primary target |

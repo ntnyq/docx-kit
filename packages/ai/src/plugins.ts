@@ -14,6 +14,22 @@ interface BuiltinPluginGuide {
  */
 export const BUILTIN_PLUGIN_GUIDES: readonly BuiltinPluginGuide[] = [
   entry(
+    'crossReference',
+    'Bookmark text, number or page references using Word fields; create the target bookmark separately and update fields in Word',
+    '{ type: "plugin", name: "crossReference", options: { target: "overview", kind: "text", prefix: "See ", fallback: "Overview" } }',
+  ),
+  entry(
+    'bibliography',
+    'Numeric source lists and citation paragraphs; catalog order determines stable numbers, citation mode uses ids and the same entries catalog',
+    '{ type: "plugin", name: "bibliography", options: { entries: [{ id: "report", title: "Annual report", authors: ["Alice"], year: "2026" }] } }',
+  ),
+  entry(
+    'glossary',
+    'Sorted and grouped terms, abbreviations, full forms and definitions',
+    '{ type: "plugin", name: "glossary", options: { entries: [{ term: "API", fullForm: "Application Programming Interface", definition: "A software interface", group: "Software" }], groupBy: "group" } }',
+  ),
+
+  entry(
     'checklist',
     'Grouped checkbox tasks with owners and notes',
     '{ type: "plugin", name: "checklist", options: { items: [{ text: "Review release", checked: true, owner: "Alice", group: "Release" }] } }',

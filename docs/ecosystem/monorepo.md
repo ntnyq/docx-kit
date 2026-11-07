@@ -1,6 +1,6 @@
 # Monorepo Structure
 
-docx-kit is maintained as a **pnpm workspace monorepo**. The documentation site should reflect the workspace as it exists today, which means the core packages, 22 plugin packages, 3 presets, and 3 themes all have a place in the docs.
+docx-kit is maintained as a **pnpm workspace monorepo**. The documentation site should reflect the workspace as it exists today, which means the core packages, 25 plugin packages, 3 presets, and 3 themes all have a place in the docs.
 
 ## Directory Layout
 
@@ -25,6 +25,9 @@ docx-kit/
 ├── packages-internal/
 │   └── app-shared/
 ├── packages-plugins/
+│   ├── cross-reference/
+│   ├── bibliography/
+│   ├── glossary/
 │   ├── badge/
 │   ├── barcode/
 │   ├── callout/
@@ -64,7 +67,7 @@ docx-kit/
 | ------------------- | ----- | ------------------------------------------------------------ |
 | `packages/`         | 12    | Runtime, tooling, AI, renderer, Markdown, and shared types   |
 | `packages-internal/` | 1 | Private source packages shared by repository applications |
-| `packages-plugins/` | 22    | Every built-in plugin has its own package, tests, and README |
+| `packages-plugins/` | 25    | Every built-in plugin has its own package, tests, and README |
 | `packages-presets/` | 3     | Style presets for common document families                   |
 | `packages-themes/`  | 3     | Token-based themes for color systems                         |
 

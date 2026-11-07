@@ -24,8 +24,9 @@ const doc = createDocx()
 
 ## 内置插件范围
 
-当前工作区包含 **22 个内置插件**：
+当前工作区包含 **25 个内置插件**：
 
+- 引用与术语: `crossReference`, `bibliography`, `glossary`
 - 内容块：`badge`、`callout`、`checklist`、`codeBlock`、`divider`、`watermark`
 - 报告结构：`coverPage`、`letterhead`、`toc`、`pageNumber`
 - 结构化业务数据：`dataTable`、`metricCard`、`propertyTable`、`timeline`、`invoice`、`meetingMinutes`、`changelog`
@@ -40,6 +41,9 @@ const doc = createDocx()
 
 ```text
 packages-plugins/
+  cross-reference/
+  bibliography/
+  glossary/
   badge/
   barcode/
   callout/

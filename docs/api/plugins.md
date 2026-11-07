@@ -95,9 +95,27 @@ Margin shorthand can mix lengths and theme tokens, for example `margin: '$spacin
 
 ## Built-in Plugin Option Types
 
-All 22 built-in plugins and their option types.
+All 25 built-in plugins and their option types.
 
 Every built-in factory accepts an optional `<Plugin>Config` with default `styles`; each invocation accepts its own typed `styles`. See [Callout](/plugins/callout#style-customization) and [DataTable](/plugins/data-table#style-customization) for part styles, precedence and JSON DSL examples.
+
+### `CrossReferenceOptions`
+
+Factories, options, defaults and complete examples: [Cross Reference](../plugins/cross-reference.md).
+
+`crossReferencePlugin` / `CrossReferenceConfig` / `CrossReferenceStyles`
+
+### `BibliographyOptions`
+
+Factories, options, defaults and complete examples: [Bibliography](../plugins/bibliography.md).
+
+`bibliographyPlugin` / `BibliographyConfig` / `BibliographyStyles` / `BibliographyEntry` / `BibliographyBaseOptions` / `BibliographyListOptions` / `BibliographyCitationOptions`
+
+### `GlossaryOptions`
+
+Factories, options, defaults and complete examples: [Glossary](../plugins/glossary.md).
+
+`glossaryPlugin` / `GlossaryConfig` / `GlossaryStyles` / `GlossaryEntry`
 
 ### `BadgeOptions`
 
@@ -495,6 +513,9 @@ interface WatermarkOptions {
 | `pageNumberPlugin`     | `pageNumber`     | Paragraph                    | No     | —                         |
 | `propertyTablePlugin`  | `propertyTable`  | Table                        | No     | —                         |
 | `qrcodePlugin`         | `qrcode`         | Paragraph(s)                 | Yes    | `qrcode`                  |
+| `crossReferencePlugin` | `crossReference` | Paragraph | No | — |
+| `bibliographyPlugin` | `bibliography` | Paragraph[] | No | — |
+| `glossaryPlugin` | `glossary` | (Paragraph \| Table)[] | No | — |
 | `checklistPlugin`     | `checklist`      | Paragraph[]                  | No     | —                         |
 | `figurePlugin`        | `figure`         | Paragraph[]                  | Yes    | —                         |
 | `metricCardPlugin`    | `metricCard`     | Table or Paragraph           | No     | —                         |
@@ -509,6 +530,9 @@ Pass `{ styles }` to the factory for instance defaults, and `options.styles` for
 
 | Plugin | Config / Styles | TextStyleRule | ParagraphStyleRule | CellStyleRule (without height) |
 | --- | --- | --- | --- | --- |
+| [crossReferencePlugin](../plugins/cross-reference.md) | `CrossReferenceConfig` / `CrossReferenceStyles` | text | paragraph | — |
+| [bibliographyPlugin](../plugins/bibliography.md) | `BibliographyConfig` / `BibliographyStyles` | citation / entry / title | citationParagraph / entryParagraph / titleParagraph | — |
+| [glossaryPlugin](../plugins/glossary.md) | `GlossaryConfig` / `GlossaryStyles` | definition / fullForm / group / headerText / term / title | bodyParagraph / groupParagraph / headerParagraph / titleParagraph | bodyCell / headerCell |
 | [badgePlugin](../plugins/badge.md) | `BadgeConfig` / `BadgeStyles` | `text` | `paragraph` | — |
 | [dividerPlugin](../plugins/divider.md) | `DividerConfig` / `DividerStyles` | — | `paragraph` | — |
 | [pageNumberPlugin](../plugins/page-number.md) | `PageNumberConfig` / `PageNumberStyles` | `text` | `paragraph` | — |

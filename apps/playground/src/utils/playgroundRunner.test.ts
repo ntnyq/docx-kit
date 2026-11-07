@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   CHECKLIST_CODE,
   COMPREHENSIVE_CODE,
+  REFERENCES_CODE,
   RICH_CONTENT_CODE,
 } from '../constants/templates'
 import { executePlaygroundCode } from './playgroundRunner'
@@ -11,15 +12,18 @@ import { prepareCode } from './prepareCode'
 const BUILTIN_PLUGIN_FACTORIES = {
   badge: docxKit.badgePlugin,
   barcode: docxKit.barcodePlugin,
+  bibliography: docxKit.bibliographyPlugin,
   callout: docxKit.calloutPlugin,
   changelog: docxKit.changelogPlugin,
   checklist: docxKit.checklistPlugin,
   codeBlock: docxKit.codeBlockPlugin,
   coverPage: docxKit.coverPagePlugin,
+  crossReference: docxKit.crossReferencePlugin,
   dataTable: docxKit.dataTablePlugin,
   divider: docxKit.dividerPlugin,
   echarts: docxKit.echartsPlugin,
   figure: docxKit.figurePlugin,
+  glossary: docxKit.glossaryPlugin,
   invoice: docxKit.invoicePlugin,
   letterhead: docxKit.letterheadPlugin,
   meetingMinutes: docxKit.meetingMinutesPlugin,
@@ -125,6 +129,12 @@ describe('playground runtime', () => {
       executePlaygroundCode(RICH_CONTENT_CODE),
     ).resolves.toBeInstanceOf(Blob)
   }, 20_000)
+
+  it('runs the reference and glossary example', async () => {
+    await expect(
+      executePlaygroundCode(REFERENCES_CODE),
+    ).resolves.toBeInstanceOf(Blob)
+  })
 
   it('runs the complete checklist example', async () => {
     await expect(executePlaygroundCode(CHECKLIST_CODE)).resolves.toBeInstanceOf(

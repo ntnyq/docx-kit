@@ -95,9 +95,27 @@ Margin 簡寫可混合長度與主題 token，例如 `margin: '$spacing.sm $spac
 
 ## 內建外掛選項型別
 
-全部 22 個內建外掛及其選項型別。
+全部 25 個內建外掛及其選項型別。
 
 所有內建工廠都支援可選的 `<Plugin>Config` 預設 `styles`，單次呼叫也支援對應的型別安全部位 `styles`。部位樣式、優先順序及 JSON DSL 範例見 [Callout](/zh-TW/plugins/callout#樣式自訂) 和 [DataTable](/zh-TW/plugins/data-table#樣式自訂)。
+
+### `CrossReferenceOptions`
+
+工廠、選項、預設值與完整範例：[交叉參照](../plugins/cross-reference.md)。
+
+`crossReferencePlugin` / `CrossReferenceConfig` / `CrossReferenceStyles`
+
+### `BibliographyOptions`
+
+工廠、選項、預設值與完整範例：[參考文獻](../plugins/bibliography.md)。
+
+`bibliographyPlugin` / `BibliographyConfig` / `BibliographyStyles` / `BibliographyEntry` / `BibliographyBaseOptions` / `BibliographyListOptions` / `BibliographyCitationOptions`
+
+### `GlossaryOptions`
+
+工廠、選項、預設值與完整範例：[術語與縮寫表](../plugins/glossary.md)。
+
+`glossaryPlugin` / `GlossaryConfig` / `GlossaryStyles` / `GlossaryEntry`
 
 ### `BadgeOptions`
 
@@ -495,6 +513,9 @@ interface WatermarkOptions {
 | `pageNumberPlugin` | `pageNumber` | 段落 | 否 | — |
 | `propertyTablePlugin` | `propertyTable` | 表格 | 否 | — |
 | `qrcodePlugin` | `qrcode` | 一個或多個段落 | 是 | `qrcode` |
+| `crossReferencePlugin` | `crossReference` | Paragraph | No | — |
+| `bibliographyPlugin` | `bibliography` | Paragraph[] | No | — |
+| `glossaryPlugin` | `glossary` | (Paragraph \| Table)[] | No | — |
 | `checklistPlugin` | `checklist` | 段落陣列 | 否 | — |
 | `figurePlugin` | `figure` | 段落陣列 | 是 | — |
 | `metricCardPlugin` | `metricCard` | 表格或段落 | 否 | — |
@@ -509,6 +530,9 @@ interface WatermarkOptions {
 
 | 外掛 | 設定 / 樣式型別 | 文字部位 | 段落部位 | 儲存格部位（不含 height） |
 | --- | --- | --- | --- | --- |
+| [crossReferencePlugin](../plugins/cross-reference.md) | `CrossReferenceConfig` / `CrossReferenceStyles` | text | paragraph | — |
+| [bibliographyPlugin](../plugins/bibliography.md) | `BibliographyConfig` / `BibliographyStyles` | citation / entry / title | citationParagraph / entryParagraph / titleParagraph | — |
+| [glossaryPlugin](../plugins/glossary.md) | `GlossaryConfig` / `GlossaryStyles` | definition / fullForm / group / headerText / term / title | bodyParagraph / groupParagraph / headerParagraph / titleParagraph | bodyCell / headerCell |
 | [badgePlugin](../plugins/badge.md) | `BadgeConfig` / `BadgeStyles` | `text` | `paragraph` | — |
 | [dividerPlugin](../plugins/divider.md) | `DividerConfig` / `DividerStyles` | — | `paragraph` | — |
 | [pageNumberPlugin](../plugins/page-number.md) | `PageNumberConfig` / `PageNumberStyles` | `text` | `paragraph` | — |

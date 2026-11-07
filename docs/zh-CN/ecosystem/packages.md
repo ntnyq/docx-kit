@@ -33,6 +33,9 @@
 
 | 包 | 功能 |
 | --- | --- |
+| `@docxkit/plugin-cross-reference` | 书签文字、编号与页码引用 |
+| `@docxkit/plugin-bibliography` | 数字编号文献列表与引用 |
+| `@docxkit/plugin-glossary` | 排序分组的术语和缩略语表 |
 | `@docxkit/plugin-badge` | 状态标签 |
 | `@docxkit/plugin-barcode` | 一维条形码 |
 | `@docxkit/plugin-callout` | 提示块 |

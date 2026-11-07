@@ -1,11 +1,14 @@
 # 插件
 
-docx-kit 当前提供 **22 个内置插件**，各自位于 `packages-plugins/` 下的独立工作区包中，通过 `.use(...)` 注册，再通过 `.plugin(name, options)` 调用。
+docx-kit 当前提供 **25 个内置插件**，各自位于 `packages-plugins/` 下的独立工作区包中，通过 `.use(...)` 注册，再通过 `.plugin(name, options)` 调用。
 
 ## 插件目录
 
 | 插件 | 包 | 节点名称 | 说明 |
 | --- | --- | --- | --- |
+| [交叉引用](./cross-reference) | `@docxkit/plugin-cross-reference` | `crossReference` | 书签文字、编号与页码引用 |
+| [参考文献](./bibliography) | `@docxkit/plugin-bibliography` | `bibliography` | 数字编号文献列表与引用 |
+| [术语与缩略语表](./glossary) | `@docxkit/plugin-glossary` | `glossary` | 排序分组的术语和缩略语表 |
 | [徽章](./badge) | `@docxkit/plugin-badge` | `badge` | 状态标记与短标签 |
 | [条形码](./barcode) | `@docxkit/plugin-barcode` | `barcode` | Code 128、EAN、UPC 等一维条形码 |
 | [提示块](./callout) | `@docxkit/plugin-callout` | `callout` | 信息、警告、成功与危险提示框 |
@@ -47,6 +50,7 @@ const doc = createDocx()
 
 | 插件 | 额外依赖或运行时说明 |
 | --- | --- |
+| `crossReference` | Word 中更新域；预览显示 fallback 缓存文字 |
 | `barcode` | 需要 `bwip-js` 包 |
 | `codeBlock` | 语法着色需要可选 `highlight.js` 对等依赖 |
 | `echarts` | 需要 `echarts`，主要用于浏览器 DOM 环境 |

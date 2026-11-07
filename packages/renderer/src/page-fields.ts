@@ -3,7 +3,7 @@ type PageField = 'NUMPAGES' | 'PAGE'
 const FIELD_CLASS_PREFIX = 'docx-kit-page-field-'
 
 /**
- * Adapt complex PAGE/NUMPAGES fields that docx-preview otherwise discards.
+ * Adapt complex PAGE/NUMPAGES fields and cached REF/PAGEREF hyperlinks.
  * Only the parsed preview tree changes; exported DOCX fields stay dynamic.
  */
 export function preparePageFields(document: unknown) {
@@ -68,6 +68,7 @@ function prepareNode(node: Record<string, unknown>) {
     let depth = 0
     let instruction = ''
     let end = index
+    let separator = -1
     for (; end < children.length; end++) {
       for (const child of getChildren(children[end])) {
         if (child.type === 'complexField') {
@@ -77,6 +78,9 @@ function prepareNode(node: Record<string, unknown>) {
           if (child.charType === 'end') {
             depth--
           }
+          if (child.charType === 'separate' && depth === 1) {
+            separator = end
+          }
         } else if (child.type === 'instruction' && depth === 1) {
           instruction += child.text
         }
@@ -84,6 +88,34 @@ function prepareNode(node: Record<string, unknown>) {
       if (depth === 0) {
         break
       }
+    }
+    const reference =
+      /^\s*(?:REF|PAGEREF)\s+([A-Z]\w{0,39})(?:\s+\\[hw])*\s*$/i.exec(
+        instruction,
+      )
+    if (
+      reference
+      && /\\h(?:\s|$)/i.test(instruction)
+      && separator >= index
+      && end < children.length
+    ) {
+      // Keep hyperlinks out of the exported field cache: some Word readers
+      // retain them alongside refreshed results, duplicating the reference.
+      // The preview alone wraps cached runs; Word uses the native \h switch.
+      for (let cursor = separator + 1; cursor < end; cursor++) {
+        const cachedRun = children[cursor]
+        if (cachedRun.type !== 'run' || cachedRun.fieldRun) {
+          continue
+        }
+        const run = { ...cachedRun, parent: cachedRun }
+        Object.assign(cachedRun, {
+          anchor: reference[1],
+          children: [run],
+          type: 'hyperlink',
+        })
+      }
+      index = end
+      continue
     }
     const field = /^\s*(PAGE|NUMPAGES)\s*(?:\\\*\s+MERGEFORMAT\s*)?$/i
       .exec(instruction)?.[1]

@@ -189,7 +189,7 @@ import { createDocxKitServer } from 'docx-kit/mcp'
 
 ### 使用內建外掛（二維碼、圖表、簽名等）
 
-→ [外掛指南](/zh-TW/guide/plugins) — 22 個內建外掛
+→ [外掛指南](/zh-TW/guide/plugins) — 25 個內建外掛
 
 ## 詳細閱讀
 

@@ -189,7 +189,7 @@ import { createDocxKitServer } from 'docx-kit/mcp'
 
 ### 使用内置插件（二维码、图表、签名等）
 
-→ [插件指南](/zh-CN/guide/plugins) — 22 个内置插件
+→ [插件指南](/zh-CN/guide/plugins) — 25 个内置插件
 
 ## 详细阅读
 

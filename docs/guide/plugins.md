@@ -24,8 +24,9 @@ const doc = createDocx()
 
 ## Built-in Coverage
 
-docx-kit now includes **22 built-in plugins** across the workspace:
+docx-kit now includes **25 built-in plugins** across the workspace:
 
+- References and terminology: `crossReference`, `bibliography`, `glossary`
 - Content blocks: `badge`, `callout`, `checklist`, `codeBlock`, `divider`, `watermark`
 - Report scaffolding: `coverPage`, `letterhead`, `toc`, `pageNumber`
 - Structured business data: `dataTable`, `metricCard`, `propertyTable`, `timeline`, `invoice`, `meetingMinutes`, `changelog`
@@ -40,6 +41,9 @@ Each built-in plugin is published as its own package under `packages-plugins/`:
 
 ```text
 packages-plugins/
+  cross-reference/
+  bibliography/
+  glossary/
   badge/
   barcode/
   callout/

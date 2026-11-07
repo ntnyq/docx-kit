@@ -7,15 +7,18 @@
 
 import type { BadgeOptions } from '@docxkit/plugin-badge'
 import type { BarcodeOptions } from '@docxkit/plugin-barcode'
+import type { BibliographyOptions } from '@docxkit/plugin-bibliography'
 import type { CalloutOptions } from '@docxkit/plugin-callout'
 import type { ChangelogOptions } from '@docxkit/plugin-changelog'
 import type { ChecklistOptions } from '@docxkit/plugin-checklist'
 import type { CodeBlockOptions } from '@docxkit/plugin-code-block'
 import type { CoverPageOptions } from '@docxkit/plugin-cover-page'
+import type { CrossReferenceOptions } from '@docxkit/plugin-cross-reference'
 import type { DataTableOptions } from '@docxkit/plugin-data-table'
 import type { DividerOptions } from '@docxkit/plugin-divider'
 import type { EChartsPluginOptions } from '@docxkit/plugin-echarts'
 import type { FigureOptions } from '@docxkit/plugin-figure'
+import type { GlossaryOptions } from '@docxkit/plugin-glossary'
 import type { InvoiceOptions } from '@docxkit/plugin-invoice'
 import type { LetterheadOptions } from '@docxkit/plugin-letterhead'
 import type { MeetingMinutesOptions } from '@docxkit/plugin-meeting-minutes'
@@ -32,15 +35,18 @@ declare module '@docxkit/core' {
   export interface BuiltinPluginMap {
     badge: BadgeOptions
     barcode: BarcodeOptions
+    bibliography: BibliographyOptions
     callout: CalloutOptions
     changelog: ChangelogOptions
     checklist: ChecklistOptions
     codeBlock: CodeBlockOptions
     coverPage: CoverPageOptions
+    crossReference: CrossReferenceOptions
     dataTable: DataTableOptions
     divider: DividerOptions
     echarts: EChartsPluginOptions
     figure: FigureOptions
+    glossary: GlossaryOptions
     invoice: InvoiceOptions
     letterhead: LetterheadOptions
     meetingMinutes: MeetingMinutesOptions

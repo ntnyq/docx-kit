@@ -1,11 +1,14 @@
 # 外掛
 
-docx-kit 目前提供 **22 個內建外掛**，各自位於 `packages-plugins/` 下的獨立工作區包中，透過 `.use(...)` 註冊，再透過 `.plugin(name, options)` 呼叫。
+docx-kit 目前提供 **25 個內建外掛**，各自位於 `packages-plugins/` 下的獨立工作區包中，透過 `.use(...)` 註冊，再透過 `.plugin(name, options)` 呼叫。
 
 ## 外掛目錄
 
 | 外掛 | 套件 | 節點名稱 | 說明 |
 | --- | --- | --- | --- |
+| [交叉參照](./cross-reference) | `@docxkit/plugin-cross-reference` | `crossReference` | 書籤文字、編號與頁碼參照 |
+| [參考文獻](./bibliography) | `@docxkit/plugin-bibliography` | `bibliography` | 數字編號文獻清單與引用 |
+| [術語與縮寫表](./glossary) | `@docxkit/plugin-glossary` | `glossary` | 排序分組的術語與縮寫表 |
 | [徽章](./badge) | `@docxkit/plugin-badge` | `badge` | 狀態標記與短標籤 |
 | [條碼](./barcode) | `@docxkit/plugin-barcode` | `barcode` | Code 128、EAN、UPC 等一維條碼 |
 | [提示區塊](./callout) | `@docxkit/plugin-callout` | `callout` | 資訊、警告、成功與危險提示框 |
@@ -47,6 +50,7 @@ const doc = createDocx()
 
 | 外掛 | 額外相依或執行階段說明 |
 | --- | --- |
+| `crossReference` | 在 Word 中更新功能變數；預覽顯示 fallback 快取文字 |
 | `barcode` | 需要 `bwip-js` 包 |
 | `codeBlock` | 語法著色需要可選 `highlight.js` 同儕相依套件 |
 | `echarts` | 需要 `echarts`，主要用於瀏覽器 DOM 環境 |

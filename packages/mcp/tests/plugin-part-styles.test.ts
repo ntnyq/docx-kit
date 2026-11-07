@@ -21,6 +21,12 @@ const aiSchema = generateToolDefinitions().find(
 const validateAi = new Ajv({ strict: false }).compile(aiSchema ?? {})
 const callout = { content: 'Message', title: 'Note', type: 'info' }
 const table = { data: [{ score: 1 }, { score: 2 }], striped: true }
+const requiredOptions: Record<string, object> = {
+  callout,
+  crossReference: { target: 'chapter' },
+  dataTable: table,
+  glossary: { entries: [] },
+}
 const node = (name: string, options: unknown) => ({
   name,
   options,
@@ -53,6 +59,17 @@ describe('plugin part style contracts', () => {
   })
 
   it.each([
+    ['crossReference', { target: 'bad target' }, '/target'],
+    ['crossReference', { target: 'chapter\n' }, '/target'],
+    ['crossReference', { kind: 'relative', target: 'chapter' }, '/kind'],
+    ['bibliography', { mode: 'citation' }, '/ids'],
+    [
+      'bibliography',
+      { entries: [{ id: 'source', title: '  ' }] },
+      '/entries/0/title',
+    ],
+    ['glossary', { entries: [{ term: 'API' }] }, '/entries/0/definition'],
+    ['glossary', { entries: [], sort: 'random' }, '/sort'],
     [
       'dataTable',
       { ...table, styles: { bodyCell: { height: 20 } } },
@@ -105,8 +122,7 @@ describe('plugin part style contracts', () => {
     BUILTIN_PLUGIN_OPTION_SCHEMAS,
   )) {
     it(`validates every ${name} part consistently across AI, resource and runtime schemas`, () => {
-      const base =
-        name === 'callout' ? callout : name === 'dataTable' ? table : {}
+      const base = requiredOptions[name] ?? {}
       for (const part of Object.keys(contract.properties.styles.properties)) {
         const valid = {
           content: [node(name, { ...base, styles: { [part]: {} } })],

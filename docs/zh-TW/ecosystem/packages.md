@@ -33,6 +33,9 @@
 
 | 套件 | 功能 |
 | --- | --- |
+| `@docxkit/plugin-cross-reference` | 書籤文字、編號與頁碼參照 |
+| `@docxkit/plugin-bibliography` | 數字編號文獻清單與引用 |
+| `@docxkit/plugin-glossary` | 排序分組的術語與縮寫表 |
 | `@docxkit/plugin-badge` | 狀態標籤 |
 | `@docxkit/plugin-barcode` | 一維條碼 |
 | `@docxkit/plugin-callout` | 提示區塊 |

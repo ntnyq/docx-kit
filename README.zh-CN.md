@@ -34,7 +34,7 @@
 
 - **CSS 风格的样式** — `fontSize`、`color`、`margin`、`border`……像写 CSS 一样定义文档样式
 - **链式构建 API** — `.h1()`、`.p()`、`.table()`、`.image()`、`.use().plugin()`
-- **22 个内置插件** — 条形码、二维码、ECharts、代码块、发票、目录等
+- **25 个内置插件** — 条形码、二维码、ECharts、代码块、发票、目录等
 - **样式预设** — `classic`（公文）、`modern`（商务）、`academic`（论文）
 - **主题** — `minimal`、`ocean`、`warm`，支持设计令牌（`$colors.primary`）
 - **JSON DSL** — 使用 `renderDocx()`，支持由 AI / 大语言模型驱动的文档生成
@@ -90,8 +90,11 @@ await doc.save('output.docx') // Node.js 入口
 
 ## 插件
 
-22 个内置插件：
+25 个内置插件：
 
+- [交叉引用](https://docx-kit.ntnyq.dev/zh-CN/plugins/cross-reference)
+- [参考文献](https://docx-kit.ntnyq.dev/zh-CN/plugins/bibliography)
+- [术语与缩略语表](https://docx-kit.ntnyq.dev/zh-CN/plugins/glossary)
 - [徽章](https://docx-kit.ntnyq.dev/zh-CN/plugins/badge)
 - [条形码](https://docx-kit.ntnyq.dev/zh-CN/plugins/barcode)
 - [提示块](https://docx-kit.ntnyq.dev/zh-CN/plugins/callout)

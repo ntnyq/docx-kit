@@ -34,7 +34,7 @@
 
 - **CSS-like styling** — `fontSize`, `color`, `margin`, `border`... just like CSS
 - **Fluent builder API** — `.h1()` `.p()` `.table()` `.image()` `.use().plugin()`
-- **22 built-in plugins** — Barcodes, QR codes, ECharts, code blocks, invoices, TOCs, and more
+- **25 built-in plugins** — Barcodes, QR codes, ECharts, code blocks, invoices, TOCs, and more
 - **Style presets** — `classic` (gov-doc), `modern` (business), `academic` (thesis)
 - **Themes** — `minimal`, `ocean`, `warm` with token system (`$colors.primary`)
 - **JSON DSL** — `renderDocx()` for AI/LLM-driven document generation
@@ -90,8 +90,11 @@ await doc.save('output.docx') // Node.js entry
 
 ## Plugins
 
-22 built-in plugins:
+25 built-in plugins:
 
+- [Cross Reference](https://docx-kit.ntnyq.dev/plugins/cross-reference)
+- [Bibliography](https://docx-kit.ntnyq.dev/plugins/bibliography)
+- [Glossary](https://docx-kit.ntnyq.dev/plugins/glossary)
 - [Badge](https://docx-kit.ntnyq.dev/plugins/badge)
 - [Barcode](https://docx-kit.ntnyq.dev/plugins/barcode)
 - [Callout](https://docx-kit.ntnyq.dev/plugins/callout)

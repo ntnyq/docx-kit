@@ -38,6 +38,15 @@ const HEADER = [
 ]
 
 const WORKSPACE_MODULES = [
+  ['@docxkit/plugin-glossary', 'packages-plugins/glossary/dist/index.d.ts'],
+  [
+    '@docxkit/plugin-bibliography',
+    'packages-plugins/bibliography/dist/index.d.ts',
+  ],
+  [
+    '@docxkit/plugin-cross-reference',
+    'packages-plugins/cross-reference/dist/index.d.ts',
+  ],
   ['docx-kit', 'packages/docx-kit/dist/browser.d.ts'],
   ['@docxkit/core', 'packages/core/dist/index.d.ts'],
   ['@docxkit/errors', 'packages/errors/dist/index.d.ts'],

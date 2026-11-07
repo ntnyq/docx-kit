@@ -24,8 +24,9 @@ const doc = createDocx()
 
 ## 內建外掛範圍
 
-目前工作區包含 **22 個內建外掛**：
+目前工作區包含 **25 個內建外掛**：
 
+- 參照與術語: `crossReference`, `bibliography`, `glossary`
 - 內容區塊：`badge`、`callout`、`checklist`、`codeBlock`、`divider`、`watermark`
 - 報告結構：`coverPage`、`letterhead`、`toc`、`pageNumber`
 - 結構化業務資料：`dataTable`、`metricCard`、`propertyTable`、`timeline`、`invoice`、`meetingMinutes`、`changelog`
@@ -40,6 +41,9 @@ const doc = createDocx()
 
 ```text
 packages-plugins/
+  cross-reference/
+  bibliography/
+  glossary/
   badge/
   barcode/
   callout/

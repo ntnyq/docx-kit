@@ -1,14 +1,17 @@
 import { BUILTIN_PLUGIN_GUIDES } from '@docxkit/ai'
 import { badgePlugin } from '@docxkit/plugin-badge'
 import { barcodePlugin } from '@docxkit/plugin-barcode'
+import { bibliographyPlugin } from '@docxkit/plugin-bibliography'
 import { calloutPlugin } from '@docxkit/plugin-callout'
 import { changelogPlugin } from '@docxkit/plugin-changelog'
 import { checklistPlugin } from '@docxkit/plugin-checklist'
 import { codeBlockPlugin } from '@docxkit/plugin-code-block'
 import { coverPagePlugin } from '@docxkit/plugin-cover-page'
+import { crossReferencePlugin } from '@docxkit/plugin-cross-reference'
 import { dataTablePlugin } from '@docxkit/plugin-data-table'
 import { dividerPlugin } from '@docxkit/plugin-divider'
 import { figurePlugin } from '@docxkit/plugin-figure'
+import { glossaryPlugin } from '@docxkit/plugin-glossary'
 import { invoicePlugin } from '@docxkit/plugin-invoice'
 import { letterheadPlugin } from '@docxkit/plugin-letterhead'
 import { meetingMinutesPlugin } from '@docxkit/plugin-meeting-minutes'
@@ -28,14 +31,17 @@ const BUILTIN_FACTORIES: Partial<
 > = {
   badge: badgePlugin,
   barcode: barcodePlugin,
+  bibliography: bibliographyPlugin,
   callout: calloutPlugin,
   changelog: changelogPlugin,
   checklist: checklistPlugin,
   codeBlock: codeBlockPlugin,
   coverPage: coverPagePlugin,
+  crossReference: crossReferencePlugin,
   dataTable: dataTablePlugin,
   divider: dividerPlugin,
   figure: figurePlugin,
+  glossary: glossaryPlugin,
   invoice: invoicePlugin,
   letterhead: letterheadPlugin,
   meetingMinutes: meetingMinutesPlugin,

@@ -2,10 +2,13 @@ import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { PNG } from 'pngjs'
 import {
+  bibliographyPlugin,
   calloutPlugin,
   createDocx,
+  crossReferencePlugin,
   dataTablePlugin,
   defineStyles,
+  glossaryPlugin,
   letterheadPlugin,
   modernPreset,
   oceanTheme,
@@ -69,6 +72,11 @@ const fixtures = [
     build: buildImageAndColumnsFixture,
     expectedPages: 1,
     name: '10-images-and-columns',
+  },
+  {
+    build: buildReferencesFixture,
+    expectedPages: 2,
+    name: '11-references-and-glossary',
   },
 ]
 
@@ -268,6 +276,78 @@ function buildListsFixture() {
       ],
       { numberingFormat: 'upperRoman', start: 3 },
     )
+}
+
+function buildReferencesFixture() {
+  const entries = [
+    {
+      authors: ['Alice Chen'],
+      id: 'architecture',
+      publisher: 'Example Press',
+      title: 'Document Architecture',
+      year: '2026',
+    },
+    {
+      authors: ['Bob Lin'],
+      id: 'api',
+      title: 'API Design Notes',
+      url: 'https://example.com/api',
+      year: '2025',
+    },
+  ]
+  return createBaseDocument('References and Glossary')
+    .use(crossReferencePlugin())
+    .use(bibliographyPlugin({ entries }))
+    .use(glossaryPlugin())
+    .bookmark('overview', ['Architecture overview'])
+    .p(
+      'This report describes the document-generation interface and its supporting sources.',
+    )
+    .plugin('bibliography', {
+      ids: ['architecture', 'api', 'architecture'],
+      mode: 'citation',
+      prefix: 'Based on ',
+      suffix: '.',
+    })
+    .plugin('crossReference', {
+      fallback: 'Architecture overview',
+      prefix: 'See ',
+      suffix: '.',
+      target: 'overview',
+    })
+    .plugin('crossReference', {
+      fallback: '1',
+      kind: 'page',
+      prefix: 'Overview is on page ',
+      suffix: '.',
+      target: 'overview',
+    })
+    .plugin('bibliography', {})
+    .pageBreak()
+    .plugin('glossary', {
+      groupBy: 'group',
+      entries: [
+        {
+          fullForm: 'Domain Specific Language',
+          group: 'Software',
+          term: 'DSL',
+          definition:
+            'A language designed for a particular domain, such as generating richly formatted documents.',
+        },
+        {
+          definition: 'The contract used by document-generation clients.',
+          fullForm: 'Application Programming Interface',
+          group: 'Software',
+          term: 'API',
+        },
+        {
+          definition: 'The XML format used inside DOCX files.',
+          fullForm: 'Office Open XML',
+          group: 'Formats',
+          term: 'OOXML',
+        },
+      ],
+    })
 }
 
 function buildRevisionsFixture() {

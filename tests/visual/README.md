@@ -1,6 +1,6 @@
 # Visual compatibility regression
 
-This suite generates ten deterministic DOCX fixtures, converts them with
+This suite generates eleven deterministic DOCX fixtures, converts them with
 LibreOffice, renders the resulting PDFs with Poppler, and compares every page
 with a committed PNG baseline.
 
@@ -28,6 +28,7 @@ fallback, and an explicit Liberation Serif fallback for the Ocean theme's
 | `08-callouts-and-data` | Callout and data-table plugins |
 | `09-business-plugins` | Letterhead, timeline, and signature plugins |
 | `10-images-and-columns` | Images, multi-column layout, column breaks |
+| `11-references-and-glossary` | REF/PAGEREF fields, linked citations, bibliography bookmarks, grouped glossary tables |
 
 ## Commands
 
@@ -92,6 +93,16 @@ layouts, three palettes, CJK typography, and common plugin output.
 The Theme Studio spacing fix updates `08-callouts-and-data` to padded single-cell
 callouts. The page was reviewed with the same pinned renderer: titles, body text,
 and left borders remain aligned, with no clipping or page-count change.
+
+### Baseline review: 2026-11-07
+
+The new `11-references-and-glossary` fixture adds two reviewed pages with the
+unchanged pinned Docker renderer. Page one checks cached and refreshed bookmark
+text/page references, stable numeric citations, and source paragraphs. Page two
+checks sorted, grouped glossary tables and wrapping of full forms and definitions.
+Both pages were inspected with no clipping, overlap, or missing content. All
+existing twelve pages still match their baselines; only the two new baselines
+were added. The suite now has eleven fixtures and fourteen pages.
 
 To investigate a locally installed LibreOffice version, use:
 
