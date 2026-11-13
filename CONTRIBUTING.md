@@ -79,6 +79,13 @@ pnpm run release:verify
 checks run once. `docs:verify` checks generated error references and builds
 the documentation, including VitePress dead-link validation.
 
+`apps:generated` compares the saved Monaco declarations with the content derived
+from installed dependencies and built workspace declarations. It does not write
+files or depend on Git status. `apps:verify` runs this check before the application
+build can regenerate the snapshot. After changing public APIs or dependencies,
+run `pnpm build`, then `pnpm --filter @docxkit/playground run generate:monaco-types`
+to refresh it.
+
 Run the plugin lifecycle test directly with:
 
 ```sh

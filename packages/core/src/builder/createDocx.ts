@@ -66,16 +66,19 @@ export interface DocxSchema<TStyles extends StyleSheet = StyleSheet> {
 export interface RenderDocxOptions {
   /**
    * Platform-aware loader for npm, URL, or local plugin sources.
+   * Set to `false` to reject external sources before any I/O; trusted inline
+   * plugin instances remain supported.
    */
-  pluginLoader?: PluginLoader
+  pluginLoader?: false | PluginLoader
   /**
    * Resolve image paths without putting executable adapters in JSON schemas.
+   * Set to `false` to disable path resolution, including platform defaults.
    *
    * @param source - Image path to resolve using the current platform adapter
    * @returns Image bytes or a Blob, optionally wrapped in a promise
    * @throws If the adapter cannot read or resolve the image source
    */
-  resolveImage?: DocxKitConfig['resolveImage']
+  resolveImage?: false | DocxKitConfig['resolveImage']
 }
 
 /**
@@ -125,6 +128,7 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
  * Ideal for AI-driven document generation or API integrations.
  *
  * @param schema - — The `DocxSchema` object
+ * @param options - Plugin loading and image resolution adapters or disable flags
  * @returns A `DocxBuilder` instance (ready to export)
  *
  * @example
@@ -163,12 +167,17 @@ export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   const { content, plugins, ...config } = schema
   const builder = new DocxBuilder<TStyles>({
     ...config,
-    resolveImage: options.resolveImage,
+    resolveImage: options.resolveImage || undefined,
   })
 
   // Load and register plugins before compiling content
   if (plugins && plugins.length > 0) {
-    const loader = options.pluginLoader ?? createPluginLoader()
+    const loader =
+      options.pluginLoader === false
+        ? createPluginLoader({
+            security: { allowLoad: source => source.type === 'inline' },
+          })
+        : (options.pluginLoader ?? createPluginLoader())
     const results = await Promise.all(
       plugins.map(source => loader.load(source)),
     )

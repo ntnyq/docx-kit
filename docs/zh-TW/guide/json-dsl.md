@@ -2,6 +2,23 @@
 
 `renderDocx()` 接收可 JSON 序列化的 schema，適合 AI/LLM 驅動的產生、API 整合，以及將文件範本作為資料存儲。
 
+
+## 來自外部的 schema
+
+平台預設實作面向可信 schema：Node 啟用本機圖片讀取與 npm/local 外掛，瀏覽器啟用 URL 外掛。處理 API 請求或 LLM 輸出時，除了結構驗證，還應明確限制執行期能力：
+
+```ts
+import { renderDocx } from 'docx-kit/node'
+
+const doc = await renderDocx(
+  { content: [{ type: 'paragraph', text: 'External content' }] },
+  { pluginLoader: false, resolveImage: false },
+)
+const bytes = await doc.toUint8Array()
+```
+
+這些選項也適用於 Figure 等可信外掛編譯的圖片。請在應用程式碼中透過 `.use()` 註冊可信外掛。如需允許部分來源，可傳入具有 `allowLoad` 策略的 `pluginLoader`，並透過自訂 `resolveImage` 執行應用程式本身的資源邊界檢查。Manifest 與文件結構驗證不會授權檔案存取，也不會隔離可執行外掛。
+
 ## 基本用法
 
 ```ts

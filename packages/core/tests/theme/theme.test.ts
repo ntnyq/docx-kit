@@ -12,6 +12,14 @@ import type { DocxStyleRule, DocxTheme } from '@docxkit/types'
 // -------------------------------------------------------------------
 
 describe('resolveThemeTokens', () => {
+  it.each(['constructor', 'toString', '__proto__'])(
+    'leaves inherited token key %s unresolved',
+    key => {
+      const token = `$colors.${key}`
+      expect(resolveThemeTokens(token, { colors: {} })).toBe(token)
+    },
+  )
+
   const theme: DocxTheme = {
     colors: { danger: '#dc2626', muted: '#6b7280', primary: '#1a56db' },
     fonts: { body: 'Arial', heading: 'Georgia' },

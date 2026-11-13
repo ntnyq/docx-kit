@@ -55,8 +55,9 @@ export class PluginRegistry {
    */
   async get(packageName: string): Promise<RegistryPluginEntry | null> {
     const cacheKey = `get:${packageName}`
+    const cache = this.cache
 
-    const cached = this.cache.get(cacheKey)
+    const cached = cache.get(cacheKey)
     if (cached && cached.expiresAt > Date.now()) {
       return cached.entries[0] ?? null
     }
@@ -64,7 +65,7 @@ export class PluginRegistry {
     const entry = await getPlugin(packageName)
 
     if (entry) {
-      this.cache.set(cacheKey, {
+      cache.set(cacheKey, {
         entries: [entry],
         expiresAt: Date.now() + this.cacheTTL,
       })
@@ -80,7 +81,8 @@ export class PluginRegistry {
    * fresh data from the npm registry.
    */
   refresh() {
-    this.cache.clear()
+    // Pending requests retain the old map and cannot restore stale entries.
+    this.cache = new Map()
   }
 
   /**
@@ -95,15 +97,16 @@ export class PluginRegistry {
    */
   async search(query?: string): Promise<RegistryPluginEntry[]> {
     const cacheKey = `search:${query ?? ''}`
+    const cache = this.cache
 
-    const cached = this.cache.get(cacheKey)
+    const cached = cache.get(cacheKey)
     if (cached && cached.expiresAt > Date.now()) {
       return cached.entries
     }
 
     const entries = await searchPlugins(query)
 
-    this.cache.set(cacheKey, {
+    cache.set(cacheKey, {
       entries,
       expiresAt: Date.now() + this.cacheTTL,
     })

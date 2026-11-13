@@ -14,7 +14,7 @@ operating-system differences make strict cross-machine thresholds unreliable.
 | `paragraphs-10000` | Large paragraph-heavy document                  |
 | `table-1000-rows`  | 1,000 rows × 5 columns                          |
 | `images-100`       | Image metadata, media registration, and packing |
-| `plugins-500`      | Plugin registry and render overhead             |
+| `plugins-500`      | 500 Callout nodes, style adaptation, DOCX packing |
 
 ## Commands
 
@@ -48,3 +48,16 @@ Investigate sustained regressions across repeated runs before adding a budget
 or making the benchmark blocking in CI. The non-blocking `Performance`
 workflow runs weekly and on manual dispatch, then retains its JSON reports as a
 workflow artifact for 30 days.
+
+Compare the generated work as well as the runtime. The original `plugins-500`
+baseline used paragraph-based Callouts; the current plugin renders a single-cell
+table for each Callout. That adds table, row, cell, border, and margin XML, so its
+total duration is not a direct measure of plugin dispatch overhead. Do not remove
+layout features or replace a baseline just to eliminate that difference.
+
+For diagnosis, replay historical code with the same installed dependencies and
+alternate old/new runs in isolated processes. Separate builder construction,
+`toDocument()` compilation, and DOCX packing, then compare uncompressed document
+and style XML. Matching XML helps distinguish implementation overhead from a
+change in the amount of generated work. Recorded environment metadata alone
+cannot attribute a timing difference to Node.js, dependencies, or the OS.

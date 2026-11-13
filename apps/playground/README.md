@@ -21,3 +21,8 @@ Language can be selected with `?lang=en-US`, `?lang=zh-CN`, or `?lang=zh-TW`. Ap
 Examples can be linked directly with `?example=checklist`. The seven example IDs are `comprehensive`, `basic`, `plugins`, `checklist`, `multi-section`, `theme`, and `rich-content`.
 
 The editor loads generated declarations from the built workspace libraries. Run `pnpm --filter @docxkit/playground generate:monaco-types` after changing public APIs.
+
+After building the workspace, `pnpm apps:generated` checks whether the saved
+declarations match their current inputs without changing files. Synchronized
+uncommitted declarations pass; missing or outdated content fails with a refresh
+command. `pnpm apps:verify` checks freshness before building the applications.

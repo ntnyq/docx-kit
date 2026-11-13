@@ -16,14 +16,24 @@ import type {
   StyleSheetEntry,
 } from '@docxkit/types'
 
+const STYLE_ALIASES = [
+  ['margin', ['marginBottom', 'marginLeft', 'marginRight', 'marginTop']],
+  ['bold', ['fontWeight']],
+  ['fontWeight', ['bold']],
+  ['italic', ['fontStyle']],
+  ['fontStyle', ['italic']],
+  ['characterSpacing', ['letterSpacing']],
+  ['letterSpacing', ['characterSpacing']],
+] as const
+
 /**
  * Options for resolving a style cascade.
  */
 export interface ResolveStyleOptions {
   /**
-   * Base style (typically element defaults).
+   * Base style or ordered default/inherited layers (lowest priority first).
    */
-  base?: DocxStyleRule
+  base?: (DocxStyleRule | undefined)[] | DocxStyleRule
   /**
    * Class name(s) to resolve from the stylesheet.
    */
@@ -80,10 +90,38 @@ export function resolveStyle(options: ResolveStyleOptions): DocxStyleRule {
   )
 
   // Merge: base → class(es) → inline
-  const merged = Object.assign({}, options.base, ...classStyles, options.inline)
+  const baseLayers = Array.isArray(options.base) ? options.base : [options.base]
+  const merged = mergeStyleRules(...baseLayers, ...classStyles, options.inline)
 
   // Resolve theme tokens as the final pass
   return resolveThemeTokens(merged, options.theme)
+}
+
+/**
+ * A higher layer's shorthand or alias replaces earlier declarations of the
+ * same meaning. Merge each layer afterward to preserve same-layer precedence.
+ * JSON keys must never invoke the legacy prototype setter.
+ */
+function mergeStyleRules(
+  ...rules: (DocxStyleRule | undefined)[]
+): DocxStyleRule {
+  let merged: DocxStyleRule = {}
+  for (const rule of rules) {
+    if (!rule) {
+      continue
+    }
+    for (const [property, aliases] of STYLE_ALIASES) {
+      if (rule[property] !== undefined) {
+        for (const alias of aliases) {
+          delete merged[alias]
+        }
+      }
+    }
+    merged = Object.hasOwn(rule, '__proto__')
+      ? Object.fromEntries([...Object.entries(merged), ...Object.entries(rule)])
+      : Object.assign(merged, rule)
+  }
+  return merged
 }
 
 /**
@@ -110,7 +148,7 @@ function resolveStyleClass(
     return cached
   }
 
-  const entry = styles?.[name]
+  const entry = styles && Object.hasOwn(styles, name) ? styles[name] : undefined
   if (!entry) {
     // Only throw if styles are explicitly provided — allows optional stylesheets
     if (styles) {
@@ -133,7 +171,7 @@ function resolveStyleClass(
       resolveStyleClass(parent, styles, visited, cache),
     )
     // Merge: parent styles as base, own properties override
-    resolved = Object.assign({}, ...parentStyles, styleRule)
+    resolved = mergeStyleRules(...parentStyles, styleRule)
   }
 
   visited.delete(name)

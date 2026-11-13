@@ -110,6 +110,8 @@ const disclaimerPlugin = definePlugin<'disclaimer', DisclaimerOptions>({
 - 在渲染函数附近完成校验
 - 避免隐藏无关的文档修改
 
+文档插件必须返回 `Paragraph`、`Table`、`TableOfContents` 等 `docx` FileChild 块对象，或一维块对象数组（允许空数组）。DSL 节点需通过 `await context.compileNode(node)` 转换。字符串、行内 run、null 和嵌套数组会在编译阶段产生 `PLUGIN_RENDER_FAILED`。
+
 ## 插件配套工具
 
 - `@docxkit/create-plugin`：创建插件包脚手架

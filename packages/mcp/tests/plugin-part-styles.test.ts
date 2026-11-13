@@ -22,10 +22,33 @@ const validateAi = new Ajv({ strict: false }).compile(aiSchema ?? {})
 const callout = { content: 'Message', title: 'Note', type: 'info' }
 const table = { data: [{ score: 1 }, { score: 2 }], striped: true }
 const requiredOptions: Record<string, object> = {
+  badge: { text: 'New' },
+  barcode: { text: '123' },
   callout,
+  changelog: { entries: [] },
+  checklist: { items: [] },
+  codeBlock: { code: '' },
+  coverPage: { title: 'Title' },
   crossReference: { target: 'chapter' },
   dataTable: table,
+  echarts: { option: {} },
+  figure: { data: 'data:image/png;base64,AA==' },
   glossary: { entries: [] },
+  letterhead: { companyName: 'Company' },
+  meetingMinutes: { agenda: [], attendees: [], date: '', title: '' },
+  metricCard: { items: [] },
+  propertyTable: { items: [] },
+  qrcode: { text: 'Hello' },
+  signatureBlock: { parties: [] },
+  timeline: { events: [] },
+  watermark: { text: '' },
+  invoice: {
+    date: '2026-11-13',
+    from: { name: 'Seller' },
+    invoiceNumber: '1',
+    items: [],
+    to: { name: 'Buyer' },
+  },
 }
 const node = (name: string, options: unknown) => ({
   name,

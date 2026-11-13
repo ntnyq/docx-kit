@@ -132,6 +132,8 @@ doc.p('Important note', {
 inline style > className > element defaults
 ```
 
+高優先級的 `margin` 簡寫會覆寫低優先級的 `marginTop`、`marginRight`、`marginBottom`、`marginLeft`；同一層中明確填寫的長屬性仍然優先。`bold`/`fontWeight` 等別名也遵守層級優先順序。同層同時填寫時，`bold`、`italic` 仍優先於 `fontWeight`、`fontStyle`。
+
 ```ts
 const doc = createDocx({
   styles: defineStyles({

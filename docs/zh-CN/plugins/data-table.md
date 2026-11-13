@@ -20,6 +20,9 @@ import { dataTablePlugin, type DataTableOptions } from 'docx-kit'
 | `striped` | `boolean` | `false` | 交替行背景底纹 |
 | `styles` | `DataTableStyles` | — | 本次调用的部位样式 |
 
+
+使用 `format: { column: 'date' }` 时，`YYYY-MM-DD` 字符串在所有时区保留原始日历日期。Date 对象和时间戳字符串仍按运行环境的本地时区显示。无法解析的日期（包括无效 Date 对象）保留为可读文本；纯日期字符串不会被悄悄归一化。
+
 ## 示例
 
 ### 基础数据表格

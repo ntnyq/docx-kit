@@ -95,6 +95,44 @@ describe('createPlugin', () => {
     consoleErrorSpy.mockRestore()
   })
 
+  it('uses the selected license in both package metadata and README', async () => {
+    vi.spyOn(process, 'cwd').mockReturnValue(tmpDir)
+    const promptsModule = await import('prompts')
+    vi.mocked(promptsModule.default).mockResolvedValueOnce({
+      author: 'Author',
+      license: 'Apache-2.0',
+      pluginName: 'custom-license',
+    })
+    await createPlugin()
+    const projectDir = path.join(tmpDir, 'custom-license')
+    const pkg = JSON.parse(
+      await fs.readFile(path.join(projectDir, 'package.json'), 'utf8'),
+    )
+    const readme = await fs.readFile(path.join(projectDir, 'README.md'), 'utf8')
+    expect(pkg.license).toBe('Apache-2.0')
+    expect(readme).toContain(`\n${pkg.license} — Author\n`)
+  })
+
+  it('allows only one concurrent scaffold to claim a directory', async () => {
+    vi.spyOn(process, 'cwd').mockReturnValue(tmpDir)
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const writes = vi.spyOn(fs, 'writeFile')
+    await Promise.all([createPlugin('concurrent'), createPlugin('concurrent')])
+    expect(errors).toHaveBeenCalledOnce()
+    expect(writes).toHaveBeenCalledTimes(8)
+  })
+
+  it('treats a dangling symbolic link as an existing target', async () => {
+    await fs.mkdir(tmpDir, { recursive: true })
+    const target = path.join(tmpDir, 'linked-project')
+    await fs.symlink(path.join(tmpDir, 'missing-project'), target, 'dir')
+    vi.spyOn(process, 'cwd').mockReturnValue(tmpDir)
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    await expect(createPlugin('linked-project')).resolves.toBeUndefined()
+    expect(errors).toHaveBeenCalledOnce()
+    expect((await fs.lstat(target)).isSymbolicLink()).toBe(true)
+  })
+
   it('handles user cancellation gracefully', async () => {
     // Mock prompts to return null (user cancelled)
     const promptsModule = await import('prompts')

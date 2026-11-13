@@ -224,10 +224,12 @@ await doc.toBase64()       // → base64 string
 await doc.toStream()       // → Node.js stream (Node.js only)
 await doc.save('f.docx')   // → writes to disk (Node.js only)
 await doc.toDocument()     // → raw docx Document
-doc.toJSON()               // → plain object (debug / serialization)
+doc.toJSON()               // → shallow config/content view (inspection)
 ```
 
-## `renderDocx(schema)`
+`toJSON()` 返回配置和内容的浅层视图，并非无损持久化格式，也不包含通过 `.use()` 注册的插件。回调（包括表格渲染函数）、二进制输入和运行时适配器无法通过 JSON stringify/parse 原样恢复。请单独保存可序列化的 schema，并在导出前重新注册可信插件和适配器。
+
+## `renderDocx(schema, options?)`
 
 面向 AI/LLM 的 JSON 文档生成入口。
 
@@ -251,6 +253,8 @@ const doc = await renderDocx({
 })
 const blob = await doc.toBlob()
 ```
+
+core、浏览器和 Node 入口均支持可选的第二个参数 `RenderDocxOptions`。`pluginLoader: false` 会在 I/O 前拒绝外部 `npm`、`local`、`url` 来源，仍支持进程内的可信 inline 插件；`resolveImage: false` 禁用图片路径解析。自定义加载器或图片解析器会替换平台默认实现。现有单参数调用保持原有行为。
 
 ## `DocxSchema<TStyles>`
 

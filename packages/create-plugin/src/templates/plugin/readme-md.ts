@@ -13,12 +13,14 @@ import { toIdentifier } from './naming'
  * @param shortName - — Plugin name without prefix (e.g. `chart`)
  * @param description - — Plugin description
  * @param author - — Author name
+ * @param license - SPDX license selected for the package
  */
 export function renderReadme(
   pluginName: string,
   shortName: string,
   description: string = 'A docx-kit plugin',
   author: string = '',
+  license: string = 'MIT',
 ): string {
   const identifier = toIdentifier(shortName)
   return `# ${pluginName}
@@ -47,11 +49,11 @@ const bytes = await doc.toUint8Array()
 ## Plugin Manifest
 
 This plugin declares a \`docx-kit.plugin.json\` manifest for compatibility
-checking and metadata. See the [Plugin Authoring Guide](https://github.com/ntnyq/docx-kit/docs/ecosystem/creating-plugins.md)
+checking and metadata. See the [Plugin Authoring Guide](https://github.com/ntnyq/docx-kit/blob/main/docs/ecosystem/creating-plugins.md)
 for details.
 
 ## License
 
-MIT${author ? ` — ${author}` : ''}
+${license}${author ? ` — ${author}` : ''}
 `
 }

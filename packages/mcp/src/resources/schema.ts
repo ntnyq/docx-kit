@@ -11,7 +11,8 @@ import {
   buildBlockNodeJsonSchemas,
   buildNestedNodeJsonSchemas,
 } from '../schema/blockNodes'
-import { STYLE_RULE_SCHEMA, UNIT_VALUE_SCHEMA } from '../schema/styles'
+import { PAGE_SCHEMA, PLUGIN_SOURCES_SCHEMA } from '../schema/document'
+import { STYLE_SCHEMA_DEFINITIONS } from '../schema/styles'
 
 /**
  * DocxSchema JSON Schema for MCP resource exposure.
@@ -32,50 +33,23 @@ export const docxSchemaResource = {
     title: 'DocxSchema',
     type: 'object',
     definitions: {
+      ...STYLE_SCHEMA_DEFINITIONS,
       ...buildNestedNodeJsonSchemas(),
-      styleRule: STYLE_RULE_SCHEMA,
+      styleRule: STYLE_SCHEMA_DEFINITIONS.styleRule,
       blockNode: {
         oneOf: buildBlockNodeJsonSchemas(),
       },
     },
     properties: {
+      page: { ...PAGE_SCHEMA, description: 'Page configuration' },
       content: {
         description: 'Ordered array of block nodes',
         items: { $ref: '#/definitions/blockNode' },
         type: 'array',
       },
-      page: {
-        description: 'Page configuration',
-        type: 'object',
-        properties: {
-          margin: STYLE_RULE_SCHEMA.properties.margin,
-          orientation: { enum: ['landscape', 'portrait'], type: 'string' },
-          size: {
-            anyOf: [
-              { enum: ['A3', 'A4', 'Legal', 'Letter'] },
-              {
-                required: ['height', 'width'],
-                type: 'object',
-                properties: {
-                  height: UNIT_VALUE_SCHEMA,
-                  width: UNIT_VALUE_SCHEMA,
-                },
-              },
-            ],
-          },
-        },
-      },
       plugins: {
+        ...PLUGIN_SOURCES_SCHEMA,
         description: 'Plugin sources to load before rendering',
-        type: 'array',
-        items: {
-          required: ['type'],
-          type: 'object',
-          properties: {
-            plugin: { description: 'Inline plugin instance', type: 'object' },
-            type: { enum: ['inline', 'npm', 'url', 'local'], type: 'string' },
-          },
-        },
       },
       styles: {
         additionalProperties: { $ref: '#/definitions/styleRule' },

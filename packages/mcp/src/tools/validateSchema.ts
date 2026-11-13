@@ -4,6 +4,7 @@
  * @module mcp-server/tools/validateSchema
  */
 
+import Ajv from 'ajv'
 import {
   BLOCK_NODE_DEFINITIONS,
   INLINE_NODE_TYPES,
@@ -11,6 +12,7 @@ import {
   MATH_NODE_DEFINITIONS,
   TEXT_NODE_DEFINITION,
 } from '../schema/blockNodes'
+import { DOCUMENT_OPTIONS_SCHEMA } from '../schema/document'
 import { validatePluginOptions } from './validatePluginOptions'
 import { validateStyle } from './validateStyle'
 import type {
@@ -19,6 +21,10 @@ import type {
   NodeCollectionKind,
   SchemaFieldRule,
 } from '../schema/blockNodes'
+
+const validateOptions = new Ajv({ allErrors: true }).compile(
+  DOCUMENT_OPTIONS_SCHEMA,
+)
 
 /**
  * Output from the validate_schema MCP tool.
@@ -85,6 +91,16 @@ export function validateSchema(schema: unknown): ValidateSchemaOutput {
   const errors: ValidationError[] = []
   const doc = schema as Record<string, unknown> | undefined
   const content = doc?.content
+  if (!validateOptions(schema)) {
+    for (const error of validateOptions.errors ?? []) {
+      const field =
+        error.keyword === 'required' ? error.params.missingProperty : undefined
+      errors.push({
+        message: `Document options ${error.message ?? 'are invalid'}`,
+        path: `${error.instancePath}${typeof field === 'string' ? `/${escapePointer(field)}` : ''}`,
+      })
+    }
+  }
   if (doc?.styles !== undefined) {
     if (isRecord(doc.styles)) {
       for (const [name, style] of Object.entries(doc.styles)) {

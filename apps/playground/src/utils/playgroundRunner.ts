@@ -49,11 +49,16 @@ function loadPlaygroundRuntime() {
     import('docx'),
     import('docx-kit'),
     import('./prepareCode'),
-  ]).then(([docx, docxKit, { prepareCode }]) => ({
-    docx,
-    docxKit,
-    prepareCode,
-  }))
+  ])
+    .then(([docx, docxKit, { prepareCode }]) => ({
+      docx,
+      docxKit,
+      prepareCode,
+    }))
+    .catch(error => {
+      runtimePromise = undefined
+      throw error
+    })
 
   return runtimePromise
 }

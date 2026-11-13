@@ -110,6 +110,8 @@ A good custom plugin should:
 - keep validation close to the render function
 - avoid hiding unrelated document mutations
 
+Document plugins must return `docx` FileChild blocks such as `Paragraph`, `Table`, or `TableOfContents`, or a flat array of blocks (an empty array is valid). Convert DSL nodes with `await context.compileNode(node)`. Strings, inline runs, null, and nested arrays fail with `PLUGIN_RENDER_FAILED` during compilation.
+
 ## Tooling Around Plugins
 
 - `@docxkit/create-plugin` scaffolds new plugin packages

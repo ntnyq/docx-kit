@@ -7,6 +7,7 @@
  * @module renderer/normalize
  */
 
+import { DocxKitError } from '@docxkit/errors'
 import { createPreviewError, PREVIEW_ERROR_CODES } from './errors'
 import type { DocxInput } from './types'
 
@@ -108,12 +109,12 @@ async function fetchDocxFromUrl(
       throw error
     }
     // Re-throw existing DocxKitError
-    if (error instanceof Error && error.message.startsWith('[')) {
+    if (error instanceof DocxKitError) {
       throw error
     }
     throw createPreviewError(
       PREVIEW_ERROR_CODES.PREVIEW_FETCH_FAILED,
-      `Failed to fetch DOCX from URL: ${(error as Error).message ?? String(error)}`,
+      `Failed to fetch DOCX from URL: ${error instanceof Error ? error.message : String(error)}`,
       error,
     )
   }

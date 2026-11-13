@@ -77,7 +77,7 @@ function resolveSingleToken(token: string, theme: DocxTheme): unknown {
 
   const [, category, key] = match
   const map = theme[category as keyof DocxTheme]
-  if (map && typeof map === 'object') {
+  if (map && typeof map === 'object' && Object.hasOwn(map, key)) {
     return (map as Record<string, unknown>)[key]
   }
   return undefined

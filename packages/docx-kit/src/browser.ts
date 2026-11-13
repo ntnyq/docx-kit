@@ -25,6 +25,7 @@ import type {
   DocxPreset,
   DocxSchema,
   DocxTheme,
+  RenderDocxOptions,
   StyleSheet,
 } from '@docxkit/core'
 
@@ -35,15 +36,18 @@ export * from '@docxkit/core'
  *
  * @template TStyles - The stylesheet type inferred from the schema
  * @param schema - Document content, configuration, and optional plugin sources
+ * @param options - Override or disable the trusted-schema platform adapters
  * @returns A promise that resolves to a builder ready for document export
  * @throws {DocxKitError} If a plugin cannot be loaded, validated, or authorized
  * @throws Propagates synchronous plugin setup errors during registration
  */
 export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   schema: DocxSchema<TStyles>,
+  options: RenderDocxOptions = {},
 ): Promise<DocxBuilder<TStyles>> {
   return renderCoreDocx(schema, {
-    pluginLoader: createPluginLoader(),
+    ...options,
+    pluginLoader: options.pluginLoader ?? createPluginLoader(),
   })
 }
 

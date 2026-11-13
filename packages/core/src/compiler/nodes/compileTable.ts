@@ -85,13 +85,15 @@ export async function compileTable<
       inline: node.headerCellStyle,
       styles: config.styles,
       theme: config.theme,
-      base: {
-        backgroundColor: config.theme?.colors?.surface ?? '#F4F6F8',
-        fontWeight: 'bold',
-        ...config.defaults?.text,
-        ...config.defaults?.cell,
-        ...tableStyle,
-      },
+      base: [
+        {
+          backgroundColor: config.theme?.colors?.surface ?? '#F4F6F8',
+          fontWeight: 'bold',
+        },
+        config.defaults?.text,
+        config.defaults?.cell,
+        tableStyle,
+      ],
     })
 
     rows.push(
@@ -132,6 +134,12 @@ export async function compileTable<
     )
   }
 
+  // Only own data properties should supply cells, including prototype-named keys.
+  const rowValues = node.data.map(row => ({
+    __proto__: null,
+    ...row,
+  }))
+
   // Data rows
   rows.push(
     ...(await Promise.all(
@@ -145,7 +153,7 @@ export async function compileTable<
                   columnSpan: cellColSpan,
                   rowSpan: cellRowSpan,
                 }) => {
-                  const raw = row[col.key]
+                  const raw = rowValues[rowIndex][col.key]
                   const rendered = col.render
                     ? col.render(raw, row, rowIndex)
                     : String(raw ?? '')
@@ -389,7 +397,7 @@ function resolveTableCellStyle<
     DocxStyleRule | undefined
 
   const withTableCellStyle = resolveStyle({
-    base: { ...config.defaults?.cell, ...tableStyle },
+    base: [config.defaults?.cell, tableStyle],
     inline: tableCellStyle,
     styles: config.styles,
     theme: config.theme,

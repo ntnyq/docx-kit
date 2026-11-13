@@ -21,8 +21,10 @@ npm install @docxkit/core
 ```ts
 import { createDocx } from '@docxkit/core'
 
-const docx = createDocx()
-  .paragraph('Hello, world!')
-  .heading('Introduction', { level: 1 })
-  .build()
+const bytes = await createDocx()
+  .h1('Introduction')
+  .p('Hello, world!')
+  .toUint8Array()
+
+// bytes contains the generated DOCX ZIP archive.
 ```

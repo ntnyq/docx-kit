@@ -44,6 +44,22 @@ async function renderPackage(
 }
 
 describe('compiler OOXML contracts', () => {
+  it('does not render inherited values for absent table cells', async () => {
+    const pkg = await renderPackage([
+      {
+        data: [{}],
+        type: 'table',
+        columns: [
+          { key: 'constructor', title: 'Constructor' },
+          { key: '__proto__', title: 'Prototype' },
+        ],
+      },
+    ])
+    const xml = await pkg.read('word/document.xml')
+    expect(xml).not.toContain('[native code]')
+    expect(xml).not.toContain('[object Object]')
+  })
+
   it('emits custom document properties and embedded fonts', async () => {
     const fontData = Uint8Array.from({ length: 64 }, (_, index) => index)
     const pkg = await renderPackage(

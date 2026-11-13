@@ -51,12 +51,19 @@ export async function createPlugin(nameArg?: string) {
 
   const targetDir = path.resolve(process.cwd(), options.directory)
 
-  // Check if directory already exists
-  if (await pathExists(targetDir)) {
-    console.error(
-      `Directory "${options.directory}" already exists. Choose a different name.`,
-    )
-    return
+  // Claim the project directory atomically before writing any files. Recursive
+  // creation is only for parents, including the scope of scoped package names.
+  await fs.mkdir(path.dirname(targetDir), { recursive: true })
+  try {
+    await fs.mkdir(targetDir)
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'EEXIST') {
+      console.error(
+        `Directory "${options.directory}" already exists. Choose a different name.`,
+      )
+      return
+    }
+    throw error
   }
 
   console.log(`Creating plugin project: ${options.pluginName}`)
@@ -87,18 +94,6 @@ function deriveShortName(packageName: string): string {
     return unscopedName.slice(prefix.length)
   }
   return unscopedName
-}
-
-/**
- * Check if a path exists on the filesystem.
- */
-async function pathExists(filePath: string): Promise<boolean> {
-  try {
-    await fs.access(filePath)
-    return true
-  } catch {
-    return false
-  }
 }
 
 /**
@@ -232,6 +227,7 @@ async function writeScaffold(targetDir: string, options: ScaffoldOptions) {
       options.shortName,
       options.description,
       options.author,
+      options.license,
     ),
   )
 }

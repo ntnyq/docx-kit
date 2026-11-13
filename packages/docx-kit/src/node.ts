@@ -34,6 +34,7 @@ import type {
   DocxSchema,
   DocxTheme,
   PluginRegistry,
+  RenderDocxOptions,
   StyleSheet,
 } from '@docxkit/core'
 
@@ -82,14 +83,19 @@ export function createDocx<const TStyles extends StyleSheet = StyleSheet>(
 
 /**
  * Render a JSON document schema with Node.js filesystem saving enabled.
+ *
+ * @param schema - Document content and configuration
+ * @param options - Override or disable the trusted-schema platform adapters
+ * @returns A builder with Node.js save and stream methods
  */
 export async function renderDocx<const TStyles extends StyleSheet = StyleSheet>(
   schema: DocxSchema<TStyles>,
+  options: RenderDocxOptions = {},
 ): Promise<NodeDocxBuilder<TStyles>> {
   return attachNodeSave(
     await renderCoreDocx(schema, {
-      pluginLoader: createPluginLoader(),
-      resolveImage: resolveNodeImage,
+      pluginLoader: options.pluginLoader ?? createPluginLoader(),
+      resolveImage: options.resolveImage ?? resolveNodeImage,
     }),
   )
 }

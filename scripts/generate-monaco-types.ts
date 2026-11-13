@@ -8,9 +8,16 @@
  * @example
  *   pnpm tsx scripts/generate-monaco-types.ts
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, relative, resolve, sep } from 'node:path'
+import process from 'node:process'
 
 interface TypeLibSource {
   sourcePath: string
@@ -95,6 +102,61 @@ const WORKSPACE_MODULES = [
   ['@docxkit/theme-ocean', 'packages-themes/ocean/dist/index.d.ts'],
   ['@docxkit/theme-warm', 'packages-themes/warm/dist/index.d.ts'],
 ] as const
+
+/**
+ * Report missing or outdated snapshots without writing files or consulting Git.
+ */
+export function checkMonacoTypes(
+  outputPath = OUTPUT,
+  sources = getTypeLibSources(),
+): string[] {
+  const expected = generateMonacoTypes(sources)
+  if (!existsSync(outputPath)) {
+    return [`Missing: ${outputPath}`]
+  }
+  return readFileSync(outputPath, 'utf8') === expected
+    ? []
+    : [`Outdated: ${outputPath}`]
+}
+
+/**
+ * Build the snapshot in memory so generation and freshness checks use exactly
+ * the same declaration graph and serialization.
+ */
+export function generateMonacoTypes(sources = getTypeLibSources()): string {
+  const seenVirtualPaths = new Set<string>()
+  const entries: string[] = []
+
+  for (const source of sources) {
+    if (seenVirtualPaths.has(source.virtualPath)) {
+      throw new Error(
+        `[generate-monaco-types] duplicate virtual path: ${source.virtualPath}`,
+      )
+    }
+    if (!existsSync(source.sourcePath)) {
+      throw new Error(
+        `[generate-monaco-types] missing declaration: ${source.sourcePath}`,
+      )
+    }
+
+    seenVirtualPaths.add(source.virtualPath)
+    entries.push(
+      `  { content: ${JSON.stringify(readFileSync(source.sourcePath, 'utf8'))}, filePath: ${JSON.stringify(source.virtualPath)} },`,
+    )
+  }
+
+  entries.push(
+    `  { content: ${JSON.stringify("declare module 'node:buffer' { export class Buffer extends Uint8Array {} }")}, filePath: 'file:///node_modules/@types/node-buffer/index.d.ts' },`,
+  )
+
+  return [
+    ...HEADER,
+    'export const DOCX_KIT_TYPE_LIBS = [',
+    ...entries,
+    '] as const',
+    '',
+  ].join('\n')
+}
 
 function collectDeclarationFiles(directory: string): string[] {
   const files: string[] = []
@@ -186,38 +248,21 @@ function getTypeLibSources(): TypeLibSource[] {
 
 function main() {
   const sources = getTypeLibSources()
-  const seenVirtualPaths = new Set<string>()
-  const entries: string[] = []
-
-  for (const source of sources) {
-    if (seenVirtualPaths.has(source.virtualPath)) {
-      throw new Error(
-        `[generate-monaco-types] duplicate virtual path: ${source.virtualPath}`,
+  if (process.argv.includes('--check')) {
+    const issues = checkMonacoTypes(OUTPUT, sources)
+    if (issues.length) {
+      console.error(issues.join('\n'))
+      console.error(
+        'Build the workspace, then run pnpm --filter @docxkit/playground run generate:monaco-types.',
       )
+      process.exitCode = 1
+    } else {
+      console.log('[generate-monaco-types] declarations are synchronized.')
     }
-    if (!existsSync(source.sourcePath)) {
-      throw new Error(
-        `[generate-monaco-types] missing declaration: ${source.sourcePath}`,
-      )
-    }
-
-    seenVirtualPaths.add(source.virtualPath)
-    entries.push(
-      `  { content: ${JSON.stringify(readFileSync(source.sourcePath, 'utf8'))}, filePath: ${JSON.stringify(source.virtualPath)} },`,
-    )
+    return
   }
 
-  entries.push(
-    `  { content: ${JSON.stringify("declare module 'node:buffer' { export class Buffer extends Uint8Array {} }")}, filePath: 'file:///node_modules/@types/node-buffer/index.d.ts' },`,
-  )
-
-  const output = [
-    ...HEADER,
-    'export const DOCX_KIT_TYPE_LIBS = [',
-    ...entries,
-    '] as const',
-    '',
-  ].join('\n')
+  const output = generateMonacoTypes(sources)
 
   writeFileSync(OUTPUT, output, 'utf8')
 
@@ -231,4 +276,11 @@ function toVirtualPath(moduleName: string, declarationPath = 'index.d.ts') {
   return `file:///node_modules/${moduleName}/${declarationPath}`
 }
 
-main()
+// Node canonicalizes import.meta.filename, including symlinked temp directories.
+if (
+  process.argv[1]
+  && existsSync(process.argv[1])
+  && realpathSync(process.argv[1]) === import.meta.filename
+) {
+  main()
+}

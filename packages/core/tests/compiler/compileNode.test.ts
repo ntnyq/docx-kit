@@ -1,3 +1,4 @@
+import { Paragraph } from 'docx'
 import { describe, expect, it } from 'vitest'
 import { compileNode } from '../../src/compiler/compileNode'
 import type { CompileNodeContext } from '../../src/compiler/compileNode'
@@ -271,7 +272,8 @@ describe('compileNode — plugin', () => {
   })
 
   it('calls registered plugin render function', async () => {
-    const plugin = { name: 'test', render: () => 'rendered' }
+    const output = new Paragraph('rendered')
+    const plugin = { name: 'test', render: () => output }
     const plugins = new Map([['test', plugin]])
     const result = await compileNode(
       makeCtx({
@@ -279,7 +281,7 @@ describe('compileNode — plugin', () => {
         plugins,
       }),
     )
-    expect(result).toBe('rendered')
+    expect(result).toBe(output)
   })
 
   it('wraps plugin render errors as PLUGIN_RENDER_FAILED', async () => {

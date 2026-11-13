@@ -13,6 +13,10 @@ export { STYLE_RULE_SCHEMA, UNIT_VALUE_SCHEMA } from './styleSchema'
 export { generateSchemaGuide, generateToolDefinitions } from './schemaGuide'
 export { toTemplateJsonSchema, validateTemplateData } from './templateSchema'
 export {
+  referenceStyleSchemas,
+  STYLE_SCHEMA_DEFINITIONS,
+} from './schemaDefinitions'
+export {
   BUILTIN_PLUGIN_OPTION_SCHEMAS,
   BUILTIN_PLUGIN_SCHEMA_CONDITIONS,
   SECTION_BREAK_SCHEMA_CONDITION,

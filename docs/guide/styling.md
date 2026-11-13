@@ -132,6 +132,8 @@ Styles are merged with the following priority (highest wins):
 inline style > className > element defaults
 ```
 
+A higher-priority `margin` shorthand resets lower-priority `marginTop`, `marginRight`, `marginBottom`, and `marginLeft`; explicit longhands in the same layer still win. Aliases such as `bold`/`fontWeight` follow layer priority too. Within one layer, `bold` and `italic` retain precedence over `fontWeight` and `fontStyle`.
+
 ```ts
 const doc = createDocx({
   styles: defineStyles({

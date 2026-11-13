@@ -11,6 +11,19 @@ vi.mock('docx-preview', async importOriginal => ({
 
 afterEach(() => vi.restoreAllMocks())
 
+it.each([null, undefined])(
+  'preserves an arbitrary parser rejection %s',
+  async cause => {
+    vi.mocked(parseAsync).mockRejectedValueOnce(cause)
+    await expect(
+      renderDocxPreview(document.createElement('div'), new Blob(['fixture'])),
+    ).rejects.toMatchObject({
+      cause,
+      code: 'PREVIEW_RENDER_FAILED',
+    })
+  },
+)
+
 it('releases media allocated before a render fails', async () => {
   const revoked = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
   const parsed = {

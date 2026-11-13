@@ -20,6 +20,9 @@ import { dataTablePlugin, type DataTableOptions } from 'docx-kit'
 | `striped` | `boolean` | `false` | Alternate row background shading |
 | `styles` | `DataTableStyles` | — | Per-part styles for this invocation |
 
+
+With `format: { column: 'date' }`, `YYYY-MM-DD` strings keep their literal calendar date in every timezone. Date objects and timestamp strings retain local-runtime timezone formatting. Unparseable dates, including invalid Date objects, remain readable text; date-only strings are not silently normalized.
+
 ## Examples
 
 ### Basic Data Table

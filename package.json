@@ -8,9 +8,9 @@
   "scripts": {
     "apps:build": "pnpm --filter @docxkit/playground --filter @docxkit/theme-studio run build",
     "apps:bundle": "tsx scripts/check-app-bundle.ts",
-    "apps:generated": "git diff --exit-code -- apps/playground/src/utils/monacoTypes.generated.ts",
+    "apps:generated": "tsx scripts/generate-monaco-types.ts --check",
     "apps:typecheck": "pnpm --filter @docxkit/app-shared --filter @docxkit/playground --filter @docxkit/theme-studio run typecheck",
-    "apps:verify": "run-s apps:typecheck apps:build apps:bundle apps:generated",
+    "apps:verify": "run-s apps:generated apps:typecheck apps:build apps:bundle",
     "bench:browser": "tsx scripts/performance/run-browser.ts",
     "bench:browser:update": "tsx scripts/performance/run-browser.ts --update-baseline",
     "bench:node": "tsx scripts/performance/run-node.ts",

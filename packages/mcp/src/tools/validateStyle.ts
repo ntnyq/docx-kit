@@ -1,8 +1,15 @@
 import Ajv from 'ajv'
-import { STYLE_RULE_SCHEMA } from '../schema/styles'
+import {
+  referenceStyleSchemas,
+  STYLE_RULE_SCHEMA,
+  STYLE_SCHEMA_DEFINITIONS,
+} from '../schema/styles'
 import type { ValidationError } from './validateSchema'
 
-const validate = new Ajv({ allErrors: true }).compile(STYLE_RULE_SCHEMA)
+const validate = new Ajv({ allErrors: true }).compile({
+  ...referenceStyleSchemas(STYLE_RULE_SCHEMA),
+  definitions: STYLE_SCHEMA_DEFINITIONS,
+})
 
 /**
  * Validate the same style schema exposed to MCP clients without echoing values.

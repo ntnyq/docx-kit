@@ -11,6 +11,10 @@ import {
   BUILTIN_PLUGIN_SCHEMA_CONDITIONS,
   SECTION_BREAK_SCHEMA_CONDITION,
 } from './pluginSchema'
+import {
+  referenceStyleSchemas,
+  STYLE_SCHEMA_DEFINITIONS,
+} from './schemaDefinitions'
 import { BUILTIN_TEMPLATES } from './templates'
 import { toTemplateJsonSchema } from './templateSchema'
 import type { BuiltinAiTemplate } from './templates'
@@ -167,7 +171,8 @@ export function generateToolDefinitions(
           required: ['content'],
           type: 'object',
           definitions: {
-            blockNode: {
+            ...STYLE_SCHEMA_DEFINITIONS,
+            blockNode: referenceStyleSchemas({
               additionalProperties: true,
               properties: { type: { type: 'string' } },
               type: 'object',
@@ -175,7 +180,7 @@ export function generateToolDefinitions(
                 ...BUILTIN_PLUGIN_SCHEMA_CONDITIONS,
                 SECTION_BREAK_SCHEMA_CONDITION,
               ],
-            },
+            }),
           },
           description:
             'A docx-kit DocxSchema object defining the document content, styles, and configuration.',

@@ -3,6 +3,24 @@ import { describe, expect, it } from 'vitest'
 import { createPluginStyle } from '../src/style/pluginStyle'
 
 describe('plugin style adapter', () => {
+  it('does not introduce cell options for empty or undefined-only style layers', () => {
+    const styles = createPluginStyle(
+      { fontSize: undefined },
+      { defaults: [{}, undefined], overrides: [{ margin: undefined }] },
+    )
+    const cell = { children: [new Paragraph('Unstyled')] }
+    expect(styles.cell(cell)).toStrictEqual(cell)
+    expect(styles.paragraph({})).toStrictEqual({})
+    expect(styles.text({})).toStrictEqual({})
+  })
+
+  it('does not introduce cell padding when only typography is overridden', () => {
+    const styles = createPluginStyle({ color: '#123456', fontSize: 14 })
+    const cell = { children: [new Paragraph('Cell')] }
+    expect(styles.cell(cell)).toStrictEqual(cell)
+    expect(styles.text({})).toMatchObject({ color: '123456', size: 28 })
+  })
+
   it('preserves native options when there are no invocation overrides', () => {
     const styles = createPluginStyle()
     const children = [new Paragraph('Cell')]

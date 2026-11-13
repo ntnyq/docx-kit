@@ -5,6 +5,7 @@
  */
 
 import { createDocxKitError } from '@docxkit/errors'
+import { FileChild } from 'docx'
 import { resolveStyle } from '../../style/normalizeStyle'
 import { dataUrlToUint8Array } from '../../utils/dataUrl'
 import { compileNode } from '../compileNode'
@@ -16,7 +17,6 @@ import type {
   PluginRenderContext,
   StyleSheet,
 } from '@docxkit/types'
-import type { FileChild } from 'docx'
 import type { CompilationSession } from '../numbers'
 
 export async function compilePlugin<TStyles extends StyleSheet>(
@@ -57,7 +57,19 @@ export async function compilePlugin<TStyles extends StyleSheet>(
   }
 
   try {
-    return (await plugin.render(node.options, ctx)) as FileChild | FileChild[]
+    const output: unknown = await plugin.render(node.options, ctx)
+    if (output instanceof FileChild) {
+      return output
+    }
+    if (
+      Array.isArray(output)
+      && output.every(child => child instanceof FileChild)
+    ) {
+      return output
+    }
+    throw new TypeError(
+      'Plugin render must return docx block objects or an array of blocks; compile DSL nodes with context.compileNode()',
+    )
   } catch (error) {
     throw createDocxKitError(
       'PLUGIN_RENDER_FAILED',

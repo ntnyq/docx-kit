@@ -61,6 +61,9 @@ export interface DocxPlugin<
   /**
    * Render plugin content into one or more `docx` objects
    * (Paragraph, Table, etc.).
+   * Document compilation accepts `docx` FileChild blocks or arrays of blocks.
+   * Use `context.compileNode()` to convert DSL nodes; strings, inline runs,
+   * null, and nested arrays are not document blocks.
    *
    * @param options - — User-provided plugin options
    * @param context - — Rendering context with helper utilities

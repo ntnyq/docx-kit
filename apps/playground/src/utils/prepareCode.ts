@@ -36,7 +36,7 @@ ${body}
 }
 
 /**
- * Replace named ESM imports with destructuring from an injected namespace.
+ * Replace ESM imports with bindings from the executor's runtime arguments.
  *
  * TypeScript has already been removed. Only actual import declarations are
  * rewritten; strings, comments and dynamic imports retain their content.
@@ -54,9 +54,9 @@ function replaceImports(source: string): string {
     }
     const namespace =
       statement.source.value === 'docx-kit'
-        ? 'docxKit'
+        ? 'arguments[0]'
         : statement.source.value === 'docx'
-          ? 'docx'
+          ? 'arguments[1]'
           : undefined
     const names = statement.specifiers.flatMap(specifier => {
       if (specifier.type !== 'ImportSpecifier') {
@@ -72,10 +72,21 @@ function replaceImports(source: string): string {
           : `${imported}: ${specifier.local.name}`,
       ]
     })
-    const replacement =
-      namespace && names.length
-        ? `const { ${names.join(', ')} } = ${namespace};`
-        : ''
+    // The async arrow inherits the executor's arguments. Unlike a named
+    // namespace variable, these references cannot be shadowed by import aliases.
+    const bindings = namespace
+      ? [
+          ...(names.length
+            ? [`const { ${names.join(', ')} } = ${namespace};`]
+            : []),
+          ...statement.specifiers.flatMap(specifier =>
+            specifier.type === 'ImportNamespaceSpecifier'
+              ? [`const ${specifier.local.name} = ${namespace};`]
+              : [],
+          ),
+        ]
+      : []
+    const replacement = bindings.join('\n')
     source = `${source.slice(0, statement.start)}${replacement}${source.slice(statement.end)}`
   }
   return source

@@ -20,6 +20,7 @@ import path from 'node:path'
 import { runInNewContext } from 'node:vm'
 import { generateSchemaGuide } from '@docxkit/ai'
 import { createPluginLoader } from '@docxkit/core'
+import { Paragraph } from 'docx'
 import JSZip from 'jszip'
 import { PNG } from 'pngjs'
 import { describe, expect, it } from 'vitest'
@@ -180,7 +181,7 @@ describe('validateSchema', () => {
       { items: [], type: 'numberedList' },
       { type: 'pageBreak' },
       { type: 'paragraph' },
-      { name: 'qrcode', options: {}, type: 'plugin' },
+      { name: 'qrcode', options: { text: 'Hello' }, type: 'plugin' },
       { type: 'sectionBreak' },
       {
         columns: [{ key: 'name', title: 'Name' }],
@@ -239,7 +240,7 @@ describe('createDocument', () => {
     const directory = await mkdtemp(path.join(tmpdir(), 'docx-kit-mcp-'))
     const sources: PluginSource[] = []
     const source: PluginSource = {
-      plugin: { name: 'custom', render: () => 'Custom content' },
+      plugin: { name: 'custom', render: () => new Paragraph('Custom content') },
       type: 'inline',
     }
     const pluginLoader = createPluginLoader({

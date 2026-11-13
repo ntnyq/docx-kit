@@ -27,7 +27,9 @@ export class PluginManager<
   TPlugins extends PluginRegistry = Record<never, never>,
 > {
   private readonly _map = new Map<string, DocxPlugin>()
-  private readonly _pendingSetups: Promise<PromiseSettledResult<void>>[] = []
+  private readonly _pendingSetups = new Set<
+    Promise<PromiseSettledResult<void>>
+  >()
 
   /**
    * Await all pending plugin setup hooks.
@@ -36,13 +38,20 @@ export class PluginManager<
    * @throws Propagates the original rejection reason if a plugin setup hook fails
    */
   async awaitSetups() {
-    const results = await Promise.all(this._pendingSetups)
-    for (const result of results) {
-      if (result.status === 'rejected') {
-        throw result.reason
+    while (this._pendingSetups.size > 0) {
+      const pending = [...this._pendingSetups]
+      const results = await Promise.all(pending)
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          throw result.reason
+        }
+      }
+      // Delete by identity: another export may be awaiting the same batch,
+      // and setup hooks can register additional plugins while we wait.
+      for (const setup of pending) {
+        this._pendingSetups.delete(setup)
       }
     }
-    this._pendingSetups.length = 0
   }
 
   /**
@@ -88,7 +97,7 @@ export class PluginManager<
     this._map.set(plugin.name, plugin as DocxPlugin)
     if (plugin.setup) {
       // Observe failures now, even if this builder is exported much later.
-      this._pendingSetups.push(
+      this._pendingSetups.add(
         Promise.resolve(plugin.setup())
           .then(
             () =>

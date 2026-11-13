@@ -60,22 +60,34 @@ export function createPluginStyle(
     style,
     ...(options.overrides ?? []),
   ]
-  const { cell, paragraph, text } = layers.reduce((result, layer) => {
-    if (!layer) {
-      return result
+  // Most plugin invocations have no overrides. Compile only effective layers,
+  // without creating an empty compiled baseline for every part.
+  let compiled: ReturnType<typeof compilePluginStyle> | undefined
+  for (const layer of layers) {
+    if (
+      !layer
+      || (isPlainObject(layer)
+        && Object.values(layer).every(value => value === undefined))
+    ) {
+      continue
     }
     const next = compilePluginStyle(resolveThemeTokens(layer, options.theme))
-    return {
-      cell: mergeStyleOptions(result.cell, next.cell),
-      paragraph: mergeStyleOptions(result.paragraph, next.paragraph),
-      text: mergeTextStyleOptions(result.text, next.text),
-    }
-  }, compilePluginStyle({}))
+    compiled = compiled
+      ? {
+          cell: mergeStyleOptions(compiled.cell, next.cell),
+          paragraph: mergeStyleOptions(compiled.paragraph, next.paragraph),
+          text: mergeTextStyleOptions(compiled.text, next.text),
+        }
+      : next
+  }
+  const cell = compiled?.cell
+  const paragraph = compiled?.paragraph
+  const text = compiled?.text
   return {
     text: options => mergeTextStyleOptions(options, text),
     cell(options) {
       const merged = mergeStyleOptions(options, cell)
-      return cell.borders
+      return cell?.borders
         ? {
             ...merged,
             borders: completePluginBorders(merged.borders, options.borders),
@@ -85,7 +97,7 @@ export function createPluginStyle(
     paragraph(options) {
       if (options.text === undefined) {
         const merged = mergeStyleOptions(options, paragraph)
-        return paragraph.border
+        return paragraph?.border
           ? {
               ...merged,
               border: completePluginBorders(merged.border, options.border),
@@ -103,7 +115,7 @@ export function createPluginStyle(
         },
         paragraph,
       )
-      return paragraph.border
+      return paragraph?.border
         ? {
             ...merged,
             border: completePluginBorders(merged.border, options.border),
@@ -166,24 +178,31 @@ function compilePluginStyle(style: DocxStyleRule) {
     ...compiledCell,
     borders,
     width: compileColumnWidth(style.width),
-    margins: {
-      bottom:
-        style.margin !== undefined || style.marginBottom !== undefined
-          ? compiledCell.margins.bottom
-          : undefined,
-      left:
-        style.margin !== undefined || style.marginLeft !== undefined
-          ? compiledCell.margins.left
-          : undefined,
-      right:
-        style.margin !== undefined || style.marginRight !== undefined
-          ? compiledCell.margins.right
-          : undefined,
-      top:
-        style.margin !== undefined || style.marginTop !== undefined
-          ? compiledCell.margins.top
-          : undefined,
-    },
+    margins:
+      style.margin !== undefined
+      || style.marginBottom !== undefined
+      || style.marginLeft !== undefined
+      || style.marginRight !== undefined
+      || style.marginTop !== undefined
+        ? {
+            bottom:
+              style.margin !== undefined || style.marginBottom !== undefined
+                ? compiledCell.margins.bottom
+                : undefined,
+            left:
+              style.margin !== undefined || style.marginLeft !== undefined
+                ? compiledCell.margins.left
+                : undefined,
+            right:
+              style.margin !== undefined || style.marginRight !== undefined
+                ? compiledCell.margins.right
+                : undefined,
+            top:
+              style.margin !== undefined || style.marginTop !== undefined
+                ? compiledCell.margins.top
+                : undefined,
+          }
+        : undefined,
     verticalAlign:
       style.verticalAlign === undefined
         ? undefined
@@ -234,26 +253,26 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 function mergeStyleOptions<TOptions extends object>(
   defaults: TOptions,
-  overrides: Record<string, unknown>,
+  overrides: Record<string, unknown> | undefined,
 ): TOptions {
-  const base = defaults as Record<string, unknown>
-  return Object.assign(
-    {},
-    defaults,
-    Object.fromEntries(
-      Object.entries(overrides)
-        .filter(([key, value]) => value !== undefined && key !== '__proto__')
-        .map(([key, value]) => [
-          key,
-          isPlainObject(value)
-            ? mergeStyleOptions(
-                isPlainObject(base[key]) ? base[key] : {},
-                value,
-              )
-            : value,
-        ]),
-    ),
-  )
+  const merged = { ...defaults }
+  if (!overrides) {
+    return merged
+  }
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined || key === '__proto__') {
+      continue
+    }
+    const base: unknown = Reflect.get(defaults, key)
+    Reflect.set(
+      merged,
+      key,
+      isPlainObject(value)
+        ? mergeStyleOptions(isPlainObject(base) ? base : {}, value)
+        : value,
+    )
+  }
+  return merged
 }
 
 /**
@@ -261,11 +280,11 @@ function mergeStyleOptions<TOptions extends object>(
  */
 function mergeTextStyleOptions<TOptions extends object>(
   defaults: TOptions,
-  overrides: Record<string, unknown>,
+  overrides: Record<string, unknown> | undefined,
 ): TOptions {
   const font: unknown = Reflect.get(defaults, 'font')
   const normalized =
-    typeof font === 'string' && isPlainObject(overrides.font)
+    typeof font === 'string' && isPlainObject(overrides?.font)
       ? {
           ...defaults,
           font: { ascii: font, cs: font, eastAsia: font, hAnsi: font },

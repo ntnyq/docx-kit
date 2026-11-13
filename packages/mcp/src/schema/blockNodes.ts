@@ -2,7 +2,11 @@ import {
   BUILTIN_PLUGIN_SCHEMA_CONDITIONS,
   SECTION_BREAK_SCHEMA_CONDITION,
 } from '@docxkit/ai'
-import { STYLE_RULE_SCHEMA, UNIT_VALUE_SCHEMA } from './styles'
+import {
+  referenceStyleSchemas,
+  STYLE_RULE_SCHEMA,
+  UNIT_VALUE_SCHEMA,
+} from './styles'
 
 export interface BlockNodeDefinition {
   fields: Record<string, SchemaFieldRule>
@@ -321,6 +325,10 @@ function buildNodeJsonSchema(
     schema.allOf = [SECTION_BREAK_SCHEMA_CONDITION]
   }
 
+  if (type === 'textBox') {
+    properties.box = { required: ['width'], type: 'object' }
+  }
+
   if (type === 'table') {
     properties.cellStyle = STYLE_RULE_SCHEMA
     properties.headerCellStyle = STYLE_RULE_SCHEMA
@@ -343,11 +351,12 @@ function buildNodeJsonSchema(
 
   if ('requireOneOf' in definition && definition.requireOneOf) {
     schema.anyOf = definition.requireOneOf.map(field => ({
+      properties: { [field]: { minLength: 1, type: 'string' } },
       required: [field],
     }))
   }
 
-  return schema
+  return referenceStyleSchemas(schema)
 }
 
 function fieldRuleToJsonSchema(rule: SchemaFieldRule): Record<string, unknown> {

@@ -38,6 +38,35 @@ const BUILTIN_PLUGIN_FACTORIES = {
 } as const
 
 describe('playground runtime', () => {
+  it('retries runtime initialization after a transient loading failure', async () => {
+    const failure = new Error('Runtime temporarily unavailable')
+    const combine = vi.spyOn(Promise, 'all').mockRejectedValueOnce(failure)
+    const rejected = executePlaygroundCode('42')
+    combine.mockRestore()
+    await expect(rejected).rejects.toBe(failure)
+    await expect(executePlaygroundCode('42')).resolves.toBe(42)
+  })
+
+  it('supports namespace imports for both runtime packages', async () => {
+    await expect(
+      executePlaygroundCode(`
+      import * as kit from 'docx-kit'
+      import * as native from 'docx'
+      kit.createDocx().p(native.HeadingLevel.HEADING_1).toBlob()
+    `),
+    ).resolves.toBeInstanceOf(Blob)
+  })
+
+  it('allows imported bindings to share the executor namespace names', async () => {
+    await expect(
+      executePlaygroundCode(`
+      import { createDocx as docxKit } from 'docx-kit'
+      import { HeadingLevel as docx } from 'docx'
+      docxKit().p(docx.HEADING_1).toBlob()
+    `),
+    ).resolves.toBeInstanceOf(Blob)
+  })
+
   it('preserves import examples inside strings and comments', async () => {
     const sample =
       "\nimport { createDocx } from 'docx-kit'\nimport 'external-package'\n"
@@ -92,8 +121,12 @@ describe('playground runtime', () => {
       doc.toBlob()
     `)
 
-    expect(source).toContain('const { createDocx: makeDocx, span } = docxKit;')
-    expect(source).toContain('const { Paragraph: DocxParagraph } = docx;')
+    expect(source).toContain(
+      'const { createDocx: makeDocx, span } = arguments[0];',
+    )
+    expect(source).toContain(
+      'const { Paragraph: DocxParagraph } = arguments[1];',
+    )
     expect(source).not.toContain('DocxKitConfig')
     expect(source).not.toContain('external-package')
   })

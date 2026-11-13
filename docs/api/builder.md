@@ -224,10 +224,12 @@ await doc.toBase64()       // → base64 string
 await doc.toStream()       // → Node.js stream (Node.js only)
 await doc.save('f.docx')   // → writes to disk (Node.js only)
 await doc.toDocument()     // → raw docx Document
-doc.toJSON()               // → plain object (debug / serialization)
+doc.toJSON()               // → shallow config/content view (inspection)
 ```
 
-## `renderDocx(schema)`
+`toJSON()` returns a shallow view of the config and content, not a lossless persistence format. It does not include plugins registered with `.use()`. Callbacks (including table renderers), binary inputs, and runtime adapters do not survive JSON stringify/parse unchanged. Store serializable schemas separately and register trusted plugins and adapters again before export.
+
+## `renderDocx(schema, options?)`
 
 AI/LLM-friendly JSON entry point for document generation.
 
@@ -251,6 +253,8 @@ const doc = await renderDocx({
 })
 const blob = await doc.toBlob()
 ```
+
+The optional second argument is `RenderDocxOptions`, supported by core, browser, and Node entries. `pluginLoader: false` rejects external `npm`, `local`, and `url` sources before I/O; trusted in-process inline plugins remain supported. `resolveImage: false` disables image-path resolution. A custom loader or image resolver replaces the platform default. Existing one-argument calls keep their behavior.
 
 ## `DocxSchema<TStyles>`
 

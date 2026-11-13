@@ -89,6 +89,8 @@ export interface DataTableOptions {
   bordered?: boolean
   /**
    * Per-column value formatter.
+   * Date-only strings keep their calendar date. Date objects and timestamps
+   * use the local runtime timezone; invalid dates remain readable text.
    */
   format?: Record<string, ColFormat>
   /**
@@ -206,7 +208,7 @@ export function dataTablePlugin(pluginConfig: DataTableConfig = {}) {
 
       // Header row
       const headerCells = columns.map(col => {
-        const label = labels?.[col] ?? col
+        const label = getOwnValue(labels, col) ?? col
         return new TableCell(
           headerCellStyle.cell({
             shading: { fill: surface, type: ShadingType.CLEAR },
@@ -215,7 +217,7 @@ export function dataTablePlugin(pluginConfig: DataTableConfig = {}) {
                 headerParagraphStyle.paragraph({
                   spacing: { after: 0, before: 0, line: 288 },
                   alignment: alignmentToDocx(
-                    align?.[col] ?? inferAlignment(col, data),
+                    getOwnValue(align, col) ?? inferAlignment(col, data),
                   ),
                   children: [
                     new TextRun(
@@ -241,14 +243,20 @@ export function dataTablePlugin(pluginConfig: DataTableConfig = {}) {
         }),
       ]
       const resolvedAlignments = new Map(
-        columns.map(col => [col, align?.[col] ?? inferAlignment(col, data)]),
+        columns.map(col => [
+          col,
+          getOwnValue(align, col) ?? inferAlignment(col, data),
+        ]),
       )
 
       // Data rows
       for (const [i, row] of data.entries()) {
         const cells = columns.map(col => {
           const colAlign = resolvedAlignments.get(col) ?? 'left'
-          const val = formatValue(row[col], format?.[col])
+          const val = formatValue(
+            getOwnValue(row, col),
+            getOwnValue(format, col),
+          )
 
           return new TableCell(
             (striped && i % 2 === 1 ? stripedCellStyle : bodyCellStyle).cell({
@@ -333,15 +341,24 @@ function formatValue(value: unknown, fmt?: ColFormat): string {
     return Number.isFinite(n) ? `${(n * 100).toFixed(1)}%` : String(value)
   }
   if (fmt === 'date') {
-    if (value instanceof Date) {
-      return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`
+    // A calendar date is not an instant. Preserve date-only input literally,
+    // including invalid dates rather than silently normalizing their fields.
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return value
     }
-    const d = new Date(String(value))
+    const d = value instanceof Date ? value : new Date(String(value))
     return Number.isNaN(d.getTime())
       ? String(value)
       : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   }
   return String(value)
+}
+
+function getOwnValue<T>(
+  record: Record<string, T> | undefined,
+  key: string,
+): T | undefined {
+  return record && Object.hasOwn(record, key) ? record[key] : undefined
 }
 
 /**
@@ -374,7 +391,7 @@ function isColumnNumeric(
 ): boolean {
   let hasNumeric = false
   for (const row of data) {
-    const v = row[col]
+    const v = getOwnValue(row, col)
     if (v == null || v === '') {
       continue
     }

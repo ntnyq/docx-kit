@@ -12,6 +12,29 @@ const sampleData = [
 ]
 
 describe('dataTablePlugin', () => {
+  it('renders columns named after prototype properties with empty option maps', async () => {
+    const data: Record<string, unknown>[] = [
+      JSON.parse(
+        '{"constructor":"Constructor value","__proto__":"Prototype value","toString":"String value"}',
+      ),
+      {},
+    ]
+    const builder = createDocx().use(dataTablePlugin()).plugin('dataTable', {
+      align: {},
+      data,
+      format: {},
+      labels: {},
+    })
+    const zip = await JSZip.loadAsync(await builder.toBuffer())
+    const xml = await zip.file('word/document.xml')?.async('string')
+    expect(xml).toContain('Constructor value')
+    expect(xml).toContain('Prototype value')
+    expect(xml).toContain('String value')
+    expect(xml).toContain('constructor</w:t>')
+    expect(xml).not.toContain('[object Object]')
+    expect(xml).not.toContain('[native code]')
+  })
+
   it('returns a plugin named "dataTable"', () => {
     expect(dataTablePlugin().name).toBe('dataTable')
   })

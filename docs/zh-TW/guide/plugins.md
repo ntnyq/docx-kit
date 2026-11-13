@@ -110,6 +110,8 @@ const disclaimerPlugin = definePlugin<'disclaimer', DisclaimerOptions>({
 - 在呈現函式附近完成驗證
 - 避免隱藏無關的文件修改
 
+文件外掛必須回傳 `Paragraph`、`Table`、`TableOfContents` 等 `docx` FileChild 區塊物件，或一維區塊物件陣列（允許空陣列）。DSL 節點需透過 `await context.compileNode(node)` 轉換。字串、行內 run、null 與巢狀陣列會在編譯階段產生 `PLUGIN_RENDER_FAILED`。
+
 ## 外掛配套工具
 
 - `@docxkit/create-plugin`：建立外掛套件鷹架

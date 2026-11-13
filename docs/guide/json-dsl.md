@@ -2,6 +2,23 @@
 
 The `renderDocx()` function accepts a JSON-serializable schema — ideal for AI/LLM-driven generation, API integrations, or storing document templates as data.
 
+
+## Schemas from external sources
+
+Platform defaults are intended for trusted schemas: Node enables local image reads and npm/local plugins; the browser enables URL plugins. For API requests or LLM output, validate the structure and explicitly restrict runtime capabilities:
+
+```ts
+import { renderDocx } from 'docx-kit/node'
+
+const doc = await renderDocx(
+  { content: [{ type: 'paragraph', text: 'External content' }] },
+  { pluginLoader: false, resolveImage: false },
+)
+const bytes = await doc.toUint8Array()
+```
+
+These settings also apply to images compiled by trusted plugins such as Figure. Register trusted plugins with `.use()` in application code. To allow selected sources, supply a `pluginLoader` with an `allowLoad` policy and a `resolveImage` adapter that enforces your application's resource boundary. Manifest validation and document structure validation do not authorize file access or sandbox executable plugins.
+
 ## Basic Usage
 
 ```ts

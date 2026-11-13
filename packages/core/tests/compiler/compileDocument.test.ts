@@ -1,3 +1,4 @@
+import { Paragraph } from 'docx'
 import { describe, expect, it } from 'vitest'
 import { compileDocument } from '../../src/compiler/compileDocument'
 
@@ -68,7 +69,7 @@ describe('compileDocument', () => {
   })
 
   it('compiles document with plugin node (registered)', async () => {
-    const plugin = { name: 'test', render: () => 'content' }
+    const plugin = { name: 'test', render: () => new Paragraph('content') }
     const plugins = new Map([['test', plugin]])
     const doc = await compileDocument({
       config: {},
@@ -81,7 +82,7 @@ describe('compileDocument', () => {
   it('handles array return from compileNode (plugin returning multiple items)', async () => {
     const plugin = {
       name: 'multi',
-      render: () => [{ type: 'paragraph' }],
+      render: () => [new Paragraph('First'), new Paragraph('Second')],
     }
     const doc = await compileDocument({
       config: {},

@@ -120,6 +120,38 @@ describe('PluginRegistry', () => {
   })
 
   describe('refresh()', () => {
+    it('does not let a pending search repopulate the refreshed cache', async () => {
+      const pending = createDeferred<RegistryPluginEntry[]>()
+      const fresh = { ...MOCK_ENTRY, version: '2.0.0' }
+      mockSearchPlugins
+        .mockReturnValueOnce(pending.promise)
+        .mockResolvedValueOnce([fresh])
+      const registry = new PluginRegistry()
+      const stale = registry.search('chart')
+      registry.refresh()
+      pending.resolve([MOCK_ENTRY])
+      await stale
+      expect(await registry.search('chart')).toEqual([fresh])
+      expect(await registry.search('chart')).toEqual([fresh])
+      expect(mockSearchPlugins).toHaveBeenCalledTimes(2)
+    })
+
+    it('does not let a pending package lookup repopulate the refreshed cache', async () => {
+      const pending = createDeferred<RegistryPluginEntry | null>()
+      const fresh = { ...MOCK_ENTRY, version: '2.0.0' }
+      mockGetPlugin
+        .mockReturnValueOnce(pending.promise)
+        .mockResolvedValueOnce(fresh)
+      const registry = new PluginRegistry()
+      const stale = registry.get(MOCK_ENTRY.name)
+      registry.refresh()
+      pending.resolve(MOCK_ENTRY)
+      await stale
+      expect(await registry.get(MOCK_ENTRY.name)).toEqual(fresh)
+      expect(await registry.get(MOCK_ENTRY.name)).toEqual(fresh)
+      expect(mockGetPlugin).toHaveBeenCalledTimes(2)
+    })
+
     it('clears cache and forces fresh data', async () => {
       mockSearchPlugins.mockResolvedValue([MOCK_ENTRY])
 
@@ -146,3 +178,14 @@ describe('PluginRegistry', () => {
     })
   })
 })
+
+function createDeferred<T>() {
+  let resolve: (value: T) => void = () => {}
+  const promise = new Promise<T>(resolvePromise => {
+    resolve = resolvePromise
+  })
+  return {
+    promise,
+    resolve,
+  }
+}

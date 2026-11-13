@@ -82,7 +82,7 @@ export async function compileInlineNodes<TStyles extends StyleSheet>(
           return compileMath(node)
         case 'text': {
           const style = resolveStyle({
-            base: { ...config.defaults?.text, ...baseStyle },
+            base: [config.defaults?.text, baseStyle],
             className: node.className,
             inline: node.style,
             styles: config.styles,

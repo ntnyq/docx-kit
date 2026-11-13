@@ -1,4 +1,8 @@
-import { BUILTIN_PLUGIN_OPTION_SCHEMAS } from '@docxkit/ai'
+import {
+  BUILTIN_PLUGIN_OPTION_SCHEMAS,
+  referenceStyleSchemas,
+  STYLE_SCHEMA_DEFINITIONS,
+} from '@docxkit/ai'
 import Ajv from 'ajv'
 import type { ValidationError } from './validateSchema'
 
@@ -6,7 +10,10 @@ const ajv = new Ajv({ allErrors: true })
 const validators = new Map(
   Object.entries(BUILTIN_PLUGIN_OPTION_SCHEMAS).map(([name, schema]) => [
     name,
-    ajv.compile(schema),
+    ajv.compile({
+      ...referenceStyleSchemas(schema),
+      definitions: STYLE_SCHEMA_DEFINITIONS,
+    }),
   ]),
 )
 

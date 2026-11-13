@@ -93,6 +93,30 @@ describe('normalizeDocxInput', () => {
       })
     })
 
+    it.each([null, undefined, '[network] unavailable'])(
+      'wraps arbitrary fetch rejection %s',
+      async cause => {
+        vi.spyOn(globalThis, 'fetch').mockRejectedValue(cause)
+        await expect(
+          normalizeDocxInput('https://example.com/doc.docx'),
+        ).rejects.toMatchObject({
+          cause,
+          code: PREVIEW_ERROR_CODES.PREVIEW_FETCH_FAILED,
+        })
+      },
+    )
+
+    it('wraps ordinary errors whose messages start with a bracket', async () => {
+      const cause = new Error('[network] unavailable')
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(cause)
+      await expect(
+        normalizeDocxInput('https://example.com/doc.docx'),
+      ).rejects.toMatchObject({
+        cause,
+        code: PREVIEW_ERROR_CODES.PREVIEW_FETCH_FAILED,
+      })
+    })
+
     it('re-throws AbortError as-is', async () => {
       const abortError = new Error('Aborted')
       abortError.name = 'AbortError'

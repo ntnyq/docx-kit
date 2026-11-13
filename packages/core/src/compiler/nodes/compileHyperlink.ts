@@ -19,7 +19,7 @@ export function compileHyperlink<TStyles extends StyleSheet>(
   config: DocxKitConfig<TStyles>,
 ) {
   const style = resolveStyle({
-    base: { ...config.defaults?.text, ...config.defaults?.paragraph },
+    base: [config.defaults?.text, config.defaults?.paragraph],
     className: node.className,
     inline: node.style,
     styles: config.styles,
@@ -47,7 +47,7 @@ export function compileInlineHyperlink<TStyles extends StyleSheet>(
   baseStyle?: DocxStyleRule,
 ) {
   const style = resolveStyle({
-    base: { ...config.defaults?.text, ...baseStyle },
+    base: [config.defaults?.text, baseStyle],
     className: node.className,
     inline: node.style,
     styles: config.styles,

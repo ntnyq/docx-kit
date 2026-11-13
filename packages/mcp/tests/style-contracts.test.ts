@@ -11,6 +11,17 @@ const validateResource = new Ajv({ strict: false }).compile(
 )
 
 describe('MCP style contracts', () => {
+  it.each([
+    { children: ['Link'], type: 'hyperlink', url: '' },
+    { anchor: '', children: ['Link'], type: 'hyperlink' },
+    { anchor: '', children: ['Link'], type: 'hyperlink', url: '' },
+    { box: {}, text: 'Box', type: 'textBox' },
+  ])('rejects missing nested requirements in both validators: %j', node => {
+    const schema = { content: [node] }
+    expect(validateSchema(schema).valid).toBe(false)
+    expect(validateResource(schema)).toBe(false)
+  })
+
   it('validates and compiles supported units, numeric weights and border objects', async () => {
     const schema = {
       content: [

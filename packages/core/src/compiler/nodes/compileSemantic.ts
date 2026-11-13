@@ -70,7 +70,7 @@ export function compileBookmark<TStyles extends StyleSheet>(
   baseStyle?: DocxStyleRule,
 ) {
   const style = resolveStyle({
-    base: { ...config.defaults?.text, ...baseStyle },
+    base: [config.defaults?.text, baseStyle],
     className: node.className,
     inline: node.style,
     styles: config.styles,
@@ -108,7 +108,7 @@ export function compileCheckbox<TStyles extends StyleSheet>(
 
   if (node.label) {
     const style = resolveStyle({
-      base: { ...config.defaults?.text, ...baseStyle },
+      base: [config.defaults?.text, baseStyle],
       className: node.className,
       inline: node.style,
       styles: config.styles,
@@ -145,7 +145,7 @@ export async function compileComment<TStyles extends StyleSheet>(
 ): Promise<ParagraphChild[]> {
   const commentId = session.registerComment(node as CommentNode)
   const style = resolveStyle({
-    base: { ...config.defaults?.text, ...baseStyle },
+    base: [config.defaults?.text, baseStyle],
     className: node.className,
     inline: node.style,
     styles: config.styles,
@@ -224,7 +224,7 @@ export function compileRevision<TStyles extends StyleSheet>(
       styles: config.styles,
       theme: config.theme,
       base: resolveStyle({
-        base: { ...config.defaults?.text, ...baseStyle },
+        base: [config.defaults?.text, baseStyle],
         className: node.className,
         inline: node.style,
         styles: config.styles,
@@ -419,7 +419,7 @@ function compileStyledText<TStyles extends StyleSheet>(
     const node: TextNode<TStyles> =
       typeof child === 'string' ? { text: child, type: 'text' } : child
     const style = resolveStyle({
-      base: { ...config.defaults?.text, ...baseStyle },
+      base: [config.defaults?.text, baseStyle],
       className: node.className,
       inline: node.style,
       styles: config.styles,

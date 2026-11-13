@@ -98,7 +98,7 @@ export async function renderDocxPreview(
     dispose?.()
     throw createPreviewError(
       PREVIEW_ERROR_CODES.PREVIEW_RENDER_FAILED,
-      `docx-preview rendering failed: ${(error as Error).message ?? String(error)}`,
+      `docx-preview rendering failed: ${error instanceof Error ? error.message : String(error)}`,
       error,
     )
   }

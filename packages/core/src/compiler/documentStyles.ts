@@ -12,14 +12,16 @@ export function compileDocumentStyles(config: DocxKitConfig): IStylesOptions {
   const theme = config.theme
   const body = resolveStyle({
     theme,
-    base: {
-      color: theme?.colors?.text ?? '#252525',
-      fontFamily: theme?.fonts?.body ?? 'Calibri',
-      fontFamilyEastAsia: theme?.fonts?.bodyEastAsia ?? 'Microsoft YaHei',
-      fontSize: theme?.fontSize?.base ?? 11,
-      ...config.defaults?.text,
-      ...config.defaults?.paragraph,
-    },
+    base: [
+      {
+        color: theme?.colors?.text ?? '#252525',
+        fontFamily: theme?.fonts?.body ?? 'Calibri',
+        fontFamilyEastAsia: theme?.fonts?.bodyEastAsia ?? 'Microsoft YaHei',
+        fontSize: theme?.fontSize?.base ?? 11,
+      },
+      config.defaults?.text,
+      config.defaults?.paragraph,
+    ],
   })
   const heading = (level: number) => {
     const key = `h${level}`
@@ -27,47 +29,51 @@ export function compileDocumentStyles(config: DocxKitConfig): IStylesOptions {
       className: config.styles?.[key] ? key : undefined,
       styles: config.styles,
       theme,
-      base: {
-        color: theme?.colors?.primary ?? '#202020',
-        fontFamily: theme?.fonts?.heading ?? body.fontFamily,
-        fontWeight: 'bold',
-        keepLines: true,
-        keepNext: true,
-        lineHeight: 1.2,
-        marginBottom: theme?.spacing?.sm ?? 8,
-        marginTop: level === 1 ? 0 : (theme?.spacing?.md ?? 16),
-        textIndent: 0,
-        fontFamilyEastAsia:
-          theme?.fonts?.headingEastAsia ?? body.fontFamilyEastAsia,
-        fontSize:
-          level === 1
-            ? (theme?.fontSize?.xl ?? 24)
-            : level === 2
-              ? (theme?.fontSize?.lg ?? 16)
-              : level === 3
-                ? 13
-                : 11,
-        ...config.defaults?.text,
-      },
+      base: [
+        {
+          color: theme?.colors?.primary ?? '#202020',
+          fontFamily: theme?.fonts?.heading ?? body.fontFamily,
+          fontWeight: 'bold',
+          keepLines: true,
+          keepNext: true,
+          lineHeight: 1.2,
+          marginBottom: theme?.spacing?.sm ?? 8,
+          marginTop: level === 1 ? 0 : (theme?.spacing?.md ?? 16),
+          textIndent: 0,
+          fontFamilyEastAsia:
+            theme?.fonts?.headingEastAsia ?? body.fontFamilyEastAsia,
+          fontSize:
+            level === 1
+              ? (theme?.fontSize?.xl ?? 24)
+              : level === 2
+                ? (theme?.fontSize?.lg ?? 16)
+                : level === 3
+                  ? 13
+                  : 11,
+        },
+        config.defaults?.text,
+      ],
     })
     return {
       paragraph: compileParagraphStyle(style),
       run: compileTextStyle(style),
     }
   }
-  const title: DocxStyleRule = {
-    ...body,
-    color: '#000000',
-    fontFamily: theme?.fonts?.heading ?? body.fontFamily,
-    fontSize: 28,
-    fontWeight: 'bold',
-    keepNext: true,
-    lineHeight: 1.15,
-    marginBottom: 12,
-    textIndent: 0,
-    fontFamilyEastAsia:
-      theme?.fonts?.headingEastAsia ?? body.fontFamilyEastAsia,
-  }
+  const title: DocxStyleRule = resolveStyle({
+    base: body,
+    inline: {
+      color: '#000000',
+      fontFamily: theme?.fonts?.heading ?? body.fontFamily,
+      fontSize: 28,
+      fontWeight: 'bold',
+      keepNext: true,
+      lineHeight: 1.15,
+      marginBottom: 12,
+      textIndent: 0,
+      fontFamilyEastAsia:
+        theme?.fonts?.headingEastAsia ?? body.fontFamilyEastAsia,
+    },
+  })
   return {
     default: {
       heading1: heading(1),

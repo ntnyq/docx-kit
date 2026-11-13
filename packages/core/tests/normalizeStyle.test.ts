@@ -1,8 +1,40 @@
 import { describe, expect, it } from 'vitest'
 import { resolveStyle } from '../src/style/normalizeStyle'
-import type { StyleSheet } from '@docxkit/types'
+import type { DocxStyleRule, StyleSheet } from '@docxkit/types'
 
 describe('resolveStyle', () => {
+  it.each(['constructor', 'toString', '__proto__'])(
+    'rejects an inherited class named %s',
+    className => {
+      expect(() => resolveStyle({ className, styles: {} })).toThrow(
+        'Style class not found',
+      )
+      expect(() =>
+        resolveStyle({
+          className: 'child',
+          styles: { child: { extends: className } },
+        }),
+      ).toThrow('Style class not found')
+    },
+  )
+
+  it('resolves explicitly declared classes with prototype property names', () => {
+    const styles: StyleSheet = JSON.parse('{"__proto__":{"color":"#123456"}}')
+    expect(resolveStyle({ className: '__proto__', styles })).toEqual({
+      color: '#123456',
+    })
+  })
+
+  it('does not let JSON style data replace the resolved object prototype', () => {
+    const inline: DocxStyleRule = JSON.parse(
+      '{"__proto__":{"color":"#FF0000"},"fontSize":12}',
+    )
+    const result = resolveStyle({ inline })
+    expect(Object.getPrototypeOf(result)).toBe(Object.prototype)
+    expect(result.color).toBeUndefined()
+    expect(result.fontSize).toBe(12)
+  })
+
   it('returns empty object with no inputs', () => {
     expect(resolveStyle({})).toEqual({})
   })

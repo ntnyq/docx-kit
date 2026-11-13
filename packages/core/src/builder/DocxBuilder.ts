@@ -829,7 +829,12 @@ export class DocxBuilder<
   }
 
   /**
-   * Serialize the builder state to a JSON-friendly object.
+   * Return a shallow view of the document config and content for inspection.
+   *
+   * This is not a lossless persistence format. Registered plugin instances are
+   * omitted; callbacks, binary inputs, and runtime adapters do not survive a
+   * JSON stringify/parse round trip. Keep serializable schemas separately and
+   * restore trusted plugins and adapters before exporting them.
    *
    * @example
    * ```ts
