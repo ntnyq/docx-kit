@@ -6,6 +6,7 @@ import { pathToFileURL } from 'node:url'
 import { expect, it } from 'vitest'
 
 const require = createRequire(import.meta.url)
+const tsxLoader = pathToFileURL(require.resolve('tsx')).href
 const source = pathToFileURL(
   path.resolve(import.meta.dirname, '../src/index.ts'),
 ).href
@@ -39,7 +40,7 @@ it.each([
   (zone, instantDate) => {
     const output = execFileSync(
       process.execPath,
-      ['--import', require.resolve('tsx'), '--input-type=module', '-e', script],
+      ['--import', tsxLoader, '--input-type=module', '-e', script],
       {
         cwd: path.resolve(import.meta.dirname, '..'),
         encoding: 'utf8',
