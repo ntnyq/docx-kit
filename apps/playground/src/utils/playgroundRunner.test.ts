@@ -131,6 +131,57 @@ describe('playground runtime', () => {
     expect(source).not.toContain('external-package')
   })
 
+  it.each([
+    'return await Promise.resolve(42)',
+    'if (true) return await Promise.resolve(42)',
+    'const value: number = 42; value as number',
+    'const value = 42; value\ntype Result = number',
+    'const value = 42; value\ninterface Result { value: number }',
+    'const value = 42; value\nimport type { Result } from "external-package"',
+    'const value = 42; value\nimport "external-package"',
+    'enum Status { Ready = 42 }; Status.Ready',
+    'class Value { constructor(public value: number) {} }; new Value(42).value',
+    'class Value { value: number = 42 }; new Value().value',
+    'const value: { nested?: { count: number } } = {}; value.nested?.count ?? 42',
+  ])('preserves TypeScript runtime behavior for %s', async source => {
+    await expect(executePlaygroundCode(source)).resolves.toBe(42)
+  })
+
+  it.each([
+    '42; import { createDocx } from "docx-kit"',
+    '42; import * as kit from "docx-kit"',
+    '42; const following = 1',
+    '42;;',
+  ])(
+    'does not auto-return an expression before a following statement: %s',
+    async source => {
+      await expect(executePlaygroundCode(source)).resolves.toBeUndefined()
+    },
+  )
+
+  it('keeps string import names and UTF-16 source ranges intact', async () => {
+    await expect(
+      executePlaygroundCode(`
+        const label = '文档📄'
+        import { "HeadingLevel" as headings } from 'docx'
+        [label, headings.HEADING_1]
+      `),
+    ).resolves.toEqual(['文档📄', 'Heading1'])
+  })
+
+  it('preserves dynamic imports', () => {
+    expect(prepareCode('import("external-package")')).toContain(
+      'import("external-package")',
+    )
+  })
+
+  it.each(['const value: number =', 'return 42; const value ='])(
+    'rejects invalid code: %s',
+    source => {
+      expect(() => prepareCode(source)).toThrow(SyntaxError)
+    },
+  )
+
   it('transforms createDocx configuration through runtime overrides', async () => {
     const transformConfig = vi.fn(config => config)
 

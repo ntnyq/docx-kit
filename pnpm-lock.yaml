@@ -278,7 +278,7 @@ importers:
         specifier: ^0.57.0
         version: 0.57.0
       sucrase:
-        specifier: ^3.35.1
+        specifier: 3.35.1
         version: 3.35.1
       vue:
         specifier: ^3.5.45

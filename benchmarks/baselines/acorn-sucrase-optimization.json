@@ -1,0 +1,270 @@
+{
+  "date": "2026-11-13",
+  "baselineCommit": "57b1db732e7ec82b2ec9fdeedde68ab961911056",
+  "dependencies": {
+    "acorn": "8.19.0",
+    "sucrase": "3.35.1"
+  },
+  "environment": {
+    "cpu": "Apple M1 Pro",
+    "node": "v24.22.1",
+    "os": "Darwin 27.0.0",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36"
+  },
+  "changes": [
+    "One Acorn parse instead of two; reverse source edits preserve import binding and final-expression behavior.",
+    "A production-only Sucrase profile folds transform selection to TypeScript, removes validation of the app-owned typed options, and removes unused source-map generation. Node and development use the normal public Sucrase entry.",
+    "Sucrase is pinned to 3.35.1. Build guards verify the caller options and audited dependency source structure; production differential tests compare the profiled bundle to normal Sucrase output."
+  ],
+  "method": {
+    "assets": "Actual Vite production compiler chunks; no WASM or additional runtime asset. Shared unchanged rolldown runtime excluded.",
+    "allAssets": "Sum of every Playground assets file, including lazy chunks, workers, fonts and CSS; this is not initial-page transfer.",
+    "gzip": "gzip level 9, deterministic mtime=0.",
+    "browserCold": "Nine fresh Chrome processes per variant, alternating before/after. Uncompressed loopback HTTP without network/CPU throttling; median includes compiler import and first basic conversion. Does not include DOCX generation or the rest of the app.",
+    "browserWarm": "Three rounds per variant in alternating order in one browser process, each in a fresh document. Engine/module caches may be reused.",
+    "nodeWarm": "Three fresh Node processes per variant in alternating order. Original source snapshot has only parameter/return type annotations removed and uses the normal Node package entries.",
+    "sampling": "100 warmups per scenario, nine batches of 100 conversions per round; median batch mean, then median of round medians. All round medians retained.",
+    "compatibility": "Production profile is covered by 17 differential source fixtures, including all eight presets, runtime enums, constructor properties, class fields, generic arrows, type imports and modern JS syntax. Invalid-source checks also run on the built bundle. Browser probes check runtime bindings, await/return, enum, constructor property, optional chaining and dynamic import.",
+    "earlierTrial": "An earlier transformer-only profile reduced size but showed no stable cold-start improvement; final measurements here include removal of the unused validator/source-map dependencies. Earlier raw samples remain under output/performance/acorn-sucrase-optimization/phase-one.",
+    "reproduceNode": "pnpm bench:prepare-code --output output/performance/prepare-code.json; add --module <baseline-module> to run a source snapshot.",
+    "maintenance": "Changing the Sucrase version, source layout, or compiler options requires reviewing the build profile. Guards fail the build instead of applying an unverified specialization."
+  },
+  "compilerAssets": {
+    "before": {
+      "name": "prepareCode-C5nJSAk9.js",
+      "bytes": 319472,
+      "gzipBytes": 80316,
+      "sha256": "9158a710c25aa7782209cea33fe8acb58e120bc9f38252e392f870a717113344"
+    },
+    "after": {
+      "name": "prepareCode-s7fszTTj.js",
+      "bytes": 252442,
+      "gzipBytes": 64164,
+      "sha256": "9473c7bfcd2bbc65ab5f93752dea605587a7e7cefb3a5880f09d1f7612bde8da"
+    }
+  },
+  "allApplicationAssetTotals": {
+    "before": {
+      "bytes": 18333050,
+      "gzipBytes": 4601824
+    },
+    "after": {
+      "bytes": 18266020,
+      "gzipBytes": 4585669
+    }
+  },
+  "browserColdStartup": {
+    "before": {
+      "medianMs": 18.600000001490116,
+      "samples": [
+        {
+          "importMs": 14.199999999254942,
+          "firstConversionMs": 5.699999999254942,
+          "totalFirstUseMs": 19.899999998509884
+        },
+        {
+          "importMs": 14.699999999254942,
+          "firstConversionMs": 5.899999998509884,
+          "totalFirstUseMs": 20.599999997764822
+        },
+        {
+          "importMs": 13.399999998509884,
+          "firstConversionMs": 6,
+          "totalFirstUseMs": 19.399999998509884
+        },
+        {
+          "importMs": 14.799999997019768,
+          "firstConversionMs": 5.900000002235174,
+          "totalFirstUseMs": 20.699999999254945
+        },
+        {
+          "importMs": 12,
+          "firstConversionMs": 5.800000000745058,
+          "totalFirstUseMs": 17.800000000745058
+        },
+        {
+          "importMs": 12.100000001490116,
+          "firstConversionMs": 5.800000000745058,
+          "totalFirstUseMs": 17.900000002235174
+        },
+        {
+          "importMs": 11.399999998509884,
+          "firstConversionMs": 5.800000000745058,
+          "totalFirstUseMs": 17.199999999254942
+        },
+        {
+          "importMs": 12.600000001490116,
+          "firstConversionMs": 5.899999998509884,
+          "totalFirstUseMs": 18.5
+        },
+        {
+          "importMs": 12.5,
+          "firstConversionMs": 6.100000001490116,
+          "totalFirstUseMs": 18.600000001490116
+        }
+      ]
+    },
+    "after": {
+      "medianMs": 16.100000001490116,
+      "samples": [
+        {
+          "importMs": 10.099999997764826,
+          "firstConversionMs": 7.600000001490116,
+          "totalFirstUseMs": 17.699999999254942
+        },
+        {
+          "importMs": 13.899999998509884,
+          "firstConversionMs": 9.400000002235174,
+          "totalFirstUseMs": 23.300000000745055
+        },
+        {
+          "importMs": 10.5,
+          "firstConversionMs": 5.600000001490116,
+          "totalFirstUseMs": 16.100000001490116
+        },
+        {
+          "importMs": 10.199999999254942,
+          "firstConversionMs": 5.800000000745058,
+          "totalFirstUseMs": 16
+        },
+        {
+          "importMs": 10.899999998509884,
+          "firstConversionMs": 5.800000000745058,
+          "totalFirstUseMs": 16.699999999254942
+        },
+        {
+          "importMs": 10.399999998509884,
+          "firstConversionMs": 5.700000002980232,
+          "totalFirstUseMs": 16.100000001490116
+        },
+        {
+          "importMs": 9.899999998509884,
+          "firstConversionMs": 5.900000002235174,
+          "totalFirstUseMs": 15.800000000745058
+        },
+        {
+          "importMs": 15.900000002235174,
+          "firstConversionMs": 5.699999999254942,
+          "totalFirstUseMs": 21.600000001490116
+        },
+        {
+          "importMs": 10.199999999254942,
+          "firstConversionMs": 5.199999999254942,
+          "totalFirstUseMs": 15.399999998509884
+        }
+      ]
+    }
+  },
+  "browserWarmConversion": [
+    {
+      "scenario": "basic",
+      "sourceBytes": 957,
+      "beforeMedianMs": 0.06599999997764826,
+      "afterMedianMs": 0.05099999997764826,
+      "speedup": 1.2941176471877263,
+      "beforeRoundMediansMs": [0.06899999998509884, 0.06599999997764826, 0.065],
+      "afterRoundMediansMs": [
+        0.05199999999254942, 0.05099999997764826, 0.04800000000745058
+      ]
+    },
+    {
+      "scenario": "comprehensive",
+      "sourceBytes": 9708,
+      "beforeMedianMs": 0.48799999997019766,
+      "afterMedianMs": 0.35399999998509885,
+      "speedup": 1.3785310734201677,
+      "beforeRoundMediansMs": [
+        0.47300000000745057, 0.4920000000298023, 0.48799999997019766
+      ],
+      "afterRoundMediansMs": [
+        0.34699999999254943, 0.3630000000074506, 0.35399999998509885
+      ]
+    },
+    {
+      "scenario": "typed-100",
+      "sourceBytes": 8003,
+      "beforeMedianMs": 0.6780000000074505,
+      "afterMedianMs": 0.5309999999776482,
+      "speedup": 1.2768361582598684,
+      "beforeRoundMediansMs": [0.665, 0.7010000000149011, 0.6780000000074505],
+      "afterRoundMediansMs": [
+        0.5309999999776482, 0.5569999999925495, 0.5289999999850988
+      ]
+    },
+    {
+      "scenario": "typed-1000",
+      "sourceBytes": 81804,
+      "beforeMedianMs": 13.026000000014902,
+      "afterMedianMs": 10.907000000029802,
+      "speedup": 1.1942789034545989,
+      "beforeRoundMediansMs": [
+        12.54199999999255, 13.026000000014902, 13.207999999970198
+      ],
+      "afterRoundMediansMs": [
+        10.45800000000745, 10.9589999999851, 10.907000000029802
+      ]
+    }
+  ],
+  "nodeWarmConversion": [
+    {
+      "scenario": "basic",
+      "sourceBytes": 957,
+      "beforeMedianMs": 0.11653791000000012,
+      "afterMedianMs": 0.07388875000000013,
+      "speedup": 1.577207761668724,
+      "beforeRoundMediansMs": [
+        0.11653791000000012, 0.10857666999999992, 0.11765250000000009
+      ],
+      "afterRoundMediansMs": [
+        0.07388875000000013, 0.07402791000000007, 0.07388000000000006
+      ]
+    },
+    {
+      "scenario": "comprehensive",
+      "sourceBytes": 9708,
+      "beforeMedianMs": 0.7906120899999997,
+      "afterMedianMs": 0.50244958,
+      "speedup": 1.5735152768960414,
+      "beforeRoundMediansMs": [
+        1.11462041, 0.7906120899999997, 0.7186816699999997
+      ],
+      "afterRoundMediansMs": [
+        0.50244958, 0.49005791000000043, 0.6470183299999996
+      ]
+    },
+    {
+      "scenario": "typed-100",
+      "sourceBytes": 8003,
+      "beforeMedianMs": 0.9064120800000001,
+      "afterMedianMs": 0.6507683300000008,
+      "speedup": 1.3928337293242266,
+      "beforeRoundMediansMs": [
+        0.9843979200000013, 0.9064120800000001, 0.87790166
+      ],
+      "afterRoundMediansMs": [
+        0.6507683300000008, 0.6253733300000011, 0.6905287499999986
+      ]
+    },
+    {
+      "scenario": "typed-1000",
+      "sourceBytes": 81804,
+      "beforeMedianMs": 11.70908875000001,
+      "afterMedianMs": 7.5127620800000114,
+      "speedup": 1.5585597714016777,
+      "beforeRoundMediansMs": [
+        10.82787042, 11.773959580000001, 11.70908875000001
+      ],
+      "afterRoundMediansMs": [
+        7.604642080000003, 7.5127620800000114, 7.202924589999993
+      ]
+    }
+  ],
+  "validation": {
+    "tests": "135 files, 1587 tests passed",
+    "lint": "passed",
+    "typecheck": "workspace and application checks passed",
+    "appsVerify": "generated declarations, both application builds and compiler bundle budget passed",
+    "productionProfile": "17 differential source fixtures plus two invalid-input cases passed against the built profile",
+    "browserSmoke": "Production preview generated the comprehensive document automatically and after clicking Run"
+  }
+}

@@ -15,41 +15,21 @@ export function prepareCode(raw: string): string {
     keepUnusedImports: true,
     transforms: ['typescript'],
   }).code.trim()
-  body = replaceImports(body)
-
-  // Return the complete final expression, regardless of line breaks or comments.
+  // Parse emitted JavaScript once; applying edits from right to left keeps all
+  // source ranges valid while imports and the final expression are rewritten.
   const program = parse(body, {
-    allowAwaitOutsideFunction: true,
-    allowReturnOutsideFunction: true,
-    ecmaVersion: 'latest',
-  })
-  const last = program.body.at(-1)
-  if (last?.type === 'ExpressionStatement') {
-    body = `${body.slice(0, last.start)}return (${body.slice(last.expression.start, last.expression.end)});${body.slice(last.end)}`
-  }
-
-  // Wrap in async IIFE so user `await` works.
-  return `"use strict";
-return (async () => {
-${body}
-})()`
-}
-
-/**
- * Replace ESM imports with bindings from the executor's runtime arguments.
- *
- * TypeScript has already been removed. Only actual import declarations are
- * rewritten; strings, comments and dynamic imports retain their content.
- */
-function replaceImports(source: string): string {
-  const program = parse(source, {
     allowAwaitOutsideFunction: true,
     allowReturnOutsideFunction: true,
     ecmaVersion: 'latest',
     sourceType: 'module',
   })
+  let hasFollowingStatement = false
   for (const statement of program.body.toReversed()) {
     if (statement.type !== 'ImportDeclaration') {
+      if (!hasFollowingStatement && statement.type === 'ExpressionStatement') {
+        body = `${body.slice(0, statement.start)}return (${body.slice(statement.expression.start, statement.expression.end)});${body.slice(statement.end)}`
+      }
+      hasFollowingStatement = true
       continue
     }
     const namespace =
@@ -87,7 +67,14 @@ function replaceImports(source: string): string {
         ]
       : []
     const replacement = bindings.join('\n')
-    source = `${source.slice(0, statement.start)}${replacement}${source.slice(statement.end)}`
+    // A rewritten import with bindings is a declaration in the emitted code;
+    // erased imports do not hide an earlier final expression.
+    hasFollowingStatement ||= replacement.length > 0
+    body = `${body.slice(0, statement.start)}${replacement}${body.slice(statement.end)}`
   }
-  return source
+  // The async arrow inherits the executor's arguments for runtime bindings.
+  return `"use strict";
+return (async () => {
+${body}
+})()`
 }

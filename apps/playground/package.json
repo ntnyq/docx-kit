@@ -21,7 +21,7 @@
     "docx": "^9.15.3",
     "docx-kit": "workspace:*",
     "monaco-editor": "^0.57.0",
-    "sucrase": "^3.35.1",
+    "sucrase": "3.35.1",
     "vue": "^3.5.45",
     "vue-i18n": "^11.4.18"
   },

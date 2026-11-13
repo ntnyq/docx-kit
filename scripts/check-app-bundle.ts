@@ -5,6 +5,7 @@ import process from 'node:process'
 const KIBIBYTE = 1024
 const MEBIBYTE = 1024 * KIBIBYTE
 const budgets = {
+  codeCompiler: 256 * KIBIBYTE,
   editorWorker: 350 * KIBIBYTE,
   lazyChunk: 3 * MEBIBYTE,
   playgroundRoute: 512 * KIBIBYTE,
@@ -41,10 +42,14 @@ const editorWorkers = assets.filter(asset =>
 const typescriptWorkers = assets.filter(asset =>
   /^ts\.worker-.+\.js$/u.test(asset.name),
 )
+const codeCompilers = assets.filter(asset =>
+  /^prepareCode-.+\.js$/u.test(asset.name),
+)
 
 requireAssets('playground route chunk', playgroundChunks)
 requireAssets('Monaco editor worker', editorWorkers, 1)
 requireAssets('Monaco TypeScript worker', typescriptWorkers, 1)
+requireAssets('code compiler', codeCompilers, 1)
 
 for (const asset of assets) {
   const workerName = asset.name.split('-')[0]
@@ -58,6 +63,7 @@ for (const asset of assets) {
 checkBudgets(playgroundChunks, budgets.playgroundRoute, 'playground route')
 checkBudgets(editorWorkers, budgets.editorWorker, 'editor worker')
 checkBudgets(typescriptWorkers, budgets.typescriptWorker, 'TypeScript worker')
+checkBudgets(codeCompilers, budgets.codeCompiler, 'code compiler')
 checkBudgets(
   assets.filter(asset => !asset.name.includes('.worker-')),
   budgets.lazyChunk,
@@ -82,6 +88,7 @@ if (errors.length > 0) {
       `Playground route: ${formatBytes(largestPlaygroundChunk.bytes)} / ${formatBytes(budgets.playgroundRoute)}.`,
       `Largest lazy chunk: ${formatBytes(largestLazyChunk.bytes)} / ${formatBytes(budgets.lazyChunk)}.`,
       `TypeScript worker: ${formatBytes(typescriptWorkers[0].bytes)} / ${formatBytes(budgets.typescriptWorker)}.`,
+      `Code compiler: ${formatBytes(codeCompilers[0].bytes)} / ${formatBytes(budgets.codeCompiler)}.`,
     ].join(' '),
   )
 }
